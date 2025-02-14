@@ -12,8 +12,8 @@ impl MigrationTrait for Migration {
             r#"
             CREATE TABLE users(
                 id uuid PRIMARY KEY,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 m_address TEXT CHECK(m_address ~ '^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp') NOT NULL,

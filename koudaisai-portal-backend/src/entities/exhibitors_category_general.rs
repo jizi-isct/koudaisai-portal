@@ -3,29 +3,23 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "users")]
+#[sea_orm(table_name = "exhibitors_category_general")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub id: Uuid,
-    pub created_at: Option<DateTimeWithTimeZone>,
-    pub updated_at: Option<DateTimeWithTimeZone>,
-    #[sea_orm(column_type = "Text")]
-    pub first_name: String,
-    #[sea_orm(column_type = "Text")]
-    pub last_name: String,
-    #[sea_orm(column_type = "Text")]
-    pub m_address: String,
-    #[sea_orm(column_type = "Text")]
-    pub password_hash: String,
-    #[sea_orm(column_type = "Text")]
-    pub exhibition_id: String,
+    pub id: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub location: Option<String>,
+    pub starting_time_day1: Option<DateTimeWithTimeZone>,
+    pub ending_time_day1: Option<DateTimeWithTimeZone>,
+    pub starting_time_day2: Option<DateTimeWithTimeZone>,
+    pub ending_time_day2: Option<DateTimeWithTimeZone>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::exhibitors_root::Entity",
-        from = "Column::ExhibitionId",
+        from = "Column::Id",
         to = "super::exhibitors_root::Column::Id",
         on_update = "NoAction",
         on_delete = "NoAction"

@@ -24,8 +24,8 @@ impl MigrationTrait for Migration {
                 r#"
                 CREATE TABLE exhibitors_root(
                     id char(5) PRIMARY KEY,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+                    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
                     exhibitor_name text NOT NULL,
                     type exhibition_type NOT NULL,
                     exhibition_name text,

@@ -2,6 +2,10 @@
 
 pub mod prelude;
 
+pub mod exhibitors_category_booth;
+pub mod exhibitors_category_general;
+pub mod exhibitors_category_labo;
+pub mod exhibitors_category_stage;
 pub mod exhibitors_root;
 pub mod sea_orm_active_enums;
 pub mod users;
