@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
                 manager.get_database_backend(),
                 r#"
                 CREATE TABLE exhibitors_category_booth(
-                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root,
+                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root DEFERRABLE INITIALLY DEFERRED,
                     location text,
                     starting_time_day1 timestamp with time zone,
                     ending_time_day1 timestamp with time zone,
@@ -31,7 +31,7 @@ impl MigrationTrait for Migration {
                 manager.get_database_backend(),
                 r#"
                 CREATE TABLE exhibitors_category_general(
-                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root,
+                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root DEFERRABLE INITIALLY DEFERRED,
                     location text,
                     starting_time_day1 timestamp with time zone,
                     ending_time_day1 timestamp with time zone,
@@ -60,7 +60,7 @@ impl MigrationTrait for Migration {
                 manager.get_database_backend(),
                 r#"
                 CREATE TABLE exhibitors_category_stage(
-                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root,
+                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root DEFERRABLE INITIALLY DEFERRED,
                     type stage_type
                 );
                 "#
@@ -74,7 +74,7 @@ impl MigrationTrait for Migration {
                 manager.get_database_backend(),
                 r#"
                 CREATE TABLE exhibitors_category_labo(
-                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root,
+                    id char(5) PRIMARY KEY NOT NULL REFERENCES exhibitors_root DEFERRABLE INITIALLY DEFERRED,
                     location text,
                     starting_time_day1 timestamp with time zone,
                     ending_time_day1 timestamp with time zone,

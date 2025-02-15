@@ -31,9 +31,9 @@ impl MigrationTrait for Migration {
                     exhibition_name text,
                     icon_id text,
                     description text,
-                    representative1 uuid REFERENCES users,
-                    representative2 uuid REFERENCES users,
-                    representative3 uuid REFERENCES users
+                    representative1 uuid REFERENCES users DEFERRABLE INITIALLY DEFERRED,
+                    representative2 uuid REFERENCES users DEFERRABLE INITIALLY DEFERRED,
+                    representative3 uuid REFERENCES users DEFERRABLE INITIALLY DEFERRED
                 );
                 "#
                 .trim(),
