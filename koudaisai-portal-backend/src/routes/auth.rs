@@ -1,22 +1,18 @@
-use std::net::SocketAddr;
-use crate::config::Web;
 use crate::entities::prelude::Users;
 use crate::entities::users;
-use crate::routes;
 use crate::routes::AppState;
-use crate::util::{digest, stretch};
-use axum::body::Body;
+use crate::util::stretch;
 use axum::extract::{ConnectInfo, State};
 use axum::handler::Handler;
-use axum::http::{Request, StatusCode};
-use axum::response::Response;
+use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, EntityTrait};
 use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
 use std::sync::Arc;
-use tracing::{debug, instrument, trace, warn};
+use tracing::{debug, instrument, warn};
 use uuid::Uuid;
 
 #[instrument(name = "init /auth")]
@@ -42,15 +38,16 @@ async fn activate(
         payload.uuid.to_string().as_str(),
         state.web.auth.activation_salt.as_str(),
         2_i32.pow(state.web.auth.stretch_cost as u32) as u32,
-    ).await;
-    
+    )
+    .await;
+
     if payload.token == hash {
         let user = match Users::find_by_id(payload.uuid).one(&state.db_conn).await {
             Ok(Some(user)) => user,
             Ok(None) => {
                 debug!("404 Not Found");
-                return StatusCode::NOT_FOUND
-            },
+                return StatusCode::NOT_FOUND;
+            }
             Err(err) => {
                 warn!("internal server error occurred while finding user: {}", err);
                 return StatusCode::INTERNAL_SERVER_ERROR;
@@ -76,7 +73,10 @@ async fn activate(
         match user.update(&state.db_conn).await {
             Ok(_) => StatusCode::OK,
             Err(err) => {
-                warn!("internal server error occurred while updating user: {}", err);
+                warn!(
+                    "internal server error occurred while updating user: {}",
+                    err
+                );
                 StatusCode::INTERNAL_SERVER_ERROR
             }
         }

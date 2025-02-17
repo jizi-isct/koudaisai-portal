@@ -1,16 +1,18 @@
 mod auth;
 
-use std::net::SocketAddr;
 use crate::config::Web;
+use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::{Router, ServiceExt};
 use sea_orm::DatabaseConnection;
+use std::net::SocketAddr;
 use std::sync::Arc;
-use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
-use axum::routing::IntoMakeService;
 use tracing::{debug, instrument};
 
 #[instrument(skip(web))]
-pub fn init_routes(web: &Web, db_conn: DatabaseConnection) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
+pub fn init_routes(
+    web: &Web,
+    db_conn: DatabaseConnection,
+) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
         web: web.clone(),

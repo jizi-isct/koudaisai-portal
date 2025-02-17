@@ -11,7 +11,7 @@ pub fn init_config() -> Result<Config, ConfyError> {
 pub struct Config {
     pub logging: Logging,
     pub web: Web,
-    pub db: Db
+    pub db: Db,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
@@ -49,7 +49,7 @@ impl LogLevel {
 #[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct Web {
     pub server: Server,
-    pub auth: Auth
+    pub auth: Auth,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -69,7 +69,7 @@ impl Default for Server {
 pub struct Auth {
     pub password_salt: String,
     pub activation_salt: String,
-    pub stretch_cost: u8
+    pub stretch_cost: u8,
 }
 
 impl Default for Auth {
@@ -83,8 +83,7 @@ impl Default for Auth {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Db {
-    pub address: String
+    pub address: String,
 }
