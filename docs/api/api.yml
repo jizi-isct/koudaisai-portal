@@ -1,0 +1,82 @@
+openapi: 3.0.3
+
+info:
+  title: 工大祭API
+  description: |-
+    工大祭のapiです。
+  version: "1"
+tags:
+  - name: auth
+
+paths:
+  /auth/v1/activate:
+    post:
+      summary: "ユーザーを有効化する。"
+      tags: [auth]
+      parameters:
+        - in: query
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: "ユーザーのuuid"
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: "ユーザーのactivation token"
+      responses:
+        "200":
+          description: "OK"
+        "409":
+          description: "ユーザーが既に有効化されている"
+        "400":
+          description: "不正なrequest bodyの形式"
+  /auth/v1/login:
+    post:
+      summary: "資格情報を検証し、アクセストークンを発行する。"
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+        "401":
+          description: "資格情報が無効だった場合"
+        "400":
+          description: "不正なrequest bodyの形式"
+
+
+
+
+components:
+  schemas:
+    Login:
+      properties:
+        m_address:
+          description: "mアドレス(新旧どちらも含む)"
+          type: string
+          pattern: ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+          example: "johnson.p.5703@m.isct.ac.jp"
+        password:
+          description: "パスワード"
+          type: string
+          example: "carryL0v3"
+    LoginSuccess:
+      properties:
+        access_token:
+          description: "アクセストークン(jwt)"
+          type: string
+          format: jwt
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U"
+
