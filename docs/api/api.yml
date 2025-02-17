@@ -13,20 +13,12 @@ paths:
     post:
       summary: "ユーザーを有効化する。"
       tags: [auth]
-      parameters:
-        - in: query
-          name: uuid
-          schema:
-            type: string
-            format: uuid
-          required: true
-          description: "ユーザーのuuid"
-        - in: query
-          name: token
-          schema:
-            type: string
-          required: true
-          description: "ユーザーのactivation token"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Activate"
       responses:
         "200":
           description: "OK"
@@ -75,6 +67,19 @@ paths:
 
 components:
   schemas:
+    Activate:
+      properties:
+        uuid:
+          description: "ユーザーのuuid"
+          type: string
+          format: uuid
+        token:
+          description: "ユーザーのactivation token"
+          type: string
+        password:
+          description: "パスワード"
+          type: string
+          example: "carryL0v3"
     Login:
       properties:
         m_address:
