@@ -1,0 +1,11 @@
+.header{
+    padding: 20px;
+    position: relative;
+    text-align: center;
+}
+
+.logoWrapper{
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
