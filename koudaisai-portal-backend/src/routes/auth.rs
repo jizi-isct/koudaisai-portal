@@ -34,14 +34,14 @@ async fn activate(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ActivatePayload>,
 ) -> StatusCode {
-    let hash = stretch(
+    let right_token = stretch_with_salt(
         payload.uuid.to_string().as_str(),
         state.web.auth.activation_salt.as_str(),
         2_i32.pow(state.web.auth.stretch_cost as u32) as u32,
     )
     .await;
 
-    if payload.token == hash {
+    if digest(&*payload.token) == digest(&*right_token) {
         let user = match Users::find_by_id(payload.uuid).one(&state.db_conn).await {
             Ok(Some(user)) => user,
             Ok(None) => {
@@ -65,7 +65,7 @@ async fn activate(
         let mut user: users::ActiveModel = user.into();
 
         user.password_hash = Set(Some(
-            stretch(
+            stretch_with_salt(
                 payload.password.to_string().as_str(),
                 &*password_salt,
                 2_i32.pow(state.web.auth.stretch_cost as u32) as u32,
