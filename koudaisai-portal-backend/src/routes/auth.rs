@@ -1,24 +1,39 @@
 use crate::entities::prelude::Users;
 use crate::entities::users;
 use crate::routes::AppState;
-use crate::util::stretch;
+use crate::util::{digest, stretch_with_salt};
 use axum::extract::{ConnectInfo, State};
-use axum::http::StatusCode;
+use axum::http::{Method, StatusCode};
 use axum::routing::post;
 use axum::{Json, Router};
+use axum_gcra::gcra::Quota;
+use axum_gcra::real_ip::RealIp;
+use axum_gcra::RateLimitLayer;
 use sea_orm::ActiveValue::Set;
 use sea_orm::ColumnTrait;
 use sea_orm::{ActiveModelTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
+use std::num::{NonZeroU32, NonZeroU64};
 use std::sync::Arc;
+use std::time::Duration;
 use tracing::{debug, instrument, warn};
 use uuid::Uuid;
 
 #[instrument(name = "init /auth")]
 pub fn init_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
     Router::new()
-        .route("/v1/activate", post(activate))
+        .route(
+            "/v1/activate",
+            post(activate)
+        )
+        .route_layer(
+            RateLimitLayer::<RealIp>::builder()
+                .with_default_quota(Quota::simple(Duration::from_secs(10)))
+                .with_global_fallback(true)
+                .with_gc_interval(Duration::from_secs(5))
+                .default_handle_error(),
+        )
         .with_state(Arc::clone(&state))
 }
 

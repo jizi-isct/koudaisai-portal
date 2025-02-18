@@ -17,3 +17,4 @@ sha2 = "0.10.8"
 uuid = { version = "1.13.1", features = ["v4"] }
 rand = "0.9.0"
 migration = { path = "migration" }
+axum_gcra = { git = "https://github.com/pasmophobia/axum_gcra.git", branch = "axum-0.8" }
