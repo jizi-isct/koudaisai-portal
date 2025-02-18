@@ -23,10 +23,7 @@ use uuid::Uuid;
 #[instrument(name = "init /auth")]
 pub fn init_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
     Router::new()
-        .route(
-            "/v1/activate",
-            post(activate)
-        )
+        .route("/v1/activate", post(activate))
         .route_layer(
             RateLimitLayer::<RealIp>::builder()
                 .with_default_quota(Quota::simple(Duration::from_secs(10)))
@@ -57,6 +54,7 @@ async fn activate(
     .await;
 
     if digest(&*payload.token) == digest(&*right_token) {
+        //文字列比較の計算時間からトークンを推測されないようにdigestしてから比較
         let user = match Users::find_by_id(payload.uuid).one(&state.db_conn).await {
             Ok(Some(user)) => user,
             Ok(None) => {
