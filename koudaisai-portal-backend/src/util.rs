@@ -1,3 +1,4 @@
+use sha2::digest::Update;
 use sha2::{Digest, Sha256};
 
 pub async fn stretch(data: &str, salt: &str, n: u32) -> String {
@@ -5,7 +6,11 @@ pub async fn stretch(data: &str, salt: &str, n: u32) -> String {
 }
 
 pub fn digest(data: &str, salt: &str) -> String {
-    hex(Sha256::digest([salt, data].concat()).as_slice())
+    hex(Sha256::new()
+        .chain(salt)
+        .chain(data.as_bytes())
+        .finalize()
+        .as_slice())
 }
 
 fn hex(bytes: &[u8]) -> String {

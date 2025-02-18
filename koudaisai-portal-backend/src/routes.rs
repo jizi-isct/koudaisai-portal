@@ -2,7 +2,7 @@ mod auth;
 
 use crate::config::Web;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
-use axum::{Router, ServiceExt};
+use axum::Router;
 use sea_orm::DatabaseConnection;
 use std::net::SocketAddr;
 use std::sync::Arc;

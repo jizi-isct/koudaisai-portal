@@ -13,10 +13,11 @@ pub struct Model {
     pub first_name: String,
     #[sea_orm(column_type = "Text")]
     pub last_name: String,
-    #[sea_orm(column_type = "Text")]
+    #[sea_orm(column_type = "Text", unique)]
     pub m_address: String,
     #[sea_orm(column_type = "Text", nullable)]
     pub password_hash: Option<String>,
+    pub password_salt: String,
     #[sea_orm(column_type = "Text")]
     pub exhibition_id: String,
 }

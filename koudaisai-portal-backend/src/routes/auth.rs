@@ -3,12 +3,12 @@ use crate::entities::users;
 use crate::routes::AppState;
 use crate::util::stretch;
 use axum::extract::{ConnectInfo, State};
-use axum::handler::Handler;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::ColumnTrait;
+use sea_orm::{ActiveModelTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -60,12 +60,14 @@ async fn activate(
             return StatusCode::CONFLICT;
         }
 
+        let password_salt = (&user.password_salt).to_string();
+
         let mut user: users::ActiveModel = user.into();
 
         user.password_hash = Set(Some(
             stretch(
                 payload.password.to_string().as_str(),
-                state.web.auth.activation_salt.as_str(),
+                &*password_salt,
                 2_i32.pow(state.web.auth.stretch_cost as u32) as u32,
             )
             .await,

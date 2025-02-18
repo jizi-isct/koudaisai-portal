@@ -6,7 +6,7 @@
 ## dbのリセット
 `$ sea-orm-cli migrate refresh -u postgres://postgres:postgres@localhost/koudaisai-portal`
 ## entityの生成
-`$ sea-orm-cli generate entity -u postgres://postgres:postgres@localhost/koudaisai-portal ./src/entities`
+`$ sea-orm-cli generate entity -u postgres://postgres:postgres@localhost/koudaisai-portal -o ./src/entities`
 # デバッグ用データ挿入クエリ
 ```postgresql
 BEGIN;
