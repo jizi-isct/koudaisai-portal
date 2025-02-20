@@ -1,0 +1,13 @@
+.headerButton{
+    align-items: center;
+    border-radius: 100vw;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 15px 35px;
+    display: inline-block;
+    border: 2px solid;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    margin: 0 10px;
+}
