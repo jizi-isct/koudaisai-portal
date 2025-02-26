@@ -5,7 +5,7 @@ use crate::util::jwt;
 use crate::util::sha::{digest, stretch_with_salt};
 use axum::extract::{ConnectInfo, State};
 use axum::http::StatusCode;
-use axum::routing::post;
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use axum_gcra::gcra::Quota;
 use axum_gcra::real_ip::RealIp;
@@ -26,6 +26,7 @@ use uuid::Uuid;
 pub fn init_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
     Router::new()
         .route("/v1/activate", post(activate))
+        .route("/v1/login", get(login))
         .route_layer(
             RateLimitLayer::<RealIp>::builder()
                 .with_default_quota(Quota::simple(Duration::from_secs(10)))
@@ -103,11 +104,13 @@ async fn activate(
     }
 }
 
+#[derive(Serialize, Deserialize)]
 struct LoginPayload {
     m_address: String,
     password: String,
 }
 
+#[derive(Serialize, Deserialize)]
 struct LoginResponse {
     access_token: String,
     refresh_token: String,

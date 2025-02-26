@@ -27,7 +27,7 @@ paths:
         "400":
           description: "不正なrequest bodyの形式"
   /auth/v1/login:
-    post:
+    get:
       summary: "資格情報を検証し、アクセストークンを発行する。"
       tags: [auth]
       requestBody:
