@@ -1,0 +1,44 @@
+.forms{
+    width: 35%;
+    border: 1px solid var(--darkblue);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 4px 4px 0px 0px var(--darkblue);
+    margin: 30px;
+    min-height: 160px;
+}
+
+.titleWrapper{
+    text-align: right;
+    position: relative;
+    margin: 0 0 8px 0 ;
+}
+
+.titleWrapper h2{
+    font-size: 17px;
+    letter-spacing: 0.32px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.status, .dueDate, .title{
+    display: inline-block;
+}
+
+.status, .dueDate{
+    margin: 0 5px;
+}
+
+.title{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.summary{
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    letter-spacing: 0.32px;
+}

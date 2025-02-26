@@ -1,11 +1,14 @@
 .header{
-    padding: 20px;
+    padding: 30px;
     position: relative;
     text-align: center;
 }
 
 .logoWrapper{
-    text-align: left;
+    position: absolute;
+    top: 50%;
+    left: 50px;
+    transform: translateY(-50%);
 }
 
 .menuWrapper{

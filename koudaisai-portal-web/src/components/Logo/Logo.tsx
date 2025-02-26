@@ -2,18 +2,26 @@ import Image from "next/image";
 import styles from "./Logo.module.css";
 
 type LogoProps = { // ①
-    width?: number;
+    height?: number;
+    hasText?: boolean;
 };
 
-const Logo = ({width = 40}: LogoProps) => {
+const Logo = ({height = 40, hasText = false}: LogoProps) => {
   return (
     <div className={styles.logo}>
         <Image
             src="/components/Logo/logo_tmp.svg"
             alt="Koudaisai Portal Logo"
-            width={width}
-            height={width}
+            width={height}
+            height={height}
         />
+        <div className={styles.logoTextWrapper} style={{height: height}}>
+          <h1 
+            className={styles.logoText}
+            style={{marginTop: height / 2  ,display: hasText ? 'inline-block' : 'none', fontSize: height * 0.4}}
+          >工大祭ポータル</h1>
+        </div>
+        
     </div>
 
   );

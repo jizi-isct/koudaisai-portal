@@ -6,25 +6,25 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.logoWrapper}>
-        <Logo />
-        <h1 className={styles.title}>工大祭ポータル</h1>
+        <Logo height={50} hasText />
       </div>
       <div className={styles.menuWrapper}>
-        <HeaderButton 
+        <HeaderButton
           text="ホーム"
-          onClick="/" 
+          onClick="/"
+          isClicked={true}
         />
         <HeaderButton 
           text="フォーム"
-          onClick="/" 
+          onClick="/forms" 
         />
         <HeaderButton 
-          text="資料資料"
+          text="資料"
           onClick="/" 
         />
         <HeaderButton 
           text="よくある質問"
-          onClick="/" 
+          onClick="/questions" 
         />
       </div>
     </header>
