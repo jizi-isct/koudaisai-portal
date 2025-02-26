@@ -3,6 +3,7 @@ mod auth;
 use crate::config::Web;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::Router;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use sea_orm::DatabaseConnection;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -17,6 +18,8 @@ pub fn init_routes(
     let state = Arc::new(AppState {
         web: web.clone(),
         db_conn,
+        jwt_encoding_key: web.auth.get_jwt_encoding_key().unwrap(),
+        jwt_decoding_key: web.auth.get_jwt_decoding_key().unwrap(),
     });
     Router::new()
         .nest("/auth", auth::init_router(Arc::clone(&state)))
@@ -24,8 +27,9 @@ pub fn init_routes(
         .into_make_service_with_connect_info::<SocketAddr>()
 }
 
-#[derive(Debug)]
 struct AppState {
     pub web: Web,
     pub db_conn: DatabaseConnection,
+    pub jwt_encoding_key: EncodingKey,
+    pub jwt_decoding_key: DecodingKey,
 }

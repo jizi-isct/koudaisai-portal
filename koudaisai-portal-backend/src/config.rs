@@ -1,6 +1,8 @@
 use confy::ConfyError;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
+use std::fs;
 use tracing_core::LevelFilter;
 
 pub fn init_config() -> Result<Config, ConfyError> {
@@ -80,6 +82,8 @@ pub struct Auth {
     pub password_salt: String,
     pub activation_salt: String,
     pub stretch_cost: u8,
+    pub jwt_secret_key_path: String,
+    pub jwt_public_key_path: String,
 }
 
 impl Default for Auth {
@@ -89,7 +93,19 @@ impl Default for Auth {
             password_salt: Alphanumeric.sample_string(&mut rng, 16),
             activation_salt: Alphanumeric.sample_string(&mut rng, 16),
             stretch_cost: 13,
+            jwt_secret_key_path: "./secret_key".parse().unwrap(),
+            jwt_public_key_path: "./public_key".parse().unwrap(),
         }
+    }
+}
+
+impl Auth {
+    pub(crate) fn get_jwt_encoding_key(&self) -> jsonwebtoken::errors::Result<EncodingKey> {
+        EncodingKey::from_rsa_pem(fs::read(&self.jwt_secret_key_path).unwrap().as_slice())
+    }
+
+    pub(crate) fn get_jwt_decoding_key(&self) -> jsonwebtoken::errors::Result<DecodingKey> {
+        DecodingKey::from_rsa_pem(fs::read(&self.jwt_public_key_path).unwrap().as_slice())
     }
 }
 

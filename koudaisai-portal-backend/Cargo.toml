@@ -18,3 +18,6 @@ uuid = { version = "1.13.1", features = ["v4"] }
 rand = "0.9.0"
 migration = { path = "migration" }
 axum_gcra = { git = "https://github.com/pasmophobia/axum_gcra.git", branch = "axum-0.8" }
+jsonwebtoken = "9.3.1"
+serde_repr = "0.1.19"
+chrono = "0.4.39"
