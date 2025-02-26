@@ -14,9 +14,19 @@ pub struct Config {
     pub db: Db,
 }
 
-#[derive(Serialize, Deserialize, Default, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Logging {
     pub log_level: LogLevel,
+    pub json: bool,
+}
+
+impl Default for Logging {
+    fn default() -> Self {
+        Self {
+            log_level: LogLevel::default(),
+            json: true,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -19,7 +19,7 @@ const PATCH_VERSION: u32 = pkg_version_patch!();
 async fn main() {
     //初期化
     let config = init_config().unwrap();
-    init_logging(config.logging.log_level.to_level_filter());
+    init_logging(config.logging);
     info!(
         "Koudaisai Portal v{}.{}.{} (c) 2025 JIZI All Rights Reserved.",
         MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION
