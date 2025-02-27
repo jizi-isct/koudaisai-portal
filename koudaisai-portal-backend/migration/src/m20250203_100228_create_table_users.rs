@@ -35,7 +35,8 @@ impl MigrationTrait for Migration {
                     RETURN NEW;
                 END;
                 $$ language 'plpgsql';
-                "#.trim(),
+                "#
+                .trim(),
             ))
             .await?;
 
@@ -48,7 +49,8 @@ impl MigrationTrait for Migration {
                     BEFORE UPDATE ON users
                     FOR EACH ROW
                     EXECUTE PROCEDURE update_timestamp();
-                "#.trim(),
+                "#
+                .trim(),
             ))
             .await?;
 

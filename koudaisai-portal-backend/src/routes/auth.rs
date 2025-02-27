@@ -11,6 +11,7 @@ use axum_gcra::gcra::Quota;
 use axum_gcra::real_ip::RealIp;
 use axum_gcra::RateLimitLayer;
 use chrono::Utc;
+use rand::distr::{Alphanumeric, SampleString};
 use sea_orm::ActiveValue::Set;
 use sea_orm::ColumnTrait;
 use sea_orm::QueryFilter;
@@ -22,8 +23,8 @@ use std::time::Duration;
 use tracing::{debug, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "init /auth", skip(state))]
-pub fn init_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
+#[instrument(name = "init /auth")]
+pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/v1/activate", post(activate))
         .route("/v1/login", get(login))
@@ -34,7 +35,6 @@ pub fn init_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
                 .with_gc_interval(Duration::from_secs(5))
                 .default_handle_error(),
         )
-        .with_state(Arc::clone(&state))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -154,12 +154,17 @@ async fn login(
     };
 
     if digest(&*prompted_hash) == digest(&*password_hash) {
-        let access_token_claim = jwt::Claims {
+        let mut rng = rand::rng();
+        let access_token_claims = jwt::Claims {
+            iss: jwt::JWT_ISS.to_string(),
+            sub: user.id.to_string(),
             exp: Utc::now().timestamp() as usize + jwt::ACCESS_TOKEN_EXPIRE_TIME,
-            iss: "jizi".parse().unwrap(),
-            typ: jwt::AccountType::User,
+            iat: Utc::now().timestamp() as usize,
+            nonce: Alphanumeric.sample_string(&mut rng, 16),
+            typ: jwt::Typ::AccessToken.to_string(),
+            role: jwt::Role::User.to_string(),
         };
-        let access_token = match jwt::encode(&access_token_claim, &state.jwt_encoding_key) {
+        let access_token = match jwt::encode(&access_token_claims, &state.jwt_encoding_key) {
             Ok(token) => token,
             Err(err) => {
                 warn!(
@@ -170,12 +175,16 @@ async fn login(
             }
         };
 
-        let refresh_token_claim = jwt::Claims {
+        let refresh_token_claims = jwt::Claims {
+            iss: jwt::JWT_ISS.to_string(),
+            sub: user.id.to_string(),
             exp: Utc::now().timestamp() as usize + jwt::REFRESH_TOKEN_EXPIRE_TIME,
-            iss: "jizi".parse().unwrap(),
-            typ: jwt::AccountType::User,
+            iat: Utc::now().timestamp() as usize,
+            nonce: Alphanumeric.sample_string(&mut rng, 16),
+            typ: jwt::Typ::RefreshToken.to_string(),
+            role: jwt::Role::User.to_string(),
         };
-        let refresh_token = match jwt::encode(&refresh_token_claim, &state.jwt_encoding_key) {
+        let refresh_token = match jwt::encode(&refresh_token_claims, &state.jwt_encoding_key) {
             Ok(token) => token,
             Err(err) => {
                 warn!(

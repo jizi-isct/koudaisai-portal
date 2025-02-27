@@ -109,6 +109,14 @@ impl Auth {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct KeyCloak {
+    pub keycloak_id: String,
+    pub keycloak_secret: String,
+    pub keycloak_issuer: String,
+    pub keycloak_logout: String,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Db {
     pub address: String,

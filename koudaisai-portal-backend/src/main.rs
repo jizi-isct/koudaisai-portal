@@ -8,8 +8,11 @@ use tracing::info;
 pub mod config;
 mod db;
 pub mod entities;
+mod forms;
 pub mod logging;
+pub mod middlewares;
 mod routes;
+mod user;
 pub mod util;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();

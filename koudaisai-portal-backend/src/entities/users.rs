@@ -32,11 +32,19 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     ExhibitorsRoot,
+    #[sea_orm(has_many = "super::form_responses::Entity")]
+    FormResponses,
 }
 
 impl Related<super::exhibitors_root::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::ExhibitorsRoot.def()
+    }
+}
+
+impl Related<super::form_responses::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::FormResponses.def()
     }
 }
 
