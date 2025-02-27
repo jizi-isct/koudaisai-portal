@@ -1,0 +1,45 @@
+.formTitleWrapper{
+    min-width: 600px;
+    width: 50vw;
+    border: 1px solid var(--darkblue);
+    border-radius: 10px;
+    padding: 15px 25px;
+    box-shadow: 4px 4px 0px 0px var(--darkblue);
+    margin: 30px;
+    display: inline-block;
+    text-align: left;
+    background-color: white;
+}
+
+.formWrapper{
+    width: 600px;
+    width: 50vw;
+    border: 1px solid var(--darkblue);
+    border-radius: 10px;
+    padding: 15px 25px;
+    box-shadow: 4px 4px 0px 0px var(--darkblue);
+    margin: 30px;
+    display: inline-block;
+    text-align: left;
+    background-color: white;
+}
+
+.main{
+    text-align: center;
+}
+
+.formTitleWrapper h1{
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%;
+}
+
+.formTitleWrapper p{
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    letter-spacing: 0.45px;
+    margin: 20px 0 10px;
+}
