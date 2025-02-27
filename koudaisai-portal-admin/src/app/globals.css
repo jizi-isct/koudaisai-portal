@@ -2,8 +2,9 @@
   --background: #F2F5FF;
   --foreground: #171717;
   --darkblue: #0048FF;
+  --lightblue: #9BB2FF;
   --gray: #B2B2B2;
-  --lightgray: #EEEEEE;
+  --lightgray: #F8F8F8;
 }
 
 @media (prefers-color-scheme: dark) {

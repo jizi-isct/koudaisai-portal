@@ -1,5 +1,10 @@
+import Image from "next/image";
 import styles from "./page.module.css";
 import TextBox from "@/components/Forms/TextBox/TextBox";
+import Question from "@/components/Forms/Question/Question";
+import Text from "@/components/Forms/Question/Text/Text";
+import CheckBox from "@/components/Forms/Question/CheckBox/CheckBox";
+import RadioButton from "@/components/Forms/Question/RadioButton/RadioButton";
 
 export default async function Page({
     params,
@@ -15,9 +20,9 @@ export default async function Page({
                 <p>工夜祭2024を工大祭2日目の17:40~18:40で開催いたします。
                 参加を希望される団体は「工夜祭2024参加募集要項」をご一読の上、このフォームにお答えください。</p>
             </div>
-            <div className={styles.formWrapper}>
-                <TextBox fontSize={16} width={150} placeholder="質問"/>
-            </div>
+            <Question>
+              <RadioButton />
+            </Question>
         </main>
         </div>
     );

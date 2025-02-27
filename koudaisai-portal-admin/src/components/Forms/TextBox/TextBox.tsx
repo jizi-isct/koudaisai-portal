@@ -12,7 +12,7 @@ const TextBox = ({fontSize = 16, width, placeholder = "回答を入力"}: TextBo
         type="text" 
         className={styles.textBox}
         placeholder={placeholder}
-        style={{}} />
+        style={{fontSize: fontSize, width: width}} />
   );
 };
 
