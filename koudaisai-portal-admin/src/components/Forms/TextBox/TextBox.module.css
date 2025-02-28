@@ -1,0 +1,14 @@
+.textBox{
+    padding: 8px;
+    border-bottom: 1px solid var(--gray);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    line-height: 150%;
+}
+
+.textBox:focus{
+    outline: none;
+    background-color: var(--lightgray);
+    border-color: var(--darkblue);
+}
