@@ -1,4 +1,8 @@
+use axum_extra::extract::cookie::Cookie;
+use axum_extra::extract::CookieJar;
+use chrono::Utc;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
+use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
@@ -52,4 +56,58 @@ pub fn encode(claims: &Claims, key: &EncodingKey) -> jsonwebtoken::errors::Resul
 
 pub fn decode(token: &str, key: &DecodingKey) -> jsonwebtoken::errors::Result<TokenData<Claims>> {
     jsonwebtoken::decode::<Claims>(token, &*key, &Validation::new(ALGORITHM))
+}
+
+pub fn issue(
+    sub: String,
+    role: Role,
+    key: &EncodingKey,
+) -> jsonwebtoken::errors::Result<(String, String)> {
+    let mut rng = rand::rng();
+    let access_token_claims = Claims {
+        iss: JWT_ISS.to_string(),
+        sub: sub.clone(),
+        exp: Utc::now().timestamp() as usize + ACCESS_TOKEN_EXPIRE_TIME,
+        iat: Utc::now().timestamp() as usize,
+        nonce: Alphanumeric.sample_string(&mut rng, 16),
+        typ: Typ::AccessToken.to_string(),
+        role: role.to_string(),
+    };
+    let access_token = encode(&access_token_claims, &key)?;
+
+    let refresh_token_claims = Claims {
+        iss: JWT_ISS.to_string(),
+        sub: sub.clone(),
+        exp: Utc::now().timestamp() as usize + REFRESH_TOKEN_EXPIRE_TIME,
+        iat: Utc::now().timestamp() as usize,
+        nonce: Alphanumeric.sample_string(&mut rng, 16),
+        typ: Typ::RefreshToken.to_string(),
+        role: role.to_string(),
+    };
+    let refresh_token = encode(&refresh_token_claims, &key)?;
+    Ok((access_token, refresh_token))
+}
+
+pub fn issue_cookie(
+    sub: String,
+    role: Role,
+    key: &EncodingKey,
+    domain: String,
+) -> jsonwebtoken::errors::Result<CookieJar> {
+    let (access_token, refresh_token) = issue(sub, role, key)?;
+    Ok(CookieJar::new()
+        .add(
+            Cookie::build(("access_token", access_token))
+                .domain(domain.clone())
+                .http_only(true)
+                .path("/")
+                .build(),
+        )
+        .add(
+            Cookie::build(("refresh_token", refresh_token))
+                .domain(domain.clone())
+                .http_only(true)
+                .path("/")
+                .build(),
+        ))
 }

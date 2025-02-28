@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
@@ -11,22 +10,22 @@ use uuid::Uuid;
 /// * `updated_at`: 更新日時
 /// * `required` - 回答必須かどうか
 /// * `question` - 質問の種類とより詳細なプロパティ
+#[derive(Debug)]
 pub struct Question {
     pub question_id: Uuid,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
     pub required: bool,
     pub question: Questions,
 }
 
 /// 質問の種類
+#[derive(Debug)]
 pub enum Questions {
     Text(QuestionText),
 }
 
 /// テキスト
 /// * `paragraph` - trueの場合複数行にわたるテキスト。falseの場合一行の回答。
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct QuestionText {
     pub paragraph: bool,
 }
@@ -36,10 +35,8 @@ impl Serialize for Question {
     where
         S: Serializer,
     {
-        let mut map = serializer.serialize_map(Some(5))?;
+        let mut map = serializer.serialize_map(Some(3))?;
         map.serialize_entry("question_id", &self.question_id)?;
-        map.serialize_entry("created_at", &self.created_at.to_rfc3339())?;
-        map.serialize_entry("updated_at", &self.updated_at.to_rfc3339())?;
         map.serialize_entry("required", &self.required)?;
         match &self.question {
             Questions::Text(question_text) => {
@@ -73,8 +70,6 @@ impl<'de> Visitor<'de> for QuestionVisitor {
         A: MapAccess<'de>,
     {
         let mut question_id = None;
-        let mut created_at = None;
-        let mut updated_at = None;
         let mut required = None;
         let mut question = None;
         while let Some(key) = map.next_key()? {
@@ -84,18 +79,6 @@ impl<'de> Visitor<'de> for QuestionVisitor {
                         return Err(de::Error::duplicate_field("question_id"));
                     }
                     question_id = Some(map.next_value()?);
-                }
-                "created_at" => {
-                    if created_at.is_some() {
-                        return Err(de::Error::duplicate_field("created_at"));
-                    }
-                    created_at = Some(map.next_value()?);
-                }
-                "updated_at" => {
-                    if updated_at.is_some() {
-                        return Err(de::Error::duplicate_field("updated_at"));
-                    }
-                    updated_at = Some(map.next_value()?);
                 }
                 "required" => {
                     if required.is_some() {
@@ -112,26 +95,16 @@ impl<'de> Visitor<'de> for QuestionVisitor {
                 unknown => {
                     return Err(de::Error::unknown_field(
                         unknown,
-                        &[
-                            "question_id",
-                            "created_at",
-                            "updated_at",
-                            "required",
-                            "question_text",
-                        ],
+                        &["question_id", "required", "question_text"],
                     ))
                 }
             }
         }
         let question_id = question_id.ok_or_else(|| de::Error::missing_field("question_id"))?;
-        let created_at = created_at.ok_or_else(|| de::Error::missing_field("created_at"))?;
-        let updated_at = updated_at.ok_or_else(|| de::Error::missing_field("updated_at"))?;
         let required = required.ok_or_else(|| de::Error::missing_field("required"))?;
         let question = question.ok_or_else(|| de::Error::missing_field("question"))?;
         Ok(Question {
             question_id,
-            created_at,
-            updated_at,
             required,
             question,
         })

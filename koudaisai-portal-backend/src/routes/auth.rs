@@ -2,16 +2,24 @@ use crate::entities::prelude::Users;
 use crate::entities::users;
 use crate::routes::AppState;
 use crate::util::jwt;
+use crate::util::jwt::Role;
 use crate::util::sha::{digest, stretch_with_salt};
-use axum::extract::{ConnectInfo, State};
-use axum::http::StatusCode;
+use axum::extract::{ConnectInfo, Query, State};
+use axum::http::{HeaderMap, StatusCode};
+use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use axum_extra::extract::cookie::Cookie;
+use axum_extra::extract::{cookie, CookieJar};
 use axum_gcra::gcra::Quota;
 use axum_gcra::real_ip::RealIp;
 use axum_gcra::RateLimitLayer;
 use chrono::Utc;
+use http::HeaderValue;
+use openid::{Client, Options, Token, Userinfo};
 use rand::distr::{Alphanumeric, SampleString};
+use rand::rng;
+use reqwest::Url;
 use sea_orm::ActiveValue::Set;
 use sea_orm::ColumnTrait;
 use sea_orm::QueryFilter;
@@ -121,7 +129,7 @@ async fn login(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<LoginPayload>,
-) -> Result<Json<LoginResponse>, StatusCode> {
+) -> Result<CookieJar, StatusCode> {
     let user = match Users::find()
         .filter(users::Column::MAddress.eq(payload.m_address))
         .one(&state.db_conn)
@@ -154,53 +162,107 @@ async fn login(
     };
 
     if digest(&*prompted_hash) == digest(&*password_hash) {
-        let mut rng = rand::rng();
-        let access_token_claims = jwt::Claims {
-            iss: jwt::JWT_ISS.to_string(),
-            sub: user.id.to_string(),
-            exp: Utc::now().timestamp() as usize + jwt::ACCESS_TOKEN_EXPIRE_TIME,
-            iat: Utc::now().timestamp() as usize,
-            nonce: Alphanumeric.sample_string(&mut rng, 16),
-            typ: jwt::Typ::AccessToken.to_string(),
-            role: jwt::Role::User.to_string(),
-        };
-        let access_token = match jwt::encode(&access_token_claims, &state.jwt_encoding_key) {
-            Ok(token) => token,
+        match jwt::issue_cookie(
+            user.id.to_string(),
+            Role::User,
+            &state.jwt_encoding_key,
+            state.web.server.host.clone(),
+        ) {
+            Ok(jar) => Ok(jar),
             Err(err) => {
-                warn!(
-                    "internal server error occurred while generating access token: {}",
-                    err
-                );
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                warn!("internal server error while generarting tokens: {}", err);
+                Err(StatusCode::INTERNAL_SERVER_ERROR)
             }
-        };
-
-        let refresh_token_claims = jwt::Claims {
-            iss: jwt::JWT_ISS.to_string(),
-            sub: user.id.to_string(),
-            exp: Utc::now().timestamp() as usize + jwt::REFRESH_TOKEN_EXPIRE_TIME,
-            iat: Utc::now().timestamp() as usize,
-            nonce: Alphanumeric.sample_string(&mut rng, 16),
-            typ: jwt::Typ::RefreshToken.to_string(),
-            role: jwt::Role::User.to_string(),
-        };
-        let refresh_token = match jwt::encode(&refresh_token_claims, &state.jwt_encoding_key) {
-            Ok(token) => token,
-            Err(err) => {
-                warn!(
-                    "internal server error occurred while generating refresh token: {}",
-                    err
-                );
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        };
-
-        Ok(Json(LoginResponse {
-            access_token,
-            refresh_token,
-        }))
+        }
     } else {
         debug!("401 Unauthorized(password)");
         Err(StatusCode::UNAUTHORIZED)
     }
+}
+
+#[instrument(name = "/auth/v1/admin/login", skip(state))]
+async fn admin_login(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+) -> (StatusCode, HeaderMap) {
+    //url
+    let url = state.oidc_client.auth_url(&Options {
+        ..Default::default()
+    });
+    let url = url.to_string();
+
+    //header
+    let mut headers = HeaderMap::new();
+    let val = if let Ok(val) = HeaderValue::from_str(&url) {
+        val
+    } else {
+        warn!("internal server error while setting header");
+        return (StatusCode::INTERNAL_SERVER_ERROR, headers);
+    };
+    headers.insert(http::header::LOCATION, val);
+
+    (StatusCode::FOUND, headers)
+}
+
+#[derive(Serialize, Deserialize)]
+struct RedirectQuery {
+    pub code: String,
+    pub state: String,
+}
+#[instrument(name = "/auth/v1/admin/redirect", skip(state, login_query))]
+async fn admin_redirect(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    login_query: Query<RedirectQuery>,
+) -> Result<CookieJar, StatusCode> {
+    let (token, _userinfo) = match request_token(&state.oidc_client, &login_query.code).await {
+        Ok(Some(tuple)) => tuple,
+        Ok(None) => {
+            warn!("login error in call: no id_token found");
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+        Err(err) => {
+            warn!("login error in call: {:?}", err);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    };
+
+    let mut id_token = token.id_token.unwrap();
+    let payload = id_token.payload_mut().unwrap();
+    match jwt::issue_cookie(
+        payload.sub.clone(),
+        Role::Admin,
+        &state.jwt_encoding_key,
+        state.web.server.host.clone(),
+    ) {
+        Ok(jar) => Ok(jar),
+        Err(err) => {
+            warn!("internal server error while generarting tokens: {}", err);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
+async fn request_token(
+    oidc_client: &Client,
+    code: &String,
+) -> Result<Option<(Token, Userinfo)>, ()> {
+    let mut token: Token = oidc_client
+        .request_token(&code)
+        .await
+        .map_err(|_| ())?
+        .into();
+
+    if let Some(id_token) = token.id_token.as_mut() {
+        oidc_client.decode_token(id_token).map_err(|_| ())?;
+        oidc_client
+            .validate_token(&id_token, None, None)
+            .map_err(|_| ())?;
+    } else {
+        return Ok(None);
+    }
+
+    let userinfo = oidc_client.request_userinfo(&token).await.map_err(|_| ())?;
+
+    Ok(Some((token, userinfo)))
 }

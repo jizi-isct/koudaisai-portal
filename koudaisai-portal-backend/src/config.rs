@@ -84,6 +84,7 @@ pub struct Auth {
     pub stretch_cost: u8,
     pub jwt_secret_key_path: String,
     pub jwt_public_key_path: String,
+    pub keycloak: KeyCloak,
 }
 
 impl Default for Auth {
@@ -95,6 +96,7 @@ impl Default for Auth {
             stretch_cost: 13,
             jwt_secret_key_path: "./secret_key".parse().unwrap(),
             jwt_public_key_path: "./public_key".parse().unwrap(),
+            keycloak: KeyCloak::default(),
         }
     }
 }
@@ -109,12 +111,11 @@ impl Auth {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct KeyCloak {
-    pub keycloak_id: String,
-    pub keycloak_secret: String,
-    pub keycloak_issuer: String,
-    pub keycloak_logout: String,
+    pub id: String,
+    pub secret: String,
+    pub issuer: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

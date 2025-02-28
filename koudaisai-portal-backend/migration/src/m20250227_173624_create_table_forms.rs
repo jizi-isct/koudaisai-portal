@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
                     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
                     info json NOT NULL,
-                    items uuid[] NOT NULL,
+                    items json NOT NULL,
                     access_control_roles text[] NOT NULL
                 );
                 "#

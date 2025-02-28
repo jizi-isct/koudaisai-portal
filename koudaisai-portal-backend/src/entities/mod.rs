@@ -7,8 +7,6 @@ pub mod exhibitors_category_general;
 pub mod exhibitors_category_labo;
 pub mod exhibitors_category_stage;
 pub mod exhibitors_root;
-pub mod form_items;
-pub mod form_questions;
 pub mod form_responses;
 pub mod forms;
 pub mod sea_orm_active_enums;

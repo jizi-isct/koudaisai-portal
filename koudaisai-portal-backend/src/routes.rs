@@ -7,6 +7,7 @@ use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::middleware::from_fn_with_state;
 use axum::Router;
 use jsonwebtoken::{DecodingKey, EncodingKey};
+use openid::Client;
 use sea_orm::DatabaseConnection;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -16,11 +17,13 @@ use tracing::{debug, instrument};
 pub fn init_routes(
     web: &Web,
     db_conn: DatabaseConnection,
+    oidc_client: Client,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
         web: web.clone(),
         db_conn,
+        oidc_client,
         jwt_encoding_key: web.auth.get_jwt_encoding_key().unwrap(),
         jwt_decoding_key: web.auth.get_jwt_decoding_key().unwrap(),
     });
@@ -36,6 +39,7 @@ pub fn init_routes(
 pub struct AppState {
     pub web: Web,
     pub db_conn: DatabaseConnection,
+    pub oidc_client: Client,
     pub jwt_encoding_key: EncodingKey,
     pub jwt_decoding_key: DecodingKey,
 }

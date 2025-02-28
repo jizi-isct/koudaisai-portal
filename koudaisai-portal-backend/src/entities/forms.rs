@@ -10,7 +10,7 @@ pub struct Model {
     pub created_at: Option<DateTimeWithTimeZone>,
     pub updated_at: Option<DateTimeWithTimeZone>,
     pub info: Json,
-    pub items: Vec<Uuid>,
+    pub items: Json,
     pub access_control_roles: Vec<String>,
 }
 
