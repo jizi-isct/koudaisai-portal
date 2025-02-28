@@ -4,7 +4,7 @@ import { use } from "react";
 import useSWR from "swr";
 
 export default function Page({ params }: { params: Promise<{ formId: string }> }) {
-  const { formId } = use{ params }; 
+  const { formId } = use(params);
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR("http://localhost:4010/api/v1/forms", fetcher);
