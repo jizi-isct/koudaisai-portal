@@ -36,15 +36,33 @@ export default function Page() {
       };
     };
   };
+
+  type Form = {
+    form_id: string;
+    created_at: string;
+    updated_at: string;
+    info: {
+      title: string;
+      document_title: string;
+      description: string;
+    };
+    description?: string;
+    items: Item[];
+    access_control?: {
+      AccessControl: {
+        roles: string[];
+      };
+    };
+  };
   
 
   const [item, setItem] = useState<Item[]>([]);
-
+  const [form, setForm] = useState<Form>();
   
   useEffect(() => {
-    if (data && Array.isArray(data) && data.length > 0 && data[0]?.items) {
-      console.log("Setting item:", data[0].items);
-      setItem(data[0].items as Item[]);
+    if (data && Array.isArray(data) && data.length > 0) {
+      console.log(data[0]);
+      setForm(data[0] as Form);
     }
   }, [data]);
 
@@ -53,17 +71,14 @@ export default function Page() {
   
   // form_id に一致するフォームを検索
   // const form = data.find((f: any) => f.form_id === formId);
-  
-  
 
   return (
     <div className={styles.page}>
     <main className={styles.main}>
         <div className={styles.formTitleWrapper}>
-        <p>{item?.[0]?.item_id ?? "データなし"}</p>
+          <h1>{form?.info?.title ?? "データなし"}</h1>
+          <p>{form?.form_id ?? "データなし"}</p>
         </div>
-        
-          
         <Question>
           <RadioButton />
         </Question>
