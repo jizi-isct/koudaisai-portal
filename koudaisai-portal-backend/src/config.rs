@@ -122,3 +122,18 @@ pub struct KeyCloak {
 pub struct Db {
     pub address: String,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct StaticFiles {
+    pub web_path: String,
+    pub admin_path: String,
+}
+
+impl Default for StaticFiles {
+    fn default() -> Self {
+        Self {
+            web_path: "/var/www/html/web".into(),
+            admin_path: "/var/www/html/admin".into(),
+        }
+    }
+}
