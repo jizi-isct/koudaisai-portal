@@ -2,6 +2,7 @@
 import styles from "./page.module.css";
 import { use } from "react";
 import useSWR from "swr";
+import TextQuestion from "@/components/Forms/Questions/TextQuestion/TextQuestion";
 
 export default function Page({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = use{ params }; 
@@ -15,6 +16,7 @@ export default function Page({ params }: { params: Promise<{ formId: string }> }
   // form_id に一致するフォームを検索
   // const form = data.find((f: any) => f.form_id === formId);
   const form = data[0];
+  const items = form.items;
 
     return (
         <div className={styles.page}>
@@ -23,8 +25,12 @@ export default function Page({ params }: { params: Promise<{ formId: string }> }
                 <h1>{form.info.title}</h1>
                 <p>{form.info.description}</p>
             </div>
-            <div className={styles.formWrapper}>
-                
+            <div> 
+                {items.map((item) => {
+                  if (item.item_question != null){
+                    return <TextQuestion key={item.item_question.question.question_id} title={item.title} description={item.description} />;
+                  }
+                })}
             </div>
         </main>
         </div>

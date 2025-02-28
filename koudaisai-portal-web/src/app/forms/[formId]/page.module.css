@@ -11,6 +11,22 @@
     background-color: white;
 }
 
+.formTitleWrapper h1{
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%;
+}
+
+.formTitleWrapper p{
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    letter-spacing: 0.45px;
+    margin: 20px 0 10px;
+}
+
 .formWrapper{
     width: 600px;
     width: 50vw;
@@ -28,18 +44,3 @@
     text-align: center;
 }
 
-.formTitleWrapper h1{
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 150%;
-}
-
-.formTitleWrapper p{
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 150%;
-    letter-spacing: 0.45px;
-    margin: 20px 0 10px;
-}
