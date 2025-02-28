@@ -1,6 +1,6 @@
 import styles from "./Lists.module.css";
 
-type HeaderListsProps = {
+type ListsProps = {
     title: string;
     status: string;
     dueDate?: string;
@@ -8,8 +8,8 @@ type HeaderListsProps = {
     formId: string;
 };
 
-const HeaderLists = ({title, status, dueDate, summary, formId}: HeaderListsProps) => {
-  const formLink = `/forms/${formId}`;
+const Lists = ({title, status, dueDate, summary, formId}: ListsProps) => {
+  const formLink = `/forms/form?formId=${formId}`;
   return (
     <div key={formId} className={styles.forms}>
       <a href={formLink}>
@@ -24,4 +24,4 @@ const HeaderLists = ({title, status, dueDate, summary, formId}: HeaderListsProps
   );
 };
 
-export default HeaderLists;
+export default Lists;
