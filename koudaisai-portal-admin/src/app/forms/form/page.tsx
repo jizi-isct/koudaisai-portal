@@ -54,7 +54,6 @@ export default function Page() {
       };
     };
   };
-  
 
   const [item, setItem] = useState<Item[]>([]);
   const [form, setForm] = useState<Form>();
@@ -66,6 +65,13 @@ export default function Page() {
     }
   }, [data]);
 
+  const updateForm = (title?: string, description?: string) => {
+    setForm((prev) => {
+      return { ...prev, ...(title !== undefined && { title }), ...(description !== undefined && { description })}
+    }
+    );
+  };
+
   if (error) return <p>データの取得に失敗しました</p>;
   if (!data) return <p>読み込み中...</p>;
   
@@ -76,6 +82,11 @@ export default function Page() {
     <div className={styles.page}>
     <main className={styles.main}>
         <div className={styles.formTitleWrapper}>
+          <input
+            type="text"
+            value={form?.info?.title ?? "データなし"}
+            onChange={(e) => updateForm(e.target.value, undefined)}
+          />
           <h1>{form?.info?.title ?? "データなし"}</h1>
           <p>{form?.form_id ?? "データなし"}</p>
         </div>
