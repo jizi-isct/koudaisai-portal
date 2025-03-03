@@ -62,6 +62,7 @@ impl LogLevel {
 pub struct Web {
     pub server: Server,
     pub auth: Auth,
+    pub static_files: StaticFiles,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

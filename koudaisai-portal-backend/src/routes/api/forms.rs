@@ -25,7 +25,7 @@ use uuid::Uuid;
 #[instrument(name = "init /api/v1/forms")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("", get(get_forms).post(post_forms))
+        .route("/", get(get_forms).post(post_forms))
         .route("/{form_id}/responses", post(post_response))
 }
 

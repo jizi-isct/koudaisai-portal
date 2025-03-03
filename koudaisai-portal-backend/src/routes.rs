@@ -5,12 +5,14 @@ use crate::config::Web;
 use crate::middlewares;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::middleware::from_fn_with_state;
+use axum::routing::get_service;
 use axum::Router;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use openid::Client;
 use sea_orm::DatabaseConnection;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
 
 #[instrument(skip(web))]
@@ -30,6 +32,11 @@ pub fn init_routes(
     Router::new()
         .nest("/auth", auth::init_router())
         .nest("/api", api::init_router())
+        .fallback_service(get_service(ServeDir::new(&web.static_files.web_path)))
+        .nest_service(
+            "/admin",
+            get_service(ServeDir::new(&web.static_files.admin_path)),
+        )
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
         .with_state(state)
         .into_make_service_with_connect_info::<SocketAddr>()
