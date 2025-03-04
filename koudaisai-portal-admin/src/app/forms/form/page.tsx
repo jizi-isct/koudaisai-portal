@@ -40,23 +40,17 @@ export default function Page() {
     };
   };
 
-  type Form = {
-    form_id: string;
-    created_at: string;
-    updated_at: string;
-    info: {
-      title: string;
-      document_title: string;
-      description: string;
-    };
-    description?: string;
-    items: Item[];
-    access_control?: {
-      AccessControl: {
-        roles: string[];
-      };
-    };
-  };
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      // form_id が formId と一致するものを検索
+      const foundForm = data.find((f: Form) => f.form_id === formId);
+  
+      if (foundForm) {
+        console.log(foundForm);
+        setForm(foundForm);
+      }
+    }
+  }, [data, formId]);
 
   const [item, setItem] = useState<Item[]>([]);
   const [form, setForm] = useState<Form>();
