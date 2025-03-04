@@ -13,9 +13,11 @@ import RadioButton from "@/components/Forms/Question/RadioButton/RadioButton";
 export default function Page() {
   const searchParams = useSearchParams();
   const formId = searchParams.get("formId");
-  
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4010";
+
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data, error } = useSWR("http://localhost:4010/api/v1/forms", fetcher);
+  const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
 
   type Item = {
     item_id: string;
