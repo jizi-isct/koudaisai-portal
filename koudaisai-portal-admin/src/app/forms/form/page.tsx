@@ -40,27 +40,38 @@ export default function Page() {
     };
   };
 
+  type Form = {
+    form_id: string;
+    created_at: string;
+    updated_at: string;
+    info: {
+      title: string;
+      document_title: string;
+      description: string;
+    };
+    description?: string;
+    items: Item[];
+    access_control?: {
+      AccessControl: {
+        roles: string[];
+      };
+    };
+  };
+
+  const [form, setForm] = useState<Form>();
+  
   useEffect(() => {
     if (data && Array.isArray(data)) {
       // form_id が formId と一致するものを検索
       const foundForm = data.find((f: Form) => f.form_id === formId);
   
       if (foundForm) {
+        //debug用の出力
         console.log(foundForm);
         setForm(foundForm);
       }
     }
   }, [data, formId]);
-
-  const [item, setItem] = useState<Item[]>([]);
-  const [form, setForm] = useState<Form>();
-  
-  useEffect(() => {
-    if (data && Array.isArray(data) && data.length > 0) {
-      console.log(data[0]);
-      setForm(data[0] as Form);
-    }
-  }, [data]);
 
   const updateTitle = (title: string) => {
     setForm((prev) => {
@@ -87,6 +98,50 @@ export default function Page() {
       };
     });
   };
+
+  const updateItem = (itemId: string, title: string, description: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+  
+      return {
+        ...prevForm,
+        items: prevForm.items.map((item) =>
+          item.item_id === itemId
+            ? {
+                ...item,
+                title: title !== undefined ? title : item.title,
+                description: description !== undefined ? description : item.description,
+              }
+            : item
+        ),
+      };
+    });
+  };
+
+  const toggleRequired = (itemId: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+  
+      return {
+        ...prevForm,
+        items: prevForm.items.map((item) =>
+        item.item_id === itemId && item.item_question?.question
+          ? {
+              ...item,
+              item_question: {
+                ...item.item_question,
+                question: {
+                  ...item.item_question.question,
+                  required: !item.item_question.question.required,
+                },
+              },
+            }
+          : item
+        ),
+      };
+    });
+  };
+
 
   if (error) return <p>データの取得に失敗しました</p>;
   if (!data) return <p>読み込み中...</p>;
