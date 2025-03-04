@@ -1,6 +1,6 @@
 import styles from "./CheckBox.module.css";
 import Image from "next/image";
-import TextBox from "@/components/Forms/TextBox/TextBox";
+import TextBox from "@/components/Forms/TextInput/TextInput";
 
 
 const CheckBox = () => {

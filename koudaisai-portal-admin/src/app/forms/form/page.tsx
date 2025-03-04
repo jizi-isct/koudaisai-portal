@@ -3,7 +3,8 @@ import styles from "./page.module.css";
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import TextBox from "@/components/Forms/TextBox/TextBox";
+import TextInput from "@/components/Forms/TextInput/TextInput";
+import ParagraphInput from "@/components/Forms/ParagraphInput/ParagraphInput";
 import Question from "@/components/Forms/Question/Question";
 import Text from "@/components/Forms/Question/Text/Text";
 import CheckBox from "@/components/Forms/Question/CheckBox/CheckBox";
@@ -65,11 +66,30 @@ export default function Page() {
     }
   }, [data]);
 
-  const updateForm = (title?: string, description?: string) => {
+  const updateTitle = (title: string) => {
     setForm((prev) => {
-      return { ...prev, ...(title !== undefined && { title }), ...(description !== undefined && { description })}
-    }
-    );
+      if (!prev) return prev;
+      return {
+        ...prev,
+        info: {
+          ...prev.info,
+          ...{title},
+        },
+      };
+    });
+  };
+
+  const updateDescription = (description: string) => {
+    setForm((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        info: {
+          ...prev.info,
+          ...{description},
+        },
+      };
+    });
   };
 
   if (error) return <p>データの取得に失敗しました</p>;
@@ -82,16 +102,24 @@ export default function Page() {
     <div className={styles.page}>
     <main className={styles.main}>
         <div className={styles.formTitleWrapper}>
-          <input
-            type="text"
+          <TextInput
+            fontSize={16}
+            width={400}
+            placeholder="タイトルを入力"
             value={form?.info?.title ?? "データなし"}
-            onChange={(e) => updateForm(e.target.value, undefined)}
+            onChange={updateTitle}
+            args={[]}
           />
-          <h1>{form?.info?.title ?? "データなし"}</h1>
-          <p>{form?.form_id ?? "データなし"}</p>
+          <ParagraphInput
+            fontSize={12}
+            placeholder="説明文を入力"
+            value={form?.info?.description ?? "データなし"}
+            onChange={updateDescription}
+            args={[]}
+          />
         </div>
         <Question>
-          <RadioButton />
+          <Text />
         </Question>
     </main>
     </div>

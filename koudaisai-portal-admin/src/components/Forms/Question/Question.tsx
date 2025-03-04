@@ -1,6 +1,6 @@
 import styles from "./Question.module.css";
 import Image from "next/image";
-import TextBox from "@/components/Forms/TextBox/TextBox";
+import TextBox from "@/components/Forms/TextInput/TextInput";
 import React from "react";
 
 type QuestionProps = {
