@@ -18,7 +18,6 @@ export default function Page() {
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
-
   type Item = {
     item_id: string;
     created_at: string;
@@ -63,8 +62,7 @@ export default function Page() {
   useEffect(() => {
     if (data && Array.isArray(data)) {
       // form_id が formId と一致するものを検索
-      const foundForm = data.find((f: Form) => f.form_id === formId);
-  
+      const foundForm = data.find((f: Form) => String(f.form_id).trim === String(formId).trim);
       if (foundForm) {
         //debug用の出力
         console.log(foundForm);
@@ -169,9 +167,6 @@ export default function Page() {
             args={[]}
           />
         </div>
-        <Question>
-          <Text />
-        </Question>
     </main>
     </div>
   );
