@@ -62,7 +62,7 @@ export default function Page() {
   useEffect(() => {
     if (data && Array.isArray(data)) {
       // form_id が formId と一致するものを検索
-      const foundForm = data.find((f: Form) => String(f.form_id).trim === String(formId).trim);
+      const foundForm = data.find((f: Form) => f.form_id === formId);
       if (foundForm) {
         //debug用の出力
         console.log(foundForm);
@@ -107,8 +107,8 @@ export default function Page() {
           item.item_id === itemId
             ? {
                 ...item,
-                title: title !== undefined ? title : item.title,
-                description: description !== undefined ? description : item.description,
+                title: title !== null ? title : item.title,
+                description: description !== null ? description : item.description,
               }
             : item
         ),
@@ -140,13 +140,30 @@ export default function Page() {
     });
   };
 
+  const renderQuestions = () => {
+    if (!form || !form.items) return null;
+  
+    return form.items.map((item) => (
+      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired}>
+        {/* itemの種類によって異なる入力コンポーネントを表示 */}
+        {item.item_text && <Text />}
+        {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
+        {item.item_question && (
+          <>
+            <CheckBox />
+            <RadioButton />
+          </>
+        )}
+      </Question>
+    ));
+  };
+
 
   if (error) return <p>データの取得に失敗しました</p>;
   if (!data) return <p>読み込み中...</p>;
   
   // form_id に一致するフォームを検索
   // const form = data.find((f: any) => f.form_id === formId);
-
   return (
     <div className={styles.page}>
     <main className={styles.main}>
@@ -167,6 +184,8 @@ export default function Page() {
             args={[]}
           />
         </div>
+        {/* 動的に生成された Question コンポーネントを表示 */}
+        {renderQuestions()}
     </main>
     </div>
   );

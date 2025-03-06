@@ -2,6 +2,7 @@ import styles from "./Question.module.css";
 import Image from "next/image";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import React from "react";
+import { describe } from "node:test";
 
 type QuestionProps = {
   children: React.ReactNode;
@@ -37,17 +38,17 @@ const findItemById = (items: Item[], itemId: string): Item | undefined => {
 };
 
 const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, toggleRequired}) => {
-  const item = findItemById(form.items, itemId);
+  const item = findItemById(form?.items ?? [], itemId);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (title: string) => {
     if (updateItem) {
-      updateItem(itemId, e.target.value, "");
+      updateItem("641fe788-ab24-44c7-317b-d257158d16bd", title, null);
     }
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDescriptionChange = (description: string) => {
     if (updateItem) {
-      updateItem(itemId, "", e.target.value);
+      updateItem(itemId, null, description);
     }
   };
 
