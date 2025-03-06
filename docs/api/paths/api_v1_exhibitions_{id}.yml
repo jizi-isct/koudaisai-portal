@@ -1,0 +1,50 @@
+get:
+  summary: 参加団体を取得
+  tags:
+    - exhibitions
+  parameters:
+    - name: id
+      in: path
+      description: 参加団体id
+      required: true
+      schema:
+        type: string
+        pattern: '[A-Z]-[0-9][0-9][0-9]'
+        example: T-001
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Exhibition.yml
+    '404':
+      description: 参加団体が存在しない
+put:
+  summary: 参加団体を編集
+  tags:
+    - exhibitions
+  parameters:
+    - name: id
+      in: path
+      description: 参加団体id
+      required: true
+      schema:
+        type: string
+        pattern: '[A-Z]-[0-9][0-9][0-9]'
+        example: T-001
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/EditExhibition.yml
+  responses:
+    '200':
+      description: OK
+    '201':
+      description: 参加団体が編集された
+    '400':
+      description: 不正なrequest bodyの形式
+    '404':
+      description: 参加団体が存在しない

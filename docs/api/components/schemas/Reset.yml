@@ -1,0 +1,15 @@
+properties:
+  access_token:
+    description: アクセストークン
+    type: string
+    format: jwt
+    example: >-
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U
+  old_password:
+    description: 古いパスワード
+    type: string
+    example: carryL0v3
+  new_password:
+    description: 新しいパスワード
+    type: string
+    example: carry<3

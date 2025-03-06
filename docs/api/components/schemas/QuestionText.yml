@@ -1,0 +1,6 @@
+description: テキスト
+type: object
+properties:
+  paragraph:
+    type: boolean
+    description: trueの場合複数行にわたるテキスト。falseの場合一行の回答。

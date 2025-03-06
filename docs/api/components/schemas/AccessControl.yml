@@ -1,0 +1,8 @@
+description: フォームのアクセス制限
+type: object
+properties:
+  roles:
+    description: アクセス可能なロール
+    type: array
+    items:
+      type: string

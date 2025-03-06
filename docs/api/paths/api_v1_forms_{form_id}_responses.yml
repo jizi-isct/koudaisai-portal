@@ -1,0 +1,56 @@
+post:
+  summary: 新たに回答を作成
+  tags:
+    - form_responses
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/FormResponse.yml
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Form.yml
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+get:
+  summary: すべての回答を取得
+  tags:
+    - form_responses
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK/
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/FormResponse.yml
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない

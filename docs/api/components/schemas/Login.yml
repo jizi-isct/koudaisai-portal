@@ -1,0 +1,11 @@
+properties:
+  m_address:
+    description: mアドレス(新旧どちらも含む)
+    type: string
+    pattern: >-
+      ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+    example: johnson.p.5703@m.isct.ac.jp
+  password:
+    description: パスワード
+    type: string
+    example: carryL0v3

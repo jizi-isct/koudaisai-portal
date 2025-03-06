@@ -1,0 +1,47 @@
+properties:
+  id:
+    description: 参加団体id
+    type: string
+    pattern: '[A-Z]-[0-9][0-9][0-9]'
+    example: T-001
+  created_at:
+    description: 作成日時
+    type: string
+    format: date-time
+  updated_at:
+    description: 最終更新日時
+    type: string
+    format: date-time
+  exhibitor_name:
+    description: 参加団体名
+    type: string
+    example: U7374
+  exhibition_name:
+    description: 企画名
+    type: string
+    example: 釈迦釈迦ポテト
+    nullable: true
+  icon_id:
+    description: アイコンのid
+    type: string
+    nullable: true
+  description:
+    description: 企画概要
+    type: string
+    nullable: true
+  type:
+    description: 参加団体の種類
+    type: string
+    enum:
+      - booth
+      - general
+      - stage
+      - labo
+    example: general
+  representatives:
+    description: 第一責任者, 第二責任者, 第三責任者
+    uniqueItems: true
+    minItems: 3
+    maxItems: 3
+    items:
+      $ref: ./User.yml

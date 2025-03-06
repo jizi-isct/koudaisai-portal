@@ -1,0 +1,27 @@
+description: フォーム
+type: object
+properties:
+  form_id:
+    description: フォームID
+    type: string
+    format: uuid
+    readOnly: true
+  created_at:
+    description: 作成日時
+    type: string
+    format: datetime
+    readOnly: true
+  updated_at:
+    description: 更新日時
+    type: string
+    format: datetime
+    readOnly: true
+  info:
+    $ref: ./Info.yml
+  items:
+    description: フォームのアイテムのリスト（質問、改ページ、テキストなど）
+    type: array
+    items:
+      $ref: ./Item.yml
+  access_control:
+    $ref: ./AccessControl.yml
