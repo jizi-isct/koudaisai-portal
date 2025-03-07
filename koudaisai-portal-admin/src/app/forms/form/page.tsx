@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import styles from "./page.module.css";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import TextInput from "@/components/Forms/TextInput/TextInput";
@@ -60,6 +60,27 @@ export default function Page() {
   };
 
   const [form, setForm] = useState<Form>();
+  const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | "unsaved">("saved");
+
+  // フォームのデータをサーバーへ保存
+  const saveForm = async (updatedForm: Form) => {
+    if (!formId) return;
+    setSaveStatus("saving");
+
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/forms/${formId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedForm),
+      });
+
+      setSaveStatus("saved");
+      mutate(`${API_BASE_URL}/api/v1/forms`); // キャッシュを更新して再フェッチ
+    } catch (error) {
+      console.error("保存に失敗しました", error);
+      setSaveStatus("unsaved");
+    }
+  };
   
   useEffect(() => {
     if (data && Array.isArray(data)) {
@@ -76,26 +97,24 @@ export default function Page() {
   const updateTitle = (title: string) => {
     setForm((prev) => {
       if (!prev) return prev;
-      return {
+      const updatedForm = {
         ...prev,
-        info: {
-          ...prev.info,
-          ...{title},
-        },
+        info: { ...prev.info, title },
       };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
     });
   };
 
   const updateDescription = (description: string) => {
     setForm((prev) => {
       if (!prev) return prev;
-      return {
+      const updatedForm = {
         ...prev,
-        info: {
-          ...prev.info,
-          ...{description},
-        },
+        info: { ...prev.info, description },
       };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
     });
   };
 
@@ -103,7 +122,7 @@ export default function Page() {
     setForm((prevForm) => {
       if (!prevForm) return prevForm;
   
-      return {
+      const updatedForm = {
         ...prevForm,
         items: prevForm.items.map((item) =>
           item.item_id === itemId
@@ -115,6 +134,8 @@ export default function Page() {
             : item
         ),
       };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
     });
   };
 
@@ -122,23 +143,25 @@ export default function Page() {
     setForm((prevForm) => {
       if (!prevForm) return prevForm;
   
-      return {
+      const updatedForm = {
         ...prevForm,
         items: prevForm.items.map((item) =>
-        item.item_id === itemId && item.item_question?.question
-          ? {
-              ...item,
-              item_question: {
-                ...item.item_question,
-                question: {
-                  ...item.item_question.question,
-                  required: !item.item_question.question.required,
+          item.item_id === itemId && item.item_question?.question
+            ? {
+                ...item,
+                item_question: {
+                  ...item.item_question,
+                  question: {
+                    ...item.item_question.question,
+                    required: !item.item_question.question.required,
+                  },
                 },
-              },
-            }
-          : item
+              }
+            : item
         ),
       };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
     });
   };
 
@@ -186,7 +209,7 @@ export default function Page() {
             args={[]}
           />
           <div className={styles.formMenuWrapper}>
-            <SaveStatus status="unsaved" />
+            <SaveStatus status={saveStatus} />
           </div>
         </div>
         {/* 動的に生成された Question コンポーネントを表示 */}
