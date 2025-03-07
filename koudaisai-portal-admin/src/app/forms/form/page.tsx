@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import styles from "./page.module.css";
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
@@ -9,6 +10,7 @@ import Question from "@/components/Forms/Question/Question";
 import Text from "@/components/Forms/Question/Text/Text";
 import CheckBox from "@/components/Forms/Question/CheckBox/CheckBox";
 import RadioButton from "@/components/Forms/Question/RadioButton/RadioButton";
+import SaveStatus from "@/components/Forms/SaveStatus/SaveStatus";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -183,6 +185,9 @@ export default function Page() {
             onChange={updateDescription}
             args={[]}
           />
+          <div className={styles.formMenuWrapper}>
+            <SaveStatus status="unsaved" />
+          </div>
         </div>
         {/* 動的に生成された Question コンポーネントを表示 */}
         {renderQuestions()}
