@@ -81,13 +81,16 @@ const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, 
         </div>
         <div className={styles.buttonsWrapper}>
             <div className={styles.arrowsWrapper}>
-            <Image src="/forms/arrowUp.svg" width={30} height={30} alt="arrrow" />
-            <Image src="/forms/arrowDown.svg" width={30} height={30} alt="arrrow" />
+              <a href="#" className={styles.arrowUp}><Image src="/forms/arrowUp.svg" width={30} height={30} alt="arrrow" /></a>
+              <a href="#" className={styles.arrowUp}><Image src="/forms/arrowDown.svg" width={30} height={30} alt="arrrow" /></a>
             </div>
             <div className={styles.buttons}>
-            <label>必須</label>
-            <input type="checkbox" className={styles.checkBox} />
-            <Image src="/forms/delete.svg" width={30} height={30} alt="delete" />
+              <label>必須</label>
+              <input type="checkbox" className={styles.checkBox} />
+              <div className={styles.deleteButtonWrapper}>
+                <Image src="/forms/delete.svg" width={25} height={25} alt="delete" />
+              </div>
+              
             </div>
         </div>
     </div>

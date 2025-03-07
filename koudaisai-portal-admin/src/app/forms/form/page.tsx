@@ -16,7 +16,7 @@ export default function Page() {
   const searchParams = useSearchParams();
   const formId = searchParams.get("formId");
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4010";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
