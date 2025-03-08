@@ -1,0 +1,17 @@
+get:
+  summary: リフレッシュトークンとそれから生成されたアクセストークンを失効させる。
+  tags:
+    - auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Revoke.yml
+  responses:
+    '200':
+      description: OK
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合

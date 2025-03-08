@@ -18,3 +18,5 @@ paths:
     $ref: paths/refresh.yml
   /reset:
     $ref: paths/reset.yml
+  /revoke:
+    $ref: paths/revoke.yml
