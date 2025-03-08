@@ -4,14 +4,17 @@ properties:
     description: unique id
     type: string
     format: uuid
+    readOnly: true
   created_at:
     description: 作成日時
     type: string
     format: date-time
+    readOnly: true
   updated_at:
     description: 最終更新日時
     type: string
     format: date-time
+    readOnly: true
   first_name:
     description: 名
     type: string

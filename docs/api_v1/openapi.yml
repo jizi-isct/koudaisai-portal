@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: 工大祭API v1
+  description: 工大祭のapiです。
+  version: '1'
+servers:
+  - url: "https://portal.koudaisai.jp/api/v1"
+tags:
+  - name: user
+    description: ユーザー情報
+  - name: exhibitions
+    description: 参加団体関連
+  - name: forms
+    description: フォーム関連
+  - name: form_responses
+    description: フォームの回答関連
+paths:
+  # exhibitions
+  /exhibitors:
+    $ref: paths/exhibitors.yml
+  /exhibitors/{id}:
+    $ref: paths/exhibitors_{id}.yml
+  # forms
+  /forms:
+    $ref: paths/forms.yml
+  /forms/{form_id}:
+    $ref: paths/forms_{form_id}.yml
+  # form_responses
+  /forms/{form_id}/responses:
+    $ref: paths/forms_{form_id}_responses.yml
+  /forms/{form_id}/responses/{response_id}:
+    $ref: paths/forms_{form_id}_responses_{response_id}.yml
+
+components:
+  securitySchemes:
+    admin_oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://auth2024.jizi.jp/realms/JIZI-Portal/.well-known/openid-configuration
+    exhibitor_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

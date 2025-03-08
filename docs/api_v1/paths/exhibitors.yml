@@ -19,6 +19,8 @@ post:
       description: 不正なrequest bodyの形式
     '409':
       description: 参加団体またはユーザーがすでに存在する
+  security:
+    - admin_oidc: [ ]
 get:
   summary: すべての参加団体を取得
   tags:
@@ -32,3 +34,5 @@ get:
             type: array
             items:
               $ref: ../components/schemas/Exhibition.yml
+  security:
+    - admin_oidc: [ ]

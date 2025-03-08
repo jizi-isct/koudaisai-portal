@@ -1,0 +1,20 @@
+openapi: 3.0.3
+info:
+  title: 工大祭auth endpoints v1
+  version: '1'
+servers:
+  - url: "https://portal.koudaisai.jp/auth/v1"
+tags:
+  - name: auth
+    description: 工大祭参加団体責任者アカウント 認証・認可・パスワード関連
+  - name: admin
+    description: JIZI Portalアカウント 認証・認可・OIDC関連
+paths:
+  /activate:
+    $ref: paths/activate.yml
+  /login:
+    $ref: paths/login.yml
+  /refresh:
+    $ref: paths/refresh.yml
+  /reset:
+    $ref: paths/reset.yml

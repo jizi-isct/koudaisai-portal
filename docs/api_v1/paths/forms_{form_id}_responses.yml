@@ -29,8 +29,14 @@ post:
       description: 資格情報が無効だった場合
     '404':
       description: フォームが存在しない
+  security:
+    - exhibitor_bearer: [ ]
 get:
-  summary: すべての回答を取得
+  summary: 閲覧可能なすべての回答を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体の責任者が回答した回答を全て取得
+    - **admin_oidcの場合**: 存在する全ての回答を取得
   tags:
     - form_responses
   parameters:
@@ -54,3 +60,7 @@ get:
       description: 資格情報が無効だった場合
     '404':
       description: フォームが存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all

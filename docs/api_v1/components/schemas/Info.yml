@@ -10,3 +10,7 @@ properties:
   description:
     description: フォームの説明
     type: string
+  deadline:
+    description: フォームの回答期限
+    type: string
+    format: datetime

@@ -1,18 +1,11 @@
 put:
-  summary: 回答を編集
+  summary: フォームを更新
   tags:
-    - form_responses
+    - forms
   parameters:
     - name: form_id
       in: path
       description: フォームID
-      required: true
-      schema:
-        type: string
-        format: uuid
-    - name: response_id
-      in: path
-      description: 回答ID
       required: true
       schema:
         type: string
@@ -22,24 +15,27 @@ put:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/FormResponse.yml
+          $ref: ../components/schemas/Form.yml
   responses:
-    '200':
-      description: OK/
+    '201':
+      description: Changed
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: ../components/schemas/FormResponse.yml
+              $ref: ../components/schemas/Form.yml
+    '400':
+      description: 不正なrequest bodyの形式
     '401':
       description: 資格情報が無効だった場合
-    '404':
-      description: フォームまたは回答が存在しない
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
 delete:
-  summary: 回答を削除
+  summary: フォームを削除
   tags:
-    - form_responses
+    - forms
   parameters:
     - name: form_id
       in: path
@@ -48,17 +44,19 @@ delete:
       schema:
         type: string
         format: uuid
-    - name: response_id
-      in: path
-      description: 回答ID
-      required: true
-      schema:
-        type: string
-        format: uuid
   responses:
     '201':
-      description: Changed.
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Form.yml
     '401':
       description: 資格情報が無効だった場合
     '404':
-      description: フォームまたは回答が存在しない
+      description: フォームが存在しない
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
