@@ -27,7 +27,7 @@ export default function Login() {
       const data = await response.json();
       
       // JWTトークンをローカルストレージに保存
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('exhibitor_access_token', data.access_token);
 
       // ログイン成功後、ホームページにリダイレクト
       router.push('/');

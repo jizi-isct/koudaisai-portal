@@ -9,7 +9,7 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    const access_token = localStorage.getItem('access_token');
+    const access_token = localStorage.getItem('exhibitor_access_token');
     if (access_token) {
       setAuthenticated(true);
     } else {
