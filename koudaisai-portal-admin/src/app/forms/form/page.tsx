@@ -171,12 +171,9 @@ export default function Page() {
     return form.items.map((item) => (
       <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired}>
         {/* itemの種類によって異なる入力コンポーネントを表示 */}
-        {item.item_text && <Text />}
         {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
         {item.item_question && (
           <>
-            <CheckBox />
-            <RadioButton />
           </>
         )}
       </Question>

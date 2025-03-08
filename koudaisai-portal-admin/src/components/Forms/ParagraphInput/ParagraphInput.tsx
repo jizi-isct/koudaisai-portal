@@ -9,12 +9,11 @@ type ParagraphInputProps = {
     args?: string[];
 };
 
-const ParagraphInput = ({fontSize = 16, width = 0, placeholder = "回答を入力", value, onChange, args}: ParagraphInput) => {
+const ParagraphInput = ({fontSize = 16, width = 0, placeholder = "回答を入力", value, onChange = () => {}, args = []}: ParagraphInput) => {
   return (
     <textarea
-        type="text"
         className={styles.Paragraph}
-        value={value ?? "データなし"}
+        value={value ?? placeholder}
         placeholder={placeholder}
         style={{fontSize: fontSize, width: width === 0 ? "100%" : width}}
         onChange={(e) => onChange(e.target.value, args)}

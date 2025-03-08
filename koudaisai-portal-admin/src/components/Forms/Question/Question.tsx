@@ -52,6 +52,10 @@ const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, 
     }
   };
 
+  const requiredStatus = (itemId: string) => {
+    return item?.item_question?.question.required ?? false;
+  };
+
   return (
     <div className={styles.formWrapper}>
         <div className={styles.questionTitleWrapper}>
@@ -86,7 +90,7 @@ const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, 
             </div>
             <div className={styles.buttons}>
               <label>必須</label>
-              <input type="checkbox" className={styles.checkBox} />
+              <input checked={requiredStatus(itemId)} type="checkbox" onChange={() => toggleRequired(itemId)} className={styles.checkBox} />
               <div className={styles.deleteButtonWrapper}>
                 <Image src="/forms/delete.svg" width={25} height={25} alt="delete" />
               </div>
