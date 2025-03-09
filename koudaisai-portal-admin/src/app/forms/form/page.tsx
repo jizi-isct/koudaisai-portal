@@ -207,11 +207,24 @@ export default function Page() {
     });
   };
 
+  const deleteQestion = (itemId: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+  
+      const updatedForm = {
+        ...prevForm,
+        items: prevForm.items.filter((item) => item.item_id !== itemId),
+      };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
+    });
+  };
+
   const renderQuestions = () => {
     if (!form || !form.items) return null;
   
     return form.items.map((item) => (
-      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired} reorderQuestionUp={reorderQuestionUp} reorderQuestionDown={reorderQuestionDown}>
+      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired} reorderQuestionUp={reorderQuestionUp} reorderQuestionDown={reorderQuestionDown} deleteQuestion={deleteQestion}>
         {/* itemの種類によって異なる入力コンポーネントを表示 */}
         {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
         {item.item_question && (

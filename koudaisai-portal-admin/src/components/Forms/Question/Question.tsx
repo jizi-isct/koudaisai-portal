@@ -12,6 +12,7 @@ type QuestionProps = {
   toggleRequired?: (itemId: string) => void;
   reorderQuestionUp: (itemId: string) => void;
   reorderQuestionDown: (itemId: string) => void;
+  deleteQuestion: (itemId: string) => void;
 };
 
 type Item = {
@@ -39,7 +40,7 @@ const findItemById = (items: Item[], itemId: string): Item | undefined => {
   return items.find(item => item.item_id === itemId);
 };
 
-const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, toggleRequired, reorderQuestionUp, reorderQuestionDown}) => {
+const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, toggleRequired, reorderQuestionUp, reorderQuestionDown, deleteQuestion}) => {
   const item = findItemById(form?.items ?? [], itemId);
 
   const handleTitleChange = (title: string) => {
@@ -93,9 +94,9 @@ const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, 
             <div className={styles.buttons}>
               <label>必須</label>
               <input checked={requiredStatus(itemId)} type="checkbox" onChange={() => toggleRequired(itemId)} className={styles.checkBox} />
-              <div className={styles.deleteButtonWrapper}>
+              <a href="#" onClick={() => deleteQuestion(itemId)} className={styles.deleteButtonWrapper}>
                 <Image src="/forms/delete.svg" width={25} height={25} alt="delete" />
-              </div>
+              </a>
               
             </div>
         </div>
