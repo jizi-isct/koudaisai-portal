@@ -165,11 +165,53 @@ export default function Page() {
     });
   };
 
+  const reorderQuestionUp = (itemId: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+  
+      const index = prevForm.items.findIndex((item) => item.item_id === itemId);
+      if (index === 0) return prevForm;
+  
+      const updatedForm = {
+        ...prevForm,
+        items: [
+          ...prevForm.items.slice(0, index - 1),
+          prevForm.items[index],
+          prevForm.items[index - 1],
+          ...prevForm.items.slice(index + 1),
+        ],
+      };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
+    });
+  };
+
+  const reorderQuestionDown = (itemId: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+  
+      const index = prevForm.items.findIndex((item) => item.item_id === itemId);
+      if (index === -1) return prevForm;
+  
+      const updatedForm = {
+        ...prevForm,
+        items: [
+          ...prevForm.items.slice(0, index),
+          prevForm.items[index + 1],
+          prevForm.items[index],
+          ...prevForm.items.slice(index + 2),
+        ],
+      };
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
+    });
+  };
+
   const renderQuestions = () => {
     if (!form || !form.items) return null;
   
     return form.items.map((item) => (
-      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired}>
+      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem} toggleRequired={toggleRequired} reorderQuestionUp={reorderQuestionUp} reorderQuestionDown={reorderQuestionDown}>
         {/* itemの種類によって異なる入力コンポーネントを表示 */}
         {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
         {item.item_question && (

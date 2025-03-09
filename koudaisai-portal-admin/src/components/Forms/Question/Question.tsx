@@ -10,6 +10,8 @@ type QuestionProps = {
   form: any;
   updateItem?: (itemId: string, title: string, description: string) => void;
   toggleRequired?: (itemId: string) => void;
+  reorderQuestionUp: (itemId: string) => void;
+  reorderQuestionDown: (itemId: string) => void;
 };
 
 type Item = {
@@ -37,7 +39,7 @@ const findItemById = (items: Item[], itemId: string): Item | undefined => {
   return items.find(item => item.item_id === itemId);
 };
 
-const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, toggleRequired}) => {
+const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, toggleRequired, reorderQuestionUp, reorderQuestionDown}) => {
   const item = findItemById(form?.items ?? [], itemId);
 
   const handleTitleChange = (title: string) => {
@@ -85,8 +87,8 @@ const Question: React.FC<QuestionProps> = ({children, itemId, form, updateItem, 
         </div>
         <div className={styles.buttonsWrapper}>
             <div className={styles.arrowsWrapper}>
-              <a href="#" className={styles.arrowUp}><Image src="/forms/arrowUp.svg" width={30} height={30} alt="arrrow" /></a>
-              <a href="#" className={styles.arrowUp}><Image src="/forms/arrowDown.svg" width={30} height={30} alt="arrrow" /></a>
+              <a href="#" onClick={() => reorderQuestionUp(itemId)} className={styles.arrowUp}><Image src="/forms/arrowUp.svg" width={30} height={30} alt="arrrow" /></a>
+              <a href="#" onClick={() => reorderQuestionDown(itemId)}className={styles.arrowUp}><Image src="/forms/arrowDown.svg" width={30} height={30} alt="arrrow" /></a>
             </div>
             <div className={styles.buttons}>
               <label>必須</label>
