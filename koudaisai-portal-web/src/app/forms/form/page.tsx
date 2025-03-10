@@ -25,7 +25,17 @@ export default function Page() {
     }
   }, []);
 
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const fetcher = (url: string) => {
+    const access_token = localStorage.getItem("exhibitor_access_token");
+  
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    }).then((res) => res.json());
+  };
   const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
 
   if (error) return <p>データの取得に失敗しました</p>;
