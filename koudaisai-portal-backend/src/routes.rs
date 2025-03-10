@@ -3,29 +3,49 @@ mod auth;
 
 use crate::config::Web;
 use crate::middlewares;
+use crate::util::jwt::JWTManager;
+use crate::util::oidc::OIDCClient;
+use crate::util::sha::SHAManager;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::middleware::from_fn_with_state;
 use axum::Router;
-use jsonwebtoken::{DecodingKey, EncodingKey};
-use openid::Client;
+use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
+use oauth2::{PkceCodeChallenge, PkceCodeVerifier};
+use openidconnect::Nonce;
+use reqwest::Client;
 use sea_orm::DatabaseConnection;
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 use tracing::{debug, instrument};
 
 #[instrument(skip(web))]
 pub fn init_routes(
     web: &Web,
     db_conn: DatabaseConnection,
-    oidc_client: Client,
+    oidc_client: OIDCClient,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
+    let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
     let state = Arc::new(AppState {
         web: web.clone(),
-        db_conn,
+        db_conn: db_conn.clone(),
         oidc_client,
-        jwt_encoding_key: web.auth.get_jwt_encoding_key().unwrap(),
-        jwt_decoding_key: web.auth.get_jwt_decoding_key().unwrap(),
+        auth_sessions: Default::default(),
+        http_client: Client::new(),
+        jwt_manager: JWTManager::new(
+            Algorithm::RS256,
+            600,
+            60 * 60 * 24 * 30 * 6,
+            "https://portal.koudaisai.jp",
+            web.auth.get_jwt_encoding_key().unwrap(),
+            web.auth.get_jwt_decoding_key().unwrap(),
+            db_conn,
+        ),
+        sha_manager: SHAManager {
+            stretch_cost: 2_i32.pow(web.auth.stretch_cost as u32),
+        },
     });
     Router::new()
         .nest("/auth", auth::init_router())
@@ -35,11 +55,17 @@ pub fn init_routes(
         .into_make_service_with_connect_info::<SocketAddr>()
 }
 
-#[derive(Clone)]
 pub struct AppState {
     pub web: Web,
     pub db_conn: DatabaseConnection,
-    pub oidc_client: Client,
-    pub jwt_encoding_key: EncodingKey,
-    pub jwt_decoding_key: DecodingKey,
+    pub oidc_client: OIDCClient,
+    pub auth_sessions: Mutex<HashMap<String, AuthSession>>,
+    pub http_client: Client,
+    pub jwt_manager: JWTManager,
+    pub sha_manager: SHAManager,
+}
+
+pub struct AuthSession {
+    pkce_verifier: PkceCodeVerifier,
+    nonce: Nonce,
 }
