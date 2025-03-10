@@ -1,0 +1,30 @@
+.saveStatus{
+    display: flex;
+    align-items: center;
+}
+
+.statusIcon{
+}
+
+.savingIcon {
+  animation: 3s linear infinite rotation;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.statusText {
+  color: var(--gray);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 0.44px;
+  margin-left: 10px;
+}

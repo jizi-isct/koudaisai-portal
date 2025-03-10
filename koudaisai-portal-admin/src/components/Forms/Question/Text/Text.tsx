@@ -1,5 +1,5 @@
 import styles from "./Text.module.css";
-import TextBox from "@/components/Forms/TextBox/TextBox";
+import TextBox from "@/components/Forms/TextInput/TextInput";
 
 
 const Text = () => {

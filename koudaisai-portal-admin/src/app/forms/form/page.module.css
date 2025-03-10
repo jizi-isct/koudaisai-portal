@@ -30,3 +30,9 @@
     letter-spacing: 0.45px;
     margin: 20px 0 10px;
 }
+
+.formMenuWrapper{
+    border-top: 1px solid var(--lightblue);
+    padding: 10px 10px 0;
+    margin-top: 10px;
+}

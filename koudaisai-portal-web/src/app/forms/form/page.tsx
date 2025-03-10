@@ -1,48 +1,55 @@
-'use client'
+"use client";
 import styles from "./page.module.css";
-import {useSearchParams} from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import useSWR from "swr";
 import TextQuestion from "@/components/Forms/Questions/TextQuestion/TextQuestion";
-import {Key, Suspense} from "react";
 
 export default function Page() {
-    return (
-        <Suspense>
-            <Form/>
-        </Suspense>
-    )
-}
+  const searchParams = useSearchParams();
+  const formId = searchParams.get("formId");
 
-function Form() {
-    const searchParams = useSearchParams();
-    const formId = searchParams.get("formId");
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-    const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const {data, error} = useSWR("http://localhost:4010/api/v1/forms", fetcher);
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
 
-    if (error) return <p>データの取得に失敗しました</p>;
-    if (!data) return <p>読み込み中...</p>;
+  useEffect(() => {
+    const access_token = localStorage.getItem('exhibitor_access_token');
+    if (access_token) {
+      setAuthenticated(true);
+    } else {
+      router.push('/login'); // トークンがない場合、ログインページにリダイレクト
+    }
+  }, []);
 
-    // form_id に一致するフォームを検索
-    // const form = data.find((f: any) => f.formId === formId);
-    const form = data[0];
-    const items = form.items;
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data, error } = useSWR('${API_BASE_URL}/api/v1/forms', fetcher);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  if (error) return <p>データの取得に失敗しました</p>;
+  if (!data) return <p>読み込み中...</p>;
 
-        const response = await fetch("http://localhost:4010//api/v1/forms/[formId]/responses", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({info: form.info, items: [], access_control: {roles: []}}),
-        });
+  // form_id に一致するフォームを検索
+  // const form = data.find((f: any) => f.formId === formId);
+  const form = data[0];
+  const items = form.items;
 
-        if (response.ok) {
-            alert("フォームを作成しました！");
-        } else {
-            alert("エラーが発生しました。");
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:4010//api/v1/forms/[formId]/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${access_token}`, },
+      body: JSON.stringify({ info: { title, description }, items: [], access_control: { roles: [] } }),
+    });
+
+    if (response.ok) {
+      alert("フォームを作成しました！");
+    } else {
+      alert("エラーが発生しました。");
+    }
+  };
 
     return (
         <main className={styles.main}>
@@ -51,20 +58,16 @@ function Form() {
                 <p>{form.info.description}</p>
             </div>
             <form onSubmit={handleSubmit}>
-                <div>
-                    {items.map((item: {
-                        item_question: { question: { question_id: Key | null | undefined; }; } | null;
-                        title: string;
-                        description: string;
-                    }) => {
-                        if (item.item_question != null) {
-                            return <TextQuestion key={item.item_question.question.question_id} title={item.title}
-                                                 description={item.description}/>;
-                        }
-                    })}
-                </div>
-                <button type="submit">送信</button>
+              <div> 
+                  {items.map((item) => {
+                    if (item.item_question != null){
+                      return <TextQuestion key={item.item_question.question.question_id} title={item.title} description={item.description} />;
+                    }
+                  })}
+              </div>
+              <button type="submit" >送信</button>
             </form>
+            
         </main>
     );
-}
+  }

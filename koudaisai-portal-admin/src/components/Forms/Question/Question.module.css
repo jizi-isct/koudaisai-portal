@@ -21,11 +21,48 @@
     border-top: 1px solid var(--lightblue);
     display: flex;
     justify-content: space-between;
-    padding: 5px;
+    padding: 10px 5px 0px;
 }
 
-.checkBox{
-    width: 20px;
-    height: 20px;
-}
+.checkBox {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--darkgray);
+    vertical-align: -5px;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+  }
+  
+  .checkBox:checked:before {
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    transform: rotate(50deg);
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid var(--darkgray);
+    border-bottom: 2px solid var(--darkgray);
+    content: '';
+  }
 
+  .buttons{
+    display: flex;
+    align-items: center;
+  }
+
+  .buttons label{
+    color: var(--darkgray);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-right: 5px;
+  }
+
+  .deleteButtonWrapper{
+    border-left: 2px solid var(--gray);
+    margin-left: 15px;
+    padding-left: 10px;
+  }

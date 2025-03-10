@@ -1,6 +1,6 @@
 import styles from "./RadioButton.module.css";
 import Image from "next/image";
-import TextBox from "@/components/Forms/TextBox/TextBox";
+import TextBox from "@/components/Forms/TextInput/TextInput";
 
 
 const RadioButton = () => {
