@@ -220,6 +220,43 @@ export default function Page() {
     });
   };
 
+  const createNewItem = (itemType: string) => {
+    setForm((prevForm) => {
+      if (!prevForm) return prevForm;
+      
+      const newItem: Item = {
+        item_id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        title: "新しい質問",
+        description: "",
+        ...(itemType === "text" && { item_text: {} }),
+        ...(itemType === "page_break" && { item_page_break: {} }),
+        ...(itemType === "question" && {
+          item_question: {
+            question: {
+              question_id: crypto.randomUUID(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              required: false,
+              question_text: {
+                paragraph: false,
+              },
+            },
+          },
+        }),
+      };
+      
+      const updatedForm = {
+        ...prevForm,
+        items: [...prevForm.items, newItem],
+      };
+      
+      saveForm(updatedForm); // 変更をサーバーに保存
+      return updatedForm;
+    });
+  };
+
   const renderQuestions = () => {
     if (!form || !form.items) return null;
   
@@ -234,6 +271,7 @@ export default function Page() {
       </Question>
     ));
   };
+  
 
 
   if (error) return <p>データの取得に失敗しました</p>;
