@@ -257,7 +257,7 @@ export default function Page() {
     });
   };
 
-  const renderQuestions = () => {
+  const renderItems = () => {
     if (!form || !form.items) return null;
   
     return form.items.map((item) => (
@@ -303,7 +303,7 @@ export default function Page() {
           </div>
         </div>
         {/* 動的に生成された Question コンポーネントを表示 */}
-        {renderQuestions()}
+        {renderItems()}
         <div className={styles.newItemWrapper}>
           <button onClick={() => createNewItem("text")}>短文回答</button>
           <button onClick={() => createNewItem("question")}>質問</button>
