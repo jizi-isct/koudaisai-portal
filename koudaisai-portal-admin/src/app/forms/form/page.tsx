@@ -304,6 +304,11 @@ export default function Page() {
         </div>
         {/* 動的に生成された Question コンポーネントを表示 */}
         {renderQuestions()}
+        <div className={styles.newItemWrapper}>
+          <button onClick={() => createNewItem("text")}>短文回答</button>
+          <button onClick={() => createNewItem("question")}>質問</button>
+          <button onClick={() => createNewItem("page_break")}>ページ区切り</button>
+        </div>
     </main>
     </div>
   );
