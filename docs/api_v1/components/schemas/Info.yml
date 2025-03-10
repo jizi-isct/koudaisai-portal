@@ -1,0 +1,16 @@
+description: フォームの一般情報
+type: object
+properties:
+  title:
+    description: 回答者に表示されるフォームのタイトル
+    type: string
+  document_title:
+    description: 編集者に表示されるフォームのタイトル
+    type: string
+  description:
+    description: フォームの説明
+    type: string
+  deadline:
+    description: フォームの回答期限
+    type: string
+    format: datetime

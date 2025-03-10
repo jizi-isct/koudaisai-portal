@@ -18,11 +18,13 @@ uuid = { version = "1.13.1", features = ["v4", "serde"] }
 rand = "0.9.0"
 migration = { path = "migration" }
 axum_gcra = { git = "https://github.com/pasmophobia/axum_gcra.git", branch = "axum-0.8" }
-jsonwebtoken = "9.3.1"
+jsonwebtoken = { version = "9.3.1", features = ["default"] }
 chrono = "0.4.39"
 axum-extra = { version = "0.10.0", features = ["typed-header", "cookie"] }
 serde_json = "1.0.139"
-openid = "0.16.1"
 reqwest = "0.12.12"
 http = "1.2.0"
+openidconnect = "4.0.0"
+oauth2 = "5.0.0"
+anyhow = "1.0.97"
 tower-http = { version = "0.6.2", features = ["fs"] }

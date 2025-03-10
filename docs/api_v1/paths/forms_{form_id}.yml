@@ -1,0 +1,62 @@
+put:
+  summary: フォームを更新
+  tags:
+    - forms
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Form.yml
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Form.yml
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
+delete:
+  summary: フォームを削除
+  tags:
+    - forms
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Form.yml
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+  security:
+    - admin_oidc:
+        - k-portal:admin:all

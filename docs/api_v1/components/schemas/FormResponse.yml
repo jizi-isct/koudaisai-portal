@@ -1,0 +1,33 @@
+description: フォームの回答
+type: object
+properties:
+  response_id:
+    description: 回答のID
+    type: string
+    format: uuid
+    readOnly: true
+  created_at:
+    description: 作成日時
+    type: string
+    format: datetime
+    readOnly: true
+  updated_at:
+    description: 更新日時
+    type: string
+    format: datetime
+    readOnly: true
+  form_id:
+    description: フォームのID
+    type: string
+    format: uuid
+    readOnly: true
+  respondent_id:
+    description: 回答者のID
+    type: string
+    format: uuid
+    readOnly: true
+  answers:
+    description: 質問に対する回答(question_idをキーとする)
+    type: object
+    additionalProperties:
+      $ref: ./Answer.yml

@@ -1,0 +1,8 @@
+description: 質問に対する回答をテキストで表したもの
+type: object
+properties:
+  value:
+    description: |-
+      回答の値
+      質問の種類ごとの回答の形式:
+      - Text: 回答者が入力したテキスト

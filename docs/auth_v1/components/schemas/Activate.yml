@@ -1,0 +1,12 @@
+properties:
+  uuid:
+    description: ユーザーのuuid
+    type: string
+    format: uuid
+  token:
+    description: ユーザーのactivation token
+    type: string
+  password:
+    description: パスワード
+    type: string
+    example: carryL0v3

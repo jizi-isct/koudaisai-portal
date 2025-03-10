@@ -1,0 +1,66 @@
+post:
+  summary: 新たに回答を作成
+  tags:
+    - form_responses
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/FormResponse.yml
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Form.yml
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+  security:
+    - exhibitor_bearer: [ ]
+get:
+  summary: 閲覧可能なすべての回答を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体の責任者が回答した回答を全て取得
+    - **admin_oidcの場合**: 存在する全ての回答を取得
+  tags:
+    - form_responses
+  parameters:
+    - name: form_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK/
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/FormResponse.yml
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all

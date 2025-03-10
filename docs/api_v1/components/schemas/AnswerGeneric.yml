@@ -1,0 +1,6 @@
+type: object
+properties:
+  question_id:
+    description: 質問のID
+    type: string
+    format: uuid

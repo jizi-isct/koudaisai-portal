@@ -1,0 +1,8 @@
+description: フォームの質問
+type: object
+oneOf:
+  - allOf:
+      - $ref: ./QuestionGeneric.yml
+      - properties:
+          question_text:
+            $ref: ./QuestionText.yml

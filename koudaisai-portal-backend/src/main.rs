@@ -1,9 +1,12 @@
 use crate::config::{init_config, Db, Logging};
 use crate::routes::init_routes;
+use crate::util::oidc::OIDCClient;
 use migration::{Migrator, MigratorTrait};
-use openid::DiscoveredClient;
+use openidconnect::core::{CoreClient, CoreProviderMetadata};
+use openidconnect::{Client, ClientId, ClientSecret, IssuerUrl, RedirectUrl};
 use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
 use sea_orm::{Database, DatabaseConnection, DbErr};
+use std::error::Error;
 use tracing::{debug, info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -29,17 +32,13 @@ async fn main() {
     );
 
     // openid connect init
-    let client_id = config.web.auth.keycloak.id.clone();
-    let client_secret = config.web.auth.keycloak.secret.clone();
-    let issuer = reqwest::Url::parse(&config.web.auth.keycloak.issuer).unwrap();
-    let redirect = Some(format!(
-        "{}{}",
-        &config.web.server.host, "/auth/v1/admin/redirect"
-    ));
-
-    let oidc_client = DiscoveredClient::discover(client_id, client_secret, redirect, issuer)
-        .await
-        .unwrap();
+    let oidc_client = init_oidc(
+        config.web.auth.keycloak.id.clone(),
+        config.web.auth.keycloak.secret.clone(),
+        config.web.auth.keycloak.issuer.to_string(),
+        format!("{}{}", &config.web.server.host, "/auth/v1/admin/redirect"),
+    )
+    .await;
 
     //app init
     let db = init_db(&config.db).await.unwrap();
@@ -53,6 +52,30 @@ async fn main() {
     .unwrap();
     tracing::debug!("Listening on: {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
+}
+
+#[instrument(skip(client_secret))]
+async fn init_oidc(
+    client_id: String,
+    client_secret: String,
+    issuer_url: String,
+    redirect_url: String,
+) -> OIDCClient {
+    let http_client = reqwest::Client::new();
+
+    let provider_metadata: CoreProviderMetadata =
+        CoreProviderMetadata::discover_async(IssuerUrl::new(issuer_url).unwrap(), &http_client)
+            .await
+            .unwrap();
+
+    let client = CoreClient::from_provider_metadata(
+        provider_metadata,
+        ClientId::new(client_id),
+        Some(ClientSecret::new(client_secret)),
+    )
+    .set_redirect_uri(RedirectUrl::new(redirect_url).unwrap());
+
+    client
 }
 
 #[instrument(skip(db))]

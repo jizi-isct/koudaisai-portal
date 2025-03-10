@@ -1,0 +1,18 @@
+description: フォームの単一の項目
+type: object
+oneOf:
+  - allOf:
+      - $ref: ./ItemGeneric.yml
+      - properties:
+          item_question:
+            $ref: ./ItemQuestion.yml
+  - allOf:
+      - $ref: ./ItemGeneric.yml
+      - properties:
+          item_page_break:
+            $ref: ./ItemPageBreak.yml
+  - allOf:
+      - $ref: ./ItemGeneric.yml
+      - properties:
+          item_text:
+            $ref: ./ItemText.yml

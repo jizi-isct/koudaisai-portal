@@ -5,6 +5,7 @@ mod m20250204_062103_create_table_exhibitors;
 mod m20250214_132032_create_table_exhibitors_children;
 mod m20250227_173624_create_table_forms;
 mod m20250227_191549_create_table_form_responses;
+mod m20250310_133355_create_table_revoked_refresh_tokens;
 
 pub struct Migrator;
 
@@ -17,6 +18,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250214_132032_create_table_exhibitors_children::Migration),
             Box::new(m20250227_173624_create_table_forms::Migration),
             Box::new(m20250227_191549_create_table_form_responses::Migration),
+            Box::new(m20250310_133355_create_table_revoked_refresh_tokens::Migration),
         ]
     }
 }

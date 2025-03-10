@@ -1,0 +1,66 @@
+get:
+  summary: 参加団体を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体のみ取得可能
+    - **admin_oidcの場合**: 存在する全ての参加団体を取得可能
+  tags:
+    - exhibitions
+  parameters:
+    - name: id
+      in: path
+      description: 参加団体id
+      required: true
+      schema:
+        type: string
+        pattern: '[A-Z]-[0-9][0-9][0-9]'
+        example: T-001
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Exhibition.yml
+    '404':
+      description: 参加団体が存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all
+put:
+  summary: 参加団体を編集
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体のみ編集可能
+    - **admin_oidcの場合**: 存在する全ての参加団体を編集可能
+  tags:
+    - exhibitions
+  parameters:
+    - name: id
+      in: path
+      description: 参加団体id
+      required: true
+      schema:
+        type: string
+        pattern: '[A-Z]-[0-9][0-9][0-9]'
+        example: T-001
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/EditExhibition.yml
+  responses:
+    '200':
+      description: OK
+    '201':
+      description: 参加団体が編集された
+    '400':
+      description: 不正なrequest bodyの形式
+    '404':
+      description: 参加団体が存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all

@@ -1,113 +1,167 @@
-use axum_extra::extract::cookie::Cookie;
-use axum_extra::extract::CookieJar;
+use crate::entities::revoked_refresh_tokens;
+use anyhow::Result;
 use chrono::Utc;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use rand::distr::{Alphanumeric, SampleString};
+use sea_orm::{DatabaseConnection, EntityTrait};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use std::str::FromStr;
+use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub iss: String,
-    pub sub: String,
-    pub exp: usize,
-    pub iat: usize,
-    pub nonce: String,
-    pub typ: String,
-    pub role: String,
+    pub sub: Uuid,
+    pub exp: i64,
+    pub iat: i64,
+    pub typ: Type,
 }
-
-pub enum Typ {
-    RefreshToken,
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum Type {
     AccessToken,
+    RefreshToken,
 }
 
-impl Display for Typ {
+impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            Typ::RefreshToken => String::from("refresh_token"),
-            Typ::AccessToken => String::from("access_token"),
-        };
-        write!(f, "{}", str)
-    }
-}
-pub enum Role {
-    User,
-    Admin,
-}
-
-impl Display for Role {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Role::User => String::from("user"),
-            Role::Admin => String::from("admin"),
+            Type::AccessToken => String::from("access_token"),
+            Type::RefreshToken => String::from("refresh_token"),
         };
         write!(f, "{}", str)
     }
 }
 
-const ALGORITHM: Algorithm = Algorithm::RS256;
+pub const ALGORITHM: Algorithm = Algorithm::RS256;
 pub const ACCESS_TOKEN_EXPIRE_TIME: usize = 600; // 10 minutes
 pub const REFRESH_TOKEN_EXPIRE_TIME: usize = 60 * 60 * 24 * 30 * 6; // 6 months
 pub const JWT_ISS: &str = "https://portal.koudaisai.jp";
-pub fn encode(claims: &Claims, key: &EncodingKey) -> jsonwebtoken::errors::Result<String> {
-    jsonwebtoken::encode(&Header::new(ALGORITHM), claims, key)
+
+#[derive(Serialize, Deserialize)]
+pub struct Tokens {
+    refresh_token: String,
+    access_token: String,
 }
 
-pub fn decode(token: &str, key: &DecodingKey) -> jsonwebtoken::errors::Result<TokenData<Claims>> {
-    jsonwebtoken::decode::<Claims>(token, &*key, &Validation::new(ALGORITHM))
+pub struct JWTManager {
+    algorithm: Algorithm,
+    access_token_expire_time: i64,
+    refresh_token_expire_time: i64,
+    iss: String,
+    encoding_key: EncodingKey,
+    decoding_key: DecodingKey,
+    db_conn: DatabaseConnection,
 }
 
-pub fn issue(
-    sub: String,
-    role: Role,
-    key: &EncodingKey,
-) -> jsonwebtoken::errors::Result<(String, String)> {
-    let mut rng = rand::rng();
-    let access_token_claims = Claims {
-        iss: JWT_ISS.to_string(),
-        sub: sub.clone(),
-        exp: Utc::now().timestamp() as usize + ACCESS_TOKEN_EXPIRE_TIME,
-        iat: Utc::now().timestamp() as usize,
-        nonce: Alphanumeric.sample_string(&mut rng, 16),
-        typ: Typ::AccessToken.to_string(),
-        role: role.to_string(),
-    };
-    let access_token = encode(&access_token_claims, &key)?;
+impl JWTManager {
+    pub fn new(
+        algorithm: Algorithm,
+        access_token_expire_time: i64,
+        refresh_token_expire_time: i64,
+        iss: impl ToString,
+        encoding_key: EncodingKey,
+        decoding_key: DecodingKey,
+        db_conn: DatabaseConnection,
+    ) -> Self {
+        Self {
+            algorithm,
+            access_token_expire_time,
+            refresh_token_expire_time,
+            iss: iss.to_string(),
+            encoding_key,
+            decoding_key,
+            db_conn,
+        }
+    }
 
-    let refresh_token_claims = Claims {
-        iss: JWT_ISS.to_string(),
-        sub: sub.clone(),
-        exp: Utc::now().timestamp() as usize + REFRESH_TOKEN_EXPIRE_TIME,
-        iat: Utc::now().timestamp() as usize,
-        nonce: Alphanumeric.sample_string(&mut rng, 16),
-        typ: Typ::RefreshToken.to_string(),
-        role: role.to_string(),
-    };
-    let refresh_token = encode(&refresh_token_claims, &key)?;
-    Ok((access_token, refresh_token))
-}
+    pub fn encode(&self, claims: &Claims) -> Result<String> {
+        Ok(jsonwebtoken::encode(
+            &Header::new(ALGORITHM),
+            claims,
+            &self.encoding_key,
+        )?)
+    }
 
-pub fn issue_cookie(
-    sub: String,
-    role: Role,
-    key: &EncodingKey,
-    domain: String,
-) -> jsonwebtoken::errors::Result<CookieJar> {
-    let (access_token, refresh_token) = issue(sub, role, key)?;
-    Ok(CookieJar::new()
-        .add(
-            Cookie::build(("access_token", access_token))
-                .domain(domain.clone())
-                .http_only(true)
-                .path("/")
-                .build(),
-        )
-        .add(
-            Cookie::build(("refresh_token", refresh_token))
-                .domain(domain.clone())
-                .http_only(true)
-                .path("/")
-                .build(),
-        ))
+    pub fn decode(&self, token: &str) -> Result<TokenData<Claims>> {
+        Ok(jsonwebtoken::decode::<Claims>(
+            token,
+            &self.decoding_key,
+            &Validation::new(ALGORITHM),
+        )?)
+    }
+
+    pub fn issue_tokens(&self, sub: Uuid) -> Result<Tokens> {
+        return Ok(Tokens {
+            refresh_token: self.issue_refresh_token(sub.clone())?,
+            access_token: self.issue_access_token(sub.clone())?,
+        });
+    }
+    pub fn issue_refresh_token(&self, sub: Uuid) -> Result<String> {
+        let refresh_token_claims = Claims {
+            iss: self.iss.clone(),
+            sub,
+            exp: Utc::now().timestamp() + self.refresh_token_expire_time,
+            iat: Utc::now().timestamp(),
+            typ: Type::RefreshToken,
+        };
+        let refresh_token = self.encode(&refresh_token_claims)?;
+        Ok(refresh_token)
+    }
+    pub fn issue_access_token(&self, sub: Uuid) -> Result<String> {
+        let access_token_claims = Claims {
+            iss: self.iss.clone(),
+            sub,
+            exp: Utc::now().timestamp() + self.access_token_expire_time,
+            iat: Utc::now().timestamp(),
+            typ: Type::AccessToken,
+        };
+        let access_token = self.encode(&access_token_claims)?;
+
+        Ok(access_token)
+    }
+
+    /// 以下の条件がすべて満たされる場合true、それ以外はfalse
+    /// - `claims.typ`が`refresh_token`である。
+    /// - 有効期限が切れていない
+    /// - revokeされていない
+    pub async fn is_refresh_token_valid(&self, token: String, claims: &Claims) -> Result<bool> {
+        // typ検証
+        if claims.typ != Type::RefreshToken {
+            return Ok(false);
+        }
+
+        // exp検証
+        if claims.exp > Utc::now().timestamp() {
+            return Ok(false);
+        }
+
+        // revoke検証
+        if revoked_refresh_tokens::Entity::find_by_id(token)
+            .one(&self.db_conn)
+            .await?
+            != None
+        {
+            return Ok(false);
+        }
+
+        Ok(true)
+    }
+
+    /// 以下の条件がすべて満たされる場合true、それ以外はfalse
+    /// - `claims.typ`が`Access_token`である。
+    /// - 有効期限が切れていない
+    pub fn is_access_token_valid(&self, claims: &Claims) -> bool {
+        // typ検証
+        if claims.typ != Type::AccessToken {
+            return false;
+        }
+
+        // exp検証
+        if claims.exp > Utc::now().timestamp() {
+            return false;
+        }
+
+        true
+    }
 }

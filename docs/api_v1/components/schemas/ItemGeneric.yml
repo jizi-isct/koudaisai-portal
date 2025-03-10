@@ -1,0 +1,23 @@
+type: object
+properties:
+  item_id:
+    description: アイテムのID
+    type: string
+    format: uuid
+    readOnly: true
+  created_at:
+    description: 作成日時
+    type: string
+    format: datetime
+    readOnly: true
+  updated_at:
+    description: 更新日時
+    type: string
+    format: datetime
+    readOnly: true
+  title:
+    description: 回答者に表示される項目のタイトル
+    type: string
+  description:
+    description: 回答者に表示される項目の説明
+    type: string
