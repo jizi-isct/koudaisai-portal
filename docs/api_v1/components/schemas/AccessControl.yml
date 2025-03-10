@@ -6,3 +6,5 @@ properties:
     type: array
     items:
       type: string
+required:
+  - roles

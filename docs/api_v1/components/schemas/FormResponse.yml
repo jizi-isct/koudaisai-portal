@@ -31,3 +31,10 @@ properties:
     type: object
     additionalProperties:
       $ref: ./Answer.yml
+required:
+  - response_id
+  - created_at
+  - updated_at
+  - form_id
+  - respondent_id
+  - answers

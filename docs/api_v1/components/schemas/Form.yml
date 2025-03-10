@@ -25,3 +25,10 @@ properties:
       $ref: ./Item.yml
   access_control:
     $ref: ./AccessControl.yml
+required:
+  - form_id
+  - created_at
+  - updated_at
+  - info
+  - items
+  - access_control

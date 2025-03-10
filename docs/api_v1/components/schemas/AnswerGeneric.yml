@@ -4,3 +4,5 @@ properties:
     description: 質問のID
     type: string
     format: uuid
+required:
+  - question_id

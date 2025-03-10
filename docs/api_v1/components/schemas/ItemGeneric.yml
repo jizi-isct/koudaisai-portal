@@ -21,3 +21,9 @@ properties:
   description:
     description: 回答者に表示される項目の説明
     type: string
+required:
+  - item_id
+  - created_at
+  - updated_at
+  - title
+  - description

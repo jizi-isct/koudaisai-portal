@@ -14,3 +14,7 @@ properties:
     description: フォームの回答期限
     type: string
     format: datetime
+required:
+  - title
+  - document_title
+  - description

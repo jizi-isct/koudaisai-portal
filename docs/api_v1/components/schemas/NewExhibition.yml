@@ -24,3 +24,8 @@ properties:
     maxItems: 3
     items:
       $ref: ./User.yml
+required:
+  - id
+  - exhibitor_name
+  - type
+  - representatives

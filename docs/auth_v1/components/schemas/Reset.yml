@@ -13,3 +13,7 @@ properties:
     description: 新しいパスワード
     type: string
     example: carry<3
+required:
+  - access_token
+  - old_password
+  - new_password

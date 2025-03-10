@@ -10,3 +10,7 @@ properties:
     description: パスワード
     type: string
     example: carryL0v3
+required:
+  - uuid
+  - token
+  - password

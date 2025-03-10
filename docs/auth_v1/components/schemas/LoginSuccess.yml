@@ -10,3 +10,6 @@ properties:
     format: jwt
     example: >-
       eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U
+required:
+  - access_token
+  - refresh_token

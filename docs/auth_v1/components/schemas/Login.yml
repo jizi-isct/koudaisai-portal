@@ -9,3 +9,6 @@ properties:
     description: パスワード
     type: string
     example: carryL0v3
+required:
+  - m_address
+  - password

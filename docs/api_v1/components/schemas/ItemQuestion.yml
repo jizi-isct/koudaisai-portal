@@ -3,3 +3,5 @@ type: object
 properties:
   question:
     $ref: ./Question.yml
+required:
+  - question

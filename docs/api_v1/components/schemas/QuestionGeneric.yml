@@ -18,3 +18,8 @@ properties:
   required:
     description: 回答必須かどうか
     type: boolean
+required:
+  - question_id
+  - created_at
+  - updated_at
+  - required

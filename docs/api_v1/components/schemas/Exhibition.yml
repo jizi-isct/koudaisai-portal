@@ -46,3 +46,10 @@ properties:
     items:
       type: string
       format: uuid
+required:
+  - id
+  - created_at
+  - updated_at
+  - exhibitor_name
+  - type
+  - representatives
