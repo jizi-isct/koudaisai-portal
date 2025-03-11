@@ -5,7 +5,7 @@ import React from "react";
 import { describe } from "node:test";
 
 type QuestionProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   itemId: string;
   form: any;
   updateItem?: (itemId: string, title: string, description: string) => void;
