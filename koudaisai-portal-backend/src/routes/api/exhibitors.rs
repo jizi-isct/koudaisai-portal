@@ -317,3 +317,71 @@ async fn get_exhibitors_id(
     let response: GetExhibitorsIdResponse = model.unwrap().into();
     Ok((StatusCode::OK, Json(response).into_response()))
 }
+
+#[derive(Serialize, Debug)]
+struct PutExhibitorsIdPayload {
+    exhibition_name: Option<String>,
+    icon_id: Option<String>,
+    description: Option<String>,
+}
+
+#[instrument(name = "PUT /api/v1/exhibitors/{id}", skip(state))]
+async fn put_exhibitors_id(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(id): Path<String>,
+    Json(payload): Json<PutExhibitorsIdPayload>,
+) -> Result<(StatusCode, Response), AppError> {
+    //permission che
+    match current_user {
+        CurrentUser::Admin(claims) => {}
+        CurrentUser::User(claims) => {
+            // 属しているかどうか確認
+            let model = users::Entity::find_by_id(claims.sub)
+                .one(&state.db_conn)
+                .await?;
+            if model == None {
+                return Ok((StatusCode::NOT_FOUND, "Subject not found.".into_response()));
+            }
+            if model.unwrap().exhibition_id != id {
+                // FORBIDDEN等にすると参加団体の存在が無駄に露呈してしまう
+                return Ok((StatusCode::NOT_FOUND, "Not found.".into_response()));
+            }
+        }
+        CurrentUser::None => {
+            return Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()));
+        }
+    }
+
+    // update
+    let exhibition_name = match payload.exhibition_name {
+        Some(it) => ActiveValue::Set(Some(it)),
+        None => ActiveValue::NotSet,
+    };
+    let icon_id = match payload.icon_id {
+        Some(it) => ActiveValue::Set(Some(it)),
+        None => ActiveValue::NotSet,
+    };
+    let description = match payload.description {
+        Some(it) => ActiveValue::Set(Some(it)),
+        None => ActiveValue::NotSet,
+    };
+    exhibitors_root::ActiveModel {
+        id: ActiveValue::Set(id),
+        created_at: ActiveValue::NotSet,
+        updated_at: ActiveValue::NotSet,
+        exhibitor_name: ActiveValue::NotSet,
+        r#type: ActiveValue::NotSet,
+        exhibition_name,
+        icon_id,
+        description,
+        representative1: ActiveValue::NotSet,
+        representative2: ActiveValue::NotSet,
+        representative3: ActiveValue::NotSet,
+    }
+    .update(&state.db_conn)
+    .await?;
+
+    Ok((StatusCode::CREATED, "Created.".into_response()))
+}
