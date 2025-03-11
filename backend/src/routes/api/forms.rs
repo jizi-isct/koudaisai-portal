@@ -74,16 +74,24 @@ async fn get_forms(
             };
             let exhibitor_type = exhibitor.r#type.into_value().to_string();
             trace!("finding forms");
-            Forms::find()
-                .filter(forms::Column::AccessControlRoles.contains(exhibitor_type))
-                .all(&state.db_conn)
-                .await?
+            let models = Forms::find().all(&state.db_conn).await?;
+            let mut filtered: Vec<forms::Model> = vec![];
+            for model in models {
+                if model.access_control_roles.contains(&exhibitor_type) {
+                    filtered.push(model)
+                }
+            }
+            filtered
         }
         CurrentUser::None => {
-            Forms::find()
-                .filter(forms::Column::AccessControlRoles.contains("none"))
-                .all(&state.db_conn)
-                .await?
+            let models = Forms::find().all(&state.db_conn).await?;
+            let mut filtered: Vec<forms::Model> = vec![];
+            for model in models {
+                if model.access_control_roles.contains(&"none".to_string()) {
+                    filtered.push(model)
+                }
+            }
+            filtered
         }
     };
 
@@ -168,16 +176,32 @@ async fn get_form(
             };
             let exhibitor_type = exhibitor.r#type.into_value().to_string();
             trace!("finding forms");
-            Forms::find_by_id(form_id)
-                .filter(forms::Column::AccessControlRoles.contains(exhibitor_type))
-                .one(&state.db_conn)
-                .await?
+            let model = Forms::find_by_id(form_id).one(&state.db_conn).await?;
+            if model == None
+                || !model
+                    .clone()
+                    .unwrap()
+                    .access_control_roles
+                    .contains(&exhibitor_type)
+            {
+                None
+            } else {
+                model
+            }
         }
         CurrentUser::None => {
-            Forms::find_by_id(form_id)
-                .filter(forms::Column::AccessControlRoles.contains("none"))
-                .one(&state.db_conn)
-                .await?
+            let model = Forms::find_by_id(form_id).one(&state.db_conn).await?;
+            if model == None
+                || !model
+                    .clone()
+                    .unwrap()
+                    .access_control_roles
+                    .contains(&"none".to_string())
+            {
+                None
+            } else {
+                model
+            }
         }
     };
 
@@ -322,7 +346,7 @@ async fn post_response(
         }
 
         let response = form_responses::ActiveModel {
-            response_id: ActiveValue::NotSet,
+            response_id: Set(Uuid::new_v4()),
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
             form_id: Set(form_id),

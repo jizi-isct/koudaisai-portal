@@ -740,11 +740,6 @@ export interface components {
             description: string;
         };
         QuestionGeneric: {
-            /**
-             * Format: uuid
-             * @description 質問のID
-             */
-            readonly question_id: string;
             /** @description 回答必須かどうか */
             required: boolean;
         };
@@ -801,16 +796,16 @@ export interface components {
         AnswerGeneric: {
             /**
              * Format: uuid
-             * @description 質問のID
+             * @description 項目のid
              */
-            question_id: string;
+            item_id: string;
         };
         /** @description 質問に対する回答をテキストで表したもの */
         AnswerText: {
             /** @description 回答の値
              *     質問の種類ごとの回答の形式:
              *     - Text: 回答者が入力したテキスト */
-            value: unknown;
+            value: string;
         };
         /** @description 質問に対する回答 */
         Answer: components["schemas"]["AnswerGeneric"] & {
@@ -822,28 +817,28 @@ export interface components {
              * Format: uuid
              * @description 回答のID
              */
-            readonly response_id: string;
+            readonly response_id?: string;
             /**
              * Format: datetime
              * @description 作成日時
              */
-            readonly created_at: string;
+            readonly created_at?: string;
             /**
              * Format: datetime
              * @description 更新日時
              */
-            readonly updated_at: string;
+            readonly updated_at?: string;
             /**
              * Format: uuid
              * @description フォームのID
              */
-            readonly form_id: string;
+            readonly form_id?: string;
             /**
              * Format: uuid
              * @description 回答者のID
              */
-            readonly respondent_id: string;
-            /** @description 質問に対する回答(question_idをキーとする) */
+            readonly respondent_id?: string;
+            /** @description 質問に対する回答(item_idをキーとする) */
             answers: {
                 [key: string]: components["schemas"]["Answer"];
             };

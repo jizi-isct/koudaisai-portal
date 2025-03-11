@@ -40,7 +40,6 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
             ...item,
             item_question: {
               question: {
-                question_id: crypto.randomUUID(),
                 required: true,
                 question_text: {
                   paragraph: false

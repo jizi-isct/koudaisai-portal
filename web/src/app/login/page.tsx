@@ -55,12 +55,14 @@ export default function Login() {
           <label htmlFor="username">mアドレス:</label>
           <input
             {...register("m_address")}
+            type="email"
           />
         </div>
         <div>
           <label htmlFor="password">パスワード:</label>
           <input
             {...register("password")}
+            type="password"
           />
         </div>
         <button type="submit">ログイン</button>

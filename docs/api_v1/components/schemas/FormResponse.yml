@@ -27,14 +27,9 @@ properties:
     format: uuid
     readOnly: true
   answers:
-    description: 質問に対する回答(question_idをキーとする)
+    description: 質問に対する回答(item_idをキーとする)
     type: object
     additionalProperties:
       $ref: ./Answer.yml
 required:
-  - response_id
-  - created_at
-  - updated_at
-  - form_id
-  - respondent_id
   - answers

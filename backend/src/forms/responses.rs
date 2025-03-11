@@ -4,6 +4,7 @@ use serde::ser::SerializeMap;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::HashMap;
 use std::fmt::Formatter;
+use std::str::FromStr;
 use uuid::Uuid;
 
 /// フォームの回答
@@ -12,7 +13,7 @@ use uuid::Uuid;
 /// * `updated_at`: 更新日時
 /// * `form_id`: フォームのID
 /// * `respondent_id`: 回答者のID
-/// * `answers`: 質問に対する回答(question_idをキーとする)
+/// * `answers`: 質問に対する回答(item_idをキーとする)
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FormResponse {
     pub response_id: Uuid,
@@ -24,11 +25,11 @@ pub struct FormResponse {
 }
 
 /// 質問に対する回答
-/// * `question_id`: 質問の回答
+/// * `item_id`: 質問の回答
 /// * `answer`: 回答の種類と詳細な情報
 #[derive(Debug, Clone)]
 pub struct Answer {
-    pub question_id: Uuid,
+    pub item_id: Uuid,
     pub answer: Answers,
 }
 
@@ -53,7 +54,7 @@ impl Serialize for Answer {
         S: Serializer,
     {
         let mut map = serializer.serialize_map(Some(2))?;
-        map.serialize_entry("question_id", &self.question_id)?;
+        map.serialize_entry("item_id", &self.item_id)?;
         match &self.answer {
             Answers::Text(answer_text) => {
                 map.serialize_entry("answer_text", &answer_text.value)?;
@@ -85,15 +86,15 @@ impl<'de> Visitor<'de> for AnswerVisitor {
     where
         A: MapAccess<'de>,
     {
-        let mut question_id = None;
+        let mut item_id = None;
         let mut answer = None;
         while let Some(key) = map.next_key()? {
             match key {
-                "question_id" => {
-                    if question_id.is_some() {
-                        return Err(de::Error::duplicate_field("question_id"));
+                "item_id" => {
+                    if item_id.is_some() {
+                        return Err(de::Error::duplicate_field("item_id"));
                     }
-                    question_id = Some(map.next_value()?);
+                    item_id = Some(map.next_value()?);
                 }
                 "answer_text" => {
                     if answer.is_some() {
@@ -104,33 +105,28 @@ impl<'de> Visitor<'de> for AnswerVisitor {
                 unknown => {
                     return Err(de::Error::unknown_field(
                         unknown,
-                        &["question_id", "answer_text"],
+                        &["item_id", "answer_text"],
                     ))
                 }
             }
         }
-        let question_id = question_id.ok_or_else(|| de::Error::missing_field("question_id"))?;
+        let item_id = item_id.ok_or_else(|| de::Error::missing_field("item_id"))?;
         let answer = answer.ok_or_else(|| de::Error::missing_field("answer"))?;
-        Ok(Answer {
-            question_id,
-            answer,
-        })
+        Ok(Answer { item_id, answer })
     }
 }
 
 impl FormResponse {
-    pub fn from_model(
-        model: &crate::entities::form_responses::Model,
-    ) -> Result<Self, serde_json::error::Error> {
+    pub fn from_model(model: &crate::entities::form_responses::Model) -> anyhow::Result<Self> {
         let response_id = model.response_id;
         let created_at = model.created_at.unwrap().into();
         let updated_at = model.updated_at.unwrap().into();
         let form_id = model.form_id;
         let respondent_id = model.respondent_id.to_string();
-        let answers1 = serde_json::from_value::<Vec<Answer>>(model.answers.clone())?;
+        let answers1 = serde_json::from_value::<HashMap<String, Answer>>(model.answers.clone())?;
         let mut answers = HashMap::new();
-        for answer in answers1 {
-            answers.insert(answer.question_id, answer);
+        for (item_id, answer) in answers1 {
+            answers.insert(Uuid::from_str(item_id.as_str())?, answer);
         }
         Ok(Self {
             response_id,

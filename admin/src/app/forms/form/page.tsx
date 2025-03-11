@@ -161,7 +161,6 @@ function Inner() {
       ...(itemType === "question" && {
         item_question: {
           question: {
-            question_id: crypto.randomUUID(),
             required: false,
             question_text: {
               paragraph: false,

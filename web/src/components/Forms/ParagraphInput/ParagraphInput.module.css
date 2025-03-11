@@ -1,0 +1,16 @@
+.Paragraph {
+    padding: 8px;
+    border: 1px solid var(--gray);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    line-height: 150%;
+    resize: none;
+    field-sizing: content;
+    min-height: 50px;
+    max-height: 300px;
+}
+
+.Paragraph:focus {
+    outline: none;
+}

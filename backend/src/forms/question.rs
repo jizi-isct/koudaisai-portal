@@ -2,17 +2,12 @@ use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;
-use uuid::Uuid;
 
 /// フォームの質問
-/// * `question_id` - 質問のid
-/// * `created_at`: 作成日時
-/// * `updated_at`: 更新日時
 /// * `required` - 回答必須かどうか
 /// * `question` - 質問の種類とより詳細なプロパティ
 #[derive(Debug)]
 pub struct Question {
-    pub question_id: Uuid,
     pub required: bool,
     pub question: Questions,
 }
@@ -35,8 +30,7 @@ impl Serialize for Question {
     where
         S: Serializer,
     {
-        let mut map = serializer.serialize_map(Some(3))?;
-        map.serialize_entry("question_id", &self.question_id)?;
+        let mut map = serializer.serialize_map(Some(2))?;
         map.serialize_entry("required", &self.required)?;
         match &self.question {
             Questions::Text(question_text) => {
@@ -69,17 +63,10 @@ impl<'de> Visitor<'de> for QuestionVisitor {
     where
         A: MapAccess<'de>,
     {
-        let mut question_id = None;
         let mut required = None;
         let mut question = None;
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
-                "question_id" => {
-                    if question_id.is_some() {
-                        return Err(de::Error::duplicate_field("question_id"));
-                    }
-                    question_id = Some(map.next_value()?);
-                }
                 "required" => {
                     if required.is_some() {
                         return Err(de::Error::duplicate_field("required"));
@@ -95,18 +82,13 @@ impl<'de> Visitor<'de> for QuestionVisitor {
                 unknown => {
                     return Err(de::Error::unknown_field(
                         unknown,
-                        &["question_id", "required", "question_text"],
+                        &["required", "question_text"],
                     ))
                 }
             }
         }
-        let question_id = question_id.ok_or_else(|| de::Error::missing_field("question_id"))?;
         let required = required.ok_or_else(|| de::Error::missing_field("required"))?;
         let question = question.ok_or_else(|| de::Error::missing_field("question"))?;
-        Ok(Question {
-            question_id,
-            required,
-            question,
-        })
+        Ok(Question { required, question })
     }
 }

@@ -1,13 +1,7 @@
 type: object
 properties:
-  question_id:
-    description: 質問のID
-    type: string
-    format: uuid
-    readOnly: true
   required:
     description: 回答必須かどうか
     type: boolean
 required:
-  - question_id
   - required
