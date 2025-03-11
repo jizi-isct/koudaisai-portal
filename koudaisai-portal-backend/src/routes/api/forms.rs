@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use std::iter::Map;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tracing::{info, instrument, warn};
+use tracing::{info, instrument, trace, warn};
 use uuid::Uuid;
 
 #[instrument(name = "init /api/v1/forms")]
@@ -40,6 +40,7 @@ async fn get_forms(
     let form_models = match current_user {
         CurrentUser::Admin(_) => Forms::find().all(&state.db_conn).await?,
         CurrentUser::User(claims) => {
+            trace!("finding user");
             let user = Users::find_by_id(claims.sub).one(&state.db_conn).await?;
             let user = match user {
                 Some(user) => user,
@@ -51,6 +52,7 @@ async fn get_forms(
                     ));
                 }
             };
+            trace!("finding exhibitor");
             let exhibition_id = user.exhibition_id;
             let exhibitor = ExhibitorsRoot::find_by_id(exhibition_id)
                 .one(&state.db_conn)
@@ -66,6 +68,7 @@ async fn get_forms(
                 }
             };
             let exhibitor_type = exhibitor.r#type.into_value().to_string();
+            trace!("finding forms");
             Forms::find()
                 .filter(forms::Column::AccessControlRoles.contains(exhibitor_type))
                 .all(&state.db_conn)

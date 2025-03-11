@@ -79,11 +79,17 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
             warn!("Authorization error: claim iss not found in the jwt");
             return StatusCode::UNAUTHORIZED.into_response();
         }
-    };
+    }
+    .strip_prefix("\"")
+    .unwrap()
+    .strip_suffix("\"")
+    .unwrap()
+    .to_string();
 
     // 自分自身が発行したトークンの場合：参加団体責任者アカウントとして処理
     // 他のissuerが発行したトークンの場合：adminアカウントとして処理
-    if iss == Value::String(jwt::JWT_ISS.to_string()) {
+    trace!("{} {}", iss, state.jwt_manager.iss);
+    if iss == state.jwt_manager.iss {
         trace!("token type: jizi jwt");
         let token = match state.jwt_manager.decode(&*token) {
             Ok(data) => data,
@@ -114,7 +120,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
         {
             Ok(user_info) => user_info,
             Err(err) => {
-                warn!("Authorization error: {:?}", err);
+                warn!("Authorization error: {:#?}", err);
                 return StatusCode::UNAUTHORIZED.into_response();
             }
         };

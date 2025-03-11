@@ -3,7 +3,6 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import {paths} from "@/lib/auth_v1";
 import createFetchClient from "openapi-fetch";
-import {router} from "next/client";
 
 type Inputs = {
   m_address: string,
@@ -34,7 +33,7 @@ export default function Login() {
     if (data) {
       localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
       localStorage.setItem("exhibitor_access_token", data.access_token)
-      await router.push('/');
+      window.location.assign("/")
     } else {
       switch (response.status) {
         case 401:

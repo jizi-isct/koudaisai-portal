@@ -33,11 +33,6 @@ impl Display for Type {
     }
 }
 
-pub const ALGORITHM: Algorithm = Algorithm::RS256;
-pub const ACCESS_TOKEN_EXPIRE_TIME: usize = 600; // 10 minutes
-pub const REFRESH_TOKEN_EXPIRE_TIME: usize = 60 * 60 * 24 * 30 * 6; // 6 months
-pub const JWT_ISS: &str = "https://portal.koudaisai.jp";
-
 #[derive(Serialize, Deserialize)]
 pub struct Tokens {
     refresh_token: String,
@@ -45,10 +40,10 @@ pub struct Tokens {
 }
 
 pub struct JWTManager {
-    algorithm: Algorithm,
-    access_token_expire_time: i64,
-    refresh_token_expire_time: i64,
-    iss: String,
+    pub algorithm: Algorithm,
+    pub access_token_expire_time: i64,
+    pub refresh_token_expire_time: i64,
+    pub iss: String,
     encoding_key: EncodingKey,
     decoding_key: DecodingKey,
     db_conn: DatabaseConnection,
@@ -77,7 +72,7 @@ impl JWTManager {
 
     pub fn encode(&self, claims: &Claims) -> Result<String> {
         Ok(jsonwebtoken::encode(
-            &Header::new(ALGORITHM),
+            &Header::new(self.algorithm),
             claims,
             &self.encoding_key,
         )?)
@@ -87,7 +82,7 @@ impl JWTManager {
         Ok(jsonwebtoken::decode::<Claims>(
             token,
             &self.decoding_key,
-            &Validation::new(ALGORITHM),
+            &Validation::new(self.algorithm),
         )?)
     }
 
@@ -158,7 +153,7 @@ impl JWTManager {
         }
 
         // exp検証
-        if claims.exp > Utc::now().timestamp() {
+        if claims.exp < Utc::now().timestamp() {
             return false;
         }
 

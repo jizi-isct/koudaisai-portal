@@ -1,36 +1,22 @@
 "use client";
 import styles from "./page.module.css";
-import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import Forms from "@/components/Forms/Lists/Lists";
+import {$api} from "@/lib/api";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export default function Page() {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-  const router = useRouter();
+  return (
+    <QueryClientProvider client={new QueryClient()}>
+      <Inner/>
+    </QueryClientProvider>
+  )
+}
 
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const access_token = localStorage.getItem("exhibitor_access_token");
-    if (access_token) {
-      setAuthenticated(true);
-    } else {
-      router.push("/login"); // トークンがない場合、ログインページにリダイレクト
-    }
-  }, []);
-
-  const fetcher = (url: string) => {
-    const access_token = localStorage.getItem("exhibitor_access_token");
-  
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    }).then((res) => res.json());
-  };
-  const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
+function Inner() {
+  const {data, error} = $api.useQuery(
+    "get",
+    "/forms"
+  )
 
   if (error) return <p>データの取得に失敗しました</p>;
   if (!data) return <p>読み込み中...</p>;

@@ -1,20 +1,22 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from "./page.module.css";
+import {useEffect, useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {getTokens} from "@/lib/auth";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const access_token = localStorage.getItem('exhibitor_access_token');
-    if (access_token) {
-      setAuthenticated(true);
-    } else {
-      router.push('/login'); // トークンがない場合、ログインページにリダイレクト
-    }
+    (async () => {
+      const tokens = await getTokens()
+      if (tokens) {
+        setAuthenticated(true);
+      } else {
+        router.push('/login'); // トークンがない場合、ログインページにリダイレクト
+      }
+    })();
   }, []);
 
   return (

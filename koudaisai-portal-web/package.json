@@ -11,6 +11,7 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.2",
     "next": "^15.1.7",
+    "next-base64": "^1.1.0",
     "openapi-fetch": "^0.13.4",
     "openapi-react-query": "^0.3.0",
     "react": "^19.0.0",
