@@ -3,7 +3,7 @@ import Image from "next/image";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import React from "react";
 import {Item} from "@/lib/api";
-import FormItemTypeSelect from "@/components/Forms/FormItem/FormItemTypeSelector/FormItemTypeSelect";
+import FormItemTypeSelect, {FormItemType} from "@/components/Forms/FormItem/FormItemTypeSelector/FormItemTypeSelect";
 
 type Props = {
   readonly item: Item;
@@ -32,25 +32,8 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
     )
   };
 
-  const handleFormItemTypeChange = (value: ("question_text" | "text" | "page_break")) => {
+  const handleFormItemTypeChange = (value: FormItemType) => {
     switch (value) {
-      case "question_text":
-        setItem(
-          {
-            ...item,
-            item_question: {
-              question: {
-                required: true,
-                question_text: {
-                  paragraph: false
-                }
-              }
-            },
-            item_page_break: undefined,
-            item_text: undefined,
-          }
-        )
-        break;
       case "page_break":
         setItem(
           {
@@ -68,6 +51,63 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
             item_question: undefined,
             item_page_break: undefined,
             item_text: {}
+          }
+        )
+        break;
+      case "question_text":
+        setItem(
+          {
+            ...item,
+            item_question: {
+              question: {
+                required: true,
+                question_text: {
+                  paragraph: false
+                },
+                question_radio_button: undefined,
+                question_check_box: undefined,
+              }
+            },
+            item_page_break: undefined,
+            item_text: undefined,
+          }
+        )
+        break;
+      case "question_radio_button":
+        setItem(
+          {
+            ...item,
+            item_question: {
+              question: {
+                required: true,
+                question_text: undefined,
+                question_radio_button: {
+                  choices: []
+                },
+                question_check_box: undefined,
+              }
+            },
+            item_page_break: undefined,
+            item_text: undefined,
+          }
+        )
+        break;
+      case "question_check_box":
+        setItem(
+          {
+            ...item,
+            item_question: {
+              question: {
+                required: true,
+                question_text: undefined,
+                question_radio_button: undefined,
+                question_check_box: {
+                  choices: []
+                },
+              }
+            },
+            item_page_break: undefined,
+            item_text: undefined,
           }
         )
         break;
@@ -102,15 +142,92 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
       }
     )
   }
+
+  const handleDeleteRadioButtonChoice = (index: number) => {
+    const choices = structuredClone(item.item_question!.question!.question_radio_button!.choices)
+    setItem(
+      {
+        ...item,
+        item_question: {
+          question: {
+            ...item.item_question!.question,
+            question_radio_button: {
+              choices: choices.toSpliced(index, 1)
+            }
+          }
+        }
+      }
+    )
+  }
+
+  const handleAddRadioButtonChoice = () => {
+    const choices = structuredClone(item.item_question!.question!.question_radio_button!.choices)
+    choices.push("選択肢" + choices.length)
+    setItem(
+      {
+        ...item,
+        item_question: {
+          question: {
+            ...item.item_question!.question,
+            question_radio_button: {
+              choices: choices
+            }
+          }
+        }
+      }
+    )
+  }
+
+  const handleDeleteCheckBoxChoice = (index: number) => {
+    const choices = structuredClone(item.item_question!.question!.question_check_box!.choices)
+    setItem(
+      {
+        ...item,
+        item_question: {
+          question: {
+            ...item.item_question!.question,
+            question_check_box: {
+              choices: choices.toSpliced(index, 1)
+            }
+          }
+        }
+      }
+    )
+  }
+
+  const handleAddCheckBoxChoice = () => {
+    const choices = structuredClone(item.item_question!.question!.question_check_box!.choices)
+    choices.push("選択肢" + choices.length)
+    setItem(
+      {
+        ...item,
+        item_question: {
+          question: {
+            ...item.item_question!.question,
+            question_check_box: {
+              choices: choices
+            }
+          }
+        }
+      }
+    )
+  }
+
   const getItemType = () => {
-    if (item.item_question?.question?.question_text) {
-      return "question_text"
-    }
     if (item.item_text) {
       return "text"
     }
     if (item.item_page_break) {
       return "page_break"
+    }
+    if (item.item_question?.question?.question_text) {
+      return "question_text"
+    }
+    if (item.item_question?.question?.question_radio_button) {
+      return "question_radio_button"
+    }
+    if (item.item_question?.question?.question_check_box) {
+      return "question_check_box"
     }
     throw Error("Illegal item type")
   }
@@ -148,6 +265,36 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
                 <input defaultChecked={item.item_question?.question?.question_text.paragraph} type="checkbox"
                        onChange={(e) => handleToggleParagraph(e.target.checked)} className={styles.checkBox}/>
             </>
+        }
+        {
+          item.item_question?.question?.question_radio_button &&
+            <ul>
+              {
+                item.item_question!.question!.question_radio_button!.choices.map((choice, i) => {
+                  return <li>{choice}
+                    <button onClick={() => handleDeleteRadioButtonChoice(i)}>削除</button>
+                  </li>
+                })
+              }
+                <li>
+                    <button onClick={() => handleAddRadioButtonChoice()}>追加</button>
+                </li>
+            </ul>
+        }
+        {
+          item.item_question?.question?.question_check_box &&
+            <ul>
+              {
+                item.item_question!.question!.question_check_box!.choices.map((choice, i) => {
+                  return <li>{choice}
+                    <button onClick={() => handleDeleteCheckBoxChoice(i)}>削除</button>
+                  </li>
+                })
+              }
+                <li>
+                    <button onClick={() => handleAddCheckBoxChoice()}>追加</button>
+                </li>
+            </ul>
         }
       </div>
       <div className={styles.buttonsWrapper}>

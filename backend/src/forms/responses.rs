@@ -57,7 +57,7 @@ impl Serialize for Answer {
         map.serialize_entry("item_id", &self.item_id)?;
         match &self.answer {
             Answers::Text(answer_text) => {
-                map.serialize_entry("answer_text", &answer_text.value)?;
+                map.serialize_entry("answer_text", &answer_text)?;
             }
         }
         map.end()
@@ -88,8 +88,8 @@ impl<'de> Visitor<'de> for AnswerVisitor {
     {
         let mut item_id = None;
         let mut answer = None;
-        while let Some(key) = map.next_key()? {
-            match key {
+        while let Some(key) = map.next_key::<String>()? {
+            match key.as_str() {
                 "item_id" => {
                     if item_id.is_some() {
                         return Err(de::Error::duplicate_field("item_id"));

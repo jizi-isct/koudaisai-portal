@@ -748,9 +748,21 @@ export interface components {
             /** @description trueの場合複数行にわたるテキスト。falseの場合一行の回答。 */
             paragraph: boolean;
         };
+        /** @description ラジオボタン */
+        QuestionRadioButton: {
+            /** @description 選択肢 */
+            choices: string[];
+        };
+        /** @description チェックボックス */
+        QuestionCheckBox: {
+            /** @description 選択肢 */
+            choices: string[];
+        };
         /** @description フォームの質問 */
         Question: components["schemas"]["QuestionGeneric"] & {
             question_text?: components["schemas"]["QuestionText"];
+            question_radio_button?: components["schemas"]["QuestionRadioButton"];
+            question_check_box?: components["schemas"]["QuestionCheckBox"];
         };
         /** @description 一つの質問を含む項目 */
         ItemQuestion: {

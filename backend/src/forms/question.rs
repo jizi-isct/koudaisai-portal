@@ -16,6 +16,8 @@ pub struct Question {
 #[derive(Debug)]
 pub enum Questions {
     Text(QuestionText),
+    RadioButton(QuestionRadioButton),
+    CheckBox(QuestionCheckBox),
 }
 
 /// テキスト
@@ -23,6 +25,20 @@ pub enum Questions {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct QuestionText {
     pub paragraph: bool,
+}
+
+/// ラジオボタン
+/// * `choices` - 選択肢
+#[derive(Serialize, Deserialize, Debug)]
+pub struct QuestionRadioButton {
+    pub choices: Vec<String>,
+}
+
+/// チェックボックス
+/// * `choices` - 選択肢
+#[derive(Serialize, Deserialize, Debug)]
+pub struct QuestionCheckBox {
+    pub choices: Vec<String>,
 }
 
 impl Serialize for Question {
@@ -35,6 +51,12 @@ impl Serialize for Question {
         match &self.question {
             Questions::Text(question_text) => {
                 map.serialize_entry("question_text", &question_text)?;
+            }
+            Questions::RadioButton(question_radio_button) => {
+                map.serialize_entry("question_radio_button", &question_radio_button)?;
+            }
+            Questions::CheckBox(question_check_box) => {
+                map.serialize_entry("question_check_box", &question_check_box)?;
             }
         }
         map.end()
@@ -79,10 +101,27 @@ impl<'de> Visitor<'de> for QuestionVisitor {
                     }
                     question = Some(Questions::Text(map.next_value()?));
                 }
+                "question_radio_button" => {
+                    if question.is_some() {
+                        return Err(de::Error::duplicate_field("question"));
+                    }
+                    question = Some(Questions::RadioButton(map.next_value()?));
+                }
+                "question_check_box" => {
+                    if question.is_some() {
+                        return Err(de::Error::duplicate_field("question"));
+                    }
+                    question = Some(Questions::CheckBox(map.next_value()?));
+                }
                 unknown => {
                     return Err(de::Error::unknown_field(
                         unknown,
-                        &["required", "question_text"],
+                        &[
+                            "required",
+                            "question_text",
+                            "question_radio_button",
+                            "question_check_box",
+                        ],
                     ))
                 }
             }

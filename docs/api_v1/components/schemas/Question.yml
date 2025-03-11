@@ -5,3 +5,7 @@ allOf:
   - properties:
       question_text:
         $ref: ./QuestionText.yml
+      question_radio_button:
+        $ref: ./QuestionRadioButton.yml
+      question_check_box:
+        $ref: ./QuestionCheckBox.yml
