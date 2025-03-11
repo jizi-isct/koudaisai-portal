@@ -3,6 +3,7 @@ mod forms;
 
 use crate::routes::AppState;
 use axum::Router;
+use std::sync::Arc;
 use tracing::instrument;
 
 #[instrument(name = "init /api")]

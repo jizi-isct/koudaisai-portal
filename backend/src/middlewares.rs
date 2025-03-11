@@ -11,6 +11,8 @@ use jsonwebtoken::{Algorithm, DecodingKey, TokenData, Validation};
 use openidconnect::core::CoreUserInfoClaims;
 use openidconnect::{AccessToken, SubjectIdentifier};
 use serde_json::Value;
+use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::io::AsyncReadExt;
 use tracing::log::{trace, warn};
 use tracing::{debug, instrument};
@@ -118,11 +120,12 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
         {
             Ok(user_info) => user_info,
             Err(err) => {
-                warn!("Authorization error: {:#?}", err);
+                warn!("Authorization error: {:?}", err);
                 return StatusCode::UNAUTHORIZED.into_response();
             }
         };
         req.extensions_mut().insert(CurrentUser::Admin(user_info));
+        trace!("oidc auth ok");
         next.run(req).await
     }
 }

@@ -72,8 +72,8 @@ impl<'de> Visitor<'de> for QuestionVisitor {
         let mut question_id = None;
         let mut required = None;
         let mut question = None;
-        while let Some(key) = map.next_key()? {
-            match key {
+        while let Some(key) = map.next_key::<String>()? {
+            match key.as_str() {
                 "question_id" => {
                     if question_id.is_some() {
                         return Err(de::Error::duplicate_field("question_id"));

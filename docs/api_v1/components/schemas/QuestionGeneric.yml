@@ -5,21 +5,9 @@ properties:
     type: string
     format: uuid
     readOnly: true
-  created_at:
-    description: 作成日時
-    type: string
-    format: datetime
-    readOnly: true
-  updated_at:
-    description: 更新日時
-    type: string
-    format: datetime
-    readOnly: true
   required:
     description: 回答必須かどうか
     type: boolean
 required:
   - question_id
-  - created_at
-  - updated_at
   - required

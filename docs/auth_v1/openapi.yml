@@ -20,3 +20,7 @@ paths:
     $ref: paths/reset.yml
   /revoke:
     $ref: paths/revoke.yml
+  /admin/login:
+    $ref: paths/admin_login.yml
+  /admin/redirect:
+    $ref: paths/admin_redirect.yml

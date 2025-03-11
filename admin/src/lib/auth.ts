@@ -8,7 +8,7 @@ export type Tokens = {
   access_token: string,
 }
 
-export const fetchClient = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+export const fetchClient = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL})
 
 export const $auth = createClient(fetchClient)
 
@@ -17,8 +17,8 @@ export const $auth = createClient(fetchClient)
  * @returns トークンがlocalStorageに存在する場合はTokensを返します．トークンが期限切れだった場合はrefreshを試み，成功した場合はTokensを返します．
  */
 export async function getTokens(): Promise<Tokens | undefined> {
-  const refresh_token = localStorage.getItem("exhibitor_refresh_token")
-  const access_token = localStorage.getItem("exhibitor_access_token")
+  const refresh_token = localStorage.getItem("admin_refresh_token")
+  const access_token = localStorage.getItem("admin_access_token")
 
   //nullだったらundefinedに
   if (refresh_token === null || access_token === null) {
@@ -56,8 +56,8 @@ export async function getTokens(): Promise<Tokens | undefined> {
   )
 
   if (data) {
-    localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
-    localStorage.setItem("exhibitor_access_token", data.access_token)
+    localStorage.setItem("admin_refresh_token", data.refresh_token)
+    localStorage.setItem("admin_access_token", data.access_token)
     return data
   } else {
     // refresh tokenが無効

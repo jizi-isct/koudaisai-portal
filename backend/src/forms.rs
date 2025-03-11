@@ -8,6 +8,7 @@ use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;
+use tracing::trace;
 use uuid::Uuid;
 
 /// フォーム
@@ -40,8 +41,6 @@ pub struct Info {
 
 /// フォームの単一の項目
 /// * `item_id`: アイテムのID
-/// * `created_at`: 作成日時
-/// * `updated_at`: 更新日時
 /// * `title`: 回答者に表示される項目のタイトル
 /// * `description`: 回答者に表示される項目の説明
 /// * `item`: アイテムの種類とより細かいプロパティ
@@ -129,12 +128,13 @@ impl<'de> Visitor<'de> for ItemVisitor {
     where
         A: MapAccess<'de>,
     {
+        trace!("visit start");
         let mut item_id = None;
         let mut title = None;
         let mut description = None;
         let mut item = None;
-        while let Some(key) = map.next_key()? {
-            match key {
+        while let Some(key) = map.next_key::<String>()? {
+            match key.as_str() {
                 "item_id" => {
                     if item_id.is_some() {
                         return Err(de::Error::duplicate_field("item_id"));
@@ -151,7 +151,9 @@ impl<'de> Visitor<'de> for ItemVisitor {
                     if description.is_some() {
                         return Err(de::Error::duplicate_field("description"));
                     }
-                    description = Some(map.next_value()?)
+                    trace!("Hello description");
+                    description = Some(map.next_value()?);
+                    trace!(description);
                 }
                 "item_question" => {
                     if item.is_some() {

@@ -67,7 +67,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
             ),
         )
         .route("/v1/admin/login", get(admin_login))
-        .route("/v1/admin/redirect", get(admin_redirect))
+        .route("/v1/admin/redirect", post(admin_redirect))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -429,13 +429,13 @@ struct RedirectResponse {
     pub access_token: String,
 }
 
-#[instrument(name = "/auth/v1/admin/redirect", skip(state, login_query))]
+#[instrument(name = "/auth/v1/admin/redirect", skip(state, payload))]
 async fn admin_redirect(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
-    login_query: Query<RedirectQuery>,
+    payload: Json<RedirectQuery>,
 ) -> Result<Json<RedirectResponse>, StatusCode> {
-    let auth_session = match state.auth_sessions.lock().await.remove(&login_query.state) {
+    let auth_session = match state.auth_sessions.lock().await.remove(&payload.state) {
         Some(auth_session) => auth_session,
         None => Err(StatusCode::BAD_REQUEST)?,
     };
@@ -443,7 +443,7 @@ async fn admin_redirect(
         auth_session,
         &state.http_client,
         &state.oidc_client,
-        &login_query.code,
+        &payload.code,
     )
     .await
     {

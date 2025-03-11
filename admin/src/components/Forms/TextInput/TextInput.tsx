@@ -5,7 +5,7 @@ type TextInputProps = {
     width?: number;
     placeholder?: string;
     value?: string;
-    onChange?: (value: string, value: string) => void;
+  onChange?: (value: string, args: string[] | undefined) => void;
     args?: string[];
 };
 
@@ -17,7 +17,8 @@ const TextInput = ({fontSize = 16, width = 0, placeholder = "回答を入力", v
         value={value ?? "データなし"}
         placeholder={placeholder}
         style={{fontSize: fontSize, width: width === 0 ? "100%" : width}}
-        onChange={(e) => onChange(e.target.value, args)}
+        onChange={(e) => (onChange ?? ((value: string, args: string[] | undefined) => {
+        }))(e.target.value, args)}
       />
   );
 };

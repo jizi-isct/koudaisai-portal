@@ -8,7 +8,7 @@ use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use axum::routing::{get, post};
+use axum::routing::{get, post, put};
 use axum::{Extension, Json, Router};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
@@ -28,6 +28,7 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_forms).post(post_forms))
+        .route("/{form_id}", put(put_form).delete(delete_form))
         .route("/{form_id}/responses", post(post_response))
 }
 
@@ -37,6 +38,7 @@ async fn get_forms(
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
 ) -> AppResponse {
+    trace!("hello");
     let form_models = match current_user {
         CurrentUser::Admin(_) => Forms::find().all(&state.db_conn).await?,
         CurrentUser::User(claims) => {
@@ -107,7 +109,7 @@ async fn post_forms(
 ) -> AppResponse {
     if let CurrentUser::Admin(_) = current_user {
         let model = forms::ActiveModel {
-            form_id: NotSet,
+            form_id: Set(Uuid::new_v4()),
             created_at: NotSet,
             updated_at: NotSet,
             info: Set(json!(new_form.info)),
@@ -130,7 +132,7 @@ struct EditForm {
     access_control: Option<AccessControl>,
 }
 
-#[instrument(name = "POST /api/v1/forms/{form_id}", skip(state))]
+#[instrument(name = "PUT /api/v1/forms/{form_id}", skip(state))]
 async fn put_form(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
