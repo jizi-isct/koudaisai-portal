@@ -11,7 +11,7 @@
 - **koudaisai-portal-web**: フロントエンドのソース
 
 ## 開発環境起動方法(backend)
-1. `./debug`で`sudo docker compose up`を起動
+1. `./debug`で`sudo docker compose up`
     - `keycloak`と`postgres`が起動される
 2. `./koudaisai-portal-backend`で`cargo run`
     - 起動に失敗するのでコンフィグを以下のように書き換える．
@@ -44,11 +44,11 @@
     address = "postgres://user:user@localhost:5432/koudaisai-portal"
     ```
     - configファイルの位置は以下の通り
-        - | OS          | path                                                         |
-                              |-------------|--------------------------------------------------------------|
-          | Linux(user) | ~/.config/koudaisai-portal/                                  |
-          | Linux(root) | /etc/koudaisai-portal/                                       |
-          | Windows     | C:\Users\__username__\AppData\Roaming\koudaisai-portal       |
-          | macOS       | /Users/__username__/Library/Preferences/rs.koudaisai-portal/ |
+      | OS          | path                                                         |
+      |-------------|--------------------------------------------------------------|
+      | Linux(user) | ~/.config/koudaisai-portal/                                  |
+      | Linux(root) | /etc/koudaisai-portal/                                       |
+      | Windows     | C:\Users\__username__\AppData\Roaming\koudaisai-portal       |
+      | macOS       | /Users/__username__/Library/Preferences/rs.koudaisai-portal/ |
 
 3. 再度`cargo run`
