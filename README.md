@@ -1,7 +1,16 @@
 # 工大祭ポータル
 
-## 開発環境起動方法(backend)
+工大祭の参加団体向けポータルサイトです．
 
+## ディレクトリ構成
+
+- **debug**: デバッグ
+- **docs**: ドキュメント
+- **koudaisai-portal-admin**: 工大祭ポータル管理サイトのソース
+- **koudaisai-portal-backend**: バックエンドのソース
+- **koudaisai-portal-web**: フロントエンドのソース
+
+## 開発環境起動方法(backend)
 1. `./debug`で`sudo docker compose up`を起動
     - `keycloak`と`postgres`が起動される
 2. `./koudaisai-portal-backend`で`cargo run`
