@@ -1,7 +1,7 @@
 "use client";
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
-import {useEffect, useState} from "react";
+import {Suspense, useEffect, useState} from "react";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import ParagraphInput from "@/components/Forms/ParagraphInput/ParagraphInput";
 import SaveStatus from "@/components/Forms/SaveStatus/SaveStatus";
@@ -12,9 +12,11 @@ import FormMetadata from "@/components/Forms/FormMetadata/FormMetadata";
 
 export default function Page() {
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <Inner/>
-    </QueryClientProvider>
+    <Suspense>
+      <QueryClientProvider client={new QueryClient()}>
+        <Inner/>
+      </QueryClientProvider>
+    </Suspense>
   )
 }
 

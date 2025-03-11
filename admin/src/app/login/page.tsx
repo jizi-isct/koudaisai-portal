@@ -2,12 +2,15 @@
 import {useSearchParams} from "next/navigation";
 import {$auth} from '@/lib/auth';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {Suspense} from "react";
 
 export default function Login() {
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <Inner/>
-    </QueryClientProvider>
+    <Suspense>
+      <QueryClientProvider client={new QueryClient()}>
+        <Inner/>
+      </QueryClientProvider>
+    </Suspense>
   );
 }
 

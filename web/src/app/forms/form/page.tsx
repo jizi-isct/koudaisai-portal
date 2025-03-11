@@ -1,16 +1,18 @@
 "use client";
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
-import {useState} from "react";
+import {Suspense, useState} from "react";
 import {$api, fetchClient, FormResponse, Item} from "@/lib/api";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import FormItem from "@/components/Forms/FormItem/FormItem";
 
 export default function Page() {
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <Inner/>
-    </QueryClientProvider>
+    <Suspense>
+      <QueryClientProvider client={new QueryClient()}>
+        <Inner/>
+      </QueryClientProvider>
+    </Suspense>
   )
 }
 
