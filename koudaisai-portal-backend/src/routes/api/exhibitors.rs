@@ -1,3 +1,4 @@
+use crate::entities::exhibitors_root::Model;
 use crate::entities::{
     exhibitors_category_booth, exhibitors_category_general, exhibitors_category_labo,
     exhibitors_category_stage, exhibitors_root, sea_orm_active_enums, users,
@@ -12,8 +13,8 @@ use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use migration::SubQueryStatement;
-use sea_orm::ColumnTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue, EntityTrait, QueryFilter, TransactionTrait};
+use sea_orm::{ColumnTrait, EntityOrSelect};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -37,7 +38,7 @@ struct PostExhibitorsPayload {
         RepresentativeWrite,
     ),
 }
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 enum ExhibitionType {
     Booth,
@@ -60,6 +61,23 @@ struct RepresentativeWrite {
     first_name: String,
     last_name: String,
     m_address: String,
+}
+
+fn new_user_model(
+    representative: &RepresentativeWrite,
+    exhibition_id: String,
+) -> users::ActiveModel {
+    users::ActiveModel {
+        id: ActiveValue::Set(Uuid::new_v4()),
+        created_at: ActiveValue::NotSet,
+        updated_at: ActiveValue::NotSet,
+        first_name: ActiveValue::Set(representative.first_name.clone()),
+        last_name: ActiveValue::Set(representative.first_name.clone()),
+        m_address: ActiveValue::Set(representative.first_name.clone()),
+        password_hash: ActiveValue::NotSet,
+        password_salt: ActiveValue::NotSet,
+        exhibition_id: ActiveValue::Set(exhibition_id),
+    }
 }
 type PostExhibitorsResponse = (String, String, String);
 #[instrument(name = "POST /api/v1/exhibitors", skip(state))]
@@ -197,19 +215,55 @@ async fn post_exhibitors(
     Ok((StatusCode::CREATED, Json(activation_tokens).into_response()))
 }
 
-fn new_user_model(
-    representative: &RepresentativeWrite,
-    exhibition_id: String,
-) -> users::ActiveModel {
-    users::ActiveModel {
-        id: ActiveValue::Set(Uuid::new_v4()),
-        created_at: ActiveValue::NotSet,
-        updated_at: ActiveValue::NotSet,
-        first_name: ActiveValue::Set(representative.first_name.clone()),
-        last_name: ActiveValue::Set(representative.first_name.clone()),
-        m_address: ActiveValue::Set(representative.first_name.clone()),
-        password_hash: ActiveValue::NotSet,
-        password_salt: ActiveValue::NotSet,
-        exhibition_id: ActiveValue::Set(exhibition_id),
+#[derive(Serialize, Debug)]
+struct GetExhibitorsResponseElement {
+    id: String,
+    created_at: String,
+    updated_at: String,
+    exhibitor_name: String,
+    exhibition_name: Option<String>,
+    icon_id: Option<String>,
+    description: Option<String>,
+    r#type: ExhibitionType,
+    representatives: (Uuid, Uuid, Uuid),
+}
+
+impl From<exhibitors_root::Model> for GetExhibitorsResponseElement {
+    fn from(value: Model) -> Self {
+        Self {
+            id: value.id,
+            created_at: value.created_at.unwrap().to_string(),
+            updated_at: value.updated_at.unwrap().to_string(),
+            exhibitor_name: value.exhibitor_name,
+            exhibition_name: value.exhibition_name,
+            icon_id: value.icon_id,
+            description: value.description,
+            r#type: value.r#type,
+            representatives: (
+                value.representative1.unwrap(),
+                value.representative2.unwrap(),
+                value.representative3.unwrap(),
+            ),
+        }
     }
+}
+
+#[instrument(name = "GET /api/v1/exhibitors", skip(state))]
+async fn get_exhibitors(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Response), AppError> {
+    match current_user {
+        CurrentUser::Admin(_) => {}
+        _ => return Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response())),
+    };
+
+    let models = exhibitors_root::Entity.select().all(&state.db_conn).await?;
+    let mut exhibitors: Vec<GetExhibitorsResponseElement> = vec![];
+    for model in models {
+        exhibitors.push(model.into())
+    }
+
+    Ok((StatusCode::OK, Json(exhibitors).into_response()))
 }
