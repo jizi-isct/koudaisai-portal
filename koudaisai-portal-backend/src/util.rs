@@ -29,3 +29,5 @@ where
         Self(err.into())
     }
 }
+
+pub type AppResponse = Result<(StatusCode, Response), AppError>;
