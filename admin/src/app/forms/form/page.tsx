@@ -1,15 +1,11 @@
 "use client";
-import Image from "next/image";
 import styles from "./page.module.css";
-import useSWR, { mutate } from "swr";
-import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import useSWR, {mutate} from "swr";
+import {useSearchParams} from "next/navigation";
+import {useEffect, useState} from "react";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import ParagraphInput from "@/components/Forms/ParagraphInput/ParagraphInput";
 import Question from "@/components/Forms/Question/Question";
-import Text from "@/components/Forms/Question/Text/Text";
-import CheckBox from "@/components/Forms/Question/CheckBox/CheckBox";
-import RadioButton from "@/components/Forms/Question/RadioButton/RadioButton";
 import SaveStatus from "@/components/Forms/SaveStatus/SaveStatus";
 
 export default function Page() {

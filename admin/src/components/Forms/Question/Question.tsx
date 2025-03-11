@@ -2,7 +2,6 @@ import styles from "./Question.module.css";
 import Image from "next/image";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import React from "react";
-import { describe } from "node:test";
 
 type QuestionProps = {
   children?: React.ReactNode;

@@ -2,7 +2,7 @@ FROM --platform=linux/amd64 node:23 AS build-web
 
 WORKDIR /usr/src/app
 
-COPY ./koudaisai-portal-web .
+COPY web .
 
 RUN npm install
 
@@ -12,7 +12,7 @@ FROM --platform=linux/amd64 node:23 AS build-admin
 
 WORKDIR /usr/src/app
 
-COPY ./koudaisai-portal-admin .
+COPY admin .
 
 RUN npm install
 
@@ -22,7 +22,7 @@ FROM --platform=linux/amd64 rust:1.85 AS build-backend
 
 WORKDIR /usr/src/app
 
-COPY ./koudaisai-portal-backend .
+COPY backend .
 
 RUN cargo fetch --locked
 RUN cargo build --release --target-dir /target

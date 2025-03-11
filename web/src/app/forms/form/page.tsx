@@ -1,8 +1,7 @@
 "use client";
 import styles from "./page.module.css";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import {useRouter, useSearchParams} from "next/navigation";
+import {useEffect, useState} from "react";
 import useSWR from "swr";
 import Question from "@/components/Forms/Questions/Question";
 

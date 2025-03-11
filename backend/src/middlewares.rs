@@ -11,8 +11,6 @@ use jsonwebtoken::{Algorithm, DecodingKey, TokenData, Validation};
 use openidconnect::core::CoreUserInfoClaims;
 use openidconnect::{AccessToken, SubjectIdentifier};
 use serde_json::Value;
-use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::io::AsyncReadExt;
 use tracing::log::{trace, warn};
 use tracing::{debug, instrument};

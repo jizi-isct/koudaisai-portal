@@ -6,9 +6,9 @@
 
 - **debug**: デバッグ
 - **docs**: ドキュメント
-- **koudaisai-portal-admin**: 工大祭ポータル管理サイトのソース
-- **koudaisai-portal-backend**: バックエンドのソース
-- **koudaisai-portal-web**: フロントエンドのソース
+- **admin**: 工大祭ポータル管理サイトのソース
+- **backend**: バックエンドのソース
+- **web**: フロントエンドのソース
 
 ## 開発環境起動方法(backend)
 1. `./debug`で`sudo docker compose up`
