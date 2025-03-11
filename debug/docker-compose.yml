@@ -1,16 +1,4 @@
 services:
-  app:
-    depends_on:
-      - keycloak
-      - db
-    build: ..
-    volumes:
-      - ./config:/usr/src/app/.config/koudaisai-portal
-      - ./private-key.pem:/usr/src/app/private-key.pem
-      - ./public-key.pem:/usr/src/app/public-key.pem
-    ports:
-      - "8000:8080"
-    restart: always
   keycloak:
     depends_on:
       - db
@@ -19,6 +7,8 @@ services:
       - "8080:8080"
       - "8443:8443"
     command: "start-dev"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
       KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
@@ -39,3 +29,4 @@ services:
 
 volumes:
   db-store:
+  keycloak-data:

@@ -1,66 +1,67 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from "./page.module.css";
+import {useState} from 'react';
+import {SubmitHandler, useForm} from "react-hook-form";
+import {paths} from "@/lib/auth_v1";
+import createFetchClient from "openapi-fetch";
+import {router} from "next/client";
+
+type Inputs = {
+  m_address: string,
+  password: string
+}
+const fetchClient = createFetchClient<paths>({
+  baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL,
+});
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
+  const [error, setError] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: {errors},
+  } = useForm<Inputs>()
+  const onSubmit: SubmitHandler<Inputs> = async (inputs) => {
+    const {data, response} = await fetchClient.POST(
+      "/login",
+      {
+        body: {
+          m_address: inputs.m_address,
+          password: inputs.password
+        }
+      })
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    // APIのエンドポイント（ログイン認証）
-    const response = await fetch('${API_BASE_URL}/auth/v1/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      
-      // JWTトークンをローカルストレージに保存
-      localStorage.setItem('exhibitor_access_token', data.access_token);
-
-      // ログイン成功後、ホームページにリダイレクト
-      router.push('/');
+    if (data) {
+      localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
+      localStorage.setItem("exhibitor_access_token", data.access_token)
+      await router.push('/');
     } else {
-      const errorData = await response.json();
-      setError(errorData.message || 'ログインに失敗しました');
-      console.log("ログインに失敗しました");
+      switch (response.status) {
+        case 401:
+          setError("mアドレスまたはパスワードが間違えています。")
+          break;
+        default:
+          setError("内部エラー。開発者に問い合わせてください。")
+          break;
+      }
     }
   };
 
   return (
     <div>
       <h1>ログイン</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+      {error && <p style={{color: 'red'}}>{error}</p>}
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label htmlFor="username">ユーザー名:</label>
+          <label htmlFor="username">mアドレス:</label>
           <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
+            {...register("m_address")}
           />
         </div>
         <div>
           <label htmlFor="password">パスワード:</label>
           <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            {...register("password")}
           />
         </div>
         <button type="submit">ログイン</button>

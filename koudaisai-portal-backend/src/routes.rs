@@ -18,8 +18,9 @@ use sea_orm::DatabaseConnection;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tower_http::services::ServeDir;
 use tokio::sync::Mutex;
+use tower_http::cors::CorsLayer;
+use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
 
 #[instrument(skip(web))]
@@ -58,6 +59,7 @@ pub fn init_routes(
             get_service(ServeDir::new(&web.static_files.admin_path)),
         )
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
+        .layer(CorsLayer::permissive())
         .with_state(state)
         .into_make_service_with_connect_info::<SocketAddr>()
 }

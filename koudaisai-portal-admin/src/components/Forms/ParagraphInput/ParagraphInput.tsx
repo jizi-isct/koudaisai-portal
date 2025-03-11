@@ -5,11 +5,14 @@ type ParagraphInputProps = {
     width?: number;
     placeholder?: string;
     value?: string;
-    onChange?: (value: string, value: string) => void;
+  onChange?: (value: String, args: string[]) => void;
     args?: string[];
 };
 
-const ParagraphInput = ({fontSize = 16, width = 0, placeholder = "回答を入力", value, onChange = () => {}, args = []}: ParagraphInput) => {
+const ParagraphInput = ({
+                          fontSize = 16, width = 0, placeholder = "回答を入力", value, onChange = () => {
+  }, args = []
+                        }: ParagraphInputProps) => {
   return (
     <textarea
         className={styles.Paragraph}

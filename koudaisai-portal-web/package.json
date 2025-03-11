@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.1.7",
+    "openapi-fetch": "^0.13.4",
+    "openapi-react-query": "^0.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
     "swr": "^2.3.3"
   },
   "devDependencies": {

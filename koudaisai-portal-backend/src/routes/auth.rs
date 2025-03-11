@@ -47,7 +47,7 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/v1/activate", post(activate))
-        .route("/v1/login", get(login))
+        .route("/v1/login", post(login))
         .route("/v1/admin/login", get(admin_login))
         .route("/v1/admin/redirect", get(admin_redirect))
         .route_layer(
@@ -61,18 +61,21 @@ pub fn init_router() -> Router<Arc<AppState>> {
 
 #[derive(Serialize, Deserialize)]
 struct ActivatePayload {
-    uuid: Uuid,
+    m_address: String,
     token: String,
     password: String,
 }
-#[instrument(name = "/auth/v1/activate", fields(payload.uuid = %payload.uuid), skip(payload, state))]
+#[instrument(name = "/auth/v1/activate", fields(payload.m_address = %payload.m_address), skip(
+    payload,
+    state
+))]
 async fn activate(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ActivatePayload>,
 ) -> StatusCode {
     let right_token = stretch_with_salt(
-        payload.uuid.to_string().as_str(),
+        payload.m_address.to_string().as_str(),
         state.web.auth.activation_salt.as_str(),
         2_i32.pow(state.web.auth.stretch_cost as u32),
     )
@@ -80,7 +83,11 @@ async fn activate(
 
     if digest(&*payload.token) == digest(&*right_token) {
         //文字列比較の計算時間からトークンを推測されないようにdigestしてから比較
-        let user = match Users::find_by_id(payload.uuid).one(&state.db_conn).await {
+        let user = match Users::find()
+            .filter(users::Column::MAddress.eq(payload.m_address.to_string()))
+            .one(&state.db_conn)
+            .await
+        {
             Ok(Some(user)) => user,
             Ok(None) => {
                 debug!("404 Not Found");

@@ -1,4 +1,4 @@
-put:
+post:
   summary: パスワードをリセット
   tags:
     - auth

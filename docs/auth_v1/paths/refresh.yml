@@ -1,4 +1,4 @@
-get:
+post:
   summary: リフレッシュトークンを検証し、アクセストークンを発行する。
   tags:
     - auth
