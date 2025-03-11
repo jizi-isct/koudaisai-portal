@@ -1,0 +1,7 @@
+get:
+  summary: OIDCの認証エンドポイントまでリダイレクト
+  tags:
+    - admin
+  responses:
+    '302':
+      description: Found.

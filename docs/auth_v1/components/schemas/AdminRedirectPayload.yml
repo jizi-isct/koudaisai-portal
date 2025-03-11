@@ -1,0 +1,10 @@
+properties:
+  code:
+    description: code
+    type: string
+  state:
+    description: state
+    type: string
+required:
+  - code
+  - state
