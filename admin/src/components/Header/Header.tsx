@@ -16,7 +16,7 @@ const Header = () => {
         />
         <HeaderButton 
           text="フォーム"
-          onClick="/forms" 
+          onClick="/admin/forms"
         />
         <HeaderButton 
           text="資料"

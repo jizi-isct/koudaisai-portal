@@ -4,11 +4,11 @@ import {useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import TextInput from "@/components/Forms/TextInput/TextInput";
 import ParagraphInput from "@/components/Forms/ParagraphInput/ParagraphInput";
-import Question from "@/components/Forms/Question/Question";
 import SaveStatus from "@/components/Forms/SaveStatus/SaveStatus";
-import {components} from "@/lib/api_v1";
-import {$api, fetchClient} from "@/lib/api";
+import {$api, fetchClient, Form, Item} from "@/lib/api";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {FormItem} from "@/components/Forms/FormItem/FormItem";
+import FormMetadata from "@/components/Forms/FormMetadata/FormMetadata";
 
 export default function Page() {
   return (
@@ -22,21 +22,36 @@ function Inner() {
   const searchParams = useSearchParams();
   const formId = searchParams.get("formId");
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  if (!formId) {
+    window.location.assign("/404")
+  }
 
   const {data, error} = $api.useQuery(
     "get",
-    "/forms"
+    "/forms/{form_id}",
+    {
+      params: {
+        path: {
+          form_id: formId!
+        }
+      }
+    }
   )
-  type Item = components["schemas"]["Item"]
-  type Form = components["schemas"]["Form"]
-
-  const [form, setForm] = useState<Form>();
+  const [form, _setForm] = useState<Form>();
   const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | "unsaved">("saved");
 
+  useEffect(() => {
+    if (data) {
+      _setForm(data)
+    }
+  }, [data])
+
+  if (!data || !form) {
+    return <p>loading...</p>;
+  }
+
   // フォームのデータをサーバーへ保存
-  const saveForm = async (updatedForm: Form) => {
-    if (!formId) return;
+  const saveForm = async (form: Form) => {
     setSaveStatus("saving");
 
     const {error} = await fetchClient.PUT(
@@ -44,13 +59,13 @@ function Inner() {
       {
         params: {
           path: {
-            form_id: formId
+            form_id: formId!
           }
         },
         body: {
-          info: updatedForm.info,
-          items: updatedForm.items,
-          access_control: updatedForm.access_control
+          info: form.info,
+          items: form.items,
+          access_control: form.access_control
         }
       }
     );
@@ -62,191 +77,129 @@ function Inner() {
     }
   };
 
-  useEffect(() => {
-    if (data && Array.isArray(data)) {
-      // form_id が formId と一致するものを検索
-      const foundForm = data.find((f: Form) => f.form_id === formId);
-      if (foundForm) {
-        //debug用の出力
-        console.log(foundForm);
-        setForm(foundForm);
+  const setForm = (form: Form) => {
+    saveForm(form).then()
+    _setForm(form)
+  }
+
+  const handleTitleChange = (value: string, args?: string[]) => {
+    console.log(form)
+    setForm({
+      ...form,
+      info: {
+        ...form.info,
+        title: value
       }
-    }
-  }, [data, formId]);
-
-  const updateTitle = (title: string) => {
-    setForm((prev) => {
-      if (!prev) return prev;
-      const updatedForm = {
-        ...prev,
-        info: {...prev.info, title},
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+    })
+    console.log(form)
   };
 
-  const updateDescription = (description: string) => {
-    setForm((prev) => {
-      if (!prev) return prev;
-      const updatedForm = {
-        ...prev,
-        info: {...prev.info, description},
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+  const handleDescriptionChange = (value: string, args?: string[]) => {
+    setForm({
+      ...form,
+      info: {
+        ...form.info,
+        description: value
+      }
+    })
   };
 
-  const updateItem = (itemId: string, title: string, description: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
 
-      const updatedForm = {
-        ...prevForm,
-        items: prevForm.items.map((item) =>
-          item.item_id === itemId
-            ? {
-              ...item,
-              title: title !== null ? title : item.title,
-              description: description !== null ? description : item.description,
-            }
-            : item
-        ),
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+  const setItem = (item: Item) => {
+    setForm({
+      ...form,
+      items: form.items.map((item_) => item_.item_id === item.item_id ? item : item_)
+    })
+  }
+
+  const moveItemUp = (item: Item) => () => {
+    const index = form.items.findIndex((item_) => item_ === item);
+    if (index === 0) return;
+    setForm({
+      ...form,
+      items: [
+        ...form.items.slice(0, index - 1),
+        form.items[index],
+        form.items[index - 1],
+        ...form.items.slice(index + 1),
+      ],
+    })
   };
 
-  const toggleRequired = (itemId: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
-
-      const updatedForm = {
-        ...prevForm,
-        items: prevForm.items.map((item) =>
-          item.item_id === itemId && item?.item_question?.question
-            ? {
-              ...item,
-              item_question: {
-                ...item?.item_question,
-                question: {
-                  ...item?.item_question!.question,
-                  required: !item?.item_question!.question.required,
-                },
-              },
-            }
-            : item
-        ),
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
-  };
-
-  const reorderQuestionUp = (itemId: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
-
-      const index = prevForm.items.findIndex((item) => item.item_id === itemId);
-      if (index === 0) return prevForm;
-
-      const updatedForm = {
-        ...prevForm,
+  const moveItemDown = (item: Item) => () => {
+    const index = form.items.findIndex((item_) => item_ === item);
+    if (index === -1) return;
+    setForm(
+      {
+        ...form,
         items: [
-          ...prevForm.items.slice(0, index - 1),
-          prevForm.items[index],
-          prevForm.items[index - 1],
-          ...prevForm.items.slice(index + 1),
+          ...form.items.slice(0, index),
+          form.items[index + 1],
+          form.items[index],
+          ...form.items.slice(index + 2),
         ],
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+      }
+    )
   };
 
-  const reorderQuestionDown = (itemId: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
-
-      const index = prevForm.items.findIndex((item) => item.item_id === itemId);
-      if (index === -1) return prevForm;
-
-      const updatedForm = {
-        ...prevForm,
-        items: [
-          ...prevForm.items.slice(0, index),
-          prevForm.items[index + 1],
-          prevForm.items[index],
-          ...prevForm.items.slice(index + 2),
-        ],
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
-  };
-
-  const deleteQestion = (itemId: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
-
-      const updatedForm = {
-        ...prevForm,
-        items: prevForm.items.filter((item) => item.item_id !== itemId),
-      };
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+  const deleteItem = (item: Item) => () => {
+    setForm(
+      {
+        ...form,
+        items: form.items.filter((item_) => item_ !== item),
+      }
+    )
   };
 
   const createNewItem = (itemType: string) => {
-    setForm((prevForm) => {
-      if (!prevForm) return prevForm;
-
-      const newItem: Item = {
-        item_id: crypto.randomUUID(),
-        title: "タイトル",
-        description: "概要",
-        ...(itemType === "text" && {item_text: {}}),
-        ...(itemType === "page_break" && {item_page_break: {}}),
-        ...(itemType === "question" && {
-          item_question: {
-            question: {
-              question_id: crypto.randomUUID(),
-              required: false,
-              question_text: {
-                paragraph: false,
-              },
+    const newItem: Item = {
+      item_id: crypto.randomUUID(),
+      title: "タイトル",
+      description: "概要",
+      ...(itemType === "text" && {item_text: {}}),
+      ...(itemType === "page_break" && {item_page_break: {}}),
+      ...(itemType === "question" && {
+        item_question: {
+          question: {
+            question_id: crypto.randomUUID(),
+            required: false,
+            question_text: {
+              paragraph: false,
             },
           },
-        }),
-      };
-
-      const updatedForm = {
-        ...prevForm,
-        items: [...prevForm.items, newItem],
-      };
-
-      saveForm(updatedForm); // 変更をサーバーに保存
-      return updatedForm;
-    });
+        },
+      }),
+    }
+    setForm(
+      {
+        ...form,
+        items: [...form.items, newItem],
+      }
+    )
   };
 
   const renderItems = () => {
     if (!form || !form.items) return null;
 
     return form.items.map((item) => (
-      <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem}
-                toggleRequired={toggleRequired} reorderQuestionUp={reorderQuestionUp}
-                reorderQuestionDown={reorderQuestionDown} deleteQuestion={deleteQestion}>
-        {/* itemの種類によって異なる入力コンポーネントを表示 */}
-        {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
-        {item.item_question && (
-          <>
-          </>
-        )}
-      </Question>
+      // <Question key={item.item_id} itemId={item.item_id} form={form} updateItem={updateItem}
+      //           toggleRequired={toggleRequired} reorderQuestionUp={reorderQuestionUp}
+      //           reorderQuestionDown={reorderQuestionDown} deleteQuestion={deleteQestion}>
+      //   {/* itemの種類によって異なる入力コンポーネントを表示 */}
+      //   {item.item_question?.question?.question_text?.paragraph ? <ParagraphInput fontSize={14} placeholder="長文回答" /> : <TextInput fontSize={14} placeholder="短文回答" />}
+      //   {item.item_question && (
+      //     <>
+      //     </>
+      //   )}
+      // </Question>
+      <FormItem
+        key={item.item_id}
+        item={item}
+        setItem={setItem}
+        moveUp={moveItemUp(item)}
+        moveDown={moveItemDown(item)}
+        delete_={deleteItem(item)}
+      />
     ));
   };
 
@@ -265,16 +218,18 @@ function Inner() {
             width={400}
             placeholder="タイトルを入力"
             value={form?.info?.title ?? "データなし"}
-            onChange={updateTitle}
+            onChange={handleTitleChange}
             args={[]}
           />
           <ParagraphInput
             fontSize={12}
             placeholder="説明文を入力"
             value={form?.info?.description ?? "データなし"}
-            onChange={updateDescription}
+            onChange={handleDescriptionChange}
             args={[]}
           />
+          <FormMetadata form={form} setForm={setForm}/>
+
           <div className={styles.formMenuWrapper}>
             <SaveStatus status={saveStatus}/>
           </div>
@@ -282,9 +237,10 @@ function Inner() {
         {/* 動的に生成された Question コンポーネントを表示 */}
         {renderItems()}
         <div className={styles.newItemWrapper}>
-          <button onClick={() => createNewItem("text")}>短文回答</button>
+          項目を追加：
+          <button onClick={() => createNewItem("text")}>テキスト</button>
           <button onClick={() => createNewItem("question")}>質問</button>
-          <button onClick={() => createNewItem("page_break")}>ページ区切り</button>
+          <button onClick={() => createNewItem("page_break")}>改ページ</button>
         </div>
       </main>
     </div>

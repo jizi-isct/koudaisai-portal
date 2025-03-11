@@ -280,7 +280,49 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * フォームを取得
+         * @description ### authの違いによる挙動の違い
+         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能なフォームな場合取得
+         *     - **admin_oidcの場合**: 存在するフォームを全て取得
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description フォームID */
+                    form_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Form"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         /** フォームを更新 */
         put: {
             parameters: {

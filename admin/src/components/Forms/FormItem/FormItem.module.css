@@ -1,5 +1,5 @@
 
-.formWrapper{
+.formWrapper {
     width: 600px;
     width: 50vw;
     border: 1px solid var(--darkblue);
@@ -12,11 +12,11 @@
     background-color: white;
 }
 
-.questionWrapper{
+.questionWrapper {
     margin: 20px 0;
 }
 
-.buttonsWrapper{
+.buttonsWrapper {
     width: 100%;
     border-top: 1px solid var(--lightblue);
     display: flex;
@@ -31,11 +31,11 @@
     border: 2px solid var(--darkgray);
     vertical-align: -5px;
     -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
-  }
-  
-  .checkBox:checked:before {
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.checkBox:checked:before {
     position: absolute;
     top: 1px;
     left: 4px;
@@ -45,24 +45,24 @@
     border-right: 2px solid var(--darkgray);
     border-bottom: 2px solid var(--darkgray);
     content: '';
-  }
+}
 
-  .buttons{
+.buttons {
     display: flex;
     align-items: center;
-  }
+}
 
-  .buttons label{
+.buttons label {
     color: var(--darkgray);
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     margin-right: 5px;
-  }
+}
 
-  .deleteButtonWrapper{
+.deleteButtonWrapper {
     border-left: 2px solid var(--gray);
     margin-left: 15px;
     padding-left: 10px;
-  }
+}

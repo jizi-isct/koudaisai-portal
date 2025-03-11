@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "crypto": "^1.0.1",
     "next": "^15.2.0",
     "next-base64": "^1.1.0",
     "nextjs": "^0.0.3",
     "openapi-fetch": "^0.13.4",
     "openapi-react-query": "^0.3.0",
     "react": "^19.0.0",
+    "react-datepicker": "^8.2.0",
     "react-dom": "^19.0.0",
     "swr": "^2.3.2"
   },

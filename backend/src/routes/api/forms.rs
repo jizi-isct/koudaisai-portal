@@ -28,7 +28,10 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_forms).post(post_forms))
-        .route("/{form_id}", put(put_form).delete(delete_form))
+        .route(
+            "/{form_id}",
+            get(get_form).put(put_form).delete(delete_form),
+        )
         .route("/{form_id}/responses", post(post_response))
 }
 
@@ -123,6 +126,68 @@ async fn post_forms(
     } else {
         Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
     }
+}
+
+#[instrument(name = "GET /api/v1/forms/{form_id}", skip(state))]
+async fn get_form(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(form_id): Path<Uuid>,
+) -> AppResponse {
+    trace!("hello");
+    let form_model = match current_user {
+        CurrentUser::Admin(_) => Forms::find_by_id(form_id).one(&state.db_conn).await?,
+        CurrentUser::User(claims) => {
+            trace!("finding user");
+            let user = Users::find_by_id(claims.sub).one(&state.db_conn).await?;
+            let user = match user {
+                Some(user) => user,
+                None => {
+                    warn!("internal server error occurred: user doesn't exist");
+                    return Ok((
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "User not found".into_response(),
+                    ));
+                }
+            };
+            trace!("finding exhibitor");
+            let exhibition_id = user.exhibition_id;
+            let exhibitor = ExhibitorsRoot::find_by_id(exhibition_id)
+                .one(&state.db_conn)
+                .await?;
+            let exhibitor = match exhibitor {
+                Some(exhibitor) => exhibitor,
+                None => {
+                    warn!("internal server error occurred: exhibitor doesn't exist");
+                    return Ok((
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "exhibitor not found".into_response(),
+                    ));
+                }
+            };
+            let exhibitor_type = exhibitor.r#type.into_value().to_string();
+            trace!("finding forms");
+            Forms::find_by_id(form_id)
+                .filter(forms::Column::AccessControlRoles.contains(exhibitor_type))
+                .one(&state.db_conn)
+                .await?
+        }
+        CurrentUser::None => {
+            Forms::find_by_id(form_id)
+                .filter(forms::Column::AccessControlRoles.contains("none"))
+                .one(&state.db_conn)
+                .await?
+        }
+    };
+
+    if form_model == None {
+        return Ok((StatusCode::NOT_FOUND, "form not found.".into_response()));
+    }
+
+    let form = Form::from_model(&form_model.unwrap())?;
+
+    Ok((StatusCode::OK, Json(form).into_response()))
 }
 
 #[derive(Serialize, Deserialize, Debug)]

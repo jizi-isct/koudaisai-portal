@@ -1,7 +1,10 @@
 import createClient from "openapi-react-query";
 import {getTokens} from "@/lib/auth";
-import {paths} from "@/lib/api_v1";
+import {components, paths} from "@/lib/api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
+
+export type Item = components["schemas"]["Item"];
+export type Form = components["schemas"]["Form"];
 
 const authMiddleware: Middleware = {
   async onRequest({request}) {
