@@ -46,17 +46,28 @@ use uuid::Uuid;
 #[instrument(name = "init /auth")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/v1/activate", post(activate))
-        .route("/v1/login", post(login))
+        .route(
+            "/v1/activate",
+            post(activate).route_layer(
+                RateLimitLayer::<RealIp>::builder()
+                    .with_default_quota(Quota::simple(Duration::from_secs(10)))
+                    .with_global_fallback(true)
+                    .with_gc_interval(Duration::from_secs(5))
+                    .default_handle_error(),
+            ),
+        )
+        .route(
+            "/v1/login",
+            post(login).route_layer(
+                RateLimitLayer::<RealIp>::builder()
+                    .with_default_quota(Quota::simple(Duration::from_secs(10)))
+                    .with_global_fallback(true)
+                    .with_gc_interval(Duration::from_secs(5))
+                    .default_handle_error(),
+            ),
+        )
         .route("/v1/admin/login", get(admin_login))
         .route("/v1/admin/redirect", get(admin_redirect))
-        .route_layer(
-            RateLimitLayer::<RealIp>::builder()
-                .with_default_quota(Quota::simple(Duration::from_secs(10)))
-                .with_global_fallback(true)
-                .with_gc_interval(Duration::from_secs(5))
-                .default_handle_error(),
-        )
 }
 
 #[derive(Serialize, Deserialize)]

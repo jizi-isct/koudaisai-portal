@@ -30,7 +30,6 @@ pub fn init_routes(
     oidc_client: OIDCClient,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
-    let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
     let state = Arc::new(AppState {
         web: web.clone(),
         db_conn: db_conn.clone(),

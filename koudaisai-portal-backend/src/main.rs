@@ -37,8 +37,8 @@ async fn main() {
         config.web.auth.keycloak.secret.clone(),
         config.web.auth.keycloak.issuer.to_string(),
         format!(
-            "http://{}{}",
-            &config.web.server.host, "/auth/v1/admin/redirect"
+            "{}{}",
+            &config.web.server.base_url, "/auth/v1/admin/redirect"
         ),
     )
     .await;

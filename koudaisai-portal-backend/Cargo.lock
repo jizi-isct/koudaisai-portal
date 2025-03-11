@@ -463,6 +463,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
+name = "base64url"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33de68096bac8e252e45589f42afd364c1dd28fbb3466ed726a941d5b9727d2c"
+dependencies = [
+ "base64 0.21.7",
+]
+
+[[package]]
 name = "bigdecimal"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1817,6 +1826,7 @@ dependencies = [
  "axum",
  "axum-extra",
  "axum_gcra",
+ "base64url",
  "chrono",
  "confy",
  "http",

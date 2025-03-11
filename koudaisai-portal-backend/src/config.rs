@@ -67,12 +67,14 @@ pub struct Web {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Server {
+    pub base_url: String,
     pub host: String,
     pub port: u16,
 }
 impl Default for Server {
     fn default() -> Self {
         Self {
+            base_url: "https://portal.koudaisai.jp".to_string(),
             host: "0.0.0.0".parse().unwrap(),
             port: 8080,
         }

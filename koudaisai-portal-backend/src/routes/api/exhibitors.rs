@@ -76,14 +76,15 @@ struct RepresentativeWrite {
 fn new_user_model(
     representative: &RepresentativeWrite,
     exhibition_id: String,
+    uuid: Uuid,
 ) -> users::ActiveModel {
     users::ActiveModel {
-        id: ActiveValue::Set(Uuid::new_v4()),
+        id: ActiveValue::Set(uuid),
         created_at: ActiveValue::NotSet,
         updated_at: ActiveValue::NotSet,
         first_name: ActiveValue::Set(representative.first_name.clone()),
-        last_name: ActiveValue::Set(representative.first_name.clone()),
-        m_address: ActiveValue::Set(representative.first_name.clone()),
+        last_name: ActiveValue::Set(representative.last_name.clone()),
+        m_address: ActiveValue::Set(representative.m_address.clone()),
         password_hash: ActiveValue::NotSet,
         password_salt: ActiveValue::NotSet,
         exhibition_id: ActiveValue::Set(exhibition_id),
@@ -117,6 +118,8 @@ async fn post_exhibitors(
     {
         return Ok((StatusCode::CONFLICT, "Conflict.".into_response()));
     }
+    // generate uuids
+    let uuids = (Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4());
 
     // transaction
     let txn = state.db_conn.begin().await?;
@@ -131,9 +134,9 @@ async fn post_exhibitors(
         exhibition_name: ActiveValue::NotSet,
         icon_id: ActiveValue::NotSet,
         description: ActiveValue::NotSet,
-        representative1: ActiveValue::NotSet,
-        representative2: ActiveValue::NotSet,
-        representative3: ActiveValue::NotSet,
+        representative1: ActiveValue::Set(Some(uuids.0.clone())),
+        representative2: ActiveValue::Set(Some(uuids.1.clone())),
+        representative3: ActiveValue::Set(Some(uuids.2.clone())),
     }
     .insert(&txn)
     .await?;
@@ -187,15 +190,27 @@ async fn post_exhibitors(
     }
 
     //users
-    new_user_model(&payload.representatives.0, payload.id.clone())
-        .insert(&txn)
-        .await?;
-    new_user_model(&payload.representatives.1, payload.id.clone())
-        .insert(&txn)
-        .await?;
-    new_user_model(&payload.representatives.2, payload.id.clone())
-        .insert(&txn)
-        .await?;
+    new_user_model(
+        &payload.representatives.0,
+        payload.id.clone(),
+        uuids.0.clone(),
+    )
+    .insert(&txn)
+    .await?;
+    new_user_model(
+        &payload.representatives.1,
+        payload.id.clone(),
+        uuids.1.clone(),
+    )
+    .insert(&txn)
+    .await?;
+    new_user_model(
+        &payload.representatives.2,
+        payload.id.clone(),
+        uuids.2.clone(),
+    )
+    .insert(&txn)
+    .await?;
 
     //commit
     txn.commit().await?;

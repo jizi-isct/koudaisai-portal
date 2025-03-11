@@ -13,6 +13,7 @@ use openidconnect::{AccessToken, SubjectIdentifier};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::io::AsyncReadExt;
 use tracing::log::{trace, warn};
 use tracing::{debug, instrument};
 use uuid::Uuid;
@@ -46,21 +47,34 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
     };
 
     // トークンのissを抽出
-    let mut validation = Validation::new(jwt::ALGORITHM);
-    validation.insecure_disable_signature_validation();
-    let insecure_token_data = match jsonwebtoken::decode::<HashMap<String, Value>>(
-        &*token,
-        &DecodingKey::from_secret(&[]),
-        &validation,
-    ) {
-        Ok(data) => data,
-        Err(err) => {
-            warn!("Authorization error: {:?}", err);
+    let payload_base64 = match token.split(".").collect::<Vec<&str>>().get(1) {
+        Some(payload) => payload.to_string(),
+        None => {
+            warn!("Authorization error: token was not jwt");
             return StatusCode::UNAUTHORIZED.into_response();
         }
     };
-    let iss = match insecure_token_data.claims.get("iss") {
-        Some(iss) => iss,
+    let mut payload = String::new();
+    if let Err(err) = base64url::decode(&payload_base64)
+        .unwrap()
+        .as_slice()
+        .read_to_string(&mut payload)
+        .await
+    {
+        warn!("Authorization error banana: {:?}", err);
+        return StatusCode::UNAUTHORIZED.into_response();
+    }
+    trace!("{}", payload);
+    let insecure_token_data = match serde_json::from_str::<HashMap<String, Value>>(payload.as_str())
+    {
+        Ok(data) => data,
+        Err(err) => {
+            warn!("Authorization error money: {:?}", err);
+            return StatusCode::UNAUTHORIZED.into_response();
+        }
+    };
+    let iss = match insecure_token_data.get("iss") {
+        Some(iss) => iss.to_string(),
         None => {
             warn!("Authorization error: claim iss not found in the jwt");
             return StatusCode::UNAUTHORIZED.into_response();
@@ -69,7 +83,6 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
 
     // 自分自身が発行したトークンの場合：参加団体責任者アカウントとして処理
     // 他のissuerが発行したトークンの場合：adminアカウントとして処理
-    let iss = jwt::JWT_ISS.to_string();
     if iss == Value::String(jwt::JWT_ISS.to_string()) {
         trace!("token type: jizi jwt");
         let token = match state.jwt_manager.decode(&*token) {
