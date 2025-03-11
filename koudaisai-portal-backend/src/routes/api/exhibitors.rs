@@ -7,7 +7,7 @@ use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::sha::stretch_with_salt;
 use crate::util::AppError;
-use axum::extract::{ConnectInfo, State};
+use axum::extract::{ConnectInfo, Path, State};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
@@ -46,13 +46,23 @@ enum ExhibitionType {
     Stage,
     Labo,
 }
-impl ExhibitionType {
-    fn into_sea_orm(self) -> sea_orm_active_enums::ExhibitionType {
+impl Into<sea_orm_active_enums::ExhibitionType> for ExhibitionType {
+    fn into(self) -> sea_orm_active_enums::ExhibitionType {
         match self {
             Self::Booth => sea_orm_active_enums::ExhibitionType::Booth,
             Self::General => sea_orm_active_enums::ExhibitionType::General,
             Self::Stage => sea_orm_active_enums::ExhibitionType::Stage,
             Self::Labo => sea_orm_active_enums::ExhibitionType::Labo,
+        }
+    }
+}
+impl From<sea_orm_active_enums::ExhibitionType> for ExhibitionType {
+    fn from(value: sea_orm_active_enums::ExhibitionType) -> Self {
+        match value {
+            sea_orm_active_enums::ExhibitionType::Booth => Self::Booth,
+            sea_orm_active_enums::ExhibitionType::General => Self::General,
+            sea_orm_active_enums::ExhibitionType::Stage => Self::Stage,
+            sea_orm_active_enums::ExhibitionType::Labo => Self::Labo,
         }
     }
 }
@@ -117,7 +127,7 @@ async fn post_exhibitors(
         created_at: ActiveValue::NotSet,
         updated_at: ActiveValue::NotSet,
         exhibitor_name: ActiveValue::Set(payload.exhibitor_name.clone()),
-        r#type: ActiveValue::Set(payload.r#type.clone().into_sea_orm()),
+        r#type: ActiveValue::Set(payload.r#type.clone().into()),
         exhibition_name: ActiveValue::NotSet,
         icon_id: ActiveValue::NotSet,
         description: ActiveValue::NotSet,
@@ -238,7 +248,7 @@ impl From<exhibitors_root::Model> for GetExhibitorsResponseElement {
             exhibition_name: value.exhibition_name,
             icon_id: value.icon_id,
             description: value.description,
-            r#type: value.r#type,
+            r#type: ExhibitionType::from(value.r#type),
             representatives: (
                 value.representative1.unwrap(),
                 value.representative2.unwrap(),
@@ -266,4 +276,44 @@ async fn get_exhibitors(
     }
 
     Ok((StatusCode::OK, Json(exhibitors).into_response()))
+}
+
+type GetExhibitorsIdResponse = GetExhibitorsResponseElement;
+#[instrument(name = "GET /api/v1/exhibitors/{id}", skip(state))]
+async fn get_exhibitors_id(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(id): Path<String>,
+) -> Result<(StatusCode, Response), AppError> {
+    //permission check
+    match current_user {
+        CurrentUser::Admin(claims) => {}
+        CurrentUser::User(claims) => {
+            // 属しているかどうか確認
+            let model = users::Entity::find_by_id(claims.sub)
+                .one(&state.db_conn)
+                .await?;
+            if model == None {
+                return Ok((StatusCode::NOT_FOUND, "Subject not found.".into_response()));
+            }
+            if model.unwrap().exhibition_id != id {
+                // FORBIDDEN等にすると参加団体の存在が無駄に露呈してしまう
+                return Ok((StatusCode::NOT_FOUND, "Not found.".into_response()));
+            }
+        }
+        CurrentUser::None => {
+            return Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()));
+        }
+    }
+
+    //select
+    let model = exhibitors_root::Entity::find_by_id(id)
+        .one(&state.db_conn)
+        .await?;
+    if model == None {
+        return Ok((StatusCode::NOT_FOUND, "Not found.".into_response()));
+    }
+    let response: GetExhibitorsIdResponse = model.unwrap().into();
+    Ok((StatusCode::OK, Json(response).into_response()))
 }
