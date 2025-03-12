@@ -10,9 +10,9 @@ type SaveStatusProps = {
 
 const SaveStatus = ({ status }: SaveStatusProps) => {
   const statusIcons: Record<SaveStatus, string> = {
-    saved: "/components/Forms/SaveStatus/saved.svg",
-    unsaved: "/components/Forms/SaveStatus/unsaved.svg",
-    saving: "/components/Forms/SaveStatus/saving.svg",
+    saved: "/admin/components/Forms/SaveStatus/saved.svg",
+    unsaved: "/admin/components/Forms/SaveStatus/unsaved.svg",
+    saving: "/admin/components/Forms/SaveStatus/saving.svg",
   };
   const statusText: Record<SaveStatus, string> = {
     saved: "変更内容を保存しました",

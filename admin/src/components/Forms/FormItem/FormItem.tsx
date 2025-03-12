@@ -299,9 +299,11 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
       </div>
       <div className={styles.buttonsWrapper}>
         <div className={styles.arrowsWrapper}>
-          <a href="#" onClick={() => moveUp()} className={styles.arrowUp}><Image src="/forms/arrowUp.svg" width={30}
+            <a href="#" onClick={() => moveUp()} className={styles.arrowUp}><Image src="/admin/forms/arrowUp.svg"
+                                                                                   width={30}
                                                                                  height={30} alt="arrrow"/></a>
-          <a href="#" onClick={() => moveDown()} className={styles.arrowUp}><Image src="/forms/arrowDown.svg" width={30}
+            <a href="#" onClick={() => moveDown()} className={styles.arrowUp}><Image src="/admin/forms/arrowDown.svg"
+                                                                                     width={30}
                                                                                    height={30} alt="arrrow"/></a>
         </div>
         <div className={styles.buttons}>
@@ -314,7 +316,7 @@ export function FormItem({item, setItem, moveUp, moveDown, delete_}: Props) {
               </>
           }
           <a href="#" onClick={() => delete_()} className={styles.deleteButtonWrapper}>
-            <Image src="/forms/delete.svg" width={25} height={25} alt="delete"/>
+              <Image src="/admin/forms/delete.svg" width={25} height={25} alt="delete"/>
           </a>
         </div>
       </div>
