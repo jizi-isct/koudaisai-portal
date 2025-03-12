@@ -4,6 +4,7 @@ import Lists from "@/components/Forms/Lists/Lists";
 import {$api} from "@/lib/api";
 import {components} from "@/lib/api_v1";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -39,6 +40,7 @@ function Inner() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <Link href={"/admin/forms/new"}>新たなフォームを作成</Link>
         <div className={styles.formsWrapper}>
           {renderLists()}
         </div>

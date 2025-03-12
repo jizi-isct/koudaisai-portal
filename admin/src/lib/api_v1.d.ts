@@ -248,7 +248,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Form"][];
+                        "application/json": components["schemas"]["Form"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */

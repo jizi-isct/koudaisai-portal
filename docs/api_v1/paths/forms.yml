@@ -39,9 +39,7 @@ post:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../components/schemas/Form.yml
+            $ref: ../components/schemas/Form.yml
     '400':
       description: 不正なrequest bodyの形式
     '401':
