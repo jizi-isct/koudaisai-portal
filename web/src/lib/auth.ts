@@ -27,7 +27,9 @@ export async function getTokens(): Promise<Tokens | undefined> {
 
   //アクセストークンのexp確認
   const access_token_payload_base64 = access_token!.split(".")[1]
-  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64))
+  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")))
   const access_token_exp = access_token_payload.exp as number;
   if (access_token_exp * 1000 >= Date.now()) {
     //有効期限OK

@@ -8,7 +8,7 @@ export default function Page() {
     const [documentTitle, setDocumentTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [progress, setProgress] = useState<("input" | "posting" | "error")>("input");
-    const handleButtonClick = async () => {
+    const handleButtonClick = () => {
         setProgress("posting")
         const form: Form = {
             info: {
@@ -22,18 +22,18 @@ export default function Page() {
             }
         }
 
-        const {data} = await fetchClient.POST(
+        fetchClient.POST(
             "/forms",
             {
                 body: form
             }
-        )
-
-        if (data) {
-            location.assign("/admin/forms/form?formId=" + data!.form_id)
-        } else {
-            setProgress("error")
-        }
+        ).then(({data}) => {
+            if (data) {
+                location.assign("/admin/forms/form?formId=" + data!.form_id)
+            } else {
+                setProgress("error")
+            }
+        })
     }
     return (
         <main>
