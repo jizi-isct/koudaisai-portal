@@ -335,7 +335,7 @@ async fn get_exhibitors_id(
     Ok((StatusCode::OK, Json(response).into_response()))
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct PutExhibitorsIdPayload {
     exhibition_name: Option<String>,
     icon_id: Option<String>,
