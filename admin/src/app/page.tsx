@@ -8,7 +8,7 @@ export default function Page() {
     <div className={styles.page}>
       <main className={styles.main}>
         <Image
-          src="/components/Logo/logo.jpg"
+            src="/admin/components/Logo/logo.jpg"
           alt="Koudaisai Portal Admin Site Logo"
           width={300}
           height={300}

@@ -10,7 +10,7 @@ const Logo = ({height = 40, hasText = false}: LogoProps) => {
   return (
     <div className={styles.logo}>
         <Image
-          src="/components/Logo/logo.jpg"
+            src="/admin/components/Logo/logo.jpg"
           alt="Koudaisai Portal Admin Site Logo"
             width={height}
             height={height}
