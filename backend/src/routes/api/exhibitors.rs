@@ -9,7 +9,7 @@ use crate::util::sha::stretch_with_salt;
 use crate::util::AppError;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::{get, post, put};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use migration::SubQueryStatement;
@@ -23,7 +23,9 @@ use uuid::Uuid;
 
 #[instrument(name = "init /api/v1/exhibitors")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", post(post_exhibitors))
+    Router::new()
+        .route("/", post(post_exhibitors).get(get_exhibitors))
+        .route("/{id}", put(put_exhibitors_id).get(get_exhibitors_id))
 }
 
 #[derive(Deserialize, Debug)]
