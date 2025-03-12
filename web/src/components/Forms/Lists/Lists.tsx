@@ -9,7 +9,7 @@ type ListsProps = {
 };
 
 const Lists = ({title, status, dueDate, summary, formId}: ListsProps) => {
-  const formLink = `/forms/form?formId=${formId}`;
+    const formLink = `/forms/form.html?formId=${formId}`;
   return (
     <div key={formId} className={styles.forms}>
       <a href={formLink}>
