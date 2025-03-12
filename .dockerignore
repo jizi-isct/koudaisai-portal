@@ -1,0 +1,14 @@
+./koudaisai-portal-admin/.next
+./koudaisai-portal-admin/node_modules
+./koudaisai-portal-admin/out
+./koudaisai-portal-admin/README.md
+
+./koudaisai-portal-backend/migration/target
+./koudaisai-portal-backend/migration/README.md
+./koudaisai-portal-backend/target
+./koudaisai-portal-backend/docker-compose.yml
+./koudaisai-portal-backend/README.md
+
+./koudaisai-portal-web/.next
+./koudaisai-portal-web/node_modules
+./koudaisai-portal-web/README.md

@@ -16,8 +16,9 @@ impl MigrationTrait for Migration {
                 updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
-                m_address TEXT CHECK(m_address ~ '^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp') NOT NULL,
-                password_hash TEXT NOT NULL
+                m_address TEXT CHECK(m_address ~ '^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp') NOT NULL UNIQUE,
+                password_hash TEXT DEFAULT NULL,
+                password_salt varchar(32) NOT NULL DEFAULT md5(random()::text)
             );
             "#.trim(),
         )).await?;
@@ -34,7 +35,8 @@ impl MigrationTrait for Migration {
                     RETURN NEW;
                 END;
                 $$ language 'plpgsql';
-                "#.trim(),
+                "#
+                .trim(),
             ))
             .await?;
 
@@ -47,7 +49,8 @@ impl MigrationTrait for Migration {
                     BEFORE UPDATE ON users
                     FOR EACH ROW
                     EXECUTE PROCEDURE update_timestamp();
-                "#.trim(),
+                "#
+                .trim(),
             ))
             .await?;
 

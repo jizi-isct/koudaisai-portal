@@ -1,115 +1,70 @@
-"use client";
+'use client'
 import styles from "./page.module.css";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import {useSearchParams} from "next/navigation";
 import useSWR from "swr";
-import Question from "@/components/Forms/Questions/Question";
+import TextQuestion from "@/components/Forms/Questions/TextQuestion/TextQuestion";
+import {Key, Suspense} from "react";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const formId = searchParams.get("formId");
+    return (
+        <Suspense>
+            <Form/>
+        </Suspense>
+    )
+}
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-  const router = useRouter();
+function Form() {
+    const searchParams = useSearchParams();
+    const formId = searchParams.get("formId");
 
-  const [authenticated, setAuthenticated] = useState(false);
-  const [answers, setAnswers] = useState({}); // 回答を管理する state
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+    const {data, error} = useSWR("http://localhost:4010/api/v1/forms", fetcher);
 
-  useEffect(() => {
-    const access_token = localStorage.getItem("exhibitor_access_token");
-    if (access_token) {
-      setAuthenticated(true);
-    } else {
-      router.push("/login"); // トークンがない場合、ログインページにリダイレクト
-    }
-  }, []);
+    if (error) return <p>データの取得に失敗しました</p>;
+    if (!data) return <p>読み込み中...</p>;
 
-  const fetcher = (url: string) => {
-    const access_token = localStorage.getItem("exhibitor_access_token");
-  
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    }).then((res) => res.json());
-  };
-  const { data, error } = useSWR(`${API_BASE_URL}/api/v1/forms`, fetcher);
+    // form_id に一致するフォームを検索
+    // const form = data.find((f: any) => f.formId === formId);
+    const form = data[0];
+    const items = form.items;
 
-  if (error) return <p>データの取得に失敗しました</p>;
-  if (!data) return <p>読み込み中...</p>;
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  const form = data.find((f: any) => f.formId === formId);
-  if (!form) return <p>フォームが見つかりません</p>;
+        const response = await fetch("http://localhost:4010//api/v1/forms/[formId]/responses", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({info: form.info, items: [], access_control: {roles: []}}),
+        });
 
-  const handleInputChange = (itemId: string, value: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [itemId]: value,
-    }));
-  };
+        if (response.ok) {
+            alert("フォームを作成しました！");
+        } else {
+            alert("エラーが発生しました。");
+        }
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const access_token = localStorage.getItem("exhibitor_access_token");
-    if (!access_token) {
-      alert("認証情報がありません。再ログインしてください。");
-      return;
-    }
-
-    // `answers` を API のフォーマットに変換
-    const formattedAnswers = Object.entries(answers).reduce((acc, [key, value], index) => {
-      acc[`additionalProp${index + 1}`] = {
-        question_id: key,
-        answer_text: { value },
-      };
-      return acc;
-    }, {});
-
-    const response = await fetch(`${API_BASE_URL}/api/v1/forms/${formId}/responses`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-      body: JSON.stringify({ answers: formattedAnswers }),
-    });
-
-    if (response.ok) {
-      alert("フォームを送信しました！");
-    } else {
-      alert("エラーが発生しました。");
-    }
-  };
-
-  const renderItems = () => {
-    if (!form || !form.items) return null;
-  
-    return form.items.map((item) => (
-      <Question key={item.item_id} itemId={item.item_id} form={form}>
-        {/* itemの種類によって異なる入力コンポーネントを表示 */}
-        {item.item_question && (
-          <>
-          </>
-        )}
-      </Question>
-    ));
-  };
-
-  return (
-    <main className={styles.main}>
-      <div className={styles.formTitleWrapper}>
-        <h1>{form.info.title}</h1>
-        <p>{form.info.description}</p>
-      </div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          { renderItems() }
-        </div>
-        <button type="submit">送信</button>
-      </form>
-    </main>
-  );
+    return (
+        <main className={styles.main}>
+            <div className={styles.formTitleWrapper}>
+                <h1>{form.info.title}</h1>
+                <p>{form.info.description}</p>
+            </div>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    {items.map((item: {
+                        item_question: { question: { question_id: Key | null | undefined; }; } | null;
+                        title: string;
+                        description: string;
+                    }) => {
+                        if (item.item_question != null) {
+                            return <TextQuestion key={item.item_question.question.question_id} title={item.title}
+                                                 description={item.description}/>;
+                        }
+                    })}
+                </div>
+                <button type="submit">送信</button>
+            </form>
+        </main>
+    );
 }

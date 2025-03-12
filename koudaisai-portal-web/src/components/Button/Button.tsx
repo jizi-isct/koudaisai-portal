@@ -3,7 +3,7 @@ import styles from "./Button.module.css";
 type ButtonProps = { // ①
     text: string;
     color?: string;
-    onClick: Function;
+    onClick: () => void;
     isClicked?: boolean;
 };
 

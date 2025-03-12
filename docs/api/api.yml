@@ -1,0 +1,384 @@
+openapi: 3.0.3
+
+info:
+  title: 工大祭API
+  description: |-
+    工大祭のapiです。
+  version: "1"
+tags:
+  - name: auth
+    description: "工大祭アカウント 認証・認可・パスワード関連"
+  - name: exhibitions
+    description: "参加団体関連"
+  - name: forms
+    description: "フォーム関連"
+
+paths:
+  /auth/v1/activate:
+    post:
+      summary: "ユーザーを有効化する。"
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Activate"
+      responses:
+        "201":
+          description: "OK"
+        "409":
+          description: "ユーザーが既に有効化されている"
+        "404":
+          description: "ユーザーが存在しない"
+        "400":
+          description: "不正なrequest bodyの形式"
+        "401":
+          description: "トークンが不正"
+        "429":
+          description: "レート制限"
+          headers:
+            ratelimit-reset:
+              schema:
+                type: integer
+              description: "rate limitがリセットされるまでの秒数"
+            retry-after:
+              schema:
+                type: integer
+              description: "再試行可能になるまでの秒数"
+  /auth/v1/login:
+    get:
+      summary: "資格情報を検証し、アクセストークンとリフレッシュトークンを発行する。"
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+        "401":
+          description: "資格情報が無効だった場合"
+        "400":
+          description: "不正なrequest bodyの形式"
+  /auth/v1/refresh:
+    get:
+      summary: "リフレッシュトークンを検証し、アクセストークンを発行する。"
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Refresh"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+        "401":
+          description: "資格情報が無効だった場合"
+        "400":
+          description: "不正なrequest bodyの形式"
+  /auth/v1/reset:
+    put:
+      summary: "パスワードをリセット"
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Reset"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "資格情報が無効だった場合"
+        "400":
+          description: "不正なrequest bodyの形式"
+  /api/v1/exhibitions:
+    post:
+      summary: "参加団体を追加"
+      tags: [ exhibitions ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewExhibition"
+      responses:
+        "201":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewExhibitionResponse"
+        "400":
+          description: "不正なrequest bodyの形式"
+        "409":
+          description: "参加団体またはユーザーがすでに存在する"
+    get:
+      summary: "すべての参加団体を取得"
+      tags: [ exhibitions ]
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exhibition"
+  /api/v1/exhibitions/{id}:
+    get:
+      summary: "参加団体を取得"
+      tags: [ exhibitions ]
+      parameters:
+        - name: id
+          in: path
+          description: 参加団体id
+          required: true
+          schema:
+            type: string
+            pattern: '[A-Z]-[0-9][0-9][0-9]'
+            example: "T-001"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exhibition"
+        "404":
+          description: "参加団体が存在しない"
+    put:
+      summary: "参加団体を編集"
+      tags: [ exhibitions ]
+      parameters:
+        - name: id
+          in: path
+          description: 参加団体id
+          required: true
+          schema:
+            type: string
+            pattern: '[A-Z]-[0-9][0-9][0-9]'
+            example: "T-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditExhibition"
+      responses:
+        "200":
+          description: "OK"
+        "201":
+          description: "参加団体が編集された"
+        "400":
+          description: "不正なrequest bodyの形式"
+        "404":
+          description: "参加団体が存在しない"
+
+components:
+  schemas:
+    Activate:
+      properties:
+        uuid:
+          description: "ユーザーのuuid"
+          type: string
+          format: uuid
+        token:
+          description: "ユーザーのactivation token"
+          type: string
+        password:
+          description: "パスワード"
+          type: string
+          example: "carryL0v3"
+    Login:
+      properties:
+        m_address:
+          description: "mアドレス(新旧どちらも含む)"
+          type: string
+          pattern: ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+          example: "johnson.p.5703@m.isct.ac.jp"
+        password:
+          description: "パスワード"
+          type: string
+          example: "carryL0v3"
+    LoginSuccess:
+      properties:
+        access_token:
+          description: "アクセストークン(jwt)"
+          type: string
+          format: jwt
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U"
+        refresh_token:
+          description: "リフレッシュトークン(jwt)"
+          format: jwt
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U"
+    Reset:
+      properties:
+        access_token:
+          description: "アクセストークン"
+          type: string
+          format: jwt
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U"
+        old_password:
+          description: "古いパスワード"
+          type: string
+          example: "carryL0v3"
+        new_password:
+          description: "新しいパスワード"
+          type: string
+          example: "carry<3"
+    Refresh:
+      properties:
+        refresh_token:
+          description: "リフレッシュトークン"
+          type: string
+          format: jwt
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1eS1NYW51ZWwgZGUgSG9tZW0gQ2hyaXN0byIsImlhdCI6MTUxNjIzOTAyMn0.DVUM5s6qVNEg1YUycbacP82KhRnvvfS8kEecEXXZi5U"
+
+    NewExhibition:
+      properties:
+        id:
+          description: "参加団体id"
+          type: string
+          pattern: '[A-Z]-[0-9][0-9][0-9]'
+          example: "T-001"
+        exhibitor_name:
+          description: "参加団体名"
+          type: string
+          example: "釈迦釈迦ポテト"
+        type:
+          description: "参加団体の種類"
+          type: string
+          enum: [ "booth", "general", "stage", "labo" ]
+          example: "general"
+        representatives:
+          description: "第一責任者, 第二責任者, 第三責任者"
+          uniqueItems: true
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/NewUser"
+
+    NewUser:
+      type: object
+      properties:
+        first_name:
+          description: "名"
+          type: string
+          example: "Paul"
+        last_name:
+          description: "姓"
+          type: string
+          example: "Johnson"
+        m_address:
+          description: "mアドレス(新旧どちらも含む)"
+          type: string
+          pattern: ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+          example: "johnson.p.5703@m.isct.ac.jp"
+    NewExhibitionResponse:
+      properties:
+        activation_tokens:
+          description: "第一責任者, 第二責任者, 第三責任者のactivation token"
+          uniqueItems: true
+          minItems: 3
+          maxItems: 3
+          items:
+            type: string
+    Exhibition:
+      properties:
+        id:
+          description: "参加団体id"
+          type: string
+          pattern: '[A-Z]-[0-9][0-9][0-9]'
+          example: "T-001"
+        created_at:
+          description: "作成日時"
+          type: string
+          format: date-time
+        updated_at:
+          description: "最終更新日時"
+          type: string
+          format: date-time
+        exhibitor_name:
+          description: "参加団体名"
+          type: string
+          example: "U7374"
+        exhibition_name:
+          description: "企画名"
+          type: string
+          example: "釈迦釈迦ポテト"
+          nullable: true
+        icon_id:
+          description: "アイコンのid"
+          type: string
+          nullable: true
+        description:
+          description: "企画概要"
+          type: string
+          nullable: true
+        type:
+          description: "参加団体の種類"
+          type: string
+          enum: [ "booth", "general", "stage", "labo" ]
+          example: "general"
+        representatives:
+          description: "第一責任者, 第二責任者, 第三責任者"
+          uniqueItems: true
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/User"
+    User:
+      type: object
+      properties:
+        id:
+          description: "unique id"
+          type: string
+          format: uuid
+        created_at:
+          description: "作成日時"
+          type: string
+          format: date-time
+        updated_at:
+          description: "最終更新日時"
+          type: string
+          format: date-time
+        first_name:
+          description: "名"
+          type: string
+          example: "Paul"
+        last_name:
+          description: "姓"
+          type: string
+          example: "Johnson"
+        m_address:
+          description: "mアドレス(新旧どちらも含む)"
+          type: string
+          pattern: ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+          example: "johnson.p.5703@m.isct.ac.jp"
+
+    EditExhibition:
+      properties:
+        exhibition_name:
+          description: "企画名"
+          type: string
+          example: "釈迦釈迦ポテト"
+        icon_id:
+          description: "アイコンのid"
+          type: string
+        description:
+          description: "企画概要"
+          type: string
