@@ -7,7 +7,9 @@ use crate::util::jwt::JWTManager;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::SHAManager;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
+use axum::http::{Request, StatusCode, Uri};
 use axum::middleware::from_fn_with_state;
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get_service;
 use axum::Router;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
@@ -19,6 +21,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tower::{Service, ServiceExt, service_fn, ServiceBuilder};
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
@@ -49,13 +52,61 @@ pub fn init_routes(
             stretch_cost: 2_i32.pow(web.auth.stretch_cost as u32),
         },
     });
+
+    let serve_dir = ServeDir::new(&web.static_files.web_path).append_index_html_on_directories(true);
+    let admin_serve_dir = ServeDir::new(&web.static_files.admin_path).append_index_html_on_directories(true);
+
+    // スラッシュ付きにリダイレクトするミドルウェア
+    let redirect_middleware = service_fn(|req: Request<_>| async move{
+        let uri = req.uri();
+        let path = uri.path();
+
+        // スラッシュなし & 拡張子なし の場合にリダイレクト
+        if !path.ends_with('/') && !path.contains('.') {
+            let mut new_uri = format!("{}/", path);
+            if let Some(query) = uri.query() {
+                new_uri.push('?');
+                new_uri.push_str(query);
+            }
+            return Ok(Redirect::temporary(&new_uri).into_response());
+        }
+
+        Ok(StatusCode::NOT_FOUND.into_response())
+    });
+
     Router::new()
         .nest("/auth", auth::init_router())
         .nest("/api", api::init_router())
-        .fallback_service(get_service(ServeDir::new(&web.static_files.web_path)))
         .nest_service(
             "/admin",
-            get_service(ServeDir::new(&web.static_files.admin_path)),
+            ServiceBuilder::new()
+                .layer(tower::layer::layer_fn(move |inner| {
+                    let redirect_middleware = redirect_middleware.clone();
+                    service_fn(move |req| {
+                        let redirect_middleware = redirect_middleware.clone();
+                        async move {
+                            let mut middleware = redirect_middleware.clone();
+                            middleware.ready().await.unwrap();
+                            middleware.call(req).await
+                        }
+                    })
+                }))
+                .service(admin_serve_dir),
+        )
+        .fallback_service(
+            ServiceBuilder::new()
+                .layer(tower::layer::layer_fn(move |inner| {
+                    let redirect_middleware = redirect_middleware.clone();
+                    service_fn(move |req| {
+                        let redirect_middleware = redirect_middleware.clone();
+                        async move {
+                            let mut middleware = redirect_middleware.clone();
+                            middleware.ready().await.unwrap();
+                            middleware.call(req).await
+                        }
+                    })
+                }))
+                .service(serve_dir),
         )
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
         .layer(CorsLayer::permissive())
