@@ -29,7 +29,7 @@ export default function Page() {
             }
         ).then(({data}) => {
             if (data) {
-                location.assign("/admin/forms/form.html?formId=" + data!.form_id)
+                location.assign("/admin/forms/form/index.html?formId=" + data!.form_id)
             } else {
                 setProgress("error")
             }
