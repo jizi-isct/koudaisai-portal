@@ -1,0 +1,30 @@
+{
+  "name": "web-core",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.0",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "eslint": "^9.22.0",
+    "eslint-config-next": "^15.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "next": "^15.2.3",
+    "next-base64": "^1.1.0",
+    "openapi-fetch": "^0.13.5",
+    "openapi-react-query": "^0.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
