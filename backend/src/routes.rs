@@ -7,7 +7,9 @@ use crate::util::jwt::JWTManager;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::SHAManager;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
+use axum::http::{Request, StatusCode, Uri};
 use axum::middleware::from_fn_with_state;
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get_service;
 use axum::Router;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
@@ -19,6 +21,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tower::{service_fn, Service, ServiceBuilder, ServiceExt};
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
@@ -49,14 +52,17 @@ pub fn init_routes(
             stretch_cost: 2_i32.pow(web.auth.stretch_cost as u32),
         },
     });
+
+    let serve_dir =
+        ServeDir::new(&web.static_files.web_path).append_index_html_on_directories(true);
+    let admin_serve_dir =
+        ServeDir::new(&web.static_files.admin_path).append_index_html_on_directories(true);
+
     Router::new()
         .nest("/auth", auth::init_router())
         .nest("/api", api::init_router())
-        .fallback_service(get_service(ServeDir::new(&web.static_files.web_path)))
-        .nest_service(
-            "/admin",
-            get_service(ServeDir::new(&web.static_files.admin_path)),
-        )
+        .fallback_service(get_service(serve_dir))
+        .nest_service("/admin", get_service(admin_serve_dir))
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
         .layer(CorsLayer::permissive())
         .with_state(state)

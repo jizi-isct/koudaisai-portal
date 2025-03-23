@@ -40,7 +40,7 @@ function Inner() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Link href={"/admin/forms/new"}>新たなフォームを作成</Link>
+        <Link href={"/forms/new"}>新たなフォームを作成</Link>
         <div className={styles.formsWrapper}>
           {renderLists()}
         </div>

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     unoptimized: true
   },
   basePath: "/admin",
+  trailingSlash: true,
 };
 
 export default nextConfig;

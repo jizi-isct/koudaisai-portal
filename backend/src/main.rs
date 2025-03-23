@@ -38,7 +38,7 @@ async fn main() {
         config.web.auth.keycloak.issuer.to_string(),
         format!(
             "{}{}",
-            &config.web.server.base_url, "/login.html"
+            &config.web.server.base_url, "/login"
         ),
     )
     .await;

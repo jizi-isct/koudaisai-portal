@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "crypto": "^1.0.1",
-    "next": "^15.2.0",
+    "next": "^15.2.3",
     "next-base64": "^1.1.0",
     "nextjs": "^0.0.3",
     "openapi-fetch": "^0.13.4",
