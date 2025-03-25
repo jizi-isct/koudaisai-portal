@@ -1,0 +1,38 @@
+{
+  "name": "backend",
+  "sourceRoot": "apps/backend/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo build --release",
+        "cwd": "apps/backend"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo test",
+        "cwd": "apps/backend"
+      }
+    },
+    "docker-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f ./debug/docker-compose.yml up -d --no-log-prefix --wait",
+        "cwd": "apps/backend"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo watch -x run",
+        "cwd": "apps/backend"
+      },
+      "dependsOn": [
+        "docker-up"
+      ]
+    }
+  }
+}

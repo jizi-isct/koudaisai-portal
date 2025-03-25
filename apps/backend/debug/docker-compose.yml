@@ -1,0 +1,32 @@
+services:
+  keycloak:
+    depends_on:
+      db:
+        condition: service_healthy
+    build: .
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+  db:
+    image: postgres:14
+    platform: linux/amd64
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-store:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'user'
+      POSTGRES_DB: 'koudaisai-portal'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  db-store:
+  keycloak-data:

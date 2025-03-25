@@ -1,0 +1,68 @@
+
+.formWrapper {
+    width: 600px;
+    width: 50vw;
+    border: 1px solid var(--darkblue);
+    border-radius: 10px;
+    padding: 15px 25px;
+    box-shadow: 4px 4px 0px 0px var(--darkblue);
+    margin: 30px;
+    display: inline-block;
+    text-align: left;
+    background-color: white;
+}
+
+.questionWrapper {
+    margin: 20px 0;
+}
+
+.buttonsWrapper {
+    width: 100%;
+    border-top: 1px solid var(--lightblue);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 5px 0px;
+}
+
+.checkBox {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--darkgray);
+    vertical-align: -5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.checkBox:checked:before {
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    transform: rotate(50deg);
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid var(--darkgray);
+    border-bottom: 2px solid var(--darkgray);
+    content: '';
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+}
+
+.buttons label {
+    color: var(--darkgray);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-right: 5px;
+}
+
+.deleteButtonWrapper {
+    border-left: 2px solid var(--gray);
+    margin-left: 15px;
+    padding-left: 10px;
+}

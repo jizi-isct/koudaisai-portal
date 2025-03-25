@@ -1,0 +1,12 @@
+{
+  "name": "koudaisai-portal",
+  "parallel": 5,
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many --target dev -p backend web-admin web-members --parallel"
+      }
+    }
+  }
+}

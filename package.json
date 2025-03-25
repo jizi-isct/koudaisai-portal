@@ -1,0 +1,18 @@
+{
+  "name": "koudaisai-portal",
+  "version": "0.1.0",
+  "description": "工大祭の参加団体向けポータルサイトです．",
+  "private": true,
+  "devDependencies": {
+    "nx": "20.6.2",
+    "@nx/next": "20.6.2",
+    "@nx/eslint": "20.6.2",
+    "@nx/storybook": "20.6.2"
+  },
+  "nx": {},
+  "workspaces": [
+    "apps/web-admin",
+    "apps/web-members",
+    "libs/web-core"
+  ]
+}
