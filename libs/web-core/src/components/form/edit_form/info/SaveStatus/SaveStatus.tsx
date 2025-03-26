@@ -1,19 +1,20 @@
-import Image from "next/image";
 import styles from "./SaveStatus.module.css";
-
-type SaveStatus = "saved" | "unsaved" | "saving";
+import saved from "../../../../assets/images/save-status/saved.svg";
+import unsaved from "../../../../assets/images/save-status/unsaved.svg"
+import saving from "../../../../assets/images/save-status/saving.svg"
+import {SaveStatus as SaveStatus_} from "../../../../../lib";
 
 type SaveStatusProps = {
-  status: SaveStatus;
+  status: SaveStatus_;
 };
 
 const SaveStatus = ({status}: SaveStatusProps) => {
-  const statusIcons: Record<SaveStatus, string> = {
-    saved: "/admin/components/Forms/SaveStatus/saved.svg",
-    unsaved: "/admin/components/Forms/SaveStatus/unsaved.svg",
-    saving: "/admin/components/Forms/SaveStatus/saving.svg",
+  const statusIcons: Record<SaveStatus_, string> = {
+    saved: saved,
+    unsaved: unsaved,
+    saving: saving,
   };
-  const statusText: Record<SaveStatus, string> = {
+  const statusText: Record<SaveStatus_, string> = {
     saved: "変更内容を保存しました",
     unsaved: "変更内容は保存されていません",
     saving: "変更内容を保存中",
@@ -21,7 +22,7 @@ const SaveStatus = ({status}: SaveStatusProps) => {
 
   return (
     <div className={styles.saveStatus}>
-      <Image
+      <img
         className={`${styles.statusIcon} ${status === "saving" ? styles.savingIcon : ""}`}
         src={statusIcons[status]}
         alt="status"

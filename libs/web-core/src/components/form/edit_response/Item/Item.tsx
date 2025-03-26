@@ -1,6 +1,6 @@
 import styles from "./Item.module.css";
-import {Item as Item_} from "@/lib/types";
-import TextInput from "@/stories/Generic/TextInput/TextInput";
+import {Item as Item_} from "../../../../lib/types";
+import TextInput from "../../../generic/TextInput/TextInput";
 import {useState} from "react";
 
 type Props = {

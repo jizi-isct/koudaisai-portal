@@ -1,13 +1,16 @@
 import styles from "./Item.module.css";
-import Image from "next/image";
-import TextInput from "@/stories/Generic/TextInput/TextInput";
+import TextInput from "../../../generic/TextInput/TextInput";
 import React from "react";
-import {FormItemType, Item} from "@/lib/types"
-import FormItemTypeSelect from "./SelectFormItemType";
+import {FormItemType, Item as Item_} from "../../../../lib/types"
+import FormItemTypeSelect from "../SelectFormItemType";
+
+import arrowDown from "../../../assets/images/form-edit/arrowDown.svg";
+import arrowUp from "../../../assets/images/form-edit/arrowUp.svg";
+import delete__ from "../../../assets/images/form-edit/delete_.svg";
 
 type Props = {
-  readonly item: Item;
-  setItem: (item: Item) => void;
+  readonly item: Item_;
+  setItem: (item: Item_) => void;
   moveUp: () => void;
   moveDown: () => void;
   delete_: () => void;
@@ -120,7 +123,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
         ...item,
         item_question: {
           question: {
-            ...item.item_question!.question,
+            ...item.item_question?.question,
             required: value
           }
         }
@@ -241,7 +244,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
             placeholder="タイトルを入力"
             value={item.title}
             setValue={handleTitleChange}
-            args={[]}
+            paragraph={false}
           />
           <FormItemTypeSelect onChange={handleFormItemTypeChange} value={getItemType()}/>
         </div>
@@ -251,7 +254,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
             placeholder="説明を入力"
             value={item.description}
             setValue={handleDescriptionChange}
-            args={[]}
+            paragraph={true}
           />
         </div>
       </div>
@@ -268,7 +271,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
           item.item_question?.question?.question_radio_button &&
                 <ul>
                   {
-                    item.item_question!.question!.question_radio_button!.choices.map((choice, i) => {
+                    item.item_question!.question!.question_radio_button!.choices.map((choice: string, i: number) => {
                       return <li key={i}>{choice}
                         <button onClick={() => handleDeleteRadioButtonChoice(i)}>削除</button>
                       </li>
@@ -283,7 +286,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
           item.item_question?.question?.question_check_box &&
                 <ul>
                   {
-                    item.item_question!.question!.question_check_box!.choices.map((choice, i) => {
+                    item.item_question!.question!.question_check_box!.choices.map((choice: string, i: number) => {
                       return <li key={i}>{choice}
                         <button onClick={() => handleDeleteCheckBoxChoice(i)}>削除</button>
                       </li>
@@ -297,12 +300,12 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
       </div>
       <div className={styles.buttonsWrapper}>
         <div className={styles.arrowsWrapper}>
-          <a href="#" onClick={() => moveUp()} className={styles.arrowUp}><Image
-            src="/admin/forms/arrowUp.svg"
+          <a href="#" onClick={() => moveUp()} className={styles.arrowUp}><img
+            src={arrowUp}
             width={30}
             height={30} alt="arrrow"/></a>
-          <a href="#" onClick={() => moveDown()} className={styles.arrowUp}><Image
-            src="/admin/forms/arrowDown.svg"
+          <a href="#" onClick={() => moveDown()} className={styles.arrowUp}><img
+            src={arrowDown}
             width={30}
             height={30} alt="arrrow"/></a>
         </div>
@@ -317,7 +320,7 @@ export default function Item({item, setItem, moveUp, moveDown, delete_}: Props) 
                   </>
           }
           <a href="#" onClick={() => delete_()} className={styles.deleteButtonWrapper}>
-            <Image src="/admin/forms/delete.svg" width={25} height={25} alt="delete"/>
+            <img src={delete__} width={25} height={25} alt="delete"/>
           </a>
         </div>
       </div>

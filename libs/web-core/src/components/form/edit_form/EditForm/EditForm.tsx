@@ -1,12 +1,10 @@
-"use client";
-
-import TextInput from "@/stories/Generic/TextInput/TextInput";
-import FormMetadata from "@/components/form/edit_form/info/FormMetadata";
-import {default as SaveStatusComponent} from "@/components/form/edit_form/info/SaveStatus";
-import {Form, Item, SaveStatus} from "@/lib/types";
+import TextInput from "../../../generic/TextInput/TextInput";
+import FormMetadata from "../info/FormMetadata/FormMetadata";
+import {default as SaveStatusComponent} from "../info/SaveStatus/SaveStatus";
+import {Form, Item, SaveStatus} from "../../../../lib/types";
 
 import styles from "./EditForm.module.css"
-import {Item as ItemComponent} from "@/components/form/edit_form/Item";
+import {default as ItemComponent} from "../Item/Item";
 
 type Props = {
   form: Form,
@@ -48,12 +46,12 @@ export default function EditForm({form, setForm, saveStatus}: Props) {
   const setItem = (item: Item) => {
     setForm({
       ...form,
-      items: form.items.map((item_) => item_.item_id === item.item_id ? item : item_)
+      items: form.items.map((item_: Item) => item_.item_id === item.item_id ? item : item_)
     })
   }
 
   const moveItemUp = (item: Item) => () => {
-    const index = form.items.findIndex((item_) => item_ === item);
+    const index = form.items.findIndex((item_: Item) => item_ === item);
     if (index === 0) return;
     setForm({
       ...form,
@@ -67,7 +65,7 @@ export default function EditForm({form, setForm, saveStatus}: Props) {
   };
 
   const moveItemDown = (item: Item) => () => {
-    const index = form.items.findIndex((item_) => item_ === item);
+    const index = form.items.findIndex((item_: Item) => item_ === item);
     if (index === -1) return;
     setForm(
       {
@@ -86,7 +84,7 @@ export default function EditForm({form, setForm, saveStatus}: Props) {
     setForm(
       {
         ...form,
-        items: form.items.filter((item_) => item_ !== item),
+        items: form.items.filter((item_: Item) => item_ !== item),
       }
     )
   };
@@ -120,7 +118,7 @@ export default function EditForm({form, setForm, saveStatus}: Props) {
   const renderItems = () => {
     if (!form || !form.items) return null;
 
-    return form.items.map((item) => (
+    return form.items.map((item: Item) => (
       <ItemComponent
         key={item.item_id}
         item={item}

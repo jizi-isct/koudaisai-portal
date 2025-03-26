@@ -1,5 +1,5 @@
 import styles from "./Info.module.css";
-import {Info as Info_} from "@/lib/types";
+import {Info as Info_} from "../../../../lib/types";
 
 type Props = {
   info: Info_

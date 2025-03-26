@@ -1,6 +1,6 @@
-import {Form, FormResponse, Item} from "@/lib/types/form";
-import {default as ItemComponent} from "@/components/form/edit_response/Item";
-import Info from "@/stories/Form/EditResponse/Info";
+import {Form, FormResponse, Item} from "../../../../lib/types";
+import {default as ItemComponent} from "../../../../components/form/edit_response/Item";
+import Info from "../../../../components/form/edit_response/Info";
 
 type Props = {
   readonly form: Form,
@@ -35,7 +35,7 @@ export default function EditResponse({form, formResponse, setFormResponse}: Prop
     <div>
       <Info info={form.info}/>
       {
-        form.items.map((item) => (
+        form.items.map((item: Item) => (
           <ItemComponent
             key={item.item_id}
             item={item}

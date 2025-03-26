@@ -5,3 +5,8 @@
 .nx/workspace-data
 
 node_modules
+
+storybook-static
+.nx/installation
+vite.config.*.timestamp*
+vitest.config.*.timestamp*

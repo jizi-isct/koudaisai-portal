@@ -19,7 +19,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "swr": "^2.3.3",
-    "web-core": "^0.1.0"
+    "web-core": "*"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

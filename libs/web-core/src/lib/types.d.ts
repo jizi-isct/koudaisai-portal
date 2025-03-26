@@ -1,4 +1,4 @@
-import {components} from "@/lib/api_v1";
+import {components} from "src/lib/api_v1";
 
 export type Item = components["schemas"]["Item"];
 export type Form = components["schemas"]["Form"];
