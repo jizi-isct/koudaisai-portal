@@ -1,7 +1,7 @@
-# ui-edit_form
+# @koudaisai-portal/ui-edit_form
 
 This library was generated with [Nx](https://nx.dev).
 
-## Building
+## Running unit tests
 
-Run `nx build ui-edit_form` to build the library.
+Run `nx test @koudaisai-portal/ui-edit_form` to execute the unit tests via [Vitest](https://vitest.dev/).

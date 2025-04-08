@@ -1,7 +1,7 @@
 {
   "name": "@koudaisai-portal/ui-edit_form",
   "version": "0.0.1",
-  "private": true,
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,8 +14,7 @@
       "default": "./dist/index.js"
     }
   },
-  "dependencies": {
-    "react-datepicker": "^8.2.1",
-    "tslib": "^2.3.0"
+  "devDependencies": {
+    "ajv": "^8.17.1"
   }
 }

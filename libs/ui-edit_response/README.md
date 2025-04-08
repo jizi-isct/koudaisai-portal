@@ -1,7 +1,7 @@
-# ui-edit_response
+# @koudaisai-portal/ui-edit_response
 
 This library was generated with [Nx](https://nx.dev).
 
-## Building
+## Running unit tests
 
-Run `nx build ui-edit_response` to build the library.
+Run `nx test @koudaisai-portal/ui-edit_response` to execute the unit tests via [Vitest](https://vitest.dev/).

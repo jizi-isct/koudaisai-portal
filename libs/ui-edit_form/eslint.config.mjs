@@ -1,23 +1,35 @@
+import nx from "@nx/eslint-plugin";
 import baseConfig from "../../eslint.config.mjs";
 
 export default [
     ...baseConfig,
     {
-        "files": [
+        files: [
             "**/*.json"
         ],
-        "rules": {
+        rules: {
             "@nx/dependency-checks": [
                 "error",
                 {
-                    "ignoredFiles": [
+                    ignoredFiles: [
                         "{projectRoot}/eslint.config.{js,cjs,mjs}"
                     ]
                 }
             ]
         },
-        "languageOptions": {
-            "parser": (await import('jsonc-eslint-parser'))
+        languageOptions: {
+            parser: await import("jsonc-eslint-parser")
         }
+    },
+    ...nx.configs["flat/react"],
+    {
+        files: [
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.js",
+            "**/*.jsx"
+        ],
+        // Override or add rules here
+        rules: {}
     }
 ];
