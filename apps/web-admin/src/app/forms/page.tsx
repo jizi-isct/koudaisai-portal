@@ -1,8 +1,7 @@
 "use client";
 import styles from "./page.module.css";
-import Lists from "@/components/Forms/Lists/Lists";
-import {$api} from "@/lib/api";
-import {components} from "@/lib/api_v1";
+import Lists from "../../components/Forms/Lists/Lists";
+import {$apiMembers, Form} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -15,13 +14,10 @@ export default function Page() {
 }
 
 function Inner() {
-    const {data, error} = $api.useQuery(
+    const {data} = $apiMembers.useQuery(
         "get",
         "/forms"
     )
-
-    type Item = components["schemas"]["Item"]
-    type Form = components["schemas"]["Form"]
 
     const renderLists = () => {
         if (!data) return null;

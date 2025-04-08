@@ -2,9 +2,9 @@
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
 import {Suspense, useState} from "react";
-import {$api, fetchClient, FormResponse, Item} from "@/lib/api";
+import {$apiMembers, fetchClient, FormResponse, Item} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import FormItem from "@/components/Forms/FormItem/FormItem";
+import {Item as ItemComponent} from "@koudaisai-portal/ui-edit_response";
 
 export default function Page() {
     return (
@@ -27,8 +27,7 @@ function Inner() {
     const [formResponse, setFormResponse] = useState<FormResponse>({
         answers: {}
     }); // 回答を管理する state
-
-    const {data, error} = $api.useQuery(
+  const {data, error} = $apiMembers.useQuery(
         "get",
         "/forms/{form_id}",
         {
@@ -85,7 +84,7 @@ function Inner() {
         if (!form || !form.items) return null;
 
         return form.items.map((item) => (
-            <FormItem
+          <ItemComponent
                 key={item.item_id}
                 item={item}
                 setValue={handleInputChange(item)}

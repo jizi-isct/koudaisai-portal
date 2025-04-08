@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {fetchClient, Form} from "@/lib/api";
+import {fetchClientAdmin, Form} from "@koudaisai-portal/util";
 
 export default function Page() {
     const [title, setTitle] = useState<string>("");
@@ -22,7 +22,7 @@ export default function Page() {
             }
         }
 
-        fetchClient.POST(
+        fetchClientAdmin.POST(
             "/forms",
             {
                 body: form

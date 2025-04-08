@@ -15,6 +15,7 @@ use tokio::io::AsyncReadExt;
 use tracing::log::{trace, warn};
 use tracing::{debug, instrument};
 use uuid::Uuid;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
 pub enum CurrentUser {

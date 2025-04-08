@@ -1,7 +1,0 @@
-description: 一つの質問を含む項目
-type: object
-properties:
-  question:
-    $ref: ./Question.yml
-required:
-  - question

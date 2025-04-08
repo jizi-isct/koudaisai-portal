@@ -15,7 +15,7 @@ export default function Login() {
 }
 
 function Inner() {
-    let search = useSearchParams()
+  const search = useSearchParams()
     const code = search.get("code")!
     const state = search.get("state")!
     const {data, error} = $auth.useQuery(

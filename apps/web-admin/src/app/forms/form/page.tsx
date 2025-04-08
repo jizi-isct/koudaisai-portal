@@ -2,13 +2,10 @@
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
 import {Suspense, useEffect, useState} from "react";
-import TextInput from "@/components/Forms/TextInput/TextInput";
-import ParagraphInput from "@/components/Forms/ParagraphInput/ParagraphInput";
-import SaveStatus from "@/components/Forms/SaveStatus/SaveStatus";
-import {$api, fetchClient, Form, Item} from "@/lib/api";
+import {TextInput} from "@koudaisai-portal/ui-generic";
+import {FormMetadata, Item as ItemComponent, SaveStatus} from "@koudaisai-portal/ui-edit_form";
+import {$apiAdmin, fetchClientAdmin, Form, Item} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {FormItem} from "@/components/Forms/FormItem/FormItem";
-import FormMetadata from "@/components/Forms/FormMetadata/FormMetadata";
 
 export default function Page() {
     return (
@@ -28,7 +25,7 @@ function Inner() {
         window.location.assign("/404")
     }
 
-    const {data, error} = $api.useQuery(
+    const {data, error} = $apiAdmin.useQuery(
         "get",
         "/forms/{form_id}",
         {
@@ -56,7 +53,7 @@ function Inner() {
     const saveForm = async (form: Form) => {
         setSaveStatus("saving");
 
-        const {error} = await fetchClient.PUT(
+        const {error} = await fetchClientAdmin.PUT(
             `/forms/{form_id}`,
             {
                 params: {
@@ -193,7 +190,7 @@ function Inner() {
             //     </>
             //   )}
             // </Question>
-            <FormItem
+          <ItemComponent
                 key={item.item_id}
                 item={item}
                 setItem={setItem}
@@ -215,19 +212,17 @@ function Inner() {
             <main className={styles.main}>
                 <div className={styles.formTitleWrapper}>
                     <TextInput
-                        fontSize={16}
                         width={400}
                         placeholder="タイトルを入力"
                         value={form?.info?.title ?? "データなし"}
-                        onChange={handleTitleChange}
-                        args={[]}
+                        setValue={handleTitleChange}
+                        paragraph={false}
                     />
-                    <ParagraphInput
-                        fontSize={12}
+                    <TextInput
                         placeholder="説明文を入力"
                         value={form?.info?.description ?? "データなし"}
-                        onChange={handleDescriptionChange}
-                        args={[]}
+                        setValue={handleDescriptionChange}
+                        paragraph={true}
                     />
                     <FormMetadata form={form} setForm={setForm}/>
 

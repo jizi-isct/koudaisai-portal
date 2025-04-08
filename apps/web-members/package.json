@@ -1,33 +1,10 @@
 {
-  "name": "web-members",
-  "version": "0.1.0",
-  "license": "MIT",
+  "name": "@koudaisai-portal/web-members",
+  "version": "0.0.1",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
   "dependencies": {
-    "jsonwebtoken": "^9.0.2",
-    "next": "^15.1.7",
-    "next-base64": "^1.1.0",
-    "openapi-fetch": "^0.13.4",
-    "openapi-react-query": "^0.3.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-hook-form": "^7.54.2",
-    "swr": "^2.3.3",
-    "web-core": "*"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.1.6",
-    "typescript": "^5"
+    "next": "^15.2.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   }
 }

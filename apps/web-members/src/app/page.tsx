@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {getTokens} from "@/lib/auth";
+import {getTokensMembers} from "@koudaisai-portal/util";
 
 export default function Page() {
     const [authenticated, setAuthenticated] = useState(false);
@@ -10,7 +10,7 @@ export default function Page() {
 
     useEffect(() => {
         (async () => {
-            const tokens = await getTokens()
+          const tokens = await getTokensMembers()
             if (tokens) {
                 setAuthenticated(true);
             } else {
