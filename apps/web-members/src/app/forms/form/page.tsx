@@ -2,7 +2,7 @@
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
 import {Suspense, useState} from "react";
-import {$apiMembers, fetchClient, FormResponse, Item} from "@koudaisai-portal/util";
+import {$apiMembers, fetchClientMembers, FormResponse, Item} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Item as ItemComponent} from "@koudaisai-portal/ui-edit_response";
 
@@ -61,7 +61,7 @@ function Inner() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const {response} = await fetchClient.POST(
+      const {response} = await fetchClientMembers.POST(
             "/forms/{form_id}/responses",
             {
                 params: {

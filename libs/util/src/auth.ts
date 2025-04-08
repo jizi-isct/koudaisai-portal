@@ -8,9 +8,9 @@ export type Tokens = {
   access_token: string,
 }
 
-export const fetchClient = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
 
-export const $auth = createClient(fetchClient)
+export const $auth = createClient(fetchClientAuth)
 
 /**
  * members_refresh_tokenとmembers_access_tokenの取得を試みる．
@@ -48,7 +48,7 @@ export async function getTokensMembers(): Promise<Tokens | undefined> {
   }
 
   //トークンのリフレッシュを試みる
-  const {data} = await fetchClient.POST(
+  const {data} = await fetchClientAuth.POST(
     "/refresh",
     {
       body: {
@@ -106,7 +106,7 @@ export async function getTokensAdmin(): Promise<Tokens | undefined> {
 
   //TODO: トークンのリフレッシュを試みる
 
-  const {data} = await fetchClient.POST(
+  const {data} = await fetchClientAuth.POST(
     "/refresh",
     {
       body: {

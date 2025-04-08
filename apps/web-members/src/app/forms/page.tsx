@@ -1,7 +1,7 @@
 "use client";
 import styles from "./page.module.css";
 import Forms from "@/components/Forms/Lists/Lists";
-import {$api} from "@/lib/api";
+import {$apiMembers, Form} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export default function Page() {
@@ -13,7 +13,7 @@ export default function Page() {
 }
 
 function Inner() {
-    const {data, error} = $api.useQuery(
+  const {data, error} = $apiMembers.useQuery(
         "get",
         "/forms"
     )
@@ -25,9 +25,9 @@ function Inner() {
         <div className={styles.page}>
             <main className={styles.main}>
                 <div className={styles.formsWrapper}>
-                    {data.map((form: any) => (
+                  {data.map((form: Form) => (
                         <Forms
-                            formId={form.form_id}
+                          formId={form.form_id!}
                             title={form.info.title}
                             status={"未回答"}
                             dueDate={form.info.deadline}

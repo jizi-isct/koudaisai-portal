@@ -1,27 +1,21 @@
 'use client';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
-import {paths} from "@/lib/auth_v1";
-import createFetchClient from "openapi-fetch";
+import {fetchClientAuth} from "@koudaisai-portal/util";
 
 type Inputs = {
     m_address: string,
     password: string
 }
-const fetchClient = createFetchClient<paths>({
-    baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL,
-});
 
 export default function Login() {
     const [error, setError] = useState<string>();
     const {
         register,
-        handleSubmit,
-        watch,
-        formState: {errors},
+        handleSubmit
     } = useForm<Inputs>()
     const onSubmit: SubmitHandler<Inputs> = async (inputs) => {
-        const {data, response} = await fetchClient.POST(
+        const {data, response} = await fetchClientAuth.POST(
             "/login",
             {
                 body: {
