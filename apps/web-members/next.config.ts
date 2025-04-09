@@ -7,6 +7,7 @@ const nextConfig: NextConfig = withNx({
         unoptimized: true
     },
     basePath: "/admin",
+    trailingSlash: true
 });
 
 export default nextConfig;

@@ -10,7 +10,7 @@ type HeaderListsProps = {
 
 const HeaderLists = ({title, status, dueDate, summary, formId}: HeaderListsProps) => {
     return (
-        <a href={`/forms/form.html?formId=${formId}`} className={styles.forms}>
+        <a href={`/forms/form?formId=${formId}`} className={styles.forms}>
             <div className={styles.titleWrapper}>
                 <h2 className={styles.title}>{title}</h2>
                 <h2 className={styles.status}>{status}</h2>
