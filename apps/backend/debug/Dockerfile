@@ -34,7 +34,8 @@ ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin \
     KC_HOSTNAME=localhost \
     KC_HOSTNAME_STRICT=false \
     KC_HTTP_ENABLE=true \
-    KC_LOGLEVEL=debug
+    KC_LOGLEVEL=debug \
+    KC_HTTP_PORT=8000
 
-HEALTHCHECK --interval=5s --retries=30 CMD curl -f -s http://localhost:8080/health/ready || exit 1
+HEALTHCHECK --interval=5s --retries=30 CMD curl -f -s http://localhost:8000/health/ready || exit 1
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--legacy-observability-interface=true"]

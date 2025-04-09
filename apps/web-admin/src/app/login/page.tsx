@@ -1,6 +1,6 @@
 'use client';
 import {useSearchParams} from "next/navigation";
-import {$auth} from '@/lib/auth';
+import {$auth} from '@koudaisai-portal/util';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Suspense} from "react";
 
