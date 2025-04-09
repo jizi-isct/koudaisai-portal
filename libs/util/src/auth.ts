@@ -8,7 +8,7 @@ export type Tokens = {
   access_token: string,
 }
 
-export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL})
 
 export const $auth = createClient(fetchClientAuth)
 
@@ -76,6 +76,8 @@ export async function getTokensAdmin(): Promise<Tokens | undefined> {
   const refresh_token = localStorage.getItem("admin_refresh_token")
   const access_token = localStorage.getItem("admin_access_token")
 
+  console.log(refresh_token)
+  console.log(access_token)
   //nullだったらundefinedに
   if (refresh_token === null || access_token === null) {
     return undefined

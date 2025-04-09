@@ -43,6 +43,6 @@ export const $apiMembers = createClient(fetchClientMembers)
 //adminトークンを乗せたリクエストを送るclients
 
 export const fetchClientAdmin = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
-fetchClientMembers.use(authMiddlewareAdmin)
+fetchClientAdmin.use(authMiddlewareAdmin)
 
 export const $apiAdmin = createClient(fetchClientAdmin)
