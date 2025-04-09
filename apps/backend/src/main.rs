@@ -36,10 +36,7 @@ async fn main() {
         config.web.auth.keycloak.id.clone(),
         config.web.auth.keycloak.secret.clone(),
         config.web.auth.keycloak.issuer.to_string(),
-        format!(
-            "{}{}",
-            &config.web.server.base_url, "/login"
-        ),
+        format!("{}{}", &config.web.server.base_url, "/login"),
     )
     .await;
 
