@@ -1,0 +1,14 @@
+.headerButton {
+    align-items: center;
+    border-radius: 100vw;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 16px 30px;
+    display: inline-block;
+    border: 1px solid;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    margin: 0 10px;
+    box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+}
