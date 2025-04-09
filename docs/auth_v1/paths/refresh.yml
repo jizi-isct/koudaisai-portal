@@ -1,0 +1,21 @@
+post:
+  summary: リフレッシュトークンを検証し、アクセストークンを発行する。
+  tags:
+    - auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Refresh.yml
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/LoginSuccess.yml
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合

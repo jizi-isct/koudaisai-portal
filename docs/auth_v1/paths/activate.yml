@@ -1,0 +1,32 @@
+post:
+  summary: ユーザーを有効化する。
+  tags:
+    - auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Activate.yml
+  responses:
+    '201':
+      description: OK
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: トークンが不正
+    '404':
+      description: ユーザーが存在しない
+    '409':
+      description: ユーザーが既に有効化されている
+    '429':
+      description: レート制限
+      headers:
+        ratelimit-reset:
+          schema:
+            type: integer
+          description: rate limitがリセットされるまでの秒数
+        retry-after:
+          schema:
+            type: integer
+          description: 再試行可能になるまでの秒数
