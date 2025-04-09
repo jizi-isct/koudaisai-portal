@@ -9,10 +9,9 @@ use crate::util::sha::stretch_with_salt;
 use crate::util::AppError;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post, put};
+use axum::routing::{post, put};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
-use migration::SubQueryStatement;
 use sea_orm::{ActiveModelTrait, ActiveValue, EntityTrait, QueryFilter, TransactionTrait};
 use sea_orm::{ColumnTrait, EntityOrSelect};
 use serde::{Deserialize, Serialize};
@@ -305,7 +304,7 @@ async fn get_exhibitors_id(
 ) -> Result<(StatusCode, Response), AppError> {
     //permission check
     match current_user {
-        CurrentUser::Admin(claims) => {}
+        CurrentUser::Admin(_) => {}
         CurrentUser::User(claims) => {
             // 属しているかどうか確認
             let model = users::Entity::find_by_id(claims.sub)
@@ -352,7 +351,7 @@ async fn put_exhibitors_id(
 ) -> Result<(StatusCode, Response), AppError> {
     //permission che
     match current_user {
-        CurrentUser::Admin(claims) => {}
+        CurrentUser::Admin(_) => {}
         CurrentUser::User(claims) => {
             // 属しているかどうか確認
             let model = users::Entity::find_by_id(claims.sub)

@@ -5,18 +5,14 @@ use axum::http;
 use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
-use axum_extra::extract::CookieJar;
-use chrono::Utc;
-use jsonwebtoken::{Algorithm, DecodingKey, TokenData, Validation};
 use openidconnect::core::CoreUserInfoClaims;
-use openidconnect::{AccessToken, SubjectIdentifier};
+use openidconnect::AccessToken;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::io::AsyncReadExt;
 use tracing::log::{trace, warn};
 use tracing::{debug, instrument};
-use uuid::Uuid;
 
 #[derive(Clone, Debug)]
 pub enum CurrentUser {
