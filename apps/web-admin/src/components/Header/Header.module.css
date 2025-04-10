@@ -19,7 +19,7 @@
     align-items: center;
 }
 
-.headerButton {
+.headerNav {
     align-items: center;
     border-radius: 100vw;
     cursor: pointer;
@@ -34,4 +34,16 @@
     box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
     border-color:#0048FF;
     background-color: white;
+}
+
+.activeNav {
+    background-color: #0048FF;
+    color: white;
+    border-color: #0048FF;
+}
+
+.inactiveNav {
+    background-color: white;
+    color: black;
+    border-color: #0048FF;
 }
