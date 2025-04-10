@@ -18,3 +18,20 @@
     justify-content: center;
     align-items: center;
 }
+
+.headerButton {
+    align-items: center;
+    border-radius: 100vw;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 16px 30px;
+    display: inline-block;
+    border: 1px solid;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    margin: 0 10px;
+    box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+    border-color:#0048FF;
+    background-color: white;
+}
