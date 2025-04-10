@@ -76,8 +76,6 @@ export async function getTokensAdmin(): Promise<Tokens | undefined> {
   const refresh_token = localStorage.getItem("admin_refresh_token")
   const access_token = localStorage.getItem("admin_access_token")
 
-    console.log(refresh_token)
-    console.log(access_token)
   //nullだったらundefinedに
   if (refresh_token === null || access_token === null) {
     return undefined
