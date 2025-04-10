@@ -5,7 +5,6 @@ use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Valid
 use sea_orm::{DatabaseConnection, EntityTrait};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-use std::str::FromStr;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

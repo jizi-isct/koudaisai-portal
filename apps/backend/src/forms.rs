@@ -3,7 +3,6 @@ pub mod responses;
 
 use chrono::{DateTime, Utc};
 use question::Question;
-use sea_orm::EntityTrait;
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};

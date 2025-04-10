@@ -8,17 +8,16 @@ use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use axum::routing::{get, post, put};
+use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveEnum, ActiveModelBehavior, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait,
-    ModelTrait, NotSet, QueryFilter,
+    ActiveEnum, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait,
+    NotSet, QueryFilter,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
-use std::iter::Map;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::{info, instrument, trace, warn};

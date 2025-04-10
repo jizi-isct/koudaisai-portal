@@ -3,10 +3,9 @@ use crate::routes::init_routes;
 use crate::util::oidc::OIDCClient;
 use migration::{Migrator, MigratorTrait};
 use openidconnect::core::{CoreClient, CoreProviderMetadata};
-use openidconnect::{Client, ClientId, ClientSecret, IssuerUrl, RedirectUrl};
+use openidconnect::{ClientId, ClientSecret, IssuerUrl, RedirectUrl};
 use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
 use sea_orm::{Database, DatabaseConnection, DbErr};
-use std::error::Error;
 use tracing::{debug, info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -36,10 +35,7 @@ async fn main() {
         config.web.auth.keycloak.id.clone(),
         config.web.auth.keycloak.secret.clone(),
         config.web.auth.keycloak.issuer.to_string(),
-        format!(
-            "{}{}",
-            &config.web.server.base_url, "/login"
-        ),
+        format!("{}{}", &config.web.server.base_url, "/login"),
     )
     .await;
 

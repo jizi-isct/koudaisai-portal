@@ -1,7 +1,7 @@
 "use client";
 import styles from "./page.module.css";
 import Lists from "../../components/Forms/Lists/Lists";
-import {$apiMembers, Form} from "@koudaisai-portal/util";
+import {$apiAdmin, Form} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ export default function Page() {
 }
 
 function Inner() {
-    const {data} = $apiMembers.useQuery(
+    const {data} = $apiAdmin.useQuery(
         "get",
         "/forms"
     )
@@ -36,7 +36,7 @@ function Inner() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                <Link href={"/admin/forms/new"}>新たなフォームを作成</Link>
+                <Link href={"/forms/new"}>新たなフォームを作成</Link>
                 <div className={styles.formsWrapper}>
                     {renderLists()}
                 </div>

@@ -1,38 +1,29 @@
 use crate::entities::prelude::Users;
-use crate::entities::users::Model;
 use crate::entities::{revoked_refresh_tokens, users};
 use crate::routes::{AppState, AuthSession};
 use crate::util::jwt;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::{digest, stretch_with_salt};
 use anyhow::Result;
-use axum::extract::{ConnectInfo, Query, State};
+use axum::extract::{ConnectInfo, State};
 use axum::http::{HeaderMap, StatusCode};
-use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use axum_extra::extract::cookie::Cookie;
-use axum_extra::extract::{cookie, CookieJar};
 use axum_gcra::gcra::Quota;
 use axum_gcra::real_ip::RealIp;
 use axum_gcra::RateLimitLayer;
-use chrono::Utc;
 use http::HeaderValue;
-use jsonwebtoken::EncodingKey;
-use oauth2::basic::BasicErrorResponseType;
 use oauth2::{
-    AccessToken, AuthorizationCode, ConfigurationError, CsrfToken, HttpClientError,
-    PkceCodeChallenge, RefreshToken, Scope, StandardErrorResponse, TokenResponse,
+    AccessToken, AuthorizationCode, CsrfToken,
+    PkceCodeChallenge, RefreshToken, Scope, TokenResponse,
 };
 use openidconnect::core::CoreAuthenticationFlow;
-use openidconnect::{ClaimsVerificationError, Nonce};
-use rand::distr::{Alphanumeric, SampleString};
-use rand::rng;
-use reqwest::{Client, Url};
+use openidconnect::Nonce;
+use reqwest::Client;
 use sea_orm::ActiveValue::Set;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, EntityTrait};
-use sea_orm::{ActiveValue, ColumnTrait, DbErr, IntoActiveModel};
+use sea_orm::{ColumnTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 use std::cmp::PartialEq;
 use std::error::Error;
@@ -41,7 +32,6 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, instrument, warn};
-use uuid::Uuid;
 
 #[instrument(name = "init /auth")]
 pub fn init_router() -> Router<Arc<AppState>> {
@@ -263,7 +253,7 @@ async fn reset(
 ) -> StatusCode {
     let access_token = match state.jwt_manager.decode(payload.access_token.as_str()) {
         Ok(access_token) => access_token,
-        Err(err) => {
+        Err(_) => {
             return StatusCode::UNAUTHORIZED;
         }
     };
@@ -340,7 +330,7 @@ async fn revoke(
     // refresh_tokenの有効性確認
     let refresh_token = match state.jwt_manager.decode(payload.refresh_token.as_str()) {
         Ok(token) => token,
-        Err(err) => {
+        Err(_) => {
             return StatusCode::UNAUTHORIZED;
         }
     };

@@ -8,7 +8,7 @@ export type Tokens = {
   access_token: string,
 }
 
-export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL})
 
 export const $auth = createClient(fetchClientAuth)
 
