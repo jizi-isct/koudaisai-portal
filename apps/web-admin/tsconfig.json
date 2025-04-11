@@ -59,9 +59,6 @@
     },
     {
       "path": "../../libs/ui-edit_form"
-    },
-    {
-      "path": "../../libs/ui-generic"
     }
   ]
 }
