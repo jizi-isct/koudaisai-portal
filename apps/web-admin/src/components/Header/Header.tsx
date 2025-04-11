@@ -10,10 +10,10 @@ type HeaderProps = {
 };
 //ヘッダーのナビゲーションアイテムを定義
 const HeaderItems = [
-    { text: "ホーム", href: "/" },
-    { text: "フォーム", href: "/forms/" },
-    { text: "資料", href: "/documents/" },
-    { text: "よくある質問", href: "/questions/" }
+    { text: "ホーム", href: "/", class: "navHome" },
+    { text: "フォーム", href: "/forms/", class: "navForm" },
+    { text: "資料", href: "/documents/", class: "navDocuments" },
+    { text: "よくある質問", href: "/questions/", class: "navQuestions" }
 ];
 
 const Header = ({header_type}: HeaderProps) => {
@@ -34,14 +34,14 @@ const Header = ({header_type}: HeaderProps) => {
             </div>
             <div className={styles.menuWrapper}>
                 {/* ヘッダーのナビゲーションボタン */}
-                {HeaderItems.map(({ text, href }) => {
+                {HeaderItems.map(({ text, href, class: className }) => {
                     // 現在のパスとヘッダーのリンクのパスを比較して、アクティブなリンクを判断
                     const isActive = pathname === href;
                     return (
                     <Link
                         key={href}
                         href={href}
-                        className={`${styles.headerNav} ${isActive ? styles.activeNav : styles.inactiveNav}`}
+                        className={`${styles.headerNav} ${styles[className]} ${isActive ? styles.activeNav : styles.inactiveNav}`}
                     >
                         {text}
                     </Link>

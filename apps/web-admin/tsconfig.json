@@ -55,13 +55,13 @@
   ],
   "references": [
     {
+      "path": "../../libs/ui-generic"
+    },
+    {
       "path": "../../libs/util"
     },
     {
       "path": "../../libs/ui-edit_form"
-    },
-    {
-      "path": "../../libs/ui-generic"
     }
   ]
 }

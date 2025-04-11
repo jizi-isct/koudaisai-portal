@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 import styles from "./Header.module.css";
 import Link from "next/link";
-import { usePathname } from 'next/navigation';
 import Image from "next/image";
 import logo from "./assets/logo.jpg";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
+    currentPath?: string;
 };
 //ヘッダーのナビゲーションアイテムを定義
 const HeaderItems = [
@@ -17,8 +17,7 @@ const HeaderItems = [
     { text: "よくある質問", href: "/questions/" }
 ];
 
-const Header = ({header_type}: HeaderProps) => {
-    const pathname = usePathname();
+export const Header = ({header_type, currentPath}: HeaderProps) => {
     const isAdmin = header_type === "admin";
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
@@ -37,7 +36,7 @@ const Header = ({header_type}: HeaderProps) => {
                 {/* ヘッダーのナビゲーションボタン */}
                 {HeaderItems.map(({ text, href }) => {
                     // 現在のパスとヘッダーのリンクのパスを比較して、アクティブなリンクを判断
-                    const isActive = pathname === href;
+                    const isActive = currentPath === href;
                     return (
                     <Link
                         key={href}
@@ -52,5 +51,3 @@ const Header = ({header_type}: HeaderProps) => {
         </header>
     );
 };
-
-export default Header;
