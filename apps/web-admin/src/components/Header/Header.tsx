@@ -7,6 +7,7 @@ import Image from "next/image";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
+    currentPath?: string;
 };
 //ヘッダーのナビゲーションアイテムを定義
 const HeaderItems = [
@@ -16,8 +17,7 @@ const HeaderItems = [
     { text: "よくある質問", href: "/questions/", class: "navQuestions" }
 ];
 
-const Header = ({header_type}: HeaderProps) => {
-    const pathname = usePathname();
+const Header = ({header_type, currentPath}: HeaderProps) => {
     const isAdmin = header_type === "admin";
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
@@ -36,7 +36,7 @@ const Header = ({header_type}: HeaderProps) => {
                 {/* ヘッダーのナビゲーションボタン */}
                 {HeaderItems.map(({ text, href, class: className }) => {
                     // 現在のパスとヘッダーのリンクのパスを比較して、アクティブなリンクを判断
-                    const isActive = pathname === href;
+                    const isActive = currentPath === href;
                     return (
                     <Link
                         key={href}

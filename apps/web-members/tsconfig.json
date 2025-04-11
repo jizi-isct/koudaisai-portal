@@ -55,6 +55,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/ui-generic"
+    },
+    {
       "path": "../../libs/ui-edit_response"
     },
     {

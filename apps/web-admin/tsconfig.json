@@ -55,9 +55,6 @@
   ],
   "references": [
     {
-      "path": "../../libs/ui-generic"
-    },
-    {
       "path": "../../libs/util"
     },
     {
