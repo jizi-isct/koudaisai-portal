@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./HeaderButton.module.css";
 
-type HeaderButtonProps = { // ①
+type HeaderButtonProps = { 
     text: string;
     color?: string;
     onClick: string;

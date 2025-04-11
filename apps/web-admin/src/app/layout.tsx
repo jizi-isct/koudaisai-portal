@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
     <body className={notoSans.className}>
-    <Header/>
+    <Header header_type="admin"/>
     {children}
     <Footer/>
     </body>
