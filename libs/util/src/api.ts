@@ -33,6 +33,18 @@ const authMiddlewareAdmin: Middleware = {
   }
 }
 
+//membersのログイン状態を確認する関数
+export async function isLoggedInMembers(): Promise<boolean> {
+  const tokens = await getTokensMembers();
+  return !!tokens;
+}
+
+//adminのログイン状態を確認する関数
+export async function isLoggedInAdmin(): Promise<boolean> {
+  const tokens = await getTokensAdmin();
+  return !!tokens;
+}
+
 //membersトークンを乗せたリクエストを送るclients
 export const fetchClientMembers = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
 fetchClientMembers.use(authMiddlewareMembers)

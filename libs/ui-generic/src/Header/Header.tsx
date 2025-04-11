@@ -11,6 +11,7 @@ import arrowIcon from "./assets/arrow.svg";
 type HeaderProps = {
     header_type: "admin" | "members" ;
     currentPath?: string;
+    isLoggedIn?: boolean | null;
 };
 
 //ヘッダーのナビゲーションアイテムを定義
@@ -21,18 +22,15 @@ const HeaderItems = [
     { text: "よくある質問", href: "/questions/", class: "navQuestions" }
 ];
 
-export const Header = ({header_type, currentPath}: HeaderProps) => {
+export const Header = ({header_type, currentPath, isLoggedIn}: HeaderProps) => {
     // ヘッダーのユーザアイコンのドロップダウンの状態を管理
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
-    };
+    }
 
     // ヘッダーのタイプによってスタイルを変更
     const isAdmin = header_type === "admin";
-
-    //ログイン状態の確認
-    const isLoggedIn = currentPath !== "/login/";
 
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
