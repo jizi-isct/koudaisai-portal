@@ -4,7 +4,7 @@ import "./globals.css";
 import { Header } from "@koudaisai-portal/ui-generic";
 import Footer from "@/components/Footer/Footer";
 import { usePathname } from "next/navigation";
-import { isLoggedInMembers } from "@koudaisai-portal/util";
+import { isLoggedInAdmin } from "@koudaisai-portal/util";
 import { useEffect, useState } from "react";
 
 const notoSans = Noto_Sans_JP({
@@ -22,7 +22,7 @@ export default function RootLayout({
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    isLoggedInMembers().then(setLoggedIn);
+    isLoggedInAdmin().then(setLoggedIn);
   }, []);
 
   const pathname = usePathname();
