@@ -1,75 +1,174 @@
-.header {
-    padding: 30px;
-    position: relative;
-    text-align: center;
+@media screen and ( min-width : 768px ) {
+    .header {
+        padding: 30px;
+        position: relative;
+        text-align: center;
+    }
+    
+    .logoWrapper {
+        position: absolute;
+        top: 50%;
+        left: 50px;
+        transform: translateY(-50%);
+    }
+    
+    .logoTextWrapper {
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 8px;
+        height: 50px;
+    }
+    
+    .logoText {
+        display: inline-block;
+        align-items: center;
+        transform: translateY(-50%);
+        margin-top: 25px;
+        font-size: 20px;
+    }
+    
+    .menuWrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .headerNav {
+        align-items: center;
+        border-radius: 100vw;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 16px 30px;
+        display: inline-block;
+        border: 1px solid;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        margin: 0 10px;
+        box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+        background-color: white;
+    }
+    
+    .members .activeNav {
+        background-color: #0048FF;
+        color: white;
+        border-color: #0048FF;
+    }
+    
+    .members .inactiveNav {
+        background-color: white;
+        color: black;
+        border-color: #0048FF;
+    }
+    
+    .admin .activeNav {
+        background-color: #ff7300;
+        color: white;
+        border-color: #ff7300;
+    }
+    
+    .admin .inactiveNav {
+        background-color: white;
+        color: black;
+        border-color: #ff7300;
+    }
 }
 
-.logoWrapper {
-    position: absolute;
-    top: 50%;
-    left: 50px;
-    transform: translateY(-50%);
+
+@media screen and ( max-width : 768px ) {
+    .header {
+        height: 100px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .logoWrapper {
+        position: absolute;
+        top: 30px;
+        left: 50vw;
+        transform: translateX(-50%);
+    }
+    
+    .logoTextWrapper {
+        display: none;
+    }
+    
+    .menuWrapper {
+        position: fixed;
+        gap: 12px;
+        bottom: 12px;
+        left: 50vw;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .headerNav {
+        width: 18vw;
+        height: 18vw;
+        align-items: center;
+        border-radius: 9vw;
+        cursor: pointer;
+        border: 1px solid;
+        box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 600;
+    }
+    
+    .members .activeNav {
+        background-color: #0048FF;
+        color: white;
+        border-color: #0048FF;
+    }
+    
+    .members .inactiveNav {
+        background-color: white;
+        color: black;
+        border-color: #0048FF;
+    }
+    
+    .admin .activeNav {
+        background-color: #ff7300;
+        color: white;
+        border-color: #ff7300;
+    }
+    
+    .admin .inactiveNav {
+        background-color: white;
+        color: black;
+        border-color: #ff7300;
+    }
+
+    .navHome::before{
+        content: "🏠";
+        font-size: 30px;
+        display: block;
+    }
+
+    .navForm::before{
+        content: "📄";
+        font-size: 30px;
+        display: block;
+    }
+
+    .navDocuments::before{
+        content: "📚";
+        font-size: 30px;
+        display: block;
+    }
+
+    .navQuestions::before{
+        content: "🔔";
+        font-size: 30px;
+        display: block;
+    }
 }
 
-.logoTextWrapper {
-    display: inline-block;
-    vertical-align: top;
-    margin-left: 8px;
-    height: 50px;
-}
-
-.logoText {
-    display: inline-block;
-    align-items: center;
-    transform: translateY(-50%);
-    margin-top: 25px;
-    font-size: 20px;
-}
-
-.menuWrapper {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-}
-
-.headerNav {
-    align-items: center;
-    border-radius: 100vw;
-    cursor: pointer;
-    transition: all 0.3s;
-    padding: 16px 30px;
-    display: inline-block;
-    border: 1px solid;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    margin: 0 10px;
-    box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
-    background-color: white;
-}
-
-.members .activeNav {
-    background-color: #0048FF;
-    color: white;
-    border-color: #0048FF;
-}
-
-.members .inactiveNav {
-    background-color: white;
-    color: black;
-    border-color: #0048FF;
-}
-
-.admin .activeNav {
-    background-color: #ff7300;
-    color: white;
-    border-color: #ff7300;
-}
-
-.admin .inactiveNav {
-    background-color: white;
-    color: black;
-    border-color: #ff7300;
-}

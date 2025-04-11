@@ -3,6 +3,7 @@ import {Noto_Sans_JP} from "next/font/google";
 import "./globals.css";
 import {Header} from "@koudaisai-portal/ui-generic";
 import Footer from "@/components/Footer/Footer";
+import { usePathname } from 'next/navigation';
 
 const notoSans = Noto_Sans_JP({
   subsets: ["latin"],
@@ -17,11 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   console.log(children);
-  const path = "/";
+  const pathname = usePathname();
   return (
     <html lang="ja">
     <body className={notoSans.className}>
-    <Header header_type="admin" currentPath={path}/>
+    <Header header_type="admin" currentPath={pathname}/>
     {children}
     <Footer/>
     </body>
