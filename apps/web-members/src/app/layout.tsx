@@ -3,25 +3,29 @@ import {Noto_Sans_JP} from "next/font/google";
 import "./globals.css";
 import {Header} from "@koudaisai-portal/ui-generic";
 import Footer from "@/components/Footer/Footer";
+import { usePathname } from 'next/navigation';
 
 const notoSans = Noto_Sans_JP({
-    subsets: ["latin"],
-    weight: "400"
+  subsets: ["latin"],
+  weight: "400"
 });
 
 
+
 export default function RootLayout({
-                                       children,
+                                     children,
                                    }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="ja">
-        <body className={notoSans.className}>
-        <Header/>
-        {children}
-        <Footer/>
-        </body>
-        </html>
-    );
+  console.log(children);
+  const pathname = usePathname();
+  return (
+    <html lang="ja">
+    <body className={notoSans.className}>
+    <Header header_type="members" currentPath={pathname}/>
+    {children}
+    <Footer/>
+    </body>
+    </html>
+  );
 }
