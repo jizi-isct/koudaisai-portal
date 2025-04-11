@@ -3,7 +3,10 @@
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import logo from "./assets/logo.jpg";
+import accountIcon from "./assets/icon_account.svg";
+import arrowIcon from "./assets/arrow.svg";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
@@ -19,7 +22,18 @@ const HeaderItems = [
 ];
 
 export const Header = ({header_type, currentPath}: HeaderProps) => {
+    // ヘッダーのユーザアイコンのドロップダウンの状態を管理
+    const [isOpen, setIsOpen] = useState(false);
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
+
+    // ヘッダーのタイプによってスタイルを変更
     const isAdmin = header_type === "admin";
+
+    //ログイン状態の確認
+    const isLoggedIn = currentPath !== "/login/";
+
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
             <div className={styles.logoWrapper}>
@@ -31,6 +45,32 @@ export const Header = ({header_type, currentPath}: HeaderProps) => {
             />
             <div className={styles.logoTextWrapper}>
                 <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
+            </div>
+            <div className={styles.userWrapper}>
+                <div className={`${styles.userWrapperLoggedIn} ${isLoggedIn ? "" : styles.hiddenUserWrapper}`}>
+                    <div className={styles.user} onClick={toggleDropdown}>
+                        <Image
+                            src={accountIcon}
+                            alt="User Account Icon"
+                            width={28}
+                            height={28}
+                        />
+                        <Image
+                            src={arrowIcon}
+                            alt="Arrow Down Icon"
+                            className={styles.arrowIcon}
+                            width={24}
+                            height={24}
+                        />
+                    </div>
+                    <div className={`${styles.userDropdownWrapper} ${isOpen ? styles.dropdownOpen : styles.dropdownClosed}`}>
+                        <Link href="" className={styles.userDropdown}>ログアウト</Link>
+                        <Link href="" className={styles.userDropdown}>ログアウト</Link>
+                    </div>
+                </div>
+                <div className={`${styles.userWrapperLoggedOut} ${isLoggedIn ? styles.hiddenUserWrapper : ""}`}>
+                    <Link href="/login/">ログイン</Link>
+                </div>
             </div>
             </div>
             <div className={styles.menuWrapper}>

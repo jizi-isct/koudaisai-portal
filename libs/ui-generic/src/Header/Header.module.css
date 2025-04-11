@@ -1,15 +1,15 @@
+/* デスクトップ向けのスタイル */
 @media screen and ( min-width : 768px ) {
     .header {
-        padding: 30px;
+        height: 100px;
         position: relative;
         text-align: center;
     }
     
     .logoWrapper {
-        position: absolute;
-        top: 50%;
+        position: fixed;
+        top: 38px;
         left: 50px;
-        transform: translateY(-50%);
     }
     
     .logoTextWrapper {
@@ -26,20 +26,77 @@
         margin-top: 25px;
         font-size: 20px;
     }
+
+    .userWrapper {
+        position: fixed;
+        top: 30px;
+        right: 50px;
+
+        align-items: center;
+        border-radius: 30px;
+        cursor: pointer;
+        padding: 10px 20px;
+        display: inline-block;
+        border: 1px solid;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        margin: 0 10px;
+        background-color: white;
+        color: black;
+        box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+    }
+
+    .admin .userWrapper {
+        border-color: #ff7300;
+    }
+
+    .members .userWrapper {
+        border-color: #0048FF;
+    }
+
+    .arrowIcon{
+        margin: 0 0 0 10px;
+    }
+
+    .dropdownOpen{
+        display: block;
+    }
+
+    .dropdownClosed{
+        display: none;
+    }
+
+    .userDropdown{
+        display: block;
+        margin: 10px 0;
+    }
+
+    .hiddenUserWrapper{
+        display: none;
+    }
+
+    
+
     
     .menuWrapper {
+        position: fixed;
+        top: 30px;
+        left: 50vw;
+        transform: translateX(-50%);
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         justify-content: center;
         align-items: center;
     }
+
+    
     
     .headerNav {
         align-items: center;
         border-radius: 100vw;
         cursor: pointer;
-        transition: all 0.3s;
         padding: 16px 30px;
         display: inline-block;
         border: 1px solid;
@@ -77,6 +134,7 @@
 }
 
 
+/* モバイル向けのスタイル */
 @media screen and ( max-width : 768px ) {
     .header {
         height: 100px;
@@ -93,6 +151,10 @@
     
     .logoTextWrapper {
         display: none;
+    }
+    
+    .userWrapper{
+        display: none
     }
     
     .menuWrapper {
