@@ -3,7 +3,7 @@
 import styles from "./Header.module.css";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import Logo from "@/components/Logo/Logo";
+import Image from "next/image";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
@@ -22,7 +22,15 @@ const Header = ({header_type}: HeaderProps) => {
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
             <div className={styles.logoWrapper}>
-                <Logo height={50} hasText/>
+            <Image
+                src="/admin/components/Logo/logo.jpg"
+                alt="Koudaisai Portal Admin Site Logo"
+                width={50}
+                height={50}
+            />
+            <div className={styles.logoTextWrapper}>
+                <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
+            </div>
             </div>
             <div className={styles.menuWrapper}>
                 {/* ヘッダーのナビゲーションボタン */}
