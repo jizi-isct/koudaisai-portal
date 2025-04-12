@@ -6,7 +6,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo build --release",
+        "command": "cargo build --release --verbose",
         "cwd": "apps/backend"
       }
     },
