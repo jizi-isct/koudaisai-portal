@@ -3,15 +3,15 @@
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { isLoggedInAdmin } from "@koudaisai-portal/util";
+import { useEffect, useState } from "react";
 import logo from "./assets/logo.jpg";
 import accountIcon from "./assets/icon_account.svg";
 import arrowIcon from "./assets/arrow.svg";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
-    currentPath?: string;
-    isLoggedIn?: boolean | null;
 };
 
 //ヘッダーのナビゲーションアイテムを定義
@@ -22,7 +22,7 @@ const HeaderItems = [
     { text: "よくある質問", href: "/questions/", class: "navQuestions" }
 ];
 
-export const Header = ({header_type, currentPath, isLoggedIn}: HeaderProps) => {
+export const Header = ({header_type}: HeaderProps) => {
     // ヘッダーのユーザアイコンのドロップダウンの状態を管理
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
@@ -31,6 +31,17 @@ export const Header = ({header_type, currentPath, isLoggedIn}: HeaderProps) => {
 
     // ヘッダーのタイプによってスタイルを変更
     const isAdmin = header_type === "admin";
+
+    
+    const currentPath = usePathname();
+
+     //ログイン状態を管理するstate
+    //nullはログイン状態がわからないことを示す
+    const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        isLoggedInAdmin().then(setLoggedIn);
+    }, []);
 
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
@@ -45,7 +56,7 @@ export const Header = ({header_type, currentPath, isLoggedIn}: HeaderProps) => {
                 <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
             </div>
             <div className={styles.userWrapper}>
-                <div className={`${styles.userWrapperLoggedIn} ${isLoggedIn ? "" : styles.hiddenUserWrapper}`}>
+                <div className={`${styles.userWrapperLoggedIn} ${loggedIn ? "" : styles.hiddenUserWrapper}`}>
                     <div className={styles.user} onClick={toggleDropdown}>
                         <Image
                             src={accountIcon}
@@ -66,7 +77,7 @@ export const Header = ({header_type, currentPath, isLoggedIn}: HeaderProps) => {
                         <Link href="" className={styles.userDropdown}>ログアウト</Link>
                     </div>
                 </div>
-                <div className={`${styles.userWrapperLoggedOut} ${isLoggedIn ? styles.hiddenUserWrapper : ""}`}>
+                <div className={`${styles.userWrapperLoggedOut} ${loggedIn ? styles.hiddenUserWrapper : ""}`}>
                     <Link href="/login/">ログイン</Link>
                 </div>
             </div>
