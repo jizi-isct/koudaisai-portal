@@ -16,10 +16,10 @@ type HeaderProps = {
 
 //ヘッダーのナビゲーションアイテムを定義
 const HeaderItems = [
-    { text: "ホーム", href: "/", class: "navHome" },
-    { text: "フォーム", href: "/forms/", class: "navForm" },
-    { text: "資料", href: "/documents/", class: "navDocuments" },
-    { text: "よくある質問", href: "/questions/", class: "navQuestions" }
+    { desktopText: "ホーム", mobileText: "ホーム", href: "/", class: "navHome" },
+    { desktopText: "フォーム", mobileText: "フォーム", href: "/forms/", class: "navForm" },
+    { desktopText: "資料", mobileText: "資料", href: "/documents/", class: "navDocuments" },
+    { desktopText: "よくある質問", mobileText: "FAQ", href: "/questions/", class: "navQuestions" }
 ];
 
 export const Header = ({header_type}: HeaderProps) => {
@@ -84,16 +84,18 @@ export const Header = ({header_type}: HeaderProps) => {
             </div>
             <div className={styles.menuWrapper}>
                 {/* ヘッダーのナビゲーションボタン */}
-                {HeaderItems.map(({ text, href, class: className }) => {
+                {HeaderItems.map(({ desktopText, mobileText, href, class: className }) => {
                     // 現在のパスとヘッダーのリンクのパスを比較して、アクティブなリンクを判断
                     const isActive = currentPath === href;
+
                     return (
                     <Link
                         key={href}
                         href={href}
                         className={`${styles.headerNav} ${styles[className]} ${isActive ? styles.activeNav : styles.inactiveNav}`}
                     >
-                        {text}
+                        <span className={styles.desktopText}>{desktopText}</span>
+                        <span className={styles.mobileText}>{mobileText}</span>
                     </Link>
                     );
                 })}
