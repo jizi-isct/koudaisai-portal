@@ -6,7 +6,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { isLoggedInAdmin } from "@koudaisai-portal/util";
 import { useEffect, useState } from "react";
-import logo from "./assets/logo.jpg";
+import adminLogo from "./assets/admin_logo.jpg";
+import membersLogo from "./assets/members_logo.svg";
 import accountIcon from "./assets/icon_account.svg";
 import arrowIcon from "./assets/arrow.svg";
 
@@ -31,7 +32,6 @@ export const Header = ({header_type}: HeaderProps) => {
 
     // ヘッダーのタイプによってスタイルを変更
     const isAdmin = header_type === "admin";
-
     
     const currentPath = usePathname();
 
@@ -47,7 +47,7 @@ export const Header = ({header_type}: HeaderProps) => {
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
             <div className={styles.logoWrapper}>
             <Image
-                src={logo}
+                src={isAdmin ? adminLogo : membersLogo}
                 alt="Koudaisai Portal Admin Site Logo"
                 width={50}
                 height={50}
