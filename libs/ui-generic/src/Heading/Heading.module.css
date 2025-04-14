@@ -1,0 +1,25 @@
+.root {
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+.emojiBackground {
+    z-index: -5;
+
+    position: absolute;
+    font-size: 4em;
+    opacity: 0.05;
+
+    top: -6rem;
+    left: -3rem;
+}
+
+.emoji {
+    font-size: 1.3em;
+    padding-right: 0.5rem;
+}
+
+.heading {
+    filter: drop-shadow(0 0 4px white);
+}
