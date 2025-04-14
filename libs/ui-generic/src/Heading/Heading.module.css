@@ -8,18 +8,19 @@
     z-index: -5;
 
     position: absolute;
-    font-size: 4em;
+    font-size: 3em;
     opacity: 0.05;
 
-    top: -6rem;
+    top: -4rem;
     left: -3rem;
 }
 
 .emoji {
-    font-size: 1.3em;
+    font-size: 32px;
     padding-right: 0.5rem;
 }
 
 .heading {
     filter: drop-shadow(0 0 4px white);
+    font-size: 24px;
 }
