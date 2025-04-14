@@ -180,6 +180,8 @@
     .headerNav {
         width: 18vw;
         height: 18vw;
+        max-height: 80px;
+        max-width: 80px;
         align-items: center;
         border-radius: 9vw;
         cursor: pointer;
