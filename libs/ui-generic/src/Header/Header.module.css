@@ -8,8 +8,8 @@
     
     .logoWrapper {
         position: fixed;
-        top: 38px;
-        left: 50px;
+        top: 32px;
+        left: 40px;
     }
     
     .logoTextWrapper {
@@ -97,8 +97,10 @@
         align-items: center;
         border-radius: 100vw;
         cursor: pointer;
-        padding: 16px 30px;
-        display: inline-block;
+        width: 120px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
         border: 1px solid;
         font-size: 14px;
         font-style: normal;
