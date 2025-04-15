@@ -6,7 +6,6 @@ const nextConfig: NextConfig = withNx({
     images: {
         unoptimized: true
     },
-    basePath: "/admin",
     trailingSlash: true
 });
 
