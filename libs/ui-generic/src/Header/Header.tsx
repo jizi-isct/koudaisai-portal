@@ -4,7 +4,7 @@ import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { isLoggedInAdmin } from "@koudaisai-portal/util";
+import { isLoggedInAdmin,isLoggedInMembers } from "@koudaisai-portal/util";
 import { useEffect, useState } from "react";
 import adminLogo from "./assets/admin_logo.jpg";
 import membersLogo from "./assets/members_logo.svg";
@@ -40,8 +40,12 @@ export const Header = ({header_type}: HeaderProps) => {
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
     useEffect(() => {
-        isLoggedInAdmin().then(setLoggedIn);
-    }, []);
+        if (header_type === "admin") {
+            isLoggedInAdmin().then(setLoggedIn);
+        } else if (header_type === "members") {
+            isLoggedInMembers().then(setLoggedIn);
+        }
+    }, [header_type]);
 
     return (
         <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
