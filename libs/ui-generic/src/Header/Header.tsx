@@ -78,7 +78,7 @@ export const Header = ({header_type}: HeaderProps) => {
                     </div>
                 </div>
                 <div className={`${styles.userWrapperLoggedOut} ${loggedIn ? styles.hiddenUserWrapper : ""}`}>
-                    <Link href="/login/">ログイン</Link>
+                    <Link href={isAdmin ? process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login" : "/login/"}>ログイン</Link>
                 </div>
             </div>
             </div>
