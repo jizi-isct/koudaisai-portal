@@ -1,0 +1,40 @@
+.root {
+    position: relative;
+
+    overflow: visible;
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+@media screen and (max-width: 1150px) {
+    .root {
+        padding: 2em 0;
+    }
+    .steps {
+        flex-direction: column;
+    }
+
+    .arrow {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1150px) {
+    .root {
+        padding: 2em 0 0 0;
+    }
+    .steps {
+        flex-direction: row;
+        width: 100vw;
+        gap: 10px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 2em;
+    }
+}
