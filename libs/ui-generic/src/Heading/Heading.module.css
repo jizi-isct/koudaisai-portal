@@ -16,6 +16,8 @@
 }
 
 .emoji {
+    position: relative;
+
     font-size: 32px;
     padding-right: 0.5rem;
 }
@@ -23,4 +25,10 @@
 .heading {
     filter: drop-shadow(0 0 4px white);
     font-size: 24px;
+}
+
+@media screen and (max-width: 700px) {
+    .root {
+        justify-content: center;
+    }
 }

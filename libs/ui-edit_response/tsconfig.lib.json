@@ -35,6 +35,9 @@
   ],
   "references": [
     {
+      "path": "../ui-generic/tsconfig.lib.json"
+    },
+    {
       "path": "../util/tsconfig.lib.json"
     }
   ]

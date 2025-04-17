@@ -3,6 +3,7 @@
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@koudaisai-portal/util";
 import {Heading, Steps, Tab} from "@koudaisai-portal/ui-generic";
+import "@koudaisai-portal/ui-generic/css"
 import {topPageData} from "@/lib/lib";
 
 export default function Page() {
@@ -78,8 +79,8 @@ export default function Page() {
               [
                 "研究室企画",
                 <>
-                  <Heading emoji={"🕺"}>
-                    参加申請までの流れ
+                  <Heading emoji={"📅"}>
+                    工大祭までの流れ
                   </Heading>
                   <Steps
                     steps={

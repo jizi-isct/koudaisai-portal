@@ -15,8 +15,10 @@ type Props = {
 export function Heading({children, emoji}: Props) {
   return (
     <h1 className={styles.root}>
-      <span className={styles.emojiBackground}>{emoji}</span>
-      <span className={styles.emoji}>{emoji}</span>
+      <span className={styles.emoji}>
+        <span className={styles.emojiBackground}>{emoji}</span>
+        {emoji}
+      </span>
       <span className={styles.heading}>{children}</span>
     </h1>
   )
