@@ -3,7 +3,6 @@
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@koudaisai-portal/util";
 import {Heading, Steps, Tab} from "@koudaisai-portal/ui-generic";
-import Link from "next/link";
 import {topPageData} from "@/lib/lib";
 
 export default function Page() {

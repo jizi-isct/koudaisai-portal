@@ -1,3 +1,5 @@
+'use client';
+
 import styles from "./Tab.module.css"
 import {JSX, useState} from "react";
 
