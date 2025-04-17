@@ -1,7 +1,7 @@
 import type {Metadata} from "next";
-import {Noto_Sans_JP} from "next/font/google";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header/Header";
+import { Header } from "@koudaisai-portal/ui-generic";
 import Footer from "@/components/Footer/Footer";
 
 const notoSans = Noto_Sans_JP({
@@ -15,17 +15,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
-    children: React.ReactNode;
+  children,
+}: Readonly<{
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="ja">
-        <body className={notoSans.className}>
-        <Header/>
+  return (
+    <html lang="ja">
+      <body className={notoSans.className}>
+        <Header header_type="members"  />
         {children}
-        <Footer/>
-        </body>
-        </html>
-    );
+        <Footer />
+      </body>
+    </html>
+  );
 }

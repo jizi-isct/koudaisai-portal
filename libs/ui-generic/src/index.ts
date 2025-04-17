@@ -4,3 +4,4 @@ export * from "./Heading"
 export * from "./Step"
 export * from "./Steps"
 export * from "./Tab"
+export * from "./Header";
