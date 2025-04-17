@@ -18,7 +18,7 @@ export const Footer = () => {
             </div>
             <div className={styles.navWrapper}>
                 <Link href="/" className={styles.navItem}>ホーム</Link>
-                <Link href="/" className={styles.navItem}>お知らせ</Link>
+                <Link href="/questions/" className={styles.navItem}>よくある質問</Link>
                 <Link href="/forms/" className={styles.navItem}>申請一覧</Link>
             </div>
             <p className={styles.copyrightText}>©︎ 2025 JIZI All Rights Reserved.</p>
