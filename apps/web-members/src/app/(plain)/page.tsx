@@ -2,13 +2,15 @@
 
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@koudaisai-portal/util";
-import {Heading, Steps, Tab} from "@koudaisai-portal/ui-generic";
+import {Heading, Steps, Tab, Header} from "@koudaisai-portal/ui-generic";
 import "@koudaisai-portal/ui-generic/css"
+import "../globals.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [scrollY, setScrollY] = useState(window.scrollY);
 
   useEffect(() => {
     (async () => {
@@ -19,6 +21,14 @@ export default function Page() {
     })();
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+  })
+
   return (
     <main>
       <Hero />
@@ -26,6 +36,7 @@ export default function Page() {
         <h1>ログイン済みです</h1>
       ) : (
         <>
+          <Header header_type="members" titleColor={scrollY > window.innerHeight ? "black" : "white"}></Header>
           <Heading emoji={"ℹ️"}>
             このサイトについて
           </Heading>

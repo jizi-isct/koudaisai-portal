@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 import { Noto_Sans_JP } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Header } from "@koudaisai-portal/ui-generic";
 import Footer from "@/components/Footer/Footer";
 
