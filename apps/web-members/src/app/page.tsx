@@ -5,6 +5,7 @@ import {getTokensMembers} from "@koudaisai-portal/util";
 import {Heading, Steps, Tab} from "@koudaisai-portal/ui-generic";
 import "@koudaisai-portal/ui-generic/css"
 import {topPageData} from "@/lib/lib";
+import {Hero} from "@/components/Hero/Hero";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -20,6 +21,7 @@ export default function Page() {
 
   return (
     <main>
+      <Hero />
       {authenticated ? (
         <h1>ログイン済みです</h1>
       ) : (
