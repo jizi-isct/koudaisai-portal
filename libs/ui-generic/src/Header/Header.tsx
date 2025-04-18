@@ -35,7 +35,8 @@ export const Header = ({header_type}: HeaderProps) => {
     
     const currentPath = usePathname();
 
-     //ログイン状態を管理するstate
+
+    //ログイン状態を管理するstate
     //nullはログイン状態がわからないことを示す
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
@@ -47,17 +48,53 @@ export const Header = ({header_type}: HeaderProps) => {
         }
     }, [header_type]);
 
+
+    // ページのサイズを管理するstate
+    const [pageSize, setPageSize] = useState<{
+        width: number;
+        height: number;
+    }>({
+        width: 1024, // 仮の幅
+        height: 1000, // 仮の高さ
+    });
+
+    // 画面回転時などにページサイズを更新する
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const updatePageSize = () => {
+        const width = window.innerWidth;
+        const height = document.body.scrollHeight;
+        setPageSize({ width, height });
+        };
+
+        updatePageSize(); // 初回実行
+
+        window.addEventListener('resize', updatePageSize);
+        return () => {
+        window.removeEventListener('resize', updatePageSize);
+        };
+    }, []);
+
+    // ローディング時はnullを返す
+    if (pageSize === null) {
+        return null;
+    }
+
     return (
-        <header className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}>
+        <header
+            className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}
+            style= {{ height: `${pageSize.width <= 768 ? pageSize.height - 70 : 100}px` }} >
             <div className={styles.logoWrapper}>
-            <Image
-                src={isAdmin ? adminLogo : membersLogo}
-                alt="Koudaisai Portal Admin Site Logo"
-                width={50}
-                height={50}
-            />
-            <div className={styles.logoTextWrapper}>
-                <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
+                <Image
+                    src={isAdmin ? adminLogo : membersLogo}
+                    alt="Koudaisai Portal Admin Site Logo"
+                    width={50}
+                    height={50}
+                />
+                <div className={styles.logoTextWrapper}>
+                    <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
+                </div>
             </div>
             <div className={styles.userWrapper}>
                 <div className={`${styles.userWrapperLoggedIn} ${loggedIn ? "" : styles.hiddenUserWrapper}`}>
@@ -84,7 +121,6 @@ export const Header = ({header_type}: HeaderProps) => {
                 <div className={`${styles.userWrapperLoggedOut} ${loggedIn ? styles.hiddenUserWrapper : ""}`}>
                     <Link href={isAdmin ? process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login" : "/login/"}>ログイン</Link>
                 </div>
-            </div>
             </div>
             <div className={styles.menuWrapper}>
                 {/* ヘッダーのナビゲーションボタン */}
