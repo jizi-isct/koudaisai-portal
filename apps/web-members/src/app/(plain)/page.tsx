@@ -36,7 +36,7 @@ export default function Page() {
         <h1>ログイン済みです</h1>
       ) : (
         <>
-          <Header header_type="members" titleColor={scrollY > window.innerHeight ? "black" : "white"}></Header>
+          <Header header_type="members" titleColor={scrollY > window.innerHeight - 80 ? "black" : "white"}></Header>
           <Heading emoji={"ℹ️"}>
             このサイトについて
           </Heading>
@@ -125,7 +125,6 @@ export default function Page() {
               ],
             ])
           } />
-
         </>
       )}
     </main>
