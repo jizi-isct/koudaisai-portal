@@ -40,3 +40,8 @@ a {
     padding: 0;
 }
 
+@media screen and ( max-width : 768px ) {
+    .content {
+        margin-top: 100px;
+    }
+}
