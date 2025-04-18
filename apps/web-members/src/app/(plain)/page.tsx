@@ -48,7 +48,7 @@ export default function Page() {
           <Tab tabs={
             new Map([
               [
-                "模擬企画",
+                "模擬店企画",
                 <>
                   <Heading emoji={"🕺"}>
                     参加申請までの流れ
