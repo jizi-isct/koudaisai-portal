@@ -10,7 +10,8 @@ import {Hero} from "@/components/Hero/Hero";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
-  const [scrollY, setScrollY] = useState(window.scrollY);
+  const [scrollY, setScrollY] = useState(0);
+  const [innerHeight, setInnerHeight] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -24,6 +25,7 @@ export default function Page() {
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY)
+      setInnerHeight(window.innerHeight)
     }
 
     window.addEventListener("scroll", handleScroll)
@@ -36,7 +38,7 @@ export default function Page() {
         <h1>ログイン済みです</h1>
       ) : (
         <>
-          <Header header_type="members" titleColor={scrollY > window.innerHeight - 80 ? "black" : "white"}></Header>
+          <Header header_type="members" titleColor={scrollY > innerHeight - 80 ? "black" : "white"}></Header>
           <Heading emoji={"ℹ️"}>
             このサイトについて
           </Heading>
