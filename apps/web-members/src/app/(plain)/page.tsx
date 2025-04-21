@@ -11,7 +11,7 @@ import {Hero} from "@/components/Hero/Hero";
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const [innerHeight, setInnerHeight] = useState(0);
+  const [innerHeight, setInnerHeight] = useState(100);
 
   useEffect(() => {
     (async () => {
