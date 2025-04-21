@@ -50,7 +50,7 @@ export default function Page() {
           <Tab tabs={
             new Map([
               [
-                "模擬企画",
+                "模擬店企画",
                 <>
                   <Heading emoji={"🕺"}>
                     参加申請までの流れ
@@ -92,19 +92,6 @@ export default function Page() {
                 </>
               ],
               [
-                "研究室企画",
-                <>
-                  <Heading emoji={"📅"}>
-                    工大祭までの流れ
-                  </Heading>
-                  <Steps
-                    steps={
-                      topPageData.labo[0]
-                    }
-                  />
-                </>
-              ],
-              [
                 "ステージ企画",
                 <>
                   <Heading emoji={"🕺"}>
@@ -121,6 +108,19 @@ export default function Page() {
                   <Steps
                     steps={
                       topPageData.stage[1]
+                    }
+                  />
+                </>
+              ],
+              [
+                "研究室企画",
+                <>
+                  <Heading emoji={"📅"}>
+                    工大祭までの流れ
+                  </Heading>
+                  <Steps
+                    steps={
+                      topPageData.labo[0]
                     }
                   />
                 </>
