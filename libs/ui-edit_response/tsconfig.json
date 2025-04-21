@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../ui-generic"
+    },
+    {
       "path": "../util"
     },
     {

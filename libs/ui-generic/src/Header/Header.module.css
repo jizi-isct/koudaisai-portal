@@ -1,6 +1,8 @@
 /* デスクトップ向けのスタイル */
 @media screen and ( min-width : 768px ) {
     .header {
+        z-index: 1000;
+
         height: 100px;
         position: relative;
         text-align: center;
@@ -25,6 +27,11 @@
         transform: translateY(-50%);
         margin-top: 25px;
         font-size: 20px;
+        transition: 500ms ease-in;
+    }
+
+    .logoTextWhite {
+        color: white;
     }
 
     .userWrapper {
@@ -171,6 +178,8 @@
     }
     
     .menuWrapper {
+        z-index: 1000;
+
         position: fixed;
         gap: 12px;
         bottom: 12px;

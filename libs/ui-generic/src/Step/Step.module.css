@@ -1,0 +1,83 @@
+.root {
+    position: relative;
+
+    background-repeat: no-repeat;
+
+    filter: drop-shadow(4px 4px 0 var(--darkblue));
+}
+
+.date {
+    position: absolute;
+
+
+    background-color: var(--darkblue);
+
+    color: white;
+
+    font-size: 10px;
+    font-weight: bold;
+
+    padding: 0.1em 0.5em 0.2em 0.5em;
+
+    border-radius: 0.5em;
+}
+
+.heading {
+    font-weight: bold;
+
+    font-size: 22px;
+
+    color: #253661;
+}
+
+.paragraph {
+    font-size: 13px;
+}
+
+@media screen and (max-width: 1150px) {
+    .rootFirst>.date {
+        top: 4.8em;
+    }
+    .date {
+        top: 6.5em;
+        left: 4em;
+    }
+    .rootFirst {
+        width: 296px;
+        height: 174px;
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='296' height='174' fill='none'%3E%3Cpath fill='%23fff' stroke='%230048FF' d='M295.5 15v113.5a14.501 14.501 0 0 1-11.426 14.171l-136.619 29.633c-2.076.45-4.226.439-6.297-.033L11.776 142.768A14.5 14.5 0 0 1 .5 128.631V15C.5 6.992 6.992.5 15 .5h266c8.008 0 14.5 6.492 14.5 14.5Z'/%3E%3C/svg%3E");
+        padding: 1rem 2rem 2rem 2.5rem;
+    }
+
+    .rootAfterSecond {
+        width: 296px;
+        height: 180px;
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='296' height='180' fill='none'%3E%3Cpath fill='%23fff' stroke='%230048FF' d='M295.5 15.494v119.849a14.5 14.5 0 0 1-11.507 14.188L147.372 178.35a14.489 14.489 0 0 1-6.132-.032L11.86 149.627A14.5 14.5 0 0 1 .5 135.471V15.691C.5 6.417 9.085-.473 18.14 1.535l122.884 27.25a15.5 15.5 0 0 0 6.555.034L278.007 1.306C287.021-.595 295.5 6.282 295.5 15.494Z'/%3E%3C/svg%3E");
+        padding: 2rem 2rem 2rem 2.5rem;
+    }
+
+    .heading {
+        text-align: left;
+    }
+}
+
+@media screen and (min-width: 1150px) {
+    .date {
+        top: 1em;
+        left: 2em;
+    }
+
+    .root {
+        width: 291px;
+        height: 173px;
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='291' height='169' fill='none'%3E%3Cpath fill='%23fff' stroke='%230048FF' d='M15.893.5h235.108a14.5 14.5 0 0 1 13.739 9.864l24.126 71.49a14.497 14.497 0 0 1-.073 9.484l-23.951 67.51a14.5 14.5 0 0 1-13.666 9.652H16.238c-10.015 0-17.014-9.91-13.666-19.348l20.393-57.48a15.5 15.5 0 0 0 .078-10.138L2.155 19.636C-1.017 10.238 5.973.5 15.893.5Z'/%3E%3C/svg%3E");
+        padding: 2rem 2rem 2rem 2.5rem;
+    }
+
+    .heading {
+        text-align: center;
+    }
+}
