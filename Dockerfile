@@ -49,9 +49,9 @@ USER 33
 
 WORKDIR /var/www
 
-COPY --chown=1000 --chmod=774 --from=build-backend /usr/src/app/apps/backend/target/release/koudaisai-portal-backend /bin/
-COPY --chown=1000 --chmod=774 --from=build-web-admin /usr/src/app/apps/web-admin/out /var/www/html/admin
-COPY --chown=1000 --chmod=774 --from=build-web-members /usr/src/app/apps/web-members/out /var/www/html/web
+COPY --chown=33 --chmod=774 --from=build-backend /usr/src/app/apps/backend/target/release/koudaisai-portal-backend /bin/
+COPY --chown=33 --chmod=774 --from=build-web-admin /usr/src/app/apps/web-admin/out /var/www/html/admin
+COPY --chown=33 --chmod=774 --from=build-web-members /usr/src/app/apps/web-members/out /var/www/html/web
 
 EXPOSE 8080
 
