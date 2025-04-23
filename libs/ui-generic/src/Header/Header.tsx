@@ -64,7 +64,8 @@ export const Header = ({header_type}: HeaderProps) => {
 
         const updatePageSize = () => {
         const width = window.innerWidth;
-        const height = document.body.scrollHeight;
+        const height = document.body.offsetHeight + document.body.getBoundingClientRect().top;
+        console.log("width", width, "height", height);
         setPageSize({ width, height });
         };
 
@@ -76,15 +77,11 @@ export const Header = ({header_type}: HeaderProps) => {
         };
     }, []);
 
-    // ローディング時はnullを返す
-    if (pageSize === null) {
-        return null;
-    }
 
     return (
         <header
             className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}
-            style= {{ height: `${pageSize.width <= 768 ? pageSize.height - 70 : 100}px` }} >
+            style= {{ height: `${pageSize.width <= 768 ? pageSize.height - 160 : 100}px` }} >
             <div className={styles.logoWrapper}>
                 <Image
                     src={isAdmin ? adminLogo : membersLogo}
