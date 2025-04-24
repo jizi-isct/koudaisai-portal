@@ -128,7 +128,7 @@ export default function Page() {
                 ],
               ])
             } />
-            <MobileNavigator/>
+            <MobileNavigator header_type="members"/>
           </main>
           <Footer />
         </>
