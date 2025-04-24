@@ -3,6 +3,9 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import {fetchClientAuth} from "@koudaisai-portal/util";
 
+import "@koudaisai-portal/ui-generic/css"
+
+
 type Inputs = {
     m_address: string,
     password: string

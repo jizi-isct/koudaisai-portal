@@ -7,6 +7,8 @@ import {fullScreenPlugin} from "@react-pdf-viewer/full-screen";
 import {documentDataNoLogin} from "@/lib/lib";
 import {Viewer, Worker} from "@react-pdf-viewer/core";
 
+import "@koudaisai-portal/ui-generic/css"
+
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
