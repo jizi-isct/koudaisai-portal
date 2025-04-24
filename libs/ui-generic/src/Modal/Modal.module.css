@@ -31,10 +31,13 @@
 }
 
 .children {
-    padding: 1em;
-    height: calc(100% - 4em);
+    height: calc(100% - 5em);
+    max-height: calc(100% - 5em);
+    overflow-y: auto;
 }
 
 .closeButton {
+    margin-top: 1em;
     text-align: center;
+    z-index: 1006;
 }

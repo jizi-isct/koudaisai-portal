@@ -2,9 +2,16 @@
 
 import {Heading1, Heading2, Modal, ContentList, Content} from "@koudaisai-portal/ui-generic"
 import {useState} from "react";
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import {fullScreenPlugin} from "@react-pdf-viewer/full-screen";
 import {documentDataNoLogin} from "@/lib/lib";
+import {Viewer, Worker} from "@react-pdf-viewer/core";
 
-export default function Page() {
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+
+
+export default function Page_() {
   const [isModalOpen, setModalOpen] = useState(false)
   const [pdfLink, setPdfLink] = useState<string>("")
 
@@ -66,15 +73,14 @@ export default function Page() {
         isOpen={isModalOpen}
         setOpen={setModalOpen}
       >
-        <embed
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "10px",
-          }}
-          src={pdfLink}
-          type="application/pdf"
-        />
+        <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+          <Viewer
+            fileUrl={pdfLink}
+            plugins={[defaultLayoutPlugin(), fullScreenPlugin({
+              getFullScreenTarget: (pagesContainer) => pagesContainer.closest('[data-testid="default-layout__body"]')!
+            })]}
+          />
+        </Worker>
       </Modal>
     </>
   )
