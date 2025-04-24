@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import styles from "./Heading.module.css";
+import styles from "./Heading1.module.css";
 
 type Props = {
   children: ReactNode,
@@ -12,13 +12,10 @@ type Props = {
  * @param emoji 見出しの頭に表示する絵文字
  * @constructor
  */
-export function Heading({children, emoji}: Props) {
+export function Heading1({children, emoji}: Props) {
   return (
     <h1 className={styles.root}>
-      <span className={styles.emoji}>
-        <span className={styles.emojiBackground}>{emoji}</span>
-        {emoji}
-      </span>
+      <span className={styles.emoji}>{emoji}</span>
       <span className={styles.heading}>{children}</span>
     </h1>
   )

@@ -5,9 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
-    "@react-pdf-viewer/core": "^3.12.0",
     "next": "~15.2.4",
-    "pdfjs-dist": "^3.4.120",
     "react": "19.0.0",
     "react-datepicker": "^8.2.1",
     "react-dom": "19.0.0",

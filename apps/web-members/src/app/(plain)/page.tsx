@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@koudaisai-portal/util";
-import {Heading, Steps, Tab, Header, Footer, MobileNavigator} from "@koudaisai-portal/ui-generic";
+import {Heading2, Steps, Tab, Header, Footer, MobileNavigator} from "@koudaisai-portal/ui-generic";
 import "@koudaisai-portal/ui-generic/css"
 import "../globals.css";
 import {topPageData} from "@/lib/lib";
@@ -40,9 +40,9 @@ export default function Page() {
           <main className="content">
             <Header header_type="members" titleColor={scrollY > innerHeight - 80 ? "black" : "white"}></Header>
             <Hero />
-            <Heading emoji={"ℹ️"}>
+            <Heading2 emoji={"ℹ️"}>
               このサイトについて
-            </Heading>
+            </Heading2>
             <p>
               このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。<br/>
               このサイトを通じて工大祭への参加に関する各種手続きを行うことができます。<br/>
@@ -53,17 +53,17 @@ export default function Page() {
                 [
                   "模擬店企画",
                   <>
-                    <Heading emoji={"🕺"}>
+                    <Heading2 emoji={"🕺"}>
                       参加申請までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.booth[0]
                       }
                     />
-                    <Heading emoji={"📅"}>
+                    <Heading2 emoji={"📅"}>
                       工大祭までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.booth[1]
@@ -74,17 +74,17 @@ export default function Page() {
                 [
                   "一般企画",
                   <>
-                    <Heading emoji={"🕺"}>
+                    <Heading2 emoji={"🕺"}>
                       参加申請までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.general[0]
                       }
                     />
-                    <Heading emoji={"📅"}>
+                    <Heading2 emoji={"📅"}>
                       工大祭までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.general[1]
@@ -95,17 +95,17 @@ export default function Page() {
                 [
                   "ステージ企画",
                   <>
-                    <Heading emoji={"🕺"}>
+                    <Heading2 emoji={"🕺"}>
                       参加申請までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.stage[0]
                       }
                     />
-                    <Heading emoji={"📅"}>
+                    <Heading2 emoji={"📅"}>
                       工大祭までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.stage[1]
@@ -116,9 +116,9 @@ export default function Page() {
                 [
                   "研究室企画",
                   <>
-                    <Heading emoji={"📅"}>
+                    <Heading2 emoji={"📅"}>
                       工大祭までの流れ
-                    </Heading>
+                    </Heading2>
                     <Steps
                       steps={
                         topPageData.labo[0]

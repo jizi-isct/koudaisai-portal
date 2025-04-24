@@ -5,6 +5,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
 
+    height: 90vh;
+    width: 90vw;
+
     border: 1px solid var(--darkblue);
     border-radius: 10px;
     padding: 15px;
@@ -29,6 +32,7 @@
 
 .children {
     padding: 1em;
+    height: calc(100% - 4em);
 }
 
 .closeButton {

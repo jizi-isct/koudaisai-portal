@@ -1,6 +1,6 @@
 export * from "./Button";
 export * from "./TextInput"
-export * from "./Heading"
+export * from "./Heading2"
 export * from "./Step"
 export * from "./Steps"
 export * from "./Tab"
@@ -8,3 +8,6 @@ export * from "./Header";
 export * from "./Footer";
 export * from "./MobileNavigator"
 export * from "./Modal"
+export * from "./ContentList"
+export * from "./Heading1"
+export * from "./lib/types"
