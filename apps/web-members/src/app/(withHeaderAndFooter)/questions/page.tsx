@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@koudaisai-portal/util";
+import {Heading1} from "@koudaisai-portal/ui-generic";
 
 export default function Page() {
     const [authenticated, setAuthenticated] = useState(false);
@@ -15,12 +16,10 @@ export default function Page() {
         })();
     }, []);
     return (
-        <main>
-            {authenticated ? (
-                <h1>ログイン済みです</h1>
-            ) : (
-                <h1>ログインしていません</h1>
-            )}
-        </main>
+        <>
+            <Heading1 emoji={"❓"}>
+                よくある質問
+            </Heading1>
+        </>
     );
 }

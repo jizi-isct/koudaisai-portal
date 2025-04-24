@@ -347,3 +347,40 @@ export const documentDataNoLogin: Record<string, Array<Document>> = {
     }
   ]
 }
+
+type Question = {
+  question: string,
+  answer: string,
+}
+export const questionDataNoLogin: Record<string, Array<Question>> = {
+  "研究室公開企画": [
+    {
+      question: "何はなにですか？",
+      answer: "なになにです"
+    }
+  ],
+  "プライバシーポリシー": [
+    {
+      question: "何はなにですか？",
+      answer: "なになにです"
+    },
+    {
+      question: "何はなにですか？",
+      answer: "なになにです"
+    }
+  ],
+  "工大祭2025参加説明会": [
+    {
+      question: "工大祭2025研究室公開企画 参加要項",
+      answer: "/privacy_policy.pdf"
+    },
+    {
+      question: "工大祭2025研究室公開企画 参加要項",
+      answer: "/privacy_policy.pdf"
+    },
+    {
+      question: "工大祭2025研究室公開企画 参加要項",
+      answer: "/privacy_policy.pdf"
+    }
+  ]
+}
