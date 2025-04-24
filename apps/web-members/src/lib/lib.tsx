@@ -287,3 +287,63 @@ export const topPageData = {
     ]
   ]
 }
+
+
+type Document = {
+  title: string,
+  url: string,
+}
+export const documentDataNoLogin: Record<string, Array<Document>> = {
+  "研究室公開企画": [
+    {
+      title: "工大祭2025研究室公開企画 参加要項",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "研究室向け模擬店企画参加のご案内",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "パンフレット掲載例",
+      url: "/privacy_policy.pdf"
+    }
+  ],
+  "プライバシーポリシー": [
+    {
+      title: "個人情報保護方針（参加団体・研究室）",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "団体情報保護方針（参加団体・研究室）",
+      url: "/privacy_policy.pdf"
+    }
+  ],
+  "工大祭2025公式ロゴ配布": [
+    {
+      title: "工大祭2025研究室公開企画 参加要項",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "研究室向け模擬店企画参加のご案内",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "パンフレット掲載例",
+      url: "/privacy_policy.pdf"
+    }
+  ],
+  "工大祭2025参加説明会": [
+    {
+      title: "工大祭2025研究室公開企画 参加要項",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "研究室向け模擬店企画参加のご案内",
+      url: "/privacy_policy.pdf"
+    },
+    {
+      title: "パンフレット掲載例",
+      url: "/privacy_policy.pdf"
+    }
+  ]
+}

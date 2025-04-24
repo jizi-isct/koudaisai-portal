@@ -8,7 +8,8 @@
     "next": "~15.2.4",
     "react": "19.0.0",
     "react-datepicker": "^8.2.1",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "react-modal": "^3.16.3"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
@@ -32,6 +33,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
+    "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^3.0.0",
     "ajv": "^8.17.1",

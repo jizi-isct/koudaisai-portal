@@ -1,0 +1,27 @@
+.footer {
+    background-color: white;
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+}
+
+.navWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.navItem {  
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.copyrightText {
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+}

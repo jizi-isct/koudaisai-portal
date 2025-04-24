@@ -32,3 +32,16 @@ a {
     color: inherit;
     text-decoration: none;
 }
+
+.content {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+@media screen and ( max-width : 768px ) {
+    .content {
+        margin-top: 100px;
+    }
+}
