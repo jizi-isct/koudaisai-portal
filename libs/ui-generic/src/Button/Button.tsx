@@ -16,7 +16,7 @@ export const Button = ({text, color = '#0048FF', onClick, isClicked = false}: Bu
         color: isClicked ? 'white' : 'black',
         borderColor: color
       }}
-      onClick={() => onClick}>
+      onClick={onClick}>
       {text}
     </div>
   );
