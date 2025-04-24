@@ -11,9 +11,9 @@
     "@wojtekmaj/react-hooks": "^1.22.0",
     "next": "~15.2.4",
     "pdfjs-dist": "^3.4.120",
-    "react": "19.1.0",
+    "react": "18.3.1",
     "react-datepicker": "^8.2.1",
-    "react-dom": "19.1.0",
+    "react-dom": "18.3.1",
     "react-modal": "^3.16.3"
   },
   "devDependencies": {
@@ -36,8 +36,8 @@
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
     "@types/node": "^20.0.0",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.0",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.1",
     "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^3.0.0",
