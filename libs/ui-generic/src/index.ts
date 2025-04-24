@@ -6,3 +6,4 @@ export * from "./Steps"
 export * from "./Tab"
 export * from "./Header";
 export * from "./Footer";
+export * from "./MobileNavigator"
