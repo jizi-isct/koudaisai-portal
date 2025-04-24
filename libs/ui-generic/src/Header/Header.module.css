@@ -41,13 +41,11 @@
         width: 120px;
         height: 50px;
 
-        display: flex;
         justify-content: center;
         align-content: center;
         border-radius: 30px;
         cursor: pointer;
         padding: 10px 20px;
-        display: inline-block;
         border: 1px solid;
         font-size: 14px;
         font-style: normal;
@@ -55,7 +53,7 @@
         margin: 0 10px;
         background-color: white;
         color: black;
-        box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+        box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
     }
 
     .admin .userWrapper {
@@ -119,7 +117,7 @@
         font-style: normal;
         font-weight: 500;
         margin: 0 10px;
-        box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
+        box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
         background-color: white;
     }
 
@@ -164,7 +162,9 @@
     }
     
     .logoWrapper {
-        position: absolute;
+        z-index: 1000;
+
+        position: fixed;
         top: 30px;
         left: 50vw;
         transform: translateX(-50%);
