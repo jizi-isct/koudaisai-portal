@@ -1,0 +1,25 @@
+.root {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    height: 2.5em;
+
+    padding: 0 0.5em;
+
+    align-content: center;
+
+    cursor: pointer;
+}
+
+.date {
+
+}
+
+.title {
+    flex-grow: 100;
+}
+
+.author {
+
+}

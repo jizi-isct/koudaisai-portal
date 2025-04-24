@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 import { Noto_Sans_JP } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Header, Footer, MobileNavigator } from "@koudaisai-portal/ui-generic";
 
 const notoSans = Noto_Sans_JP({
@@ -20,11 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={notoSans.className}>
+      <body className={notoSans.className} id={"app"}>
         <Header header_type="members"  />
         <main className="content">
-          <MobileNavigator header_type="members"/>
           {children}
+          <MobileNavigator header_type="members"/>
         </main>
         <Footer />
       </body>
