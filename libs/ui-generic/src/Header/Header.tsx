@@ -13,6 +13,7 @@ import arrowIcon from "./assets/arrow.svg";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;
+    titleColor?: "white" | "black";
 };
 
 //ヘッダーのナビゲーションアイテムを定義
@@ -23,7 +24,7 @@ const HeaderItems = [
     { desktopText: "よくある質問", mobileText: "FAQ", href: "/questions/", class: "navQuestions" }
 ];
 
-export const Header = ({header_type}: HeaderProps) => {
+export const Header = ({header_type, titleColor = "black"}: HeaderProps) => {
     // ヘッダーのユーザアイコンのドロップダウンの状態を管理
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
@@ -83,15 +84,15 @@ export const Header = ({header_type}: HeaderProps) => {
             className={`${styles.header} ${isAdmin ? styles.admin : styles.members}`}
             style= {{ height: `${pageSize.width <= 768 ? pageSize.height - 160 : 100}px` }} >
             <div className={styles.logoWrapper}>
-                <Image
-                    src={isAdmin ? adminLogo : membersLogo}
-                    alt="Koudaisai Portal Admin Site Logo"
-                    width={50}
-                    height={50}
-                />
-                <div className={styles.logoTextWrapper}>
-                    <h1 className={styles.logoText}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
-                </div>
+              <Image
+                src={isAdmin ? adminLogo : membersLogo}
+                alt="Koudaisai Portal Admin Site Logo"
+                width={50}
+                height={50}
+              />
+              <div className={styles.logoTextWrapper}>
+                <h1 className={`${styles.logoText} ${titleColor === "white" && styles.logoTextWhite}`}>{isAdmin ? "工大祭ポータル管理サイト" : "工大祭ポータル"}</h1>
+              </div>
             </div>
             <div className={styles.userWrapper}>
                 <div className={`${styles.userWrapperLoggedIn} ${loggedIn ? "" : styles.hiddenUserWrapper}`}>

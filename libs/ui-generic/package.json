@@ -12,8 +12,12 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./css": "./dist/index.css"
   },
+  "sideEffects": [
+    "*.css"
+  ],
   "devDependencies": {
     "ajv": "^8.17.1"
   }

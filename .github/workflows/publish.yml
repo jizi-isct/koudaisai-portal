@@ -5,7 +5,7 @@ on:
     types: [ published ]
 
 env:
-  IMAGE_NAME: ghcr.io/jizi-network/k-portal
+  IMAGE_NAME: ghcr.io/jizi-isct/koudaisai-portal
 
 jobs:
   build:

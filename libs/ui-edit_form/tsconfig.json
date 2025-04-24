@@ -6,6 +6,9 @@
       "path": "../util"
     },
     {
+      "path": "../ui-generic"
+    },
+    {
       "path": "./tsconfig.lib.json"
     }
   ],
