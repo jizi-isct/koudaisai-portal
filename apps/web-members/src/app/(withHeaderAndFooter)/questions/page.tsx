@@ -13,7 +13,7 @@ export default function Page() {
                 よくある質問
             </Heading1>
             {
-            questionDataNoLogin["研究室公開企画"]
+            questionDataNoLogin["プライバシーポリシー"]
             .map((data, i) => (
                 <Question key={i} content={data} />
             ))

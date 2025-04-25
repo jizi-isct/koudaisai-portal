@@ -11,8 +11,8 @@ type Props = {
 export function Question({content}: Props) {
   return (
     <div className={styles.root}>
-      <span className={styles.date}>{content.question}</span>
-      <span className={styles.date}>{content.answer}</span>
+      <p className={styles.question}>{content.question}</p>
+      <p className={styles.answer}>{content.answer}</p>
     </div>
   )
 }

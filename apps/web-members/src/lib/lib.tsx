@@ -355,7 +355,7 @@ type Question = {
 export const questionDataNoLogin: Record<string, Array<Question>> = {
   "研究室公開企画": [
     {
-      question: "何はなにですか？",
+      question: "何はなにでなににににに何はなにでなににににに何はなにでなにににににですか？",
       answer: "なになにです"
     }
   ],
