@@ -18,7 +18,7 @@
 }
 
 .question::before {
-    content: 'Q';
+    content: 'Q.';
     display: block;
     color: var(--darkgray);
     position: absolute;
@@ -29,7 +29,7 @@
 }
 
 .answer::before {
-    content: 'A';
+    content: 'A.';
     display: block;
     color: var(--darkgray);
     position: absolute;
