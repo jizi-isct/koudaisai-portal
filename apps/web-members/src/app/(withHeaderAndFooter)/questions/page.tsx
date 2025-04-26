@@ -1,6 +1,6 @@
 'use client';
 
-import {Heading1, Question, Selector} from "@koudaisai-portal/ui-generic";
+import {Heading1, Faq, Selector} from "@koudaisai-portal/ui-generic";
 import {useState} from "react";
 import {questionDataNoLogin} from "@/lib/lib";
 
@@ -19,7 +19,7 @@ export default function Page() {
             {
             questionDataNoLogin[questionType]
             .map((data, i) => (
-                <Question key={i} content={data} />
+                <Faq key={i} content={data} />
             ))
             }
         </>

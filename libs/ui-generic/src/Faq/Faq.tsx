@@ -1,4 +1,4 @@
-import styles from "./Question.module.css"
+import styles from "./Faq.module.css"
 
 type Props = {
   content: 
@@ -8,7 +8,7 @@ type Props = {
   }
 }
 
-export function Question({content}: Props) {
+export function Faq({content}: Props) {
   return (
     <div className={styles.root}>
       <p className={styles.question}>{content.question}</p>
