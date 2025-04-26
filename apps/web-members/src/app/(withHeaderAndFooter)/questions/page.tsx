@@ -14,7 +14,7 @@ export default function Page() {
             </Heading1>
             <Selector
                 options={Object.keys(questionDataNoLogin)}
-                slectedOption={questionType}
+                selectedOption={questionType}
                 setOption={setQuestionType} />
             {
             questionDataNoLogin[questionType]
