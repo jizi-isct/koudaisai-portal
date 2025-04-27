@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: 工大祭API v1
   description: 工大祭のapiです。
@@ -14,6 +14,8 @@ tags:
     description: フォーム関連
   - name: form_responses
     description: フォームの回答関連
+  - name: documents
+    description: 資料関連
 paths:
   # exhibitions
   /exhibitors:
@@ -30,6 +32,15 @@ paths:
     $ref: paths/forms_{form_id}_responses.yml
   /forms/{form_id}/responses/{response_id}:
     $ref: paths/forms_{form_id}_responses_{response_id}.yml
+  # documents
+  /documents:
+    $ref: paths/documents.yml
+  /documents/{document_id}:
+    $ref: paths/documents_{document_id}.yml
+  /document-categories:
+    $ref: paths/document-categories.yml
+  /document-categories/{category_id}:
+    $ref: paths/document-categories_{category_id}.yml
 
 components:
   securitySchemes:

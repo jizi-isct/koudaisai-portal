@@ -1,15 +1,11 @@
 get:
-  summary: フォームを取得
-  description: |-
-    ### authの違いによる挙動の違い
-    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能なフォームな場合取得
-    - **admin_oidcの場合**: 存在するフォームを全て取得
+  summary: 資料カテゴリを取得
   tags:
-    - forms
+    - documents
   parameters:
-    - name: form_id
+    - name: category_id
       in: path
-      description: フォームID
+      description: 資料カテゴリのID
       required: true
       schema:
         type: string
@@ -20,7 +16,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/Form.yml
+            $ref: "../components/schemas/DocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -30,13 +26,13 @@ get:
     - admin_oidc:
         - k-portal:admin:all
 put:
-  summary: フォームを更新
+  summary: 資料を更新
   tags:
     - forms
   parameters:
-    - name: form_id
+    - name: document_id
       in: path
-      description: フォームID
+      description: 資料のID
       required: true
       schema:
         type: string
@@ -46,7 +42,7 @@ put:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/Form.yml
+          $ref: "../components/schemas/DocumentCategory.yml"
   responses:
     '201':
       description: Changed
@@ -55,7 +51,7 @@ put:
           schema:
             type: array
             items:
-              $ref: ../components/schemas/Form.yml
+              $ref: "../components/schemas/DocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -64,13 +60,13 @@ put:
     - admin_oidc:
         - k-portal:admin:all
 delete:
-  summary: フォームを削除
+  summary: 資料カテゴリを削除
   tags:
-    - forms
+    - documents
   parameters:
-    - name: form_id
+    - name: category_id
       in: path
-      description: フォームID
+      description: カテゴリID
       required: true
       schema:
         type: string
@@ -83,7 +79,7 @@ delete:
           schema:
             type: array
             items:
-              $ref: ../components/schemas/Form.yml
+              $ref: "../components/schemas/DocumentCategory.yml"
     '401':
       description: 資格情報が無効だった場合
     '404':

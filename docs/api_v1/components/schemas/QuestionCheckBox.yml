@@ -1,0 +1,10 @@
+description: チェックボックス
+type: object
+properties:
+  choices:
+    type: array
+    items:
+      type: string
+    description: 選択肢
+required:
+  - choices

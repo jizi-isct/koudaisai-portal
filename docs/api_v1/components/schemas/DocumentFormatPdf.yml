@@ -1,0 +1,7 @@
+description: pdf形式の資料
+type: object
+properties:
+  file_url:
+    type: string
+required:
+  - file_url
