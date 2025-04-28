@@ -2,7 +2,9 @@ use crate::sea_orm_entities;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ColumnTrait, DbConn, EntityOrSelect, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, QueryFilter,
+};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,7 +15,7 @@ pub enum DocumentFormat {
     FormatPdf { file_url: String },
 }
 
-enum DocumentActiveModel {
+pub enum DocumentActiveModel {
     Markdown(
         sea_orm_entities::document::ActiveModel,
         sea_orm_entities::document_format_markdown::ActiveModel,
@@ -21,17 +23,6 @@ enum DocumentActiveModel {
     Pdf(
         sea_orm_entities::document::ActiveModel,
         sea_orm_entities::document_format_pdf::ActiveModel,
-    ),
-}
-
-enum DocumentModel {
-    Markdown(
-        sea_orm_entities::document::Model,
-        sea_orm_entities::document_format_markdown::Model,
-    ),
-    Pdf(
-        sea_orm_entities::document::Model,
-        sea_orm_entities::document_format_pdf::Model,
     ),
 }
 
@@ -89,6 +80,20 @@ impl Into<DocumentActiveModel> for DocumentWrite {
     }
 }
 
+impl DocumentWrite {
+    pub async fn insert(self, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
+        Ok(match self.into() {
+            DocumentActiveModel::Markdown(generic, markdown) => DocumentRead::from_markdown(
+                generic.insert(db_conn).await?,
+                markdown.insert(db_conn).await?,
+            ),
+            DocumentActiveModel::Pdf(generic, pdf) => {
+                DocumentRead::from_pdf(generic.insert(db_conn).await?, pdf.insert(db_conn).await?)
+            }
+        })
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentRead {
     pub id: Uuid,
@@ -103,6 +108,42 @@ pub struct DocumentRead {
 }
 
 impl DocumentRead {
+    pub fn from_markdown(
+        generic: sea_orm_entities::document::Model,
+        markdown: sea_orm_entities::document_format_markdown::Model,
+    ) -> Self {
+        DocumentRead {
+            id: generic.id,
+            created_at: generic.created_at.unwrap().to_utc(),
+            updated_at: generic.updated_at.unwrap().to_utc(),
+            created_by: generic.created_by,
+            updated_by: generic.updated_by,
+            title: generic.title,
+            category: generic.category.unwrap(),
+            format: DocumentFormat::FormatMarkdown {
+                content: markdown.content,
+            },
+        }
+    }
+
+    pub fn from_pdf(
+        generic: sea_orm_entities::document::Model,
+        pdf: sea_orm_entities::document_format_pdf::Model,
+    ) -> DocumentRead {
+        DocumentRead {
+            id: generic.id,
+            created_at: generic.created_at.unwrap().to_utc(),
+            updated_at: generic.updated_at.unwrap().to_utc(),
+            created_by: generic.created_by,
+            updated_by: generic.updated_by,
+            title: generic.title,
+            category: generic.category.unwrap(),
+            format: DocumentFormat::FormatPdf {
+                file_url: pdf.file_url,
+            },
+        }
+    }
+
     pub async fn from(value: sea_orm_entities::document::Model, db_conn: &DbConn) -> Result<Self> {
         match value.format {
             sea_orm_entities::sea_orm_active_enums::DocumentFormat::Markdown => {
@@ -113,18 +154,7 @@ impl DocumentRead {
                         .await?
                         .ok_or(anyhow::anyhow!("Document not found"))?;
 
-                Ok(DocumentRead {
-                    id: value.id,
-                    created_at: value.created_at.unwrap().to_utc(),
-                    updated_at: value.updated_at.unwrap().to_utc(),
-                    created_by: value.created_by,
-                    updated_by: value.updated_by,
-                    title: value.title,
-                    category: value.category.unwrap(),
-                    format: DocumentFormat::FormatMarkdown {
-                        content: markdown.content,
-                    },
-                })
+                Ok(Self::from_markdown(value, markdown))
             }
             sea_orm_entities::sea_orm_active_enums::DocumentFormat::Pdf => {
                 let pdf = sea_orm_entities::document_format_pdf::Entity::find_by_id(value.id)
@@ -132,18 +162,7 @@ impl DocumentRead {
                     .await?
                     .ok_or(anyhow::anyhow!("Document not found"))?;
 
-                Ok(DocumentRead {
-                    id: value.id,
-                    created_at: value.created_at.unwrap().to_utc(),
-                    updated_at: value.updated_at.unwrap().to_utc(),
-                    created_by: value.created_by,
-                    updated_by: value.updated_by,
-                    title: value.title,
-                    category: value.category.unwrap(),
-                    format: DocumentFormat::FormatPdf {
-                        file_url: pdf.file_url,
-                    },
-                })
+                Ok(Self::from_pdf(value, pdf))
             }
         }
     }

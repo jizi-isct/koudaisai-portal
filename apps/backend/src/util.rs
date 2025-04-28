@@ -1,5 +1,6 @@
 use axum::response::{IntoResponse, Response};
 use http::StatusCode;
+use sea_orm::DbErr;
 use tracing::warn;
 
 pub(crate) mod jwt;
