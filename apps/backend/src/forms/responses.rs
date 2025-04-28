@@ -1,9 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::de::{MapAccess, Visitor};
-use serde::ser::SerializeMap;
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer};
 use std::collections::HashMap;
-use std::fmt::Formatter;
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -27,15 +24,17 @@ pub struct FormResponse {
 /// 質問に対する回答
 /// * `item_id`: 質問の回答
 /// * `answer`: 回答の種類と詳細な情報
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Answer {
     pub item_id: Uuid,
+    #[serde(flatten)]
     pub answer: Answers,
 }
 
 /// 回答の種類
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Answers {
+    #[serde(rename = "answer_text")]
     Text(AnswerText),
 }
 
@@ -46,74 +45,6 @@ pub enum Answers {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AnswerText {
     pub value: String,
-}
-
-impl Serialize for Answer {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut map = serializer.serialize_map(Some(2))?;
-        map.serialize_entry("item_id", &self.item_id)?;
-        match &self.answer {
-            Answers::Text(answer_text) => {
-                map.serialize_entry("answer_text", &answer_text)?;
-            }
-        }
-        map.end()
-    }
-}
-
-impl<'de> Deserialize<'de> for Answer {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_map(AnswerVisitor)
-    }
-}
-
-struct AnswerVisitor;
-
-impl<'de> Visitor<'de> for AnswerVisitor {
-    type Value = Answer;
-
-    fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
-        formatter.write_str("map")
-    }
-
-    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
-    where
-        A: MapAccess<'de>,
-    {
-        let mut item_id = None;
-        let mut answer = None;
-        while let Some(key) = map.next_key::<String>()? {
-            match key.as_str() {
-                "item_id" => {
-                    if item_id.is_some() {
-                        return Err(de::Error::duplicate_field("item_id"));
-                    }
-                    item_id = Some(map.next_value()?);
-                }
-                "answer_text" => {
-                    if answer.is_some() {
-                        return Err(de::Error::duplicate_field("answer"));
-                    }
-                    answer = Some(Answers::Text(map.next_value()?));
-                }
-                unknown => {
-                    return Err(de::Error::unknown_field(
-                        unknown,
-                        &["item_id", "answer_text"],
-                    ))
-                }
-            }
-        }
-        let item_id = item_id.ok_or_else(|| de::Error::missing_field("item_id"))?;
-        let answer = answer.ok_or_else(|| de::Error::missing_field("answer"))?;
-        Ok(Answer { item_id, answer })
-    }
 }
 
 impl FormResponse {
