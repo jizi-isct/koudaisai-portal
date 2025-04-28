@@ -29,10 +29,10 @@ get:
     - exhibitor_bearer: [ ]
     - admin_oidc:
         - k-portal:admin:all
-put:
+patch:
   summary: 資料を更新
   tags:
-    - forms
+    - documents
   parameters:
     - name: document_id
       in: path

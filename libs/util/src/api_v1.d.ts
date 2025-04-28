@@ -747,48 +747,7 @@ export interface paths {
                 };
             };
         };
-        /** 資料を更新 */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料のID */
-                    document_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["Document"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Document"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        put?: never;
         post?: never;
         /** 資料を削除 */
         delete: {
@@ -830,7 +789,48 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
+        /** 資料を更新 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 資料のID */
+                    document_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+            responses: {
+                /** @description Changed */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Document"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
     "/document-categories": {
@@ -966,48 +966,7 @@ export interface paths {
                 };
             };
         };
-        /** 資料を更新 */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料のID */
-                    document_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["DocumentCategory"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["DocumentCategory"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        put?: never;
         post?: never;
         /** 資料カテゴリを削除 */
         delete: {
@@ -1049,7 +1008,48 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
+        /** 資料カテゴリを更新 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 資料カテゴリのID */
+                    category_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DocumentCategory"];
+                };
+            };
+            responses: {
+                /** @description Changed */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DocumentCategory"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
 }
