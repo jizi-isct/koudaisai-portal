@@ -1,6 +1,6 @@
-use crate::entities::prelude::Users;
-use crate::entities::{revoked_refresh_tokens, users};
 use crate::routes::{AppState, AuthSession};
+use crate::sea_orm_entities::prelude::Users;
+use crate::sea_orm_entities::{revoked_refresh_tokens, users};
 use crate::util::jwt;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::{digest, stretch_with_salt};
@@ -14,8 +14,8 @@ use axum_gcra::real_ip::RealIp;
 use axum_gcra::RateLimitLayer;
 use http::HeaderValue;
 use oauth2::{
-    AccessToken, AuthorizationCode, CsrfToken,
-    PkceCodeChallenge, RefreshToken, Scope, TokenResponse,
+    AccessToken, AuthorizationCode, CsrfToken, PkceCodeChallenge, RefreshToken, Scope,
+    TokenResponse,
 };
 use openidconnect::core::CoreAuthenticationFlow;
 use openidconnect::Nonce;
@@ -25,7 +25,6 @@ use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, EntityTrait};
 use sea_orm::{ColumnTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
-use std::cmp::PartialEq;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 use std::net::SocketAddr;

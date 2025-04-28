@@ -1,3 +1,4 @@
+mod documents;
 mod exhibitors;
 mod forms;
 

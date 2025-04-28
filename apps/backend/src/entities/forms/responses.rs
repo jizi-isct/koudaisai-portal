@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -48,7 +48,9 @@ pub struct AnswerText {
 }
 
 impl FormResponse {
-    pub fn from_model(model: &crate::entities::form_responses::Model) -> anyhow::Result<Self> {
+    pub fn from_model(
+        model: &crate::sea_orm_entities::form_responses::Model,
+    ) -> anyhow::Result<Self> {
         let response_id = model.response_id;
         let created_at = model.created_at.unwrap().into();
         let updated_at = model.updated_at.unwrap().into();

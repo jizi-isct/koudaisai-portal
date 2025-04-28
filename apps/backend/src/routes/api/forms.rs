@@ -1,9 +1,9 @@
-use crate::entities::prelude::{ExhibitorsRoot, Forms, Users};
-use crate::entities::{exhibitors_root, form_responses, forms, users};
-use crate::forms::responses::{Answer, FormResponse};
-use crate::forms::{AccessControl, Form, Info, Item};
+use crate::entities::forms::responses::{Answer, FormResponse};
+use crate::entities::forms::{AccessControl, Form, Info, Item};
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
+use crate::sea_orm_entities::prelude::{ExhibitorsRoot, Forms, Users};
+use crate::sea_orm_entities::{exhibitors_root, form_responses, forms, users};
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::http::StatusCode;
@@ -12,8 +12,7 @@ use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveEnum, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait,
-    NotSet, QueryFilter,
+    ActiveEnum, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, NotSet, QueryFilter,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -363,10 +362,10 @@ async fn post_response(
 
 #[instrument(name = "GET /api/v1/forms/{form_id}/responses", skip(state))]
 async fn get_responses(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    ConnectInfo(..): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
-    Path(form_id): Path<Uuid>,
+    Path(..): Path<Uuid>,
 ) -> AppResponse {
     let responses = match current_user {
         CurrentUser::User(claims) => form_responses::Entity::find()

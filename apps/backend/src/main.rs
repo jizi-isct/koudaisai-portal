@@ -12,9 +12,9 @@ use tracing_subscriber::util::SubscriberInitExt;
 
 pub mod config;
 pub mod entities;
-mod forms;
 pub mod middlewares;
 mod routes;
+pub mod sea_orm_entities;
 pub mod util;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();

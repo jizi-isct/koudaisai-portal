@@ -1,4 +1,4 @@
-use crate::entities::revoked_refresh_tokens;
+use crate::sea_orm_entities::revoked_refresh_tokens;
 use anyhow::Result;
 use chrono::Utc;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
