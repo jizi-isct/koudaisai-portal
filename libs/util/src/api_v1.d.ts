@@ -1317,6 +1317,7 @@ export interface components {
             title?: string;
             /** Format: uuid */
             category?: string;
+          required_one_of_scopes?: string[];
         };
         /** @description マークダウン形式の資料 */
         DocumentFormatMarkdown: {
