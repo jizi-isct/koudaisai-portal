@@ -5,6 +5,7 @@ use crate::routes::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, State};
 use axum::response::IntoResponse;
+use axum::routing::get;
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use std::net::SocketAddr;
@@ -13,7 +14,7 @@ use tracing::instrument;
 
 #[instrument(name = "init /api/v1/documents")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new()
+    Router::new().route("/", get(get_documents))
 }
 
 #[instrument(name = "GET /api/v1/documents", skip(state))]
@@ -36,7 +37,7 @@ async fn get_documents(
             )
             .await?
         }
-        CurrentUser::Admin(claims) => DocumentRead::get_all(&state.db_conn).await?,
+        CurrentUser::Admin(..) => DocumentRead::get_all(&state.db_conn).await?,
     };
 
     Ok((StatusCode::OK, Json(documents).into_response()))
