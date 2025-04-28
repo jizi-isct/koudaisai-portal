@@ -5,7 +5,7 @@ use crate::routes::AppState;
 use crate::sea_orm_entities;
 use crate::util::AppResponse;
 use anyhow::anyhow;
-use axum::extract::{ConnectInfo, State};
+use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
@@ -14,10 +14,13 @@ use sea_orm::{ActiveModelTrait, DbErr, IntoActiveModel};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::{error, instrument, warn};
+use uuid::Uuid;
 
 #[instrument(name = "init /api/v1/documents")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", get(get_documents).post(post_documents))
+    Router::new()
+        .route("/", get(get_documents).post(post_documents))
+        .route("/{document_id}", get(get_document))
 }
 
 #[instrument(name = "GET /api/v1/documents", skip(state))]
@@ -65,5 +68,40 @@ async fn post_documents(
         }
     } else {
         Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+    }
+}
+
+#[instrument(name = "GET /api/v1/documents/{document_id}", skip(state))]
+async fn get_document(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(document_id): Path<Uuid>,
+) -> AppResponse {
+    let document: DocumentRead = DocumentRead::find_from_id(document_id, &state.db_conn).await?;
+    match current_user {
+        CurrentUser::None => {
+            if document
+                .required_one_of_scopes
+                .contains(&"none".to_string())
+            {
+                Ok((StatusCode::OK, Json(document).into_response()))
+            } else {
+                Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+            }
+        }
+        CurrentUser::User(claims) => {
+            let user = UserRead::from(claims, &state.db_conn).await?;
+            let exhibitor = user.get_exhibitor_read(&state.db_conn).await?;
+            if document
+                .required_one_of_scopes
+                .contains(&exhibitor.r#type.to_string())
+            {
+                Ok((StatusCode::OK, Json(document).into_response()))
+            } else {
+                Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+            }
+        }
+        CurrentUser::Admin(..) => Ok((StatusCode::OK, Json(document).into_response())),
     }
 }

@@ -105,6 +105,7 @@ pub struct DocumentRead {
     pub category: Uuid,
     #[serde(flatten)]
     pub format: DocumentFormat,
+    pub required_one_of_scopes: Vec<String>,
 }
 
 impl DocumentRead {
@@ -123,6 +124,7 @@ impl DocumentRead {
             format: DocumentFormat::FormatMarkdown {
                 content: markdown.content,
             },
+            required_one_of_scopes: generic.required_one_of_scopes,
         }
     }
 
@@ -141,6 +143,7 @@ impl DocumentRead {
             format: DocumentFormat::FormatPdf {
                 file_url: pdf.file_url,
             },
+            required_one_of_scopes: generic.required_one_of_scopes,
         }
     }
 
