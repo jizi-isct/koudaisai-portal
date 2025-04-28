@@ -3,26 +3,25 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "forms")]
+#[sea_orm(table_name = "document_category")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub form_id: Uuid,
+    pub id: Uuid,
     pub created_at: Option<DateTimeWithTimeZone>,
     pub updated_at: Option<DateTimeWithTimeZone>,
-    pub info: Json,
-    pub items: Json,
-    pub access_control_roles: Vec<String>,
+    #[sea_orm(column_type = "Text")]
+    pub title: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::form_responses::Entity")]
-    FormResponses,
+    #[sea_orm(has_many = "super::document::Entity")]
+    Document,
 }
 
-impl Related<super::form_responses::Entity> for Entity {
+impl Related<super::document::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::FormResponses.def()
+        Relation::Document.def()
     }
 }
 
