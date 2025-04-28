@@ -16,9 +16,10 @@ services:
       - "5432:5432"
     volumes:
       - db-store:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_USER: 'user'
-      POSTGRES_PASSWORD: 'user'
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'root'
       POSTGRES_DB: 'koudaisai-portal'
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1" ]

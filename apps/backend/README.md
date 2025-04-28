@@ -1,12 +1,14 @@
 # dbの起動
 `$ docker compose up -d`
 # migration
+> [!IMPORTANT]
+> `$ nx docker-up backend`で開発環境を起動する必要があります．
 ## migrationの生成
 `$ sea-orm-cli migrate generate <migration名>`
 ## dbのリセット
-`$ sea-orm-cli migrate refresh -u postgres://postgres:postgres@localhost/koudaisai-portal`
+`$ sea-orm-cli migrate refresh -u postgres://root:root@localhost/koudaisai-portal`
 ## entityの生成
-`$ sea-orm-cli generate entity -u postgres://postgres:postgres@localhost/koudaisai-portal -o ./src/entities`
+`$ sea-orm-cli generate entity -u postgres://root:root@localhost/koudaisai-portal -o ./src/entities`
 # デバッグ用データ挿入クエリ
 ```postgresql
 BEGIN;
