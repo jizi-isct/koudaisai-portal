@@ -1,11 +1,12 @@
 use crate::entities::document_category;
 use crate::entities::document_category::{DocumentCategoryRead, DocumentCategoryWrite};
+use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::get;
-use axum::{Json, Router};
+use axum::{Extension, Json, Router};
 use http::StatusCode;
 use sea_orm::ActiveModelTrait;
 use std::net::SocketAddr;
@@ -42,13 +43,18 @@ async fn get_document_categories(
 async fn post_document_categories(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
     Json(document_category): Json<DocumentCategoryWrite>,
 ) -> AppResponse {
-    let document_category = document_category
-        .insert(Uuid::new_v4(), &state.db_conn)
-        .await?;
+    if let CurrentUser::Admin(..) = current_user {
+        let document_category = document_category
+            .insert(Uuid::new_v4(), &state.db_conn)
+            .await?;
 
-    Ok((StatusCode::OK, Json(document_category).into_response()))
+        Ok((StatusCode::OK, Json(document_category).into_response()))
+    } else {
+        Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
+    }
 }
 
 #[instrument(name = "GET /api/v1/document-categories/{category_id}", skip(state))]
@@ -67,15 +73,22 @@ async fn get_document_category(
 async fn patch_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
     Path(category_id): Path<Uuid>,
     Json(document_category): Json<DocumentCategoryWrite>,
 ) -> AppResponse {
-    match document_category
-        .update(category_id, &state.db_conn)
-        .await?
-    {
-        Some(document_category) => Ok((StatusCode::OK, Json(document_category).into_response())),
-        None => Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
+    if let CurrentUser::Admin(..) = current_user {
+        match document_category
+            .update(category_id, &state.db_conn)
+            .await?
+        {
+            Some(document_category) => {
+                Ok((StatusCode::OK, Json(document_category).into_response()))
+            }
+            None => Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
+        }
+    } else {
+        Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
     }
 }
 
@@ -83,11 +96,16 @@ async fn patch_document_category(
 async fn delete_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
     Path(category_id): Path<Uuid>,
 ) -> AppResponse {
-    if document_category::delete_document_category(category_id, &state.db_conn).await? > 0 {
-        Ok((StatusCode::OK, "Deleted.".into_response()))
+    if let CurrentUser::Admin(..) = current_user {
+        if document_category::delete_document_category(category_id, &state.db_conn).await? > 0 {
+            Ok((StatusCode::OK, "Deleted.".into_response()))
+        } else {
+            Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
+        }
     } else {
-        Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
+        Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
     }
 }
