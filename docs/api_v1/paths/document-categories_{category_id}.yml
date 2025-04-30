@@ -74,12 +74,6 @@ delete:
   responses:
     '201':
       description: Changed
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: "../components/schemas/DocumentCategory.yml"
     '401':
       description: 資格情報が無効だった場合
     '404':
