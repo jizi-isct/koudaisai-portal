@@ -14,4 +14,8 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .nest("/v1/forms", forms::init_router())
         .nest("/v1/exhibitors", exhibitors::init_router())
         .nest("/v1/documents", documents::init_router())
+        .nest(
+            "/v1/document-categories",
+            document_categories::init_router(),
+        )
 }
