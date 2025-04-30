@@ -1,3 +1,4 @@
+mod document_categories;
 mod documents;
 mod exhibitors;
 mod forms;
@@ -12,4 +13,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .nest("/v1/forms", forms::init_router())
         .nest("/v1/exhibitors", exhibitors::init_router())
+        .nest("/v1/documents", documents::init_router())
 }
