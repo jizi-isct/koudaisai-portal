@@ -22,6 +22,7 @@ export default function Page() {
                 <Faq key={i} content={data} />
             ))
             }
+            <p>その他何かご不明などございましたら、当委員会までお気軽にお問い合わせください！</p>
         </>
     );
 }
