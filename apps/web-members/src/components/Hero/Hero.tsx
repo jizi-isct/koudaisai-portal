@@ -1,4 +1,5 @@
 import styles from "./Hero.module.css";
+
 export function Hero() {
   return (
     <>
@@ -12,8 +13,8 @@ export function Hero() {
           <p className={styles.deadline}>
             参加申込期間：
             <ul>
-              <li>模擬店・ステージ・一般:5/15〜6/13</li>
-              <li>研究室:5/8〜6/13</li>
+              <li>模擬店・ステージ・一般:5/14(水)〜6/18(水)</li>
+              <li>研究室:5/7(水)～6/18(水)</li>
             </ul>
           </p>
         </div>
