@@ -1,3 +1,4 @@
+use crate::entities::document_category;
 use crate::entities::document_category::{DocumentCategoryRead, DocumentCategoryWrite};
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -21,7 +22,9 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
         .route(
             "/{category_id}",
-            get(get_document_category).patch(patch_document_category),
+            get(get_document_category)
+                .patch(patch_document_category)
+                .delete(delete_document_category),
         )
 }
 
@@ -64,8 +67,8 @@ async fn get_document_category(
 async fn patch_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
-    Json(document_category): Json<DocumentCategoryWrite>,
     Path(category_id): Path<Uuid>,
+    Json(document_category): Json<DocumentCategoryWrite>,
 ) -> AppResponse {
     match document_category
         .update(category_id, &state.db_conn)
@@ -73,5 +76,18 @@ async fn patch_document_category(
     {
         Some(document_category) => Ok((StatusCode::OK, Json(document_category).into_response())),
         None => Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
+    }
+}
+
+#[instrument(name = "DELETE /api/v1/document-categories/{category_id}", skip(state))]
+async fn delete_document_category(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Path(category_id): Path<Uuid>,
+) -> AppResponse {
+    if document_category::delete_document_category(category_id, &state.db_conn).await? > 0 {
+        Ok((StatusCode::OK, "Deleted.".into_response()))
+    } else {
+        Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
     }
 }

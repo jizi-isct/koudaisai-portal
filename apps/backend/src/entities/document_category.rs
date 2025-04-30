@@ -77,3 +77,7 @@ impl DocumentCategoryRead {
         Ok(result.map(|model| model.into()))
     }
 }
+
+pub async fn delete_document_category(id: Uuid, db_conn: &DbConn) -> Result<u64, DbErr> {
+    Ok(Entity::delete_by_id(id).exec(db_conn).await?.rows_affected)
+}
