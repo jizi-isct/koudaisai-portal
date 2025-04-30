@@ -3,7 +3,7 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, QueryFilter,
+    ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotSet, QueryFilter,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -15,7 +15,7 @@ pub enum DocumentFormat {
     FormatPdf { file_url: String },
 }
 
-pub enum DocumentActiveModel {
+pub enum DocumentWriteActiveModel {
     Markdown(
         sea_orm_entities::document::ActiveModel,
         sea_orm_entities::document_format_markdown::ActiveModel,
@@ -37,8 +37,8 @@ pub struct DocumentWrite {
     pub required_one_of_scopes: Vec<String>,
 }
 
-impl Into<DocumentActiveModel> for DocumentWrite {
-    fn into(self) -> DocumentActiveModel {
+impl Into<DocumentWriteActiveModel> for DocumentWrite {
+    fn into(self) -> DocumentWriteActiveModel {
         let format = match self.format {
             DocumentFormat::FormatMarkdown { .. } => {
                 sea_orm_entities::sea_orm_active_enums::DocumentFormat::Markdown
@@ -62,14 +62,14 @@ impl Into<DocumentActiveModel> for DocumentWrite {
         };
 
         match self.format {
-            DocumentFormat::FormatMarkdown { content } => DocumentActiveModel::Markdown(
+            DocumentFormat::FormatMarkdown { content } => DocumentWriteActiveModel::Markdown(
                 generic,
                 sea_orm_entities::document_format_markdown::ActiveModel {
                     id: Set(id),
                     content: Set(content),
                 },
             ),
-            DocumentFormat::FormatPdf { file_url } => DocumentActiveModel::Pdf(
+            DocumentFormat::FormatPdf { file_url } => DocumentWriteActiveModel::Pdf(
                 generic,
                 sea_orm_entities::document_format_pdf::ActiveModel {
                     id: Set(id),
@@ -83,12 +83,130 @@ impl Into<DocumentActiveModel> for DocumentWrite {
 impl DocumentWrite {
     pub async fn insert(self, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
         Ok(match self.into() {
-            DocumentActiveModel::Markdown(generic, markdown) => DocumentRead::from_markdown(
+            DocumentWriteActiveModel::Markdown(generic, markdown) => DocumentRead::from_markdown(
                 generic.insert(db_conn).await?,
                 markdown.insert(db_conn).await?,
             ),
-            DocumentActiveModel::Pdf(generic, pdf) => {
+            DocumentWriteActiveModel::Pdf(generic, pdf) => {
                 DocumentRead::from_pdf(generic.insert(db_conn).await?, pdf.insert(db_conn).await?)
+            }
+        })
+    }
+
+    pub async fn update(self, id: Uuid, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
+        Ok(match self.into() {
+            DocumentWriteActiveModel::Markdown(mut generic, mut markdown) => {
+                generic.id = Set(id);
+                markdown.id = Set(id);
+                DocumentRead::from_markdown(
+                    generic.update(db_conn).await?,
+                    markdown.update(db_conn).await?,
+                )
+            }
+            DocumentWriteActiveModel::Pdf(mut generic, mut pdf) => {
+                generic.id = Set(id);
+                pdf.id = Set(id);
+                DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
+            }
+        })
+    }
+}
+pub enum DocumentUpdateActiveModel {
+    Markdown(
+        sea_orm_entities::document::ActiveModel,
+        sea_orm_entities::document_format_markdown::ActiveModel,
+    ),
+    Pdf(
+        sea_orm_entities::document::ActiveModel,
+        sea_orm_entities::document_format_pdf::ActiveModel,
+    ),
+    Generic(sea_orm_entities::document::ActiveModel),
+}
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DocumentUpdate {
+    pub updated_by: Uuid,
+    #[serde(default)]
+    pub title: Option<String>,
+    #[serde(default)]
+    pub category: Option<Option<Uuid>>,
+    #[serde(flatten)]
+    #[serde(default)]
+    pub format: Option<DocumentFormat>,
+    #[serde(default)]
+    pub required_one_of_scopes: Option<Vec<String>>,
+}
+
+impl DocumentUpdate {
+    fn into_active_model(self, id: Uuid) -> DocumentUpdateActiveModel {
+        let updated_by = Set(self.updated_by);
+        let title = match self.title {
+            None => NotSet,
+            Some(title) => Set(title),
+        };
+        let format = match self.format {
+            None => NotSet,
+            Some(DocumentFormat::FormatMarkdown { .. }) => {
+                Set(sea_orm_entities::sea_orm_active_enums::DocumentFormat::Markdown)
+            }
+            Some(DocumentFormat::FormatPdf { .. }) => {
+                Set(sea_orm_entities::sea_orm_active_enums::DocumentFormat::Pdf)
+            }
+        };
+        let category = match self.category {
+            None => NotSet,
+            Some(category) => Set(category),
+        };
+        let required_one_of_scopes = match self.required_one_of_scopes {
+            None => NotSet,
+            Some(required_one_of_scopes) => Set(required_one_of_scopes),
+        };
+
+        let generic = sea_orm_entities::document::ActiveModel {
+            id: Set(id.clone()),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            created_by: Default::default(),
+            updated_by,
+            title,
+            format,
+            category,
+            required_one_of_scopes,
+        };
+
+        match self.format {
+            Some(DocumentFormat::FormatMarkdown { content }) => {
+                DocumentUpdateActiveModel::Markdown(
+                    generic,
+                    sea_orm_entities::document_format_markdown::ActiveModel {
+                        id: Set(id),
+                        content: Set(content),
+                    },
+                )
+            }
+            Some(DocumentFormat::FormatPdf { file_url }) => DocumentUpdateActiveModel::Pdf(
+                generic,
+                sea_orm_entities::document_format_pdf::ActiveModel {
+                    id: Set(id),
+                    file_url: Set(file_url),
+                },
+            ),
+            None => DocumentUpdateActiveModel::Generic(generic),
+        }
+    }
+
+    pub async fn update(self, id: Uuid, db_conn: &DbConn) -> Result<DocumentRead> {
+        Ok(match self.into_active_model(id) {
+            DocumentUpdateActiveModel::Markdown(mut generic, mut markdown) => {
+                DocumentRead::from_markdown(
+                    generic.update(db_conn).await?,
+                    markdown.update(db_conn).await?,
+                )
+            }
+            DocumentUpdateActiveModel::Pdf(mut generic, mut pdf) => {
+                DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
+            }
+            DocumentUpdateActiveModel::Generic(generic) => {
+                DocumentRead::from(generic.update(db_conn).await?, db_conn).await?
             }
         })
     }

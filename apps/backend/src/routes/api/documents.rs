@@ -1,10 +1,12 @@
-use crate::entities::document::{DocumentActiveModel, DocumentRead, DocumentWrite};
+use crate::entities::document::{
+    DocumentRead, DocumentUpdate, DocumentWrite, DocumentWriteActiveModel,
+};
 use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::sea_orm_entities;
 use crate::util::AppResponse;
-use anyhow::anyhow;
+use anyhow::{anyhow, Error};
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -20,7 +22,7 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_documents).post(post_documents))
-        .route("/{document_id}", get(get_document))
+        .route("/{document_id}", get(get_document).patch(patch_document))
 }
 
 #[instrument(name = "GET /api/v1/documents", skip(state))]
@@ -103,5 +105,36 @@ async fn get_document(
             }
         }
         CurrentUser::Admin(..) => Ok((StatusCode::OK, Json(document).into_response())),
+    }
+}
+
+#[instrument(name = "PATCH /api/v1/documents/{document_id}", skip(state))]
+async fn patch_document(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(document_id): Path<Uuid>,
+    Json(document): Json<DocumentUpdate>,
+) -> AppResponse {
+    if let CurrentUser::Admin(..) = current_user {
+        let result = document.update(document_id, &state.db_conn).await;
+        match result {
+            Ok(document) => Ok((StatusCode::CREATED, Json(document).into_response())),
+            Err(err) => match err.downcast::<DbErr>() {
+                Ok(DbErr::RecordNotUpdated) => {
+                    Ok((StatusCode::NOT_FOUND, "Not Found".into_response()))
+                }
+                Ok(db_err) => {
+                    warn!("Internal Server Error: {:?}", db_err);
+                    Err(db_err.into())
+                }
+                Err(err) => {
+                    warn!("Internal Server Error: {:?}", err);
+                    Err(anyhow!("Internal Server Error: {:?}", err).into())
+                }
+            },
+        }
+    } else {
+        Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
     }
 }
