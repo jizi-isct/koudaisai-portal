@@ -19,7 +19,10 @@ pub fn init_router() -> Router<Arc<AppState>> {
             "/",
             get(get_document_categories).post(post_document_categories),
         )
-        .route("/{category_id}", get(get_document_category))
+        .route(
+            "/{category_id}",
+            get(get_document_category).patch(patch_document_category),
+        )
 }
 
 #[instrument(name = "GET /api/v1/document-categories", skip(state))]
@@ -52,6 +55,22 @@ async fn get_document_category(
     Path(category_id): Path<Uuid>,
 ) -> AppResponse {
     match DocumentCategoryRead::find_by_id(category_id, &state.db_conn).await? {
+        Some(document_category) => Ok((StatusCode::OK, Json(document_category).into_response())),
+        None => Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
+    }
+}
+
+#[instrument(name = "PATCH /api/v1/document-categories/{category_id}", skip(state))]
+async fn patch_document_category(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Json(document_category): Json<DocumentCategoryWrite>,
+    Path(category_id): Path<Uuid>,
+) -> AppResponse {
+    match document_category
+        .update(category_id, &state.db_conn)
+        .await?
+    {
         Some(document_category) => Ok((StatusCode::OK, Json(document_category).into_response())),
         None => Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
     }

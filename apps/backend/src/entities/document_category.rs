@@ -26,6 +26,18 @@ impl DocumentCategoryWrite {
         let result = self.into_active_model(id).insert(db_conn).await?;
         Ok(result.into())
     }
+
+    pub async fn update(
+        self,
+        id: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<Option<DocumentCategoryRead>, DbErr> {
+        match self.into_active_model(id).update(db_conn).await {
+            Ok(model) => Ok(Some(model.into())),
+            Err(DbErr::RecordNotUpdated) => Ok(None),
+            Err(err) => Err(err),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
