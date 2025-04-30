@@ -16,6 +16,8 @@ tags:
     description: フォームの回答関連
   - name: documents
     description: 資料関連
+  - name: files
+    description: ファイル関連
 paths:
   # exhibitions
   /exhibitors:
@@ -41,6 +43,9 @@ paths:
     $ref: paths/document-categories.yml
   /document-categories/{category_id}:
     $ref: paths/document-categories_{category_id}.yml
+  # files
+  /files/upload:
+    $ref: paths/files_upload.yml
 
 components:
   securitySchemes:

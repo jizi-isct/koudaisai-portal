@@ -1,6 +1,7 @@
 mod document_categories;
 mod documents;
 mod exhibitors;
+mod files;
 mod forms;
 
 use crate::routes::AppState;

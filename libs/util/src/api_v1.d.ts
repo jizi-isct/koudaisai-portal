@@ -986,9 +986,7 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": components["schemas"]["DocumentCategory"][];
-                    };
+                    content?: never;
                 };
                 /** @description 資格情報が無効だった場合 */
                 401: {
@@ -1050,6 +1048,66 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新規ファイルをアップロード */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        filename?: string;
+                        /** Format: binary */
+                        file?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Changed */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            file_url?: string;
+                        };
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -1317,7 +1375,7 @@ export interface components {
             title?: string;
             /** Format: uuid */
             category?: string;
-          required_one_of_scopes?: string[];
+            required_one_of_scopes?: string[];
         };
         /** @description マークダウン形式の資料 */
         DocumentFormatMarkdown: {

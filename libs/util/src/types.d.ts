@@ -7,3 +7,6 @@ export type Info = components["schemas"]["Info"]
 
 export type FormItemType = ("question_text" | "text" | "page_break" | "question_radio_button" | "question_check_box");
 export type SaveStatus = "saving" | "saved" | "unsaved";
+
+export type Document = components["schemas"]["Document"];
+export type DocumentCategory = components["schemas"]["DocumentCategory"];

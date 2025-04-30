@@ -1,6 +1,8 @@
 use crate::config::{init_config, Db, Logging};
 use crate::routes::init_routes;
 use crate::util::oidc::OIDCClient;
+use aws_config::BehaviorVersion;
+use aws_sdk_s3::config::Credentials;
 use migration::{Migrator, MigratorTrait};
 use openidconnect::core::{CoreClient, CoreProviderMetadata};
 use openidconnect::{ClientId, ClientSecret, IssuerUrl, RedirectUrl};
@@ -39,9 +41,23 @@ async fn main() {
     )
     .await;
 
+    // s3 init
+    let s3_client = init_s3(
+        config.s3.access_key_id.clone(),
+        config.s3.secret_access_key.clone(),
+        config.s3.endpoint.clone(),
+    )
+    .await;
+
     //app init
     let db = init_db(&config.db).await.unwrap();
-    let app = init_routes(&config.web, db, oidc_client);
+    let app = init_routes(
+        &config.web,
+        db,
+        oidc_client,
+        s3_client,
+        config.s3.bucket.clone(),
+    );
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",
@@ -97,4 +113,27 @@ pub fn init_logging(logging: Logging) {
             .with(tracing_subscriber::fmt::layer())
             .init();
     }
+}
+
+pub async fn init_s3(
+    access_key_id: impl Into<String>,
+    secret_access_key: impl Into<String>,
+    endpoint: impl Into<String>,
+) -> aws_sdk_s3::Client {
+    let shared_cfg = aws_config::defaults(BehaviorVersion::latest())
+        .credentials_provider(
+            Credentials::builder()
+                .access_key_id(access_key_id)
+                .secret_access_key(secret_access_key)
+                .build(),
+        )
+        .endpoint_url(endpoint)
+        .load()
+        .await;
+
+    let s3_cfg = aws_sdk_s3::config::Builder::from(&shared_cfg)
+        .force_path_style(true)
+        .build();
+
+    aws_sdk_s3::Client::from_conf(s3_cfg)
 }
