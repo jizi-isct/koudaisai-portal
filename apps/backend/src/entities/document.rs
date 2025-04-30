@@ -12,7 +12,7 @@ use uuid::Uuid;
 #[serde(rename_all = "snake_case")]
 pub enum DocumentFormat {
     FormatMarkdown { content: String },
-    FormatPdf { file_url: String },
+    FormatPdf { file_key: String },
 }
 
 pub enum DocumentWriteActiveModel {
@@ -69,11 +69,11 @@ impl Into<DocumentWriteActiveModel> for DocumentWrite {
                     content: Set(content),
                 },
             ),
-            DocumentFormat::FormatPdf { file_url } => DocumentWriteActiveModel::Pdf(
+            DocumentFormat::FormatPdf { file_key } => DocumentWriteActiveModel::Pdf(
                 generic,
                 sea_orm_entities::document_format_pdf::ActiveModel {
                     id: Set(id),
-                    file_url: Set(file_url),
+                    file_key: Set(file_key),
                 },
             ),
         }
@@ -183,11 +183,11 @@ impl DocumentUpdate {
                     },
                 )
             }
-            Some(DocumentFormat::FormatPdf { file_url }) => DocumentUpdateActiveModel::Pdf(
+            Some(DocumentFormat::FormatPdf { file_key }) => DocumentUpdateActiveModel::Pdf(
                 generic,
                 sea_orm_entities::document_format_pdf::ActiveModel {
                     id: Set(id),
-                    file_url: Set(file_url),
+                    file_key: Set(file_key),
                 },
             ),
             None => DocumentUpdateActiveModel::Generic(generic),
@@ -259,7 +259,7 @@ impl DocumentRead {
             title: generic.title,
             category: generic.category.unwrap(),
             format: DocumentFormat::FormatPdf {
-                file_url: pdf.file_url,
+                file_key: pdf.file_key,
             },
             required_one_of_scopes: generic.required_one_of_scopes,
         }

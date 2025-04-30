@@ -8,7 +8,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     #[sea_orm(column_type = "Text")]
-    pub file_url: String,
+    pub file_key: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
