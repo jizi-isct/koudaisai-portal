@@ -8,7 +8,7 @@ export function Hero() {
         <div className={styles.content}>
           <p className={styles.catchCopy}>一緒に工大祭を創りませんか？</p>
           <h1 className={styles.title}>工大祭2025</h1>
-          <p className={styles.schedule}>11/2(日), 11/3(月・祝)</p>
+          <p className={styles.schedule}>テーマ：Bloom 11/2(日), 11/3(月・祝)</p>
 
           <p className={styles.deadline}>
             参加申込期間：
