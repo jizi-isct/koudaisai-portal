@@ -12,7 +12,6 @@
     width: 100vw;
     height: 110vh;
 
-    filter: drop-shadow(0 0 4px black);
 
     color: white;
 
@@ -27,6 +26,10 @@
 
 .content {
     filter: drop-shadow(0 0 4px black);
+}
+
+.noWrap {
+    white-space: nowrap;
 }
 
 /* テキストのレスポンシブcss */
