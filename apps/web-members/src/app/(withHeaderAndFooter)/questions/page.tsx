@@ -4,6 +4,8 @@ import {Heading1, Faq, Selector} from "@koudaisai-portal/ui-generic";
 import {useState} from "react";
 import {questionDataNoLogin} from "@/lib/lib";
 
+import "@koudaisai-portal/ui-generic/css"
+
 export default function Page() {
     const firstQuestionType = Object.keys(questionDataNoLogin)[0];
     const [questionType, setQuestionType] = useState(firstQuestionType);
