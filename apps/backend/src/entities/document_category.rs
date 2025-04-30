@@ -3,7 +3,7 @@ use crate::sea_orm_entities::document_category::Entity;
 use crate::sea_orm_entities::document_category::Model;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect};
+use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -55,5 +55,13 @@ impl DocumentCategoryRead {
             result.push(model.into());
         }
         Ok(result)
+    }
+
+    pub async fn find_by_id(
+        id: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<Option<DocumentCategoryRead>, DbErr> {
+        let result = Entity::find_by_id(id).one(db_conn).await?;
+        Ok(result.map(|model| model.into()))
     }
 }
