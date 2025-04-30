@@ -1,3 +1,4 @@
+use crate::entities::document;
 use crate::entities::document::{
     DocumentRead, DocumentUpdate, DocumentWrite, DocumentWriteActiveModel,
 };
@@ -22,7 +23,12 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_documents).post(post_documents))
-        .route("/{document_id}", get(get_document).patch(patch_document))
+        .route(
+            "/{document_id}",
+            get(get_document)
+                .patch(patch_document)
+                .delete(delete_document),
+        )
 }
 
 #[instrument(name = "GET /api/v1/documents", skip(state))]
@@ -133,6 +139,32 @@ async fn patch_document(
                     Err(anyhow!("Internal Server Error: {:?}", err).into())
                 }
             },
+        }
+    } else {
+        Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+    }
+}
+
+#[instrument(name = "DELETE /api/v1/documents/{document_id}", skip(state))]
+async fn delete_document(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(document_id): Path<Uuid>,
+) -> AppResponse {
+    if let CurrentUser::Admin(..) = current_user {
+        match document::delete_document(document_id, &state.db_conn).await {
+            Ok(affected_rows) => {
+                if affected_rows == 0 {
+                    Ok((StatusCode::NOT_FOUND, "Not Found".into_response()))
+                } else {
+                    Ok((StatusCode::OK, "OK".into_response()))
+                }
+            }
+            Err(err) => {
+                warn!("Internal Server Error: {:?}", err);
+                Err(err.into())
+            }
         }
     } else {
         Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))

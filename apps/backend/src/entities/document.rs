@@ -363,3 +363,11 @@ impl From<sea_orm_entities::document_category::Model> for DocumentCategoryRead {
         }
     }
 }
+
+pub async fn delete_document(id: Uuid, db_conn: &DbConn) -> Result<u64, DbErr> {
+    let result = sea_orm_entities::document::Entity::delete_by_id(id)
+        .exec(db_conn)
+        .await?;
+
+    Ok(result.rows_affected)
+}
