@@ -2,6 +2,7 @@ import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
+import * as process from "node:process";
 
 const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {
@@ -58,3 +59,7 @@ export const fetchClientAdmin = createFetchClient<paths>({baseUrl: process.env.N
 fetchClientAdmin.use(authMiddlewareAdmin)
 
 export const $apiAdmin = createClient(fetchClientAdmin)
+
+export const fetchClientNoAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+
+export const $apiNoAuth = createClient(fetchClientNoAuth)

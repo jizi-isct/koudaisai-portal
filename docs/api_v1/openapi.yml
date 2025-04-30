@@ -46,6 +46,8 @@ paths:
   # files
   /files/upload:
     $ref: paths/files_upload.yml
+  /files/download:
+    $ref: paths/files_download.yml
 
 components:
   securitySchemes:

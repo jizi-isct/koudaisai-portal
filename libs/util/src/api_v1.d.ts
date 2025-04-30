@@ -1050,7 +1050,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/files": {
+    "/files/upload": {
         parameters: {
             query?: never;
             header?: never;
@@ -1059,7 +1059,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 新規ファイルをアップロード */
+        /** ファイルのアップロードurlを取得 */
         post: {
             parameters: {
                 query?: never;
@@ -1069,10 +1069,8 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "multipart/form-data": {
-                        filename?: string;
-                        /** Format: binary */
-                        file?: string;
+                    "application/json": {
+                        file_name?: string;
                     };
                 };
             };
@@ -1084,7 +1082,8 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            file_url?: string;
+                            presigned_url?: string;
+                            key?: string;
                         };
                     };
                 };
@@ -1104,6 +1103,60 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ファイルのダウンロードurlを取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Changed */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            presigned_url?: string;
+                        };
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;

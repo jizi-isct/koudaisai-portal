@@ -19,4 +19,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
             "/v1/document-categories",
             document_categories::init_router(),
         )
+        .nest("/v1/files", files::init_router())
 }

@@ -20,6 +20,8 @@ post:
             properties:
               presigned_url:
                 type: string
+              key:
+                type: string
     '400':
       description: 不正なrequest bodyの形式
     '401':

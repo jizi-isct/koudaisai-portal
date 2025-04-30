@@ -2,9 +2,9 @@ use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
 use aws_sdk_s3::presigning::PresigningConfig;
-use axum::extract::{ConnectInfo, State};
+use axum::extract::{ConnectInfo, Query, State};
 use axum::response::IntoResponse;
-use axum::routing::post;
+use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -14,9 +14,11 @@ use std::time::Duration;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/exhibitors")]
+#[instrument(name = "init /api/v1/files")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", post(post_files_upload))
+    Router::new()
+        .route("/upload", post(post_files_upload))
+        .route("/download", get(get_files_download))
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -36,7 +38,7 @@ async fn post_files_upload(
     Extension(current_user): Extension<CurrentUser>,
     Json(payload): Json<PostFilesUploadPayload>,
 ) -> AppResponse {
-    if let CurrentUser::Admin(claims) = current_user {
+    if let CurrentUser::Admin(..) = current_user {
         let key = format!("{}-{}", Uuid::new_v4(), payload.file_name);
 
         let presigned = state
@@ -61,4 +63,41 @@ async fn post_files_upload(
     } else {
         Ok((StatusCode::FORBIDDEN, "Forbidden".into_response()))
     }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct GetFilesDownloadParams {
+    key: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct GetFilesDownloadResponse {
+    presigned_url: String,
+}
+
+#[instrument(name = "GET /api/v1/files/download", skip(state))]
+async fn get_files_download(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Query(params): Query<GetFilesDownloadParams>,
+) -> AppResponse {
+    let presigned = state
+        .s3_client
+        .get_object()
+        .bucket(state.s3_bucket.clone())
+        .key(&params.key)
+        .presigned(
+            PresigningConfig::builder()
+                .expires_in(Duration::from_secs(60 * 10)) // 10 分
+                .build()?,
+        )
+        .await?;
+
+    Ok((
+        StatusCode::OK,
+        Json(GetFilesDownloadResponse {
+            presigned_url: presigned.uri().to_string(),
+        })
+        .into_response(),
+    ))
 }
