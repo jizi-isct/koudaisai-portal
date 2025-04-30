@@ -3,7 +3,7 @@ use crate::sea_orm_entities::document_category::Entity;
 use crate::sea_orm_entities::document_category::Model;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{DbConn, DbErr, EntityOrSelect};
+use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -20,6 +20,11 @@ impl DocumentCategoryWrite {
             updated_at: Default::default(),
             title: Set(self.title),
         }
+    }
+
+    pub async fn insert(self, id: Uuid, db_conn: &DbConn) -> Result<DocumentCategoryRead, DbErr> {
+        let result = self.into_active_model(id).insert(db_conn).await?;
+        Ok(result.into())
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::entities::document_category::DocumentCategoryRead;
+use crate::entities::document_category::{DocumentCategoryRead, DocumentCategoryWrite};
 use crate::routes::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, State};
@@ -10,10 +10,14 @@ use sea_orm::ActiveModelTrait;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::instrument;
+use uuid::Uuid;
 
 #[instrument(name = "init /api/v1/document-categories")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", get(get_document_categories))
+    Router::new().route(
+        "/",
+        get(get_document_categories).post(post_document_categories),
+    )
 }
 
 #[instrument(name = "GET /api/v1/document-categories", skip(state))]
@@ -24,4 +28,17 @@ async fn get_document_categories(
     let document_categories = DocumentCategoryRead::get_all(&state.db_conn).await?;
 
     Ok((StatusCode::OK, Json(document_categories).into_response()))
+}
+
+#[instrument(name = "POST /api/v1/document-categories", skip(state))]
+async fn post_document_categories(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Json(document_category): Json<DocumentCategoryWrite>,
+) -> AppResponse {
+    let document_category = document_category
+        .insert(Uuid::new_v4(), &state.db_conn)
+        .await?;
+
+    Ok((StatusCode::OK, Json(document_category).into_response()))
 }
