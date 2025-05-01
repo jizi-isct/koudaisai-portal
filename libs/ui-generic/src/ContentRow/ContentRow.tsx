@@ -7,9 +7,9 @@ type Props = {
 
 export function ContentRow({content}: Props) {
   return (
-    <div className={styles.root}>
+    <div className={styles.root} onClick={content.onClick}>
       <span className={styles.date}>{content.date}</span>
-      <span className={styles.title} onClick={content.onClick}>{content.title}</span>
+      <span className={styles.title}>{content.title}</span>
       <span className={styles.author}>{content.author}</span>
     </div>
   )

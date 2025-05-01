@@ -3,7 +3,7 @@ get:
   tags:
     - files
   parameters:
-    - in: path
+    - in: query
       name: key
       schema:
         type: string

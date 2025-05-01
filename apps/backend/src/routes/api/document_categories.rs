@@ -34,7 +34,9 @@ async fn get_document_categories(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
 ) -> AppResponse {
-    let document_categories = DocumentCategoryRead::get_all(&state.db_conn).await?;
+    let mut document_categories = DocumentCategoryRead::get_all(&state.db_conn).await?;
+
+    document_categories.sort_by(|a, b| a.created_at.cmp(&b.created_at));
 
     Ok((StatusCode::OK, Json(document_categories).into_response()))
 }

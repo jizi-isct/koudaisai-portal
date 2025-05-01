@@ -1119,11 +1119,11 @@ export interface paths {
         /** ファイルのダウンロードurlを取得 */
         get: {
             parameters: {
-                query?: never;
-                header?: never;
-                path: {
+              query: {
                     key: string;
                 };
+              header?: never;
+              path?: never;
                 cookie?: never;
             };
             requestBody?: never;
@@ -1436,7 +1436,7 @@ export interface components {
         };
         /** @description pdf形式の資料 */
         DocumentFormatPdf: {
-            file_url: string;
+          file_key: string;
         };
         Document: components["schemas"]["DocumentGeneric"] & {
             format_markdown?: components["schemas"]["DocumentFormatMarkdown"];
@@ -1445,7 +1445,7 @@ export interface components {
         /** @description 資料のカテゴリー */
         DocumentCategory: {
             /** Format: uuid */
-            readonly id: string;
+            readonly id?: string;
             /** Format: date-time */
             readonly created_at?: string;
             /** Format: date-time */

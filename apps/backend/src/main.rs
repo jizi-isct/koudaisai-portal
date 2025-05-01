@@ -125,9 +125,11 @@ pub async fn init_s3(
             Credentials::builder()
                 .access_key_id(access_key_id)
                 .secret_access_key(secret_access_key)
+                .provider_name("default-provider")
                 .build(),
         )
         .endpoint_url(endpoint)
+        .region("ap-northeast-1")
         .load()
         .await;
 

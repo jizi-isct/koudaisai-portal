@@ -16,7 +16,4 @@ properties:
   title:
     type: string
 required:
-  - id
-  - created_by
-  - updated_by
   - title

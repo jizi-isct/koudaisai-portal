@@ -2,9 +2,7 @@ use crate::sea_orm_entities;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotSet, QueryFilter,
-};
+use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -27,18 +25,16 @@ pub enum DocumentWriteActiveModel {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DocumentWrite {
-    pub created_by: Uuid,
-    pub updated_by: Uuid,
+pub struct DocumentCreate {
     pub title: String,
-    pub category: Option<Uuid>,
+    pub category: Uuid,
     #[serde(flatten)]
     pub format: DocumentFormat,
     pub required_one_of_scopes: Vec<String>,
 }
 
-impl Into<DocumentWriteActiveModel> for DocumentWrite {
-    fn into(self) -> DocumentWriteActiveModel {
+impl DocumentCreate {
+    pub fn into_active_model(self, created_by: Uuid) -> DocumentWriteActiveModel {
         let format = match self.format {
             DocumentFormat::FormatMarkdown { .. } => {
                 sea_orm_entities::sea_orm_active_enums::DocumentFormat::Markdown
@@ -53,11 +49,11 @@ impl Into<DocumentWriteActiveModel> for DocumentWrite {
             id: Set(id.clone()),
             created_at: Default::default(),
             updated_at: Default::default(),
-            created_by: Set(self.created_by),
-            updated_by: Set(self.updated_by),
+            created_by: Set(created_by.clone()),
+            updated_by: Set(created_by),
             title: Set(self.title),
             format: Set(format),
-            category: Set(self.category),
+            category: Set(Some(self.category)),
             required_one_of_scopes: Set(self.required_one_of_scopes),
         };
 
@@ -78,11 +74,9 @@ impl Into<DocumentWriteActiveModel> for DocumentWrite {
             ),
         }
     }
-}
 
-impl DocumentWrite {
-    pub async fn insert(self, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
-        Ok(match self.into() {
+    pub async fn insert(self, created_by: Uuid, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
+        Ok(match self.into_active_model(created_by) {
             DocumentWriteActiveModel::Markdown(generic, markdown) => DocumentRead::from_markdown(
                 generic.insert(db_conn).await?,
                 markdown.insert(db_conn).await?,
@@ -93,8 +87,13 @@ impl DocumentWrite {
         })
     }
 
-    pub async fn update(self, id: Uuid, db_conn: &DbConn) -> Result<DocumentRead, DbErr> {
-        Ok(match self.into() {
+    pub async fn update(
+        self,
+        id: Uuid,
+        created_by: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<DocumentRead, DbErr> {
+        Ok(match self.into_active_model(created_by) {
             DocumentWriteActiveModel::Markdown(mut generic, mut markdown) => {
                 generic.id = Set(id);
                 markdown.id = Set(id);
@@ -310,20 +309,19 @@ impl DocumentRead {
         Ok(documents)
     }
 
-    pub async fn find_from_required_one_of_scopes<T: Into<String>>(
-        scope: T,
+    pub async fn find_from_required_one_of_scopes(
+        scope: &String,
         db_conn: &DbConn,
     ) -> Result<Vec<Self>> {
-        let models = sea_orm_entities::document::Entity
-            .select()
-            .filter(sea_orm_entities::document::Column::RequiredOneOfScopes.contains(scope))
-            .all(db_conn)
-            .await?;
+        let all_documents = Self::get_all(db_conn).await?;
+        let mut documents = vec![];
 
-        let mut documents = Vec::new();
-        for model in models {
-            documents.push(DocumentRead::from(model, db_conn).await?)
+        for document in all_documents {
+            if document.required_one_of_scopes.contains(scope) {
+                documents.push(document);
+            }
         }
+
         Ok(documents)
     }
 }

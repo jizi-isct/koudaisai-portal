@@ -9,6 +9,7 @@ mod m20250310_133355_create_table_revoked_refresh_tokens;
 mod m20250425_085751_create_table_document;
 mod m20250428_070428_add_column_required_one_of_scopes_to_table_document;
 mod m20250430_064809_rename_column_file_url_of_document_format_pdf;
+mod m20250501_161327_create_trigger_update_document_modtime;
 
 pub struct Migrator;
 
@@ -27,6 +28,7 @@ impl MigratorTrait for Migrator {
                 m20250428_070428_add_column_required_one_of_scopes_to_table_document::Migration,
             ),
             Box::new(m20250430_064809_rename_column_file_url_of_document_format_pdf::Migration),
+            Box::new(m20250501_161327_create_trigger_update_document_modtime::Migration),
         ]
     }
 }

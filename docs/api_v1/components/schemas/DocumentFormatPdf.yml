@@ -1,7 +1,7 @@
 description: pdf形式の資料
 type: object
 properties:
-  file_url:
+  file_key:
     type: string
 required:
-  - file_url
+  - file_key

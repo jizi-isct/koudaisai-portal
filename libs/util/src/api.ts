@@ -2,7 +2,6 @@ import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
-import * as process from "node:process";
 
 const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {

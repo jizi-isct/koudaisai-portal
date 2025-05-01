@@ -1,6 +1,6 @@
 use crate::entities::document;
 use crate::entities::document::{
-    DocumentRead, DocumentUpdate, DocumentWrite, DocumentWriteActiveModel,
+    DocumentCreate, DocumentRead, DocumentUpdate, DocumentWriteActiveModel,
 };
 use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
@@ -15,6 +15,7 @@ use axum::{Extension, Json, Router};
 use http::StatusCode;
 use sea_orm::{ActiveModelTrait, DbErr, IntoActiveModel};
 use std::net::SocketAddr;
+use std::str::FromStr;
 use std::sync::Arc;
 use tracing::{error, instrument, warn};
 use uuid::Uuid;
@@ -38,21 +39,24 @@ async fn get_documents(
     Extension(current_user): Extension<CurrentUser>,
 ) -> AppResponse {
     // 権限確認
-    let documents: Vec<DocumentRead> = match current_user {
+    let mut documents: Vec<DocumentRead> = match current_user {
         CurrentUser::None => {
-            DocumentRead::find_from_required_one_of_scopes("none", &state.db_conn).await?
+            DocumentRead::find_from_required_one_of_scopes(&"none".to_string(), &state.db_conn)
+                .await?
         }
         CurrentUser::User(claims) => {
             let user = UserRead::from(claims, &state.db_conn).await?;
             let exhibitor = user.get_exhibitor_read(&state.db_conn).await?;
             DocumentRead::find_from_required_one_of_scopes(
-                exhibitor.r#type.to_string(),
+                &exhibitor.r#type.to_string(),
                 &state.db_conn,
             )
             .await?
         }
         CurrentUser::Admin(..) => DocumentRead::get_all(&state.db_conn).await?,
     };
+
+    documents.sort_by(|a, b| a.updated_at.cmp(&b.updated_at));
 
     Ok((StatusCode::OK, Json(documents).into_response()))
 }
@@ -62,10 +66,12 @@ async fn post_documents(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
-    Json(document): Json<DocumentWrite>,
+    Json(document): Json<DocumentCreate>,
 ) -> AppResponse {
-    if let CurrentUser::Admin(..) = current_user {
-        let result = document.insert(&state.db_conn).await;
+    if let CurrentUser::Admin(claims) = current_user {
+        let result = document
+            .insert(Uuid::from_str(claims.subject().as_str())?, &state.db_conn)
+            .await;
         match result {
             Ok(document) => Ok((StatusCode::CREATED, Json(document).into_response())),
             Err(DbErr::RecordNotInserted) => Ok((StatusCode::CONFLICT, "Conflict".into_response())),

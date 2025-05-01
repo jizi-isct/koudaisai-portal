@@ -29,6 +29,7 @@ struct PostFilesUploadPayload {
 #[derive(Deserialize, Serialize, Debug)]
 struct PostFilesUploadResponse {
     presigned_url: String,
+    key: String,
 }
 
 #[instrument(name = "POST /api/v1/files/upload", skip(state))]
@@ -57,6 +58,7 @@ async fn post_files_upload(
             StatusCode::OK,
             Json(PostFilesUploadResponse {
                 presigned_url: presigned.uri().to_string(),
+                key: key.clone(),
             })
             .into_response(),
         ))

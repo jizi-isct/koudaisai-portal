@@ -55,10 +55,13 @@
   ],
   "references": [
     {
-      "path": "../../libs/ui-generic"
+      "path": "../../libs/ui-edit_response"
     },
     {
-      "path": "../../libs/ui-edit_response"
+      "path": "../../libs/ui-show_document"
+    },
+    {
+      "path": "../../libs/ui-generic"
     },
     {
       "path": "../../libs/util"
