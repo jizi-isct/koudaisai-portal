@@ -29,6 +29,12 @@
     },
     {
       "path": "./libs/ui-generic"
+    },
+    {
+      "path": "./libs/ui-edit_document"
+    },
+    {
+      "path": "./libs/ui-show_document"
     }
   ],
   "ts-node": {

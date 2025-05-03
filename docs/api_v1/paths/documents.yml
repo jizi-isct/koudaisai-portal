@@ -1,0 +1,49 @@
+get:
+  summary: アクセス可能な資料をすべて取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料を取得
+    - **admin_oidcの場合**: 存在する資料を全て取得
+  tags:
+    - documents
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../components/schemas/Document.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all
+post:
+  summary: 資料を新規作成
+  tags:
+    - documents
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/Document.yml"
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/Document.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - admin_oidc:
+        - k-portal:admin:all

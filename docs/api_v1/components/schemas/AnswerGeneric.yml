@@ -1,0 +1,9 @@
+type: object
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: |-
+      項目のid
+required:
+  - item_id

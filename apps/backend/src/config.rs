@@ -14,6 +14,7 @@ pub struct Config {
     pub logging: Logging,
     pub web: Web,
     pub db: Db,
+    pub s3: S3,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -139,4 +140,11 @@ impl Default for StaticFiles {
             admin_path: "/var/www/html/admin".into(),
         }
     }
+}
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct S3 {
+    pub access_key_id: String,
+    pub secret_access_key: String,
+    pub endpoint: String,
+    pub bucket: String,
 }

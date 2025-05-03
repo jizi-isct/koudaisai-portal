@@ -1,0 +1,83 @@
+get:
+  summary: 資料カテゴリを取得
+  tags:
+    - documents
+  parameters:
+    - name: category_id
+      in: path
+      description: 資料カテゴリのID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/DocumentCategory.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all
+patch:
+  summary: 資料カテゴリを更新
+  tags:
+    - documents
+  parameters:
+    - name: category_id
+      in: path
+      description: 資料カテゴリのID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/DocumentCategory.yml"
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../components/schemas/DocumentCategory.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
+delete:
+  summary: 資料カテゴリを削除
+  tags:
+    - documents
+  parameters:
+    - name: category_id
+      in: path
+      description: カテゴリID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '201':
+      description: Changed
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+  security:
+    - admin_oidc:
+        - k-portal:admin:all

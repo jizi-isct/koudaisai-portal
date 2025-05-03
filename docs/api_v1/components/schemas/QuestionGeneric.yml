@@ -1,0 +1,7 @@
+type: object
+properties:
+  required:
+    description: 回答必須かどうか
+    type: boolean
+required:
+  - required

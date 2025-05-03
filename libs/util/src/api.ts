@@ -58,3 +58,7 @@ export const fetchClientAdmin = createFetchClient<paths>({baseUrl: process.env.N
 fetchClientAdmin.use(authMiddlewareAdmin)
 
 export const $apiAdmin = createClient(fetchClientAdmin)
+
+export const fetchClientNoAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
+
+export const $apiNoAuth = createClient(fetchClientNoAuth)

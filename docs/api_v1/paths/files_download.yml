@@ -1,0 +1,24 @@
+get:
+  summary: ファイルのダウンロードurlを取得
+  tags:
+    - files
+  parameters:
+    - in: query
+      name: key
+      schema:
+        type: string
+      required: true
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              presigned_url:
+                type: string
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合

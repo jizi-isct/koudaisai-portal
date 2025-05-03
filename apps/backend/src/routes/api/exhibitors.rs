@@ -1,10 +1,10 @@
-use crate::entities::exhibitors_root::Model;
-use crate::entities::{
+use crate::middlewares::CurrentUser;
+use crate::routes::AppState;
+use crate::sea_orm_entities::exhibitors_root::Model;
+use crate::sea_orm_entities::{
     exhibitors_category_booth, exhibitors_category_general, exhibitors_category_labo,
     exhibitors_category_stage, exhibitors_root, sea_orm_active_enums, users,
 };
-use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
 use crate::util::sha::stretch_with_salt;
 use crate::util::AppError;
 use axum::extract::{ConnectInfo, Path, State};

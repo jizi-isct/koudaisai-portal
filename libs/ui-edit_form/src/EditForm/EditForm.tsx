@@ -1,7 +1,6 @@
-import {TextInput} from "@koudaisai-portal/ui-generic";
+import {SaveStatus as SaveStatusComponent, TextInput} from "@koudaisai-portal/ui-generic";
 import {Item as ItemComponent} from "../Item"
 import {FormMetadata} from "../FormMetadata";
-import {SaveStatus as SaveStatusComponent} from "../SaveStatus";
 import {Form, Item, SaveStatus} from "@koudaisai-portal/util";
 
 import styles from "./EditForm.module.css"
@@ -135,7 +134,7 @@ export function EditForm({form, setForm, saveStatus}: Props) {
       <main className={styles.main}>
         <div className={styles.formTitleWrapper}>
           <TextInput
-            width={400}
+            width="400px"
             placeholder="タイトルを入力"
             value={form?.info?.title ?? "データなし"}
             setValue={handleTitleChange}

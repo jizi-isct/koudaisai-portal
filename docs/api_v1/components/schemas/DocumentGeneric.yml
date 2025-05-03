@@ -1,0 +1,29 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+    readOnly: true
+  created_at:
+    type: string
+    format: date-time
+    readOnly: true
+  updated_at:
+    type: string
+    format: date-time
+    readOnly: true
+  created_by:
+    type: string
+    format: uuid
+  updated_by:
+    type: string
+    format: uuid
+  title:
+    type: string
+  category:
+    type: string
+    format: uuid
+  required_one_of_scopes:
+    type: array
+    items:
+      type: string

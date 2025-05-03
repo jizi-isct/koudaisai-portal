@@ -1,0 +1,93 @@
+get:
+  summary: 資料を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
+    - **admin_oidcの場合**: 存在する資料を全て取得可能
+  tags:
+    - documents
+  parameters:
+    - name: document_id
+      in: path
+      description: 資料のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/Document.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all
+patch:
+  summary: 資料を更新
+  tags:
+    - documents
+  parameters:
+    - name: document_id
+      in: path
+      description: 資料のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/Document.yml"
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../components/schemas/Document.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
+delete:
+  summary: 資料を削除
+  tags:
+    - documents
+  parameters:
+    - name: document_id
+      in: path
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '201':
+      description: Changed
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../components/schemas/Document.yml"
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+  security:
+    - admin_oidc:
+        - k-portal:admin:all

@@ -1,4 +1,7 @@
+mod document_categories;
+mod documents;
 mod exhibitors;
+mod files;
 mod forms;
 
 use crate::routes::AppState;
@@ -11,4 +14,10 @@ pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .nest("/v1/forms", forms::init_router())
         .nest("/v1/exhibitors", exhibitors::init_router())
+        .nest("/v1/documents", documents::init_router())
+        .nest(
+            "/v1/document-categories",
+            document_categories::init_router(),
+        )
+        .nest("/v1/files", files::init_router())
 }

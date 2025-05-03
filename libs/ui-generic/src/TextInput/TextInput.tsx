@@ -1,7 +1,7 @@
 import styles from "./TextInput.module.css";
 
 type TextInputProps = {
-  width?: number;
+  width?: string;
   placeholder?: string;
   value?: string;
   setValue: (newValue: string) => void;
@@ -25,7 +25,7 @@ export const TextInput = ({width, placeholder = "テキストを入力", value, 
         className={styles.Paragraph}
         value={value ?? placeholder}
         placeholder={placeholder}
-        style={{fontSize: 12, width: width === 0 ? "100%" : width}}
+        style={{fontSize: 12, width: width ? width : "100%"}}
         onChange={(e) => (setValue(e.target.value))}
       />
     )

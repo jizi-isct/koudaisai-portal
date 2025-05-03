@@ -1,0 +1,7 @@
+description: マークダウン形式の資料
+type: object
+properties:
+  content:
+    type: string
+required:
+  - content

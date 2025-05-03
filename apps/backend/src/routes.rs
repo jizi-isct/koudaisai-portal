@@ -1,6 +1,5 @@
 mod api;
 mod auth;
-
 use crate::config::Web;
 use crate::middlewares;
 use crate::util::jwt::JWTManager;
@@ -28,6 +27,8 @@ pub fn init_routes(
     web: &Web,
     db_conn: DatabaseConnection,
     oidc_client: OIDCClient,
+    s3_client: aws_sdk_s3::Client,
+    s3_bucket: String,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
@@ -48,6 +49,8 @@ pub fn init_routes(
         sha_manager: SHAManager {
             stretch_cost: 2_i32.pow(web.auth.stretch_cost as u32),
         },
+        s3_client,
+        s3_bucket,
     });
 
     let serve_dir =
@@ -74,6 +77,8 @@ pub struct AppState {
     pub http_client: Client,
     pub jwt_manager: JWTManager,
     pub sha_manager: SHAManager,
+    pub s3_client: aws_sdk_s3::Client,
+    pub s3_bucket: String,
 }
 
 pub struct AuthSession {
