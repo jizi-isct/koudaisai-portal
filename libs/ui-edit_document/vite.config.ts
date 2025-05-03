@@ -3,6 +3,7 @@ import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
+import preserveDirectives from "rollup-plugin-preserve-directives";
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -32,7 +33,11 @@ export default defineConfig(() => ({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ['react', 'react-dom', 'react/jsx-runtime']
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      output: {
+        preserveModules: true
+      },
+      plugins: [preserveDirectives()]
     },
   },
 }));

@@ -3,8 +3,17 @@
 import {Viewer, Worker} from "@react-pdf-viewer/core";
 import {Modal} from "@koudaisai-portal/ui-generic";
 import {Document, fetchClientNoAuth} from "@koudaisai-portal/util";
-import ReactMarkdown from "react-markdown";
 import {useEffect, useState} from "react";
+import dynamic from "next/dynamic";
+
+const ReactMarkdown = dynamic(
+  () =>
+    import("react-markdown").then(
+      (m) => m.default,
+    ),
+  {ssr: false}
+);
+
 
 type Props = {
   document: Document

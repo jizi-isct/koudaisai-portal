@@ -2,8 +2,8 @@
 import styles from "./page.module.css";
 import {useSearchParams} from "next/navigation";
 import {Suspense, useEffect, useState} from "react";
-import {TextInput} from "@koudaisai-portal/ui-generic";
-import {FormMetadata, Item as ItemComponent, SaveStatus} from "@koudaisai-portal/ui-edit_form";
+import {SaveStatus, TextInput} from "@koudaisai-portal/ui-generic";
+import {FormMetadata, Item as ItemComponent} from "@koudaisai-portal/ui-edit_form";
 import {$apiAdmin, fetchClientAdmin, Form, Item} from "@koudaisai-portal/util";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
@@ -212,7 +212,7 @@ function Inner() {
             <main className={styles.main}>
                 <div className={styles.formTitleWrapper}>
                     <TextInput
-                        width={400}
+                      width="400px"
                         placeholder="タイトルを入力"
                         value={form?.info?.title ?? "データなし"}
                         setValue={handleTitleChange}
