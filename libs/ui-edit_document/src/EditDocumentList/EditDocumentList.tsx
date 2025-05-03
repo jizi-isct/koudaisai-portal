@@ -10,7 +10,9 @@ import {useQueryClient} from "@tanstack/react-query";
 const headingEmojis = ["📕", "📗", "📘", "📙"];
 
 export function EditDocumentList() {
+  console.log("hello")
   const queryClient = useQueryClient()
+  console.log("hello1s")
   const {data: categories} = $apiAdmin.useQuery("get", "/document-categories")
   const {data: documents} = $apiAdmin.useQuery("get", "/documents")
   const [selectedDocument, setSelectedDocument] = useState<Document>({})

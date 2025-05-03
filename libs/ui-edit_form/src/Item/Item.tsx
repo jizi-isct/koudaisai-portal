@@ -236,7 +236,7 @@ export function Item({item, setItem, moveUp, moveDown, delete_}: Props) {
       <div className={styles.questionTitleWrapper}>
         <div className={styles.questionTitle}>
           <TextInput
-            width={400}
+            width="400px"
             placeholder="タイトルを入力"
             value={item.title}
             setValue={handleTitleChange}
@@ -246,7 +246,7 @@ export function Item({item, setItem, moveUp, moveDown, delete_}: Props) {
         </div>
         <div className={styles.questionDescription}>
           <TextInput
-            width={800}
+            width="400px"
             placeholder="説明を入力"
             value={item.description}
             setValue={handleDescriptionChange}

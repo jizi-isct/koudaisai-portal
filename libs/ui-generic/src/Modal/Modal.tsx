@@ -1,11 +1,15 @@
 "use client";
 
-import {default as ReactModal} from "react-modal"
 import * as React from "react";
+import {useEffect} from "react";
 import {Button} from "../Button";
 import styles from "./Modal.module.css";
-import {useEffect} from "react";
+import dynamic from "next/dynamic";
 
+const ReactModal = dynamic(
+  () => import("react-modal"),
+  {ssr: false}
+)
 
 type Props = {
   isOpen: boolean,
