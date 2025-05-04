@@ -22,15 +22,6 @@
       "path": "./libs/util"
     },
     {
-      "path": "./libs/ui-edit_form"
-    },
-    {
-      "path": "./libs/ui-edit_response"
-    },
-    {
-      "path": "./libs/ui-generic"
-    },
-    {
       "path": "./libs/ui-edit_document"
     },
     {
