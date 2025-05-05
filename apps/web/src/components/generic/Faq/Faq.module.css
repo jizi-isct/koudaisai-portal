@@ -11,30 +11,16 @@
 .root p {
     margin: 0;
     padding: 0;
-    width: 80%;
+    width: 90%;
     margin:20px auto;
     position: relative;
     font-size: 15px;
 }
 
-.question::before {
-    content: 'Q.';
-    display: block;
+.prefix {
+    display: inline-block;
     color: var(--darkgray);
-    position: absolute;
-    left: -30px;
-    top: -5px;
     font-weight: 700;
     font-size: 20px;
-}
-
-.answer::before {
-    content: 'A.';
-    display: block;
-    color: var(--darkgray);
-    position: absolute;
-    left: -30px;
-    top: -5px;
-    font-weight: 700;
-    font-size: 20px;
-}
+    margin-right: 8px;
+  }
