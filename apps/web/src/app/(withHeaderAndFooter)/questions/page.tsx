@@ -19,7 +19,7 @@ export default function Page() {
             {
             questionDataNoLogin[questionType]
             .map((data, i) => (
-                <Faq key={i} content={data} />
+                <Faq key={i} number={i} content={data} />
             ))
             }
             <p>その他何かご不明などございましたら、当委員会までお気軽にお問い合わせください！</p>

@@ -353,7 +353,7 @@ type Question = {
   answer: string,
 }
 export const questionDataNoLogin: Record<string, Array<Question>> = {
-  "まるぜろ": [
+  "〜参加申請関連〜": [
     {
       question: "出店の団体名と企画名の違いはなんですか？",
       answer: "団体名は申請していただく団体そのもののお名前で、企画名は工大祭当日に実施する企画を表すお名前です。"
