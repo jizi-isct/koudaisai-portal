@@ -63,7 +63,7 @@ export function DocumentList({documents}: Props) {
       }
       setCategories(categories)
     })()
-  })
+  }, [documents])
 
   const openDocumentModal = (document: Document) => {
     setSelectedDocument(document)
