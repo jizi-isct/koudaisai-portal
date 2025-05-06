@@ -21,8 +21,8 @@
     }
 
     .headerNav {
-        width: 18vw;
-        height: 18vw;
+        width: 70px;
+        height: 70px;
         max-height: 80px;
         max-width: 80px;
         align-items: center;
@@ -31,33 +31,21 @@
         border: 1px solid;
         box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
 
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .text {
         font-size: 10px;
         font-style: normal;
         font-weight: 600;
     }
 
-    .navHome::before{
-        content: "🏠";
+    .emoji {
+        line-height: 25px;
         font-size: 30px;
-        display: block;
-    }
-
-    .navForm::before{
-        content: "📄";
-        font-size: 30px;
-        display: block;
-    }
-
-    .navDocuments::before{
-        content: "📚";
-        font-size: 30px;
-        display: block;
-    }
-
-    .navQuestions::before{
-        content: "🔔";
-        font-size: 30px;
-        display: block;
     }
 
     .members .activeNav {
