@@ -3,6 +3,7 @@ import {useSearchParams} from "next/navigation";
 import {$auth} from '@/lib';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Suspense} from "react";
+import "../../../globals.css";
 
 export default function Login() {
     return (
@@ -37,7 +38,6 @@ function Inner() {
 
     return (
         <div>
-            <h1>ログイン</h1>
             {error && <p style={{color: 'red'}}>{error}</p>}
             {!data && !error && <p>ログイン中...</p>}
         </div>

@@ -6,8 +6,7 @@ export const headerItemsMembers = [
 ];
 
 export const headerItemsAdmin = [
-  {desktopText: "ホーム", mobileText: "ホーム", emoji: "🏠", href: "/admin", class: "navHome"},
+  {desktopText: "ホーム", mobileText: "ホーム", emoji: "🏠", href: "/admin/", class: "navHome"},
   {desktopText: "フォーム", mobileText: "フォーム", emoji: "📄", href: "/admin/forms/", class: "navForm"},
   {desktopText: "資料", mobileText: "資料", emoji: "📚", href: "/admin/documents/", class: "navDocuments"},
-  {desktopText: "よくある質問", mobileText: "FAQ", emoji: "❓", href: "/admin/questions/", class: "navQuestions"}
 ];
