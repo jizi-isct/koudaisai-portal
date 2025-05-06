@@ -1,42 +1,22 @@
 "use client";
-import styles from "./page.module.css";
-import Forms from "@/components/Forms/Lists/Lists";
-import {$apiMembers, Form} from "@/lib";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ContentList, Heading1} from "@/components/generic";
+import {formDataNoLogin} from "@/lib/lib";
+import React from "react";
 
 export default function Page() {
     return (
-        <QueryClientProvider client={new QueryClient()}>
-            <Inner/>
-        </QueryClientProvider>
+      <>
+        <Heading1 emoji="📃">フォーム一覧</Heading1>
+        <ContentList
+          contents={
+            formDataNoLogin.map((form, i) => ({
+              title: form.title,
+              onClick: () => {
+                window.location.assign(form.url)
+              }
+            }))
+          }
+        />
+      </>
     )
-}
-
-function Inner() {
-  const {data, error} = $apiMembers.useQuery(
-        "get",
-        "/forms"
-    )
-
-    if (error) return <p>データの取得に失敗しました</p>;
-    if (!data) return <p>読み込み中...</p>;
-
-    return (
-        <div className={styles.page}>
-            <main className={styles.main}>
-                <div className={styles.formsWrapper}>
-                  {data.map((form: Form) => (
-                        <Forms
-                          formId={form.form_id!}
-                            title={form.info.title}
-                            status={"未回答"}
-                            dueDate={form.info.deadline}
-                            summary={form.info.description}
-                            key={form.form_id}
-                        />
-                    ))}
-                </div>
-            </main>
-        </div>
-    );
 }
