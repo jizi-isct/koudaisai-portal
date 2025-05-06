@@ -8,7 +8,7 @@ export const topPageData = {
         children: <>
           参加説明会に出席！<br/>
           説明会は5/14(水)と5/16(金)に実施<br/>
-          資料は<Link href={""}>こちら</Link>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -16,7 +16,7 @@ export const topPageData = {
         children: <>
           参加申請をしよう！<br/>
           申請期間は5/14(水)から6/18(水)まで<br/>
-          参加申請のフォームは<Link href={""}>こちら</Link>
+          参加申請のフォームは<Link href={"/forms"}>こちら</Link>
         </>
       },
       {
@@ -41,7 +41,7 @@ export const topPageData = {
         date: "7/16(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。<br/>
-          資料は[こちら]()から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -64,7 +64,7 @@ export const topPageData = {
         date: "9/24(水)",
         children: <>
           責任者3名に出席していただく必要がございます。<br/>
-          資料は[こちら]()から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -72,7 +72,7 @@ export const topPageData = {
         date: "10/8(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。<br/>
-          資料は[こちら]()から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -90,7 +90,7 @@ export const topPageData = {
         children: <>
           参加説明会に出席！<br/>
           説明会は5/14(水)と5/16(金)に実施<br/>
-          資料は<Link href={""}>こちら</Link>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -98,7 +98,7 @@ export const topPageData = {
         children: <>
           参加申請をしよう！<br/>
           申請期間は5/14(水)から6/18(水)まで<br/>
-          参加申請のフォームは<Link href={""}>こちら</Link>
+          参加申請のフォームは<Link href={"/forms"}>こちら</Link>
         </>
       },
       {
@@ -130,7 +130,7 @@ export const topPageData = {
         date: "7/16(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。
-          資料は<a>こちら</a>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -145,7 +145,7 @@ export const topPageData = {
         date: "9/24(水)",
         children: <>
           責任者のうち1名に出席していただく必要がございます。
-          資料は<a>こちら</a>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -153,7 +153,7 @@ export const topPageData = {
         date: "10/8(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。<br/>
-          資料は<a>こちら</a>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -171,7 +171,7 @@ export const topPageData = {
         children: <>
           参加説明会に出席！<br/>
           説明会は5/14(水)と5/16(金)に実施<br/>
-          資料は<Link href={""}>こちら</Link>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -179,7 +179,7 @@ export const topPageData = {
         children: <>
           参加申請をしよう！<br/>
           申請期間は5/14(水)から6/18(水)まで<br/>
-          参加申請のフォームは<Link href={""}>こちら</Link>
+          参加申請のフォームは<Link href={"/forms"}>こちら</Link>
         </>
       },
       {
@@ -212,7 +212,7 @@ export const topPageData = {
         date: "7/16(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。<br/>
-          資料は<a>こちら</a>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -227,7 +227,7 @@ export const topPageData = {
         date: "10/8(水)",
         children: <>
           全団体に出席義務があり、責任者のうち少なくとも1名の出席が必要です。
-          資料は<a>こちら</a>から
+          資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
       {
@@ -244,8 +244,8 @@ export const topPageData = {
         title: "参加申請を行う",
         date: "5/7(水)13:00～6/18(水)",
         children: <>
-          資料は<a>こちら</a>！<br/>
-          参加申請フォームは<a>こちら</a>
+          資料は<Link href={"/documents"}>こちら</Link>！<br/>
+          参加申請フォームは<Link href={"/forms"}>こちら</Link>
         </>
       },
       {
