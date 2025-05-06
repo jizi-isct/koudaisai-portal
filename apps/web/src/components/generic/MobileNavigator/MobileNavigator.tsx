@@ -17,6 +17,7 @@ export function MobileNavigator({header_type}: Props) {
       {/* ヘッダーのナビゲーションボタン */}
       {(header_type === "members" ? headerItemsMembers : headerItemsAdmin).map(({
                                                                                   mobileText,
+                                                                                  emoji,
                                                                                   href,
                                                                                   class: className
                                                                                 }) => {
@@ -29,7 +30,8 @@ export function MobileNavigator({header_type}: Props) {
             href={href}
             className={`${styles.headerNav} ${styles[className]} ${isActive ? styles.activeNav : styles.inactiveNav}`}
           >
-            <span>{mobileText}</span>
+            <span className={styles.emoji}>{emoji}</span>
+            <span className={styles.text}>{mobileText}</span>
           </Link>
         );
       })}
