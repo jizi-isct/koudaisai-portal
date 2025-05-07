@@ -1,22 +1,22 @@
 "use client";
-import {Heading1} from "@/components/generic";
+import {ContentList, Heading1} from "@/components/generic";
 import React from "react";
+import {formDataNoLogin} from "@/lib/lib";
 
 export default function Page() {
     return (
       <>
         <Heading1 emoji="📃">フォーム一覧</Heading1>
-        <p>😢ここにはまだ何もありません</p>
-        {/*<ContentList*/}
-        {/*  contents={*/}
-        {/*    formDataNoLogin.map((form, i) => ({*/}
-        {/*      title: form.title,*/}
-        {/*      onClick: () => {*/}
-        {/*        window.location.assign(form.url)*/}
-        {/*      }*/}
-        {/*    }))*/}
-        {/*  }*/}
-        {/*/>*/}
+        <ContentList
+          contents={
+            formDataNoLogin.map((form, i) => ({
+              title: form.title,
+              onClick: () => {
+                window.location.assign(form.url)
+              }
+            }))
+          }
+        />
       </>
     )
 }
