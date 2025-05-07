@@ -55,14 +55,14 @@ pub fn init_routes(
 
     let serve_dir =
         ServeDir::new(&web.static_files.web_path).append_index_html_on_directories(true);
-    let admin_serve_dir =
-        ServeDir::new(&web.static_files.admin_path).append_index_html_on_directories(true);
+    // let admin_serve_dir =
+    //     ServeDir::new(&web.static_files.admin_path).append_index_html_on_directories(true);
 
     Router::new()
         .nest("/auth", auth::init_router())
         .nest("/api", api::init_router())
         .fallback_service(get_service(serve_dir))
-        .nest_service("/admin", get_service(admin_serve_dir))
+        // .nest_service("/admin", get_service(admin_serve_dir))
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
         .layer(CorsLayer::permissive())
         .with_state(state)
