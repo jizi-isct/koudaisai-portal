@@ -11,6 +11,7 @@ use uuid::Uuid;
 pub enum DocumentFormat {
     FormatMarkdown { content: String },
     FormatPdf { file_key: String },
+    FormatMisc { file_key: String },
 }
 
 pub enum DocumentWriteActiveModel {
