@@ -31,6 +31,8 @@ pub enum Relation {
     DocumentCategory,
     #[sea_orm(has_one = "super::document_format_markdown::Entity")]
     DocumentFormatMarkdown,
+    #[sea_orm(has_one = "super::document_format_misc::Entity")]
+    DocumentFormatMisc,
     #[sea_orm(has_one = "super::document_format_pdf::Entity")]
     DocumentFormatPdf,
 }
@@ -44,6 +46,12 @@ impl Related<super::document_category::Entity> for Entity {
 impl Related<super::document_format_markdown::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::DocumentFormatMarkdown.def()
+    }
+}
+
+impl Related<super::document_format_misc::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DocumentFormatMisc.def()
     }
 }
 

@@ -5,6 +5,7 @@ pub mod prelude;
 pub mod document;
 pub mod document_category;
 pub mod document_format_markdown;
+pub mod document_format_misc;
 pub mod document_format_pdf;
 pub mod exhibitors_category_booth;
 pub mod exhibitors_category_general;
