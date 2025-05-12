@@ -2,6 +2,7 @@
 import {ContentList, Heading1} from "@/components/generic";
 import React from "react";
 import {formDataNoLogin} from "@/lib/lib";
+import {ContentRow} from "@/components/generic/ContentRow";
 
 export default function Page() {
     return (
@@ -14,7 +15,7 @@ export default function Page() {
               onClick: () => {
                 window.location.assign(form.url)
               }
-            }))
+            })).map((content, i) => <ContentRow content={content} key={`row-${i}`}/>)
           }
         />
       </>

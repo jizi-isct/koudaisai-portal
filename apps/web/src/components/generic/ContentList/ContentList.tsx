@@ -1,10 +1,8 @@
 import styles from "./ContentList.module.css";
-import {Content} from "../lib/types";
-import {ContentRow} from "../ContentRow";
-import React from "react";
+import React, {ReactNode} from "react";
 
 type Props = {
-  contents: Array<Content>
+  contents: Array<ReactNode>
 }
 
 export function ContentList({contents}: Props) {
@@ -14,7 +12,7 @@ export function ContentList({contents}: Props) {
         contents.map((content, i) => (
           <React.Fragment key={`fragment-${i}`}>
             { i > 0 && <div className={styles.separator}/>}
-            <ContentRow content={content} />
+            {content}
           </React.Fragment>
         ))
       }

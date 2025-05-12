@@ -1,9 +1,10 @@
 "use client";
 
 import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl} from "@/lib";
-import {ContentList, Heading2} from "@/components/generic";
+import {Heading2} from "@/components/generic";
 import React, {useEffect, useState} from "react";
 import {DocumentModal} from "../DocumentModal";
+import {ContentListDocument} from "@/components/show_document";
 
 type Props = {
   documents: Array<Document>
@@ -70,7 +71,7 @@ export function DocumentList({documents}: Props) {
     setIsModalOpen(true)
   }
 
-  const handleDocumentDownload = async (document: Document) => {
+  const handleDocumentDownload = (document: Document) => async () => {
     if (document.format_pdf) {
       const key = document.format_pdf.file_key
       const {data, error} = await getDownloadUrl(key)
@@ -94,6 +95,14 @@ export function DocumentList({documents}: Props) {
     }
   }
 
+  const handleDocumentOpen = (document: Document) => async () => {
+    if (document.format_misc) {
+      await handleDocumentDownload(document)()
+    } else {
+      openDocumentModal(document)
+    }
+  }
+
   if (!categories) return "Loading..."
 
 
@@ -103,20 +112,10 @@ export function DocumentList({documents}: Props) {
         categories.map((entry, index) => (
           <React.Fragment key={`fragment-${index}`}>
             <Heading2 emoji={headingEmojis[index % 4]}>{entry[0].title}</Heading2>
-            <ContentList
-              contents={
-                entry[1].map((document, _) => ({
-                  title: document.title!,
-                  onClick:
-                    document.format_misc
-                      ? async () => {
-                        await handleDocumentDownload(document)
-                      }
-                      : () => {
-                        openDocumentModal(document)
-                      }
-                }))
-              }
+            <ContentListDocument
+              documents={entry[1]}
+              handleDownloadDocument={handleDocumentDownload}
+              handleOpenDocument={handleDocumentOpen}
             />
           </React.Fragment>
         ))
