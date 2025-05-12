@@ -5,7 +5,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many --target dev -p backend web-admin web-members --parallel"
+        "command": "nx run-many --target dev -p backend web --parallel"
       }
     }
   }

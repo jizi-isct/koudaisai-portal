@@ -9,6 +9,8 @@ pub enum DocumentFormat {
     Pdf,
     #[sea_orm(string_value = "MARKDOWN")]
     Markdown,
+    #[sea_orm(string_value = "misc")]
+    Misc,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "exhibition_type")]

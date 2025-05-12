@@ -44,7 +44,7 @@ export function EditDocument({categories, document, setDocument}: Props) {
     }
   }
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, format: "pdf" | "misc") => {
     setStatus("ファイルをアップロード中...")
     const {data, error} = await fetchClientAdmin.POST("/files/upload", {
       body: {
@@ -58,12 +58,21 @@ export function EditDocument({categories, document, setDocument}: Props) {
         body: file
       })
 
-      setDocument({
-        ...document,
-        format_pdf: {
-          file_key: data.key!
-        }
-      })
+      if (format === "pdf") {
+        setDocument({
+          ...document,
+          format_pdf: {
+            file_key: data.key!
+          }
+        })
+      } else if (format === "misc") {
+        setDocument({
+          ...document,
+          format_misc: {
+            file_key: data.key!
+          }
+        })
+      }
       setStatus("FILE UPLOAD SUCCESS: " + data.key + "")
     } else {
       setStatus("FILE UPLOAD ERROR: " + error)
@@ -143,7 +152,24 @@ export function EditDocument({categories, document, setDocument}: Props) {
                   <input
                           type="file"
                           accept={"application/pdf"}
-                          onChange={e => handleFileUpload(e.target.files![0])}
+                          onChange={e => handleFileUpload(e.target.files![0], "pdf")}
+                  />
+                </div>
+              </>
+      }
+      {
+        document.format_misc &&
+              <>
+                <div>
+                  <h3>ファイルをアップロードする</h3>
+                  {
+                    document.format_misc.file_key === ""
+                      ? "ファイルをアップロードしてください。"
+                      : "すでにファイルがアップロードされています。"
+                  }
+                  <input
+                          type="file"
+                          onChange={e => handleFileUpload(e.target.files![0], "misc")}
                   />
                 </div>
               </>

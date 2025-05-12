@@ -1,0 +1,7 @@
+description: 任意形式の資料
+type: object
+properties:
+  file_key:
+    type: string
+required:
+  - file_key
