@@ -1,7 +1,7 @@
 "use client";
 
 import {$apiAdmin, Document, DocumentCategory, fetchClientAdmin} from "@/lib";
-import {Button, ContentList, Heading2, TextInput} from "@/components/generic";
+import {Button, ContentList, Heading2, Loading, TextInput} from "@/components/generic";
 import {EditDocumentModal} from "../EditDocumentModal";
 import {CreateDocumentModal} from "../CreateDocumentModal";
 import React, {useState} from "react";
@@ -19,7 +19,7 @@ export function EditDocumentList() {
   const [isEditDocumentModalOpen, setIsEditDocumentModalOpen] = useState(false)
   const [isCreateDocumentModalOpen, setIsCreateDocumentModalOpen] = useState(false)
 
-  if (!categories || !documents) return "Loading..."
+  if (!categories || !documents) return <Loading/>
 
   const categoryDocumentList = new Map<DocumentCategory | undefined, Array<Document>>()
 

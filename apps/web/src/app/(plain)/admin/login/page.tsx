@@ -4,6 +4,8 @@ import {$auth} from '@/lib';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Suspense} from "react";
 import "../../../globals.css";
+import {Loading} from "@/components/generic";
+import styles from "./page.module.css";
 
 export default function Login() {
     return (
@@ -37,9 +39,9 @@ function Inner() {
     }
 
     return (
-        <div>
+      <div className={styles.root}>
             {error && <p style={{color: 'red'}}>{error}</p>}
-            {!data && !error && <p>ログイン中...</p>}
+        {!data && !error && <Loading/>}
         </div>
     );
 }
