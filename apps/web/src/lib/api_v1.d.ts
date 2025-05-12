@@ -1121,6 +1121,7 @@ export interface paths {
             parameters: {
                 query: {
                     key: string;
+                    file_name: string;
                 };
                 header?: never;
                 path?: never;
@@ -1437,10 +1438,12 @@ export interface components {
         /** @description pdf形式の資料 */
         DocumentFormatPdf: {
             file_key: string;
+            file_name: string;
         };
         /** @description 任意形式の資料 */
         DocumentFormatMisc: {
             file_key: string;
+            file_name: string;
         };
         Document: components["schemas"]["DocumentGeneric"] & {
             format_markdown?: components["schemas"]["DocumentFormatMarkdown"];

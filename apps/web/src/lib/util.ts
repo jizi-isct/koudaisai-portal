@@ -8,13 +8,14 @@ export function chunk<T>(array: T[], size: number): T[][] {
   return result;
 }
 
-export async function getDownloadUrl(fileKey: string) {
+export async function getDownloadUrl(fileKey: string, fileName: string) {
   return await fetchClientNoAuth.GET(
     "/files/download",
     {
       params: {
         query: {
-          key: fileKey
+          key: fileKey,
+          file_name: fileName
         }
       }
     }

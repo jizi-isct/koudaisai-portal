@@ -8,6 +8,11 @@ get:
       schema:
         type: string
       required: true
+    - in: query
+      name: file_name
+      schema:
+        type: string
+      required: true
   responses:
     '201':
       description: Changed

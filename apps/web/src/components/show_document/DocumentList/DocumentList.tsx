@@ -74,7 +74,8 @@ export function DocumentList({documents}: Props) {
   const handleDocumentDownload = (document: Document) => async () => {
     if (document.format_pdf) {
       const key = document.format_pdf.file_key
-      const {data, error} = await getDownloadUrl(key)
+      const fileName = document.format_pdf.file_name
+      const {data, error} = await getDownloadUrl(key, fileName)
       if (data) {
         window.open(data.presigned_url)
       } else {
@@ -82,7 +83,8 @@ export function DocumentList({documents}: Props) {
       }
     } else if (document.format_misc) {
       const key = document.format_misc.file_key
-      const {data, error} = await getDownloadUrl(key)
+      const fileName = document.format_misc.file_name
+      const {data, error} = await getDownloadUrl(key, fileName)
       if (data) {
         window.open(data.presigned_url)
       } else {

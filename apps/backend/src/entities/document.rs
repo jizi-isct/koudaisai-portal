@@ -10,8 +10,8 @@ use uuid::Uuid;
 #[serde(rename_all = "snake_case")]
 pub enum DocumentFormat {
     FormatMarkdown { content: String },
-    FormatPdf { file_key: String },
-    FormatMisc { file_key: String },
+    FormatPdf { file_key: String, file_name: String },
+    FormatMisc { file_key: String, file_name: String },
 }
 
 pub enum DocumentWriteActiveModel {
@@ -73,18 +73,26 @@ impl DocumentCreate {
                     content: Set(content),
                 },
             ),
-            DocumentFormat::FormatPdf { file_key } => DocumentWriteActiveModel::Pdf(
+            DocumentFormat::FormatPdf {
+                file_key,
+                file_name,
+            } => DocumentWriteActiveModel::Pdf(
                 generic,
                 sea_orm_entities::document_format_pdf::ActiveModel {
                     id: Set(id),
                     file_key: Set(file_key),
+                    file_name: Set(file_name),
                 },
             ),
-            DocumentFormat::FormatMisc { file_key } => DocumentWriteActiveModel::Misc(
+            DocumentFormat::FormatMisc {
+                file_key,
+                file_name,
+            } => DocumentWriteActiveModel::Misc(
                 generic,
                 sea_orm_entities::document_format_misc::ActiveModel {
                     id: Set(id),
                     file_key: Set(file_key),
+                    file_name: Set(file_name),
                 },
             ),
         }
@@ -212,18 +220,26 @@ impl DocumentUpdate {
                     },
                 )
             }
-            Some(DocumentFormat::FormatPdf { file_key }) => DocumentUpdateActiveModel::Pdf(
+            Some(DocumentFormat::FormatPdf {
+                file_key,
+                file_name,
+            }) => DocumentUpdateActiveModel::Pdf(
                 generic,
                 sea_orm_entities::document_format_pdf::ActiveModel {
                     id: Set(id),
                     file_key: Set(file_key),
+                    file_name: Set(file_name),
                 },
             ),
-            Some(DocumentFormat::FormatMisc { file_key }) => DocumentUpdateActiveModel::Misc(
+            Some(DocumentFormat::FormatMisc {
+                file_key,
+                file_name,
+            }) => DocumentUpdateActiveModel::Misc(
                 generic,
                 sea_orm_entities::document_format_misc::ActiveModel {
                     id: Set(id),
                     file_key: Set(file_key),
+                    file_name: Set(file_name),
                 },
             ),
             None => DocumentUpdateActiveModel::Generic(generic),
@@ -299,6 +315,7 @@ impl DocumentRead {
             category: generic.category.unwrap(),
             format: DocumentFormat::FormatPdf {
                 file_key: pdf.file_key,
+                file_name: pdf.file_name,
             },
             required_one_of_scopes: generic.required_one_of_scopes,
         }
@@ -318,6 +335,7 @@ impl DocumentRead {
             category: generic.category.unwrap(),
             format: DocumentFormat::FormatMisc {
                 file_key: misc.file_key,
+                file_name: misc.file_name,
             },
             required_one_of_scopes: generic.required_one_of_scopes,
         }
