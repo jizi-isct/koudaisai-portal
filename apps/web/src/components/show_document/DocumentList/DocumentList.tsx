@@ -1,6 +1,6 @@
 "use client";
 
-import {Document, DocumentCategory, fetchClientNoAuth} from "@/lib";
+import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl} from "@/lib";
 import {ContentList, Heading2} from "@/components/generic";
 import React, {useEffect, useState} from "react";
 import {DocumentModal} from "../DocumentModal";
@@ -70,6 +70,30 @@ export function DocumentList({documents}: Props) {
     setIsModalOpen(true)
   }
 
+  const handleDocumentDownload = async (document: Document) => {
+    if (document.format_pdf) {
+      const key = document.format_pdf.file_key
+      const {data, error} = await getDownloadUrl(key)
+      if (data) {
+        window.open(data.presigned_url)
+      } else {
+        alert("資料ダウンロード中にエラーが発生しました。: " + error)
+      }
+    } else if (document.format_misc) {
+      const key = document.format_misc.file_key
+      const {data, error} = await getDownloadUrl(key)
+      if (data) {
+        window.open(data.presigned_url)
+      } else {
+        alert("資料ダウンロード中にエラーが発生しました。: " + error)
+      }
+    } else if (document.format_markdown) {
+      const blob = new Blob([document.format_markdown.content], {type: "text/markdown;charset=utf-8;"})
+      const url = URL.createObjectURL(blob)
+      window.open(url)
+    }
+  }
+
   if (!categories) return "Loading..."
 
 
@@ -81,11 +105,16 @@ export function DocumentList({documents}: Props) {
             <Heading2 emoji={headingEmojis[index % 4]}>{entry[0].title}</Heading2>
             <ContentList
               contents={
-                entry[1].map((document, i) => ({
+                entry[1].map((document, _) => ({
                   title: document.title!,
-                  onClick: () => {
-                    openDocumentModal(document)
-                  }
+                  onClick:
+                    document.format_misc
+                      ? async () => {
+                        await handleDocumentDownload(document)
+                      }
+                      : () => {
+                        openDocumentModal(document)
+                      }
                 }))
               }
             />

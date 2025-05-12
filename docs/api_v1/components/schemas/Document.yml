@@ -6,3 +6,5 @@ allOf:
         $ref: ./DocumentFormatMarkdown.yml
       format_pdf:
         $ref: ./DocumentFormatPdf.yml
+      format_misc:
+        $ref: ./DocumentFormatMisc.yml

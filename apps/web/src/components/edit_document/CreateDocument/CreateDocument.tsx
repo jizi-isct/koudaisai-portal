@@ -22,14 +22,15 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
   })
   const [error, setError] = useState<string | null>(null)
 
-  const handleFormatChange = (format: "pdf" | "markdown") => {
+  const handleFormatChange = (format: "pdf" | "markdown" | "misc") => {
     if (format === "pdf") {
       setDocument({
         ...document,
         format_pdf: {
           file_key: ""
         },
-        format_markdown: undefined
+        format_markdown: undefined,
+        format_misc: undefined,
       })
     } else if (format === "markdown") {
       setDocument({
@@ -37,7 +38,17 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
         format_markdown: {
           content: ""
         },
-        format_pdf: undefined
+        format_pdf: undefined,
+        format_misc: undefined
+      })
+    } else if (format === "misc") {
+      setDocument({
+        ...document,
+        format_markdown: undefined,
+        format_pdf: undefined,
+        format_misc: {
+          file_key: ""
+        },
       })
     }
   }
@@ -67,6 +78,11 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
           <input type="radio" name="format" checked={document.format_markdown !== undefined}
                  onChange={() => handleFormatChange("markdown")}/>
           <span>Markdown</span>
+        </div>
+        <div>
+          <input type="radio" name="format" checked={document.format_misc !== undefined}
+                 onChange={() => handleFormatChange("misc")}/>
+          <span>ファイル</span>
         </div>
       </div>
       <EditDocument categories={categories} document={document} setDocument={setDocument}/>
