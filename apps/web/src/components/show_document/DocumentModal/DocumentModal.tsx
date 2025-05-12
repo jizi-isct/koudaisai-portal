@@ -23,6 +23,7 @@ export function DocumentModal({document, isModalOpen, setModalOpen}: Props) {
           params: {
             query: {
               key: document.format_pdf.file_key,
+              file_name: document.format_pdf.file_name
             }
           }
         })

@@ -62,14 +62,16 @@ export function EditDocument({categories, document, setDocument}: Props) {
         setDocument({
           ...document,
           format_pdf: {
-            file_key: data.key!
+            file_key: data.key!,
+            file_name: file.name,
           }
         })
       } else if (format === "misc") {
         setDocument({
           ...document,
           format_misc: {
-            file_key: data.key!
+            file_key: data.key!,
+            file_name: file.name,
           }
         })
       }
