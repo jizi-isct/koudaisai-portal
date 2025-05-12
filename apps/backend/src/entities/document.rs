@@ -241,8 +241,8 @@ impl DocumentUpdate {
             DocumentUpdateActiveModel::Pdf(mut generic, mut pdf) => {
                 DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
             }
-            DocumentUpdateActiveModel::Misc(mut generic, mut pdf) => {
-                DocumentRead::from_misc(generic.update(db_conn).await?, pdf.update(db_conn).await?)
+            DocumentUpdateActiveModel::Misc(mut generic, mut misc) => {
+                DocumentRead::from_misc(generic.update(db_conn).await?, misc.update(db_conn).await?)
             }
             DocumentUpdateActiveModel::Generic(generic) => {
                 DocumentRead::from(generic.update(db_conn).await?, db_conn).await?
