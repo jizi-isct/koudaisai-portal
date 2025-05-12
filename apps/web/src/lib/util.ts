@@ -1,4 +1,5 @@
 import {fetchClientNoAuth} from "@/lib/api";
+import {useCallback} from "react";
 
 export function chunk<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -20,4 +21,20 @@ export async function getDownloadUrl(fileKey: string, fileName: string) {
       }
     }
   )
+}
+
+export function useDownload() {
+  return useCallback(
+    (url: string, fileName: string) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+    }, []
+  );
 }
