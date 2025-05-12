@@ -23,6 +23,10 @@ pub enum DocumentWriteActiveModel {
         sea_orm_entities::document::ActiveModel,
         sea_orm_entities::document_format_pdf::ActiveModel,
     ),
+    Misc(
+        sea_orm_entities::document::ActiveModel,
+        sea_orm_entities::document_format_misc::ActiveModel,
+    ),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -42,6 +46,9 @@ impl DocumentCreate {
             }
             DocumentFormat::FormatPdf { .. } => {
                 sea_orm_entities::sea_orm_active_enums::DocumentFormat::Pdf
+            }
+            DocumentFormat::FormatMisc { .. } => {
+                sea_orm_entities::sea_orm_active_enums::DocumentFormat::Misc
             }
         };
 
@@ -73,6 +80,13 @@ impl DocumentCreate {
                     file_key: Set(file_key),
                 },
             ),
+            DocumentFormat::FormatMisc { file_key } => DocumentWriteActiveModel::Misc(
+                generic,
+                sea_orm_entities::document_format_misc::ActiveModel {
+                    id: Set(id),
+                    file_key: Set(file_key),
+                },
+            ),
         }
     }
 
@@ -84,6 +98,9 @@ impl DocumentCreate {
             ),
             DocumentWriteActiveModel::Pdf(generic, pdf) => {
                 DocumentRead::from_pdf(generic.insert(db_conn).await?, pdf.insert(db_conn).await?)
+            }
+            DocumentWriteActiveModel::Misc(generic, misc) => {
+                DocumentRead::from_misc(generic.insert(db_conn).await?, misc.insert(db_conn).await?)
             }
         })
     }
@@ -108,6 +125,11 @@ impl DocumentCreate {
                 pdf.id = Set(id);
                 DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
             }
+            DocumentWriteActiveModel::Misc(mut generic, mut misc) => {
+                generic.id = Set(id);
+                misc.id = Set(id);
+                DocumentRead::from_misc(generic.update(db_conn).await?, misc.update(db_conn).await?)
+            }
         })
     }
 }
@@ -119,6 +141,10 @@ pub enum DocumentUpdateActiveModel {
     Pdf(
         sea_orm_entities::document::ActiveModel,
         sea_orm_entities::document_format_pdf::ActiveModel,
+    ),
+    Misc(
+        sea_orm_entities::document::ActiveModel,
+        sea_orm_entities::document_format_misc::ActiveModel,
     ),
     Generic(sea_orm_entities::document::ActiveModel),
 }
@@ -150,6 +176,9 @@ impl DocumentUpdate {
             }
             Some(DocumentFormat::FormatPdf { .. }) => {
                 Set(sea_orm_entities::sea_orm_active_enums::DocumentFormat::Pdf)
+            }
+            Some(DocumentFormat::FormatMisc { .. }) => {
+                Set(sea_orm_entities::sea_orm_active_enums::DocumentFormat::Misc)
             }
         };
         let category = match self.category {
@@ -190,6 +219,13 @@ impl DocumentUpdate {
                     file_key: Set(file_key),
                 },
             ),
+            Some(DocumentFormat::FormatMisc { file_key }) => DocumentUpdateActiveModel::Misc(
+                generic,
+                sea_orm_entities::document_format_misc::ActiveModel {
+                    id: Set(id),
+                    file_key: Set(file_key),
+                },
+            ),
             None => DocumentUpdateActiveModel::Generic(generic),
         }
     }
@@ -204,6 +240,9 @@ impl DocumentUpdate {
             }
             DocumentUpdateActiveModel::Pdf(mut generic, mut pdf) => {
                 DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
+            }
+            DocumentUpdateActiveModel::Misc(mut generic, mut pdf) => {
+                DocumentRead::from_misc(generic.update(db_conn).await?, pdf.update(db_conn).await?)
             }
             DocumentUpdateActiveModel::Generic(generic) => {
                 DocumentRead::from(generic.update(db_conn).await?, db_conn).await?
@@ -265,6 +304,25 @@ impl DocumentRead {
         }
     }
 
+    pub fn from_misc(
+        generic: sea_orm_entities::document::Model,
+        misc: sea_orm_entities::document_format_misc::Model,
+    ) -> DocumentRead {
+        DocumentRead {
+            id: generic.id,
+            created_at: generic.created_at.unwrap().to_utc(),
+            updated_at: generic.updated_at.unwrap().to_utc(),
+            created_by: generic.created_by,
+            updated_by: generic.updated_by,
+            title: generic.title,
+            category: generic.category.unwrap(),
+            format: DocumentFormat::FormatMisc {
+                file_key: misc.file_key,
+            },
+            required_one_of_scopes: generic.required_one_of_scopes,
+        }
+    }
+
     pub async fn from(value: sea_orm_entities::document::Model, db_conn: &DbConn) -> Result<Self> {
         match value.format {
             sea_orm_entities::sea_orm_active_enums::DocumentFormat::Markdown => {
@@ -284,6 +342,14 @@ impl DocumentRead {
                     .ok_or(anyhow::anyhow!("Document not found"))?;
 
                 Ok(Self::from_pdf(value, pdf))
+            }
+            sea_orm_entities::sea_orm_active_enums::DocumentFormat::Misc => {
+                let misc = sea_orm_entities::document_format_misc::Entity::find_by_id(value.id)
+                    .one(db_conn)
+                    .await?
+                    .ok_or(anyhow::anyhow!("Document not found"))?;
+
+                Ok(Self::from_misc(value, misc))
             }
         }
     }

@@ -85,7 +85,7 @@ impl MigrationTrait for Migration {
             .execute(Statement::from_string(
                 manager.get_database_backend(),
                 r#"
-                ALTER TABLE document ALTER COLUMN format TYPE document_format;
+                ALTER TABLE document ALTER COLUMN format TYPE document_format USING format::document_format;
                 "#
                 .trim(),
             ))
