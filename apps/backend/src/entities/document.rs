@@ -32,7 +32,7 @@ pub enum DocumentWriteActiveModel {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCreate {
     pub title: String,
-    pub category: Uuid,
+    pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
     pub required_one_of_scopes: Vec<String>,
@@ -61,7 +61,7 @@ impl DocumentCreate {
             updated_by: Set(created_by),
             title: Set(self.title),
             format: Set(format),
-            category: Set(Some(self.category)),
+            category: Set(self.category),
             required_one_of_scopes: Set(self.required_one_of_scopes),
         };
 
@@ -275,7 +275,7 @@ pub struct DocumentRead {
     pub created_by: Uuid,
     pub updated_by: Uuid,
     pub title: String,
-    pub category: Uuid,
+    pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
     pub required_one_of_scopes: Vec<String>,
@@ -293,7 +293,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatMarkdown {
                 content: markdown.content,
             },
@@ -312,7 +312,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatPdf {
                 file_key: pdf.file_key,
                 file_name: pdf.file_name,
@@ -332,7 +332,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatMisc {
                 file_key: misc.file_key,
                 file_name: misc.file_name,

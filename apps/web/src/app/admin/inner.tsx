@@ -1,6 +1,6 @@
 "use client";
 
-import "./globals.css";
+import "../globals.css";
 import {getTokensAdmin, Tokens} from "@/lib";
 import {ReactNode, useEffect, useState} from "react";
 

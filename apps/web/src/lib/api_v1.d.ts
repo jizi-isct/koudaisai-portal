@@ -762,14 +762,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Changed */
-                201: {
+                /** @description 削除成功 */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": components["schemas"]["Document"][];
-                    };
+                    content?: never;
                 };
                 /** @description 資格情報が無効だった場合 */
                 401: {
@@ -981,8 +979,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Changed */
-                201: {
+                /** @description 削除成功 */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1428,7 +1426,7 @@ export interface components {
             updated_by?: string;
             title?: string;
             /** Format: uuid */
-            category?: string;
+            category?: string | null;
             required_one_of_scopes?: string[];
         };
         /** @description マークダウン形式の資料 */

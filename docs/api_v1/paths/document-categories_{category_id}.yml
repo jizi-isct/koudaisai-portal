@@ -72,8 +72,8 @@ delete:
         type: string
         format: uuid
   responses:
-    '201':
-      description: Changed
+    '204':
+      description: 削除成功
     '401':
       description: 資格情報が無効だった場合
     '404':

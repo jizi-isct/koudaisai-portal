@@ -25,6 +25,9 @@
 .heading {
     filter: drop-shadow(0 0 4px white);
     font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
 }
 
 @media screen and (max-width: 700px) {
