@@ -3,22 +3,32 @@ use crate::sea_orm_entities::document_category::Entity;
 use crate::sea_orm_entities::document_category::Model;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait};
+use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCategoryWrite {
-    pub title: String,
+    pub title: Option<String>,
+    pub emoji: Option<Option<String>>,
 }
 
 impl DocumentCategoryWrite {
     pub fn into_active_model(self, id: Uuid) -> sea_orm_entities::document_category::ActiveModel {
+        let title = match self.title {
+            Some(title) => Set(title),
+            None => NotSet,
+        };
+        let emoji = match self.emoji {
+            Some(emoji) => Set(emoji),
+            None => NotSet,
+        };
         sea_orm_entities::document_category::ActiveModel {
             id: Set(id),
             created_at: Default::default(),
             updated_at: Default::default(),
-            title: Set(self.title),
+            title,
+            emoji,
         }
     }
 
@@ -46,6 +56,7 @@ pub struct DocumentCategoryRead {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub title: String,
+    pub emoji: Option<String>,
 }
 
 impl From<Model> for DocumentCategoryRead {
@@ -55,6 +66,7 @@ impl From<Model> for DocumentCategoryRead {
             created_at: value.created_at.unwrap().to_utc(),
             updated_at: value.updated_at.unwrap().to_utc(),
             title: value.title,
+            emoji: value.emoji,
         }
     }
 }

@@ -411,42 +411,6 @@ impl DocumentRead {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DocumentCategoryWrite {
-    pub title: String,
-}
-
-impl Into<sea_orm_entities::document_category::ActiveModel> for DocumentCategoryWrite {
-    fn into(self) -> sea_orm_entities::document_category::ActiveModel {
-        let id = Uuid::new_v4();
-        sea_orm_entities::document_category::ActiveModel {
-            id: Set(id),
-            created_at: Default::default(),
-            updated_at: Default::default(),
-            title: Set(self.title),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DocumentCategoryRead {
-    pub id: Uuid,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub title: String,
-}
-
-impl From<sea_orm_entities::document_category::Model> for DocumentCategoryRead {
-    fn from(value: sea_orm_entities::document_category::Model) -> Self {
-        DocumentCategoryRead {
-            id: value.id,
-            created_at: value.created_at.unwrap().to_utc(),
-            updated_at: value.updated_at.unwrap().to_utc(),
-            title: value.title,
-        }
-    }
-}
-
 pub async fn delete_document(id: Uuid, db_conn: &DbConn) -> Result<u64, DbErr> {
     let result = sea_orm_entities::document::Entity::delete_by_id(id)
         .exec(db_conn)

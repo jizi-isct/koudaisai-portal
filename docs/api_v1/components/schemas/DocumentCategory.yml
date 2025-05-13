@@ -15,5 +15,6 @@ properties:
     readOnly: true
   title:
     type: string
-required:
-  - title
+  emoji:
+    type: string
+    nullable: true

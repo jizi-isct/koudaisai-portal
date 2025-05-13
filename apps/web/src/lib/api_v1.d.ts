@@ -1456,7 +1456,8 @@ export interface components {
             readonly created_at?: string;
             /** Format: date-time */
             readonly updated_at?: string;
-            title: string;
+          title?: string;
+          emoji?: string | null;
         };
     };
     responses: never;
