@@ -6,6 +6,9 @@ type Props = {
 }
 
 export function ContentList({contents}: Props) {
+  if (contents.length === 0) {
+    return <></>;
+  }
   return (
     <div className={styles.root}>
       {

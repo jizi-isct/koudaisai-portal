@@ -24,8 +24,8 @@ export default function RootLayout({
         <Header header_type="members"  />
         <main className="content">
           {children}
-          <MobileNavigator header_type="members"/>
         </main>
+        <MobileNavigator header_type="members"/>
         <Footer />
       </body>
     </html>
