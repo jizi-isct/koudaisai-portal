@@ -294,25 +294,29 @@ type Form = {
 }
 
 export const formDataNoLogin: Array<Form> = [
-  // {
-  //   title: "模擬店企画参加申請フォーム",
-  //   url: "https://forms.gle/bATDgsuBDqx2c8TF8"
-  // },
-  // {
-  //   title: "一般企画参加申請フォーム",
-  //   url: "https://docs.google.com/forms/d/e/1FAIpQLSf9t96fVPYlrKkGD5rwOJXFG9eWNAVdRzKkZ2fbR3hv6ZZ47g/viewform"
-  // },
-  // {
-  //   title: "ステージ企画参加申請フォーム",
-  //   url: "https://forms.gle/3YJV7mwsd47R9vU1A"
-  // },
-  // {
-  //   title: "講義室利用希望フォーム",
-  //   url: "https://forms.gle/j2wxNAZ94tKUb7rs6"
-  // },
+  {
+    title: "模擬店企画参加申請フォーム",
+    url: "https://forms.gle/bATDgsuBDqx2c8TF8"
+  },
+  {
+    title: "一般企画参加申請フォーム",
+    url: "https://docs.google.com/forms/d/e/1FAIpQLSf9t96fVPYlrKkGD5rwOJXFG9eWNAVdRzKkZ2fbR3hv6ZZ47g/viewform"
+  },
+  {
+    title: "ステージ企画参加申請フォーム",
+    url: "https://forms.gle/3YJV7mwsd47R9vU1A"
+  },
   {
     title: "研究室企画参加申請フォーム",
     url: "https://forms.gle/bULS65eE1oL2tVic7"
+  },
+  {
+    title: "講義室利用希望フォーム",
+    url: "https://forms.gle/j2wxNAZ94tKUb7rs6"
+  },
+  {
+    title: "テーマソング募集フォーム",
+    url: "https://forms.gle/pAXBAMkvFN8P268g6"
   }
 ]
 
