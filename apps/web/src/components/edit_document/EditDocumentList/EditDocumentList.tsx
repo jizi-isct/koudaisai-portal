@@ -51,7 +51,8 @@ export function EditDocumentList() {
     await patchDocumentCategory(
       {
         body: {
-          title: category.title
+          title: category.title,
+          emoji: category.emoji
         },
         params: {
           path: {
@@ -126,23 +127,23 @@ export function EditDocumentList() {
                   documentCategory={entry[0]}
                   setDocumentCategory={handleDocumentCategoryEdit}
                   deleteDocumentCategory={handleDocumentCategoryDelete(entry[0])}
-                  emoji={headingEmojis[index % 4]!}
+                  emoji={headingEmojis[index % 4]}
                 /> :
                 <Heading2 emoji={"⚠️"}>カテゴリなし</Heading2>
             }
             <ContentList
               contents={
                 entry[1].map((document, i) => ({
-                  title: document.title!,
-                  onClick: () => {
-                    openEditDocumentModal(document)
+                  title: document.title ?? "ERROR: DOCUMENT TITLE NOT FOUND",
+                  onClick: async () => {
+                    await openEditDocumentModal(document)
                   }
-                })).concat({
+                })).concat(entry[0] ? {
                   title: "➕ 資料を追加",
-                  onClick: () => {
-                    openCreateDocumentModal(entry[0]!)
+                  onClick: async () => {
+                    await openCreateDocumentModal(entry[0]!)
                   }
-                }).map((content, i) =>
+                } : []).map((content, i) =>
                   <ContentRow key={`row-${i}`} content={content}/>
                 )
               }
@@ -157,13 +158,16 @@ export function EditDocumentList() {
         isModalOpen={isEditDocumentModalOpen}
         setModalOpen={setIsEditDocumentModalOpen}
       />
-      <CreateDocumentModal
-        categories={categories}
-        initialCategory={selectedDocumentCategory!}
-        isModalOpen={isCreateDocumentModalOpen}
-        setModalOpen={setIsCreateDocumentModalOpen}
-        onCreate={onDocumentCreate}
-      />
+      {
+        selectedDocumentCategory &&
+              <CreateDocumentModal
+                      categories={categories}
+                      initialCategory={selectedDocumentCategory}
+                      isModalOpen={isCreateDocumentModalOpen}
+                      setModalOpen={setIsCreateDocumentModalOpen}
+                      onCreate={onDocumentCreate}
+              />
+      }
     </div>
   )
 }
@@ -193,13 +197,14 @@ function DocumentCategoryHeading({
 
   return (
     <>
-      <Heading2 emoji={emoji}>
+      <Heading2 emoji={documentCategory.emoji ?? emoji}>
         {documentCategory.title}
         <ButtonIcon iconType={"edit"} onClick={handleEdit}/>
         <ButtonIcon iconType={"delete"} onClick={handleDelete}/>
       </Heading2>
       <Modal isOpen={isEditModalOpen} setOpen={setIsEditModalOpen}>
-        <EditDocumentCategory documentCategory={documentCategory} setDocumentCategory={setDocumentCategory}/>
+        <EditDocumentCategory documentCategory={documentCategory} setDocumentCategory={setDocumentCategory}
+                              finish={() => setIsEditModalOpen(false)}/>
       </Modal>
     </>
   )

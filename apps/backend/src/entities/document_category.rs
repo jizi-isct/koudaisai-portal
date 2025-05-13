@@ -9,7 +9,9 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCategoryWrite {
+    #[serde(default)]
     pub title: Option<String>,
+    #[serde(default)]
     pub emoji: Option<Option<String>>,
 }
 
