@@ -12,6 +12,7 @@ mod m20250430_064809_rename_column_file_url_of_document_format_pdf;
 mod m20250501_161327_create_trigger_update_document_modtime;
 mod m20250509_065506_add_document_format_misc;
 mod m20250509_072250_rename_column_file_url_of_document_format_misc;
+mod m20250512_110316_add_column_file_name;
 
 pub struct Migrator;
 
@@ -33,6 +34,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250501_161327_create_trigger_update_document_modtime::Migration),
             Box::new(m20250509_065506_add_document_format_misc::Migration),
             Box::new(m20250509_072250_rename_column_file_url_of_document_format_misc::Migration),
+            Box::new(m20250512_110316_add_column_file_name::Migration),
         ]
     }
 }

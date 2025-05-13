@@ -16,7 +16,8 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
     title: "",
     category: initialCategory.id,
     format_pdf: {
-      file_key: ""
+      file_key: "",
+      file_name: ""
     },
     required_one_of_scopes: []
   })
@@ -27,7 +28,8 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
       setDocument({
         ...document,
         format_pdf: {
-          file_key: ""
+          file_key: "",
+          file_name: ""
         },
         format_markdown: undefined,
         format_misc: undefined,
@@ -47,7 +49,8 @@ export function CreateDocument({categories, onCreate, initialCategory}: Props) {
         format_markdown: undefined,
         format_pdf: undefined,
         format_misc: {
-          file_key: ""
+          file_key: "",
+          file_name: "",
         },
       })
     }

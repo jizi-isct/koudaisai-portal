@@ -3,5 +3,8 @@ type: object
 properties:
   file_key:
     type: string
+  file_name:
+    type: string
 required:
   - file_key
+  - file_name

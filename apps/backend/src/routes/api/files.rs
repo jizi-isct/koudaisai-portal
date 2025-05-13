@@ -70,6 +70,7 @@ async fn post_files_upload(
 #[derive(Deserialize, Serialize, Debug)]
 struct GetFilesDownloadParams {
     key: String,
+    file_name: String,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -88,6 +89,7 @@ async fn get_files_download(
         .get_object()
         .bucket(state.s3_bucket.clone())
         .key(&params.key)
+        .response_content_disposition(format!(r#"attachment; filename="{}""#, params.file_name))
         .presigned(
             PresigningConfig::builder()
                 .expires_in(Duration::from_secs(60 * 10)) // 10 分
