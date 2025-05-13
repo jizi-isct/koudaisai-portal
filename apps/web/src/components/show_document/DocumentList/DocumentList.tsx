@@ -1,6 +1,6 @@
 "use client";
 
-import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl} from "@/lib";
+import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl, useDownload} from "@/lib";
 import {Heading2} from "@/components/generic";
 import React, {useEffect, useState} from "react";
 import {DocumentModal} from "../DocumentModal";
@@ -13,15 +13,11 @@ type Props = {
 const headingEmojis = ["📕", "📗", "📘", "📙"];
 
 export function DocumentList({documents}: Props) {
-  console.log("a")
   const category_ids = new Map<string | undefined, Array<Document>>()
-  console.log("b")
   const [categories, setCategories] = useState<Array<[DocumentCategory, Array<Document>]>>([])
-  console.log("c")
   const [selectedDocument, setSelectedDocument] = useState<Document>({})
-  console.log("d")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  console.log("e")
+  const download = useDownload()
 
   for (const document of documents) {
     category_ids.set(document.category, (category_ids.get(document.category) ?? []).concat(document))
@@ -77,7 +73,7 @@ export function DocumentList({documents}: Props) {
       const fileName = document.format_pdf.file_name
       const {data, error} = await getDownloadUrl(key, fileName)
       if (data) {
-        window.open(data.presigned_url)
+        download(data.presigned_url!, fileName)
       } else {
         alert("資料ダウンロード中にエラーが発生しました。: " + error)
       }
@@ -86,14 +82,14 @@ export function DocumentList({documents}: Props) {
       const fileName = document.format_misc.file_name
       const {data, error} = await getDownloadUrl(key, fileName)
       if (data) {
-        window.open(data.presigned_url)
+        download(data.presigned_url!, fileName)
       } else {
         alert("資料ダウンロード中にエラーが発生しました。: " + error)
       }
     } else if (document.format_markdown) {
       const blob = new Blob([document.format_markdown.content], {type: "text/markdown;charset=utf-8;"})
       const url = URL.createObjectURL(blob)
-      window.open(url)
+      download(url, `${document.title}.md`)
     }
   }
 
