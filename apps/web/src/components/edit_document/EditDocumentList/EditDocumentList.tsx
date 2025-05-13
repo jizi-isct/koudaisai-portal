@@ -6,7 +6,7 @@ import {EditDocumentModal} from "../EditDocumentModal";
 import {CreateDocumentModal} from "../CreateDocumentModal";
 import React, {useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
-import {ContentRow} from "@/components/generic/ContentRow";
+import {EditDocumentRaw} from "@/components/edit_document/EditDocumentRaw";
 
 const headingEmojis = ["📕", "📗", "📘", "📙"];
 
@@ -123,7 +123,7 @@ export function EditDocumentList() {
                     openCreateDocumentModal(entry[0]!)
                   }
                 }).map((content, i) =>
-                  <ContentRow key={`row-${i}`} content={content}/>
+                  <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={openEditDocumentModal} handleDeleteDocument={openEditDocumentModal} />
                 )
               }
             />
