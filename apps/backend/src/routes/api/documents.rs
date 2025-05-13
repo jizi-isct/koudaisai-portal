@@ -164,7 +164,7 @@ async fn delete_document(
                 if affected_rows == 0 {
                     Ok((StatusCode::NOT_FOUND, "Not Found".into_response()))
                 } else {
-                    Ok((StatusCode::OK, "OK".into_response()))
+                    Ok((StatusCode::NO_CONTENT, "".into_response()))
                 }
             }
             Err(err) => {
