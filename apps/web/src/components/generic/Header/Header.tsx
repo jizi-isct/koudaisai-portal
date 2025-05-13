@@ -3,13 +3,13 @@
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import {usePathname} from "next/navigation";
 import {isLoggedInAdmin, isLoggedInMembers} from "@/lib";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 
 const adminLogo = "/components/generic/Header/admin_logo.jpg"
-const membersLogo = "/components/generic/Header/members_logo.svg"
+const membersLogo = "/components/generic/Header/members_logo.png"
 const accountIcon = "/components/generic/Header/icon_account.svg"
 const arrowIcon = "/components/generic/Header/arrow.svg"
 

@@ -13,7 +13,7 @@ export function Hero() {
             開催日：11/2(日), 11/3(月・祝)
           </p>
 
-          <p className={styles.deadline}>
+          <div className={styles.deadline}>
             参加申込期間：
             <ul>
               <li>
@@ -26,7 +26,7 @@ export function Hero() {
               </li>
               <li>研究室:5/7(水)～6/18(水)</li>
             </ul>
-          </p>
+          </div>
         </div>
 
       </section>

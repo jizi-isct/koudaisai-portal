@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import {getTokensMembers} from "@/lib";
-import {Heading2, Steps, Tab, Header, Footer, MobileNavigator} from "@/components/generic";
+import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
 import "../globals.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
@@ -28,7 +28,7 @@ export default function Page() {
     }
 
     window.addEventListener("scroll", handleScroll)
-  })
+  }, [])
 
   return (
     <>
