@@ -76,8 +76,8 @@ delete:
         type: string
         format: uuid
   responses:
-    '201':
-      description: Changed
+    '200':
+      description: OK
       content:
         application/json:
           schema:

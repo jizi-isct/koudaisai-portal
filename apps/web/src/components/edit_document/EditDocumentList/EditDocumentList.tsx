@@ -92,7 +92,7 @@ export function EditDocumentList() {
         }
       }
     })
-    await queryClient.invalidateQueries({ queryKey: ["/documents"] });
+    await queryClient.refetchQueries({ queryKey: ["/documents"] })
   }
 
   const onDocumentCreate = async () => {
