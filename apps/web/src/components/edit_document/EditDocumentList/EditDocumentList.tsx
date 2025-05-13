@@ -84,6 +84,17 @@ export function EditDocumentList() {
     await queryClient.refetchQueries()
   }
 
+  const handleDeleteDocument = async (document: Document) => {
+    await fetchClientAdmin.DELETE("/documents/{document_id}", {
+      params: {
+        path: {
+          document_id: document.id!
+        }
+      }
+    })
+    await queryClient.invalidateQueries({ queryKey: ["/documents"] });
+  }
+
   const onDocumentCreate = async () => {
     await queryClient.refetchQueries()
   }
@@ -116,6 +127,9 @@ export function EditDocumentList() {
                   title: document.title!,
                   onClick: () => {
                     openEditDocumentModal(document)
+                  },
+                  onDelete: () => {
+                    handleDeleteDocument(document)
                   }
                 })).concat({
                   title: "➕ 資料を追加",
@@ -123,7 +137,7 @@ export function EditDocumentList() {
                     openCreateDocumentModal(entry[0]!)
                   }
                 }).map((content, i) =>
-                  <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={openEditDocumentModal} handleDeleteDocument={openEditDocumentModal} />
+                  <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={content.onClick} handleDeleteDocument={content.onDelete} />
                 )
               }
             />

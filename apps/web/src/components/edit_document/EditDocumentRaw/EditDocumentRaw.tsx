@@ -16,8 +16,11 @@ export function EditDocumentRaw({document, handleOpenDocument, handleDeleteDocum
           {document.title}
         </span>
       </div>
-      <div className={styles.download} onClick={handleDeleteDocument}>
-        <Image src={"/generic/download.svg"} width={24} height={24} alt={"ダウンロード"}/>
+      <div 
+        className={styles.download}
+        style={{ display: handleDeleteDocument ? 'flex' : 'none' }}
+        onClick={handleDeleteDocument} >
+        <Image src={"/generic/delete.svg"} width={24} height={24} alt={"ダウンロード"}/>
         <span>削除</span>
       </div>
     </div>
