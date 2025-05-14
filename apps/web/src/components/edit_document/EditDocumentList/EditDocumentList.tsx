@@ -7,7 +7,6 @@ import {CreateDocumentModal} from "../CreateDocumentModal";
 import React, {useMemo, useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
 import {EditDocumentRaw} from "@/components/edit_document/EditDocumentRaw";
-import {ContentRow} from "@/components/generic/ContentRow";
 import {EditDocumentCategory} from "@/components/edit_document";
 
 const headingEmojis = ["📕", "📗", "📘", "📙"];
@@ -152,10 +151,14 @@ export function EditDocumentList() {
                   },
                   onDelete: () => {
                     handleDeleteDocument(document)
-                })).concat(entry[0] ? {
+                  }
+                })).concat({
                   title: "➕ 資料を追加",
                   onClick: async () => {
                     await openCreateDocumentModal(entry[0]!)
+                  },
+                  onDelete: () => {
+                    return
                   }
                 }).map((content, i) =>
                   <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={content.onClick} handleDeleteDocument={content.onDelete} />

@@ -5,7 +5,7 @@ import Image from "next/image";
 type Props = {
     document: Document,
     handleOpenDocument: () => void,
-    handleDeleteDocument: () => void
+  handleDeleteDocument?: () => void
 }
 
 export function EditDocumentRaw({document, handleOpenDocument, handleDeleteDocument}: Props) {
