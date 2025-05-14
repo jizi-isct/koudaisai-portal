@@ -77,13 +77,7 @@ delete:
         format: uuid
   responses:
     '204':
-      description: No Content
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: "../components/schemas/Document.yml"
+      description: 削除成功
     '401':
       description: 資格情報が無効だった場合
     '404':

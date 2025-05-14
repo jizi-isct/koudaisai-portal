@@ -13,8 +13,9 @@ export function Tab({tabs}: Props) {
     <>
       <div className={styles.tabs}>
         {
-          Array.from(tabs.entries()).map((entry) => (
-            <a className={`${entry[0] === selectedTab ? styles.tabSelected : ""} ${styles.tab}`} onClick={() => setSelectedTab(entry[0])}>
+          Array.from(tabs.entries()).map((entry, i) => (
+            <a key={`tab-${i}`} className={`${entry[0] === selectedTab ? styles.tabSelected : ""} ${styles.tab}`}
+               onClick={() => setSelectedTab(entry[0])}>
               {entry[0]}
             </a>
           ))

@@ -32,7 +32,7 @@ pub enum DocumentWriteActiveModel {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCreate {
     pub title: String,
-    pub category: Uuid,
+    pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
     pub required_one_of_scopes: Vec<String>,
@@ -61,7 +61,7 @@ impl DocumentCreate {
             updated_by: Set(created_by),
             title: Set(self.title),
             format: Set(format),
-            category: Set(Some(self.category)),
+            category: Set(self.category),
             required_one_of_scopes: Set(self.required_one_of_scopes),
         };
 
@@ -275,7 +275,7 @@ pub struct DocumentRead {
     pub created_by: Uuid,
     pub updated_by: Uuid,
     pub title: String,
-    pub category: Uuid,
+    pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
     pub required_one_of_scopes: Vec<String>,
@@ -293,7 +293,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatMarkdown {
                 content: markdown.content,
             },
@@ -312,7 +312,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatPdf {
                 file_key: pdf.file_key,
                 file_name: pdf.file_name,
@@ -332,7 +332,7 @@ impl DocumentRead {
             created_by: generic.created_by,
             updated_by: generic.updated_by,
             title: generic.title,
-            category: generic.category.unwrap(),
+            category: generic.category,
             format: DocumentFormat::FormatMisc {
                 file_key: misc.file_key,
                 file_name: misc.file_name,
@@ -408,42 +408,6 @@ impl DocumentRead {
         }
 
         Ok(documents)
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DocumentCategoryWrite {
-    pub title: String,
-}
-
-impl Into<sea_orm_entities::document_category::ActiveModel> for DocumentCategoryWrite {
-    fn into(self) -> sea_orm_entities::document_category::ActiveModel {
-        let id = Uuid::new_v4();
-        sea_orm_entities::document_category::ActiveModel {
-            id: Set(id),
-            created_at: Default::default(),
-            updated_at: Default::default(),
-            title: Set(self.title),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DocumentCategoryRead {
-    pub id: Uuid,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub title: String,
-}
-
-impl From<sea_orm_entities::document_category::Model> for DocumentCategoryRead {
-    fn from(value: sea_orm_entities::document_category::Model) -> Self {
-        DocumentCategoryRead {
-            id: value.id,
-            created_at: value.created_at.unwrap().to_utc(),
-            updated_at: value.updated_at.unwrap().to_utc(),
-            title: value.title,
-        }
     }
 }
 

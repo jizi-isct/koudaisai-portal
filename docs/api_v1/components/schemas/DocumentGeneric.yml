@@ -23,6 +23,7 @@ properties:
   category:
     type: string
     format: uuid
+    nullable: true
   required_one_of_scopes:
     type: array
     items:

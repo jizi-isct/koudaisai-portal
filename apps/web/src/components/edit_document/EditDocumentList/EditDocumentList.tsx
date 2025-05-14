@@ -1,55 +1,82 @@
 "use client";
 
 import {$apiAdmin, Document, DocumentCategory, fetchClientAdmin} from "@/lib";
-import {Button, ContentList, Heading2, Loading, TextInput} from "@/components/generic";
+import {Button, ButtonIcon, ContentList, Heading2, Loading, Modal} from "@/components/generic";
 import {EditDocumentModal} from "../EditDocumentModal";
 import {CreateDocumentModal} from "../CreateDocumentModal";
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
 import {EditDocumentRaw} from "@/components/edit_document/EditDocumentRaw";
+import {ContentRow} from "@/components/generic/ContentRow";
+import {EditDocumentCategory} from "@/components/edit_document";
 
 const headingEmojis = ["📕", "📗", "📘", "📙"];
 
 export function EditDocumentList() {
   const queryClient = useQueryClient()
-  const {data: categories} = $apiAdmin.useQuery("get", "/document-categories")
-  const {data: documents} = $apiAdmin.useQuery("get", "/documents")
+  const {mutateAsync: patchDocumentCategory} = $apiAdmin.useMutation("patch", "/document-categories/{category_id}")
+  const {mutateAsync: deleteDocumentCategory} = $apiAdmin.useMutation("delete", "/document-categories/{category_id}")
+  const {data: categories, refetch: refetchCategories} = $apiAdmin.useQuery("get", "/document-categories")
+  const {data: documents, refetch: refetchDocuments} = $apiAdmin.useQuery("get", "/documents")
   const [selectedDocument, setSelectedDocument] = useState<Document>({})
   const [selectedDocumentCategory, setSelectedDocumentCategory] = useState<DocumentCategory>()
   const [isEditDocumentModalOpen, setIsEditDocumentModalOpen] = useState(false)
   const [isCreateDocumentModalOpen, setIsCreateDocumentModalOpen] = useState(false)
+  const categoryDocumentList = useMemo(() => {
+    const categoryDocumentList = new Map<DocumentCategory | undefined, Array<Document>>()
 
-  if (!categories || !documents) return <Loading/>
+    if (!categories || !documents) return undefined
 
-  const categoryDocumentList = new Map<DocumentCategory | undefined, Array<Document>>()
+    for (const category of categories) {
+      categoryDocumentList.set(category, [])
+    }
 
-  for (const category of categories) {
-    categoryDocumentList.set(category, [])
-  }
+    for (const document of documents) {
+      const category = categories
+        .filter(
+          (category) => category.id === document.category
+        )[0]
+      categoryDocumentList.set(
+        category,
+        (categoryDocumentList.get(category) ?? []).concat(document)
+      )
+    }
 
-  for (const document of documents) {
-    const category = categories
-      .filter(
-        (category) => category.id === document.category
-      )[0]
-    categoryDocumentList.set(
-      category,
-      (categoryDocumentList.get(category) ?? []).concat(document)
-    )
-  }
+    return categoryDocumentList
+  }, [categories, documents])
 
-  const handleDocumentCategoryEdit = async (category: DocumentCategory, title: string) => {
-    await fetchClientAdmin.PATCH("/document-categories/{category_id}", {
-      body: {
-        title: title
-      },
-      params: {
-        path: {
-          category_id: category.id!
+  if (!categoryDocumentList || !categories) return <Loading/>
+
+
+  const handleDocumentCategoryEdit = async (category: DocumentCategory) => {
+    await patchDocumentCategory(
+      {
+        body: {
+          title: category.title,
+          emoji: category.emoji
+        },
+        params: {
+          path: {
+            category_id: category.id!
+          }
         }
       }
-    })
-    await queryClient.refetchQueries()
+    )
+    await refetchCategories()
+    await refetchDocuments()
+  }
+
+  const handleDocumentCategoryDelete = (category: DocumentCategory) => async () => {
+    await deleteDocumentCategory(
+      {
+        params: {
+          path: {
+            category_id: category.id!
+          }
+        }
+      }
+    )
+    await refetchCategories()
   }
 
   const openEditDocumentModal = async (document: Document) => {
@@ -81,7 +108,7 @@ export function EditDocumentList() {
         title: "新規カテゴリー"
       }
     })
-    await queryClient.refetchQueries()
+    await refetchCategories()
   }
 
   const handleDeleteDocument = async (document: Document) => {
@@ -99,8 +126,6 @@ export function EditDocumentList() {
     await queryClient.refetchQueries()
   }
 
-  if (!categories) return "Loading..."
-
 
   return (
     <div>
@@ -108,19 +133,16 @@ export function EditDocumentList() {
       {
         [...categoryDocumentList].map((entry, index) => (
           <React.Fragment key={`fragment-${index}`}>
-            <Heading2 emoji={headingEmojis[index % 4]}>
-              {
-                entry[0]
-                  ? <TextInput
-                    value={entry[0]?.title}
-                    setValue={str => {
-                      handleDocumentCategoryEdit(entry[0]!, str)
-                    }}
-                    paragraph={false}
-                  />
-                  : "カテゴリなし"
-              }
-            </Heading2>
+            {
+              entry[0] ?
+                <DocumentCategoryHeading
+                  documentCategory={entry[0]}
+                  setDocumentCategory={handleDocumentCategoryEdit}
+                  deleteDocumentCategory={handleDocumentCategoryDelete(entry[0])}
+                  emoji={headingEmojis[index % 4]}
+                /> :
+                <Heading2 emoji={"⚠️"}>カテゴリなし</Heading2>
+            }
             <ContentList
               contents={
                 entry[1].map((document, i) => ({
@@ -130,11 +152,10 @@ export function EditDocumentList() {
                   },
                   onDelete: () => {
                     handleDeleteDocument(document)
-                  }
-                })).concat({
+                })).concat(entry[0] ? {
                   title: "➕ 資料を追加",
-                  onClick: () => {
-                    openCreateDocumentModal(entry[0]!)
+                  onClick: async () => {
+                    await openCreateDocumentModal(entry[0]!)
                   }
                 }).map((content, i) =>
                   <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={content.onClick} handleDeleteDocument={content.onDelete} />
@@ -151,13 +172,54 @@ export function EditDocumentList() {
         isModalOpen={isEditDocumentModalOpen}
         setModalOpen={setIsEditDocumentModalOpen}
       />
-      <CreateDocumentModal
-        categories={categories}
-        initialCategory={selectedDocumentCategory!}
-        isModalOpen={isCreateDocumentModalOpen}
-        setModalOpen={setIsCreateDocumentModalOpen}
-        onCreate={onDocumentCreate}
-      />
+      {
+        selectedDocumentCategory &&
+              <CreateDocumentModal
+                      categories={categories}
+                      initialCategory={selectedDocumentCategory}
+                      isModalOpen={isCreateDocumentModalOpen}
+                      setModalOpen={setIsCreateDocumentModalOpen}
+                      onCreate={onDocumentCreate}
+              />
+      }
     </div>
+  )
+}
+
+type DocumentCategoryHeadingProps = {
+  documentCategory: DocumentCategory,
+  setDocumentCategory: ((documentCategory: DocumentCategory) => void | Promise<void>),
+  deleteDocumentCategory: (() => void | Promise<void>),
+  emoji: string
+}
+
+function DocumentCategoryHeading({
+                                   documentCategory,
+                                   setDocumentCategory,
+                                   deleteDocumentCategory,
+                                   emoji
+                                 }: DocumentCategoryHeadingProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  const handleEdit = () => {
+    setIsEditModalOpen(true)
+  }
+
+  const handleDelete = async () => {
+    await deleteDocumentCategory()
+  }
+
+  return (
+    <>
+      <Heading2 emoji={documentCategory.emoji ?? emoji}>
+        {documentCategory.title}
+        <ButtonIcon iconType={"edit"} onClick={handleEdit}/>
+        <ButtonIcon iconType={"delete"} onClick={handleDelete}/>
+      </Heading2>
+      <Modal isOpen={isEditModalOpen} setOpen={setIsEditModalOpen}>
+        <EditDocumentCategory documentCategory={documentCategory} setDocumentCategory={setDocumentCategory}
+                              finish={() => setIsEditModalOpen(false)}/>
+      </Modal>
+    </>
   )
 }
