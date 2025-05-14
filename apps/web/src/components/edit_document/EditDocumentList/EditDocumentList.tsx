@@ -6,6 +6,7 @@ import {EditDocumentModal} from "../EditDocumentModal";
 import {CreateDocumentModal} from "../CreateDocumentModal";
 import React, {useMemo, useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
+import {EditDocumentRaw} from "@/components/edit_document/EditDocumentRaw";
 import {ContentRow} from "@/components/generic/ContentRow";
 import {EditDocumentCategory} from "@/components/edit_document";
 
@@ -110,6 +111,17 @@ export function EditDocumentList() {
     await refetchCategories()
   }
 
+  const handleDeleteDocument = async (document: Document) => {
+    await fetchClientAdmin.DELETE("/documents/{document_id}", {
+      params: {
+        path: {
+          document_id: document.id!
+        }
+      }
+    })
+    await queryClient.refetchQueries()
+  }
+
   const onDocumentCreate = async () => {
     await queryClient.refetchQueries()
   }
@@ -134,17 +146,19 @@ export function EditDocumentList() {
             <ContentList
               contents={
                 entry[1].map((document, i) => ({
-                  title: document.title ?? "ERROR: DOCUMENT TITLE NOT FOUND",
-                  onClick: async () => {
-                    await openEditDocumentModal(document)
-                  }
+                  title: document.title!,
+                  onClick: () => {
+                    openEditDocumentModal(document)
+                  },
+                  onDelete: () => {
+                    handleDeleteDocument(document)
                 })).concat(entry[0] ? {
                   title: "➕ 資料を追加",
                   onClick: async () => {
                     await openCreateDocumentModal(entry[0]!)
                   }
-                } : []).map((content, i) =>
-                  <ContentRow key={`row-${i}`} content={content}/>
+                }).map((content, i) =>
+                  <EditDocumentRaw key={`row-${i}`} document={content} handleOpenDocument={content.onClick} handleDeleteDocument={content.onDelete} />
                 )
               }
             />
