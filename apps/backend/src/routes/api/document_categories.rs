@@ -103,7 +103,7 @@ async fn delete_document_category(
 ) -> AppResponse {
     if let CurrentUser::Admin(..) = current_user {
         if document_category::delete_document_category(category_id, &state.db_conn).await? > 0 {
-            Ok((StatusCode::OK, "Deleted.".into_response()))
+            Ok((StatusCode::NO_CONTENT, ().into_response()))
         } else {
             Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
         }

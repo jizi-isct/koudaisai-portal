@@ -13,6 +13,7 @@ mod m20250501_161327_create_trigger_update_document_modtime;
 mod m20250509_065506_add_document_format_misc;
 mod m20250509_072250_rename_column_file_url_of_document_format_misc;
 mod m20250512_110316_add_column_file_name;
+mod m20250513_161809_add_column_emoji_to_table_document_category;
 
 pub struct Migrator;
 
@@ -35,6 +36,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250509_065506_add_document_format_misc::Migration),
             Box::new(m20250509_072250_rename_column_file_url_of_document_format_misc::Migration),
             Box::new(m20250512_110316_add_column_file_name::Migration),
+            Box::new(m20250513_161809_add_column_emoji_to_table_document_category::Migration),
         ]
     }
 }

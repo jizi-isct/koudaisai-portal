@@ -1,4 +1,5 @@
 export * from "./Button";
+export * from "./ButtonIcon"
 export * from "./TextInput"
 export * from "./Heading2"
 export * from "./Step"

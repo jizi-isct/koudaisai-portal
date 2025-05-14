@@ -26,7 +26,7 @@ export function Modal({isOpen, setOpen, children}: Props) {
 
   useEffect(() => {
     setAppElement(document.getElementById("app"));
-  })
+  }, [])
 
 
   return (

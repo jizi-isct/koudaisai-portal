@@ -1,7 +1,7 @@
 "use client";
 
 import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl, useDownload} from "@/lib";
-import {Heading2} from "@/components/generic";
+import {Heading2, Loading} from "@/components/generic";
 import React, {useEffect, useState} from "react";
 import {DocumentModal} from "../DocumentModal";
 import {ContentListDocument} from "@/components/show_document";
@@ -13,7 +13,7 @@ type Props = {
 const headingEmojis = ["📕", "📗", "📘", "📙"];
 
 export function DocumentList({documents}: Props) {
-  const category_ids = new Map<string | undefined, Array<Document>>()
+  const category_ids = new Map<string | null | undefined, Array<Document>>()
   const [categories, setCategories] = useState<Array<[DocumentCategory, Array<Document>]>>([])
   const [selectedDocument, setSelectedDocument] = useState<Document>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -101,7 +101,7 @@ export function DocumentList({documents}: Props) {
     }
   }
 
-  if (!categories) return "Loading..."
+  if (!categories) return <Loading/>
 
 
   return (
@@ -109,7 +109,7 @@ export function DocumentList({documents}: Props) {
       {
         categories.map((entry, index) => (
           <React.Fragment key={`fragment-${index}`}>
-            <Heading2 emoji={headingEmojis[index % 4]}>{entry[0].title}</Heading2>
+            <Heading2 emoji={entry[0].emoji ?? headingEmojis[index % 4]}>{entry[0].title}</Heading2>
             <ContentListDocument
               documents={entry[1]}
               handleDownloadDocument={handleDocumentDownload}

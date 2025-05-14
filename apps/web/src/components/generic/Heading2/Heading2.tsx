@@ -19,7 +19,7 @@ export function Heading2({children, emoji}: Props) {
         <span className={styles.emojiBackground}>{emoji}</span>
         {emoji}
       </span>
-      <span className={styles.heading}>{children}</span>
+      <div className={styles.heading}>{children}</div>
     </h1>
   )
 }

@@ -21,6 +21,9 @@ export function EditDocument({categories, document, setDocument}: Props) {
   }
 
   const handleCategoryChange = (id: string) => {
+    if (id === "__null__") {
+      console.error("INVALID CATEGORY ID: " + id + "")
+    }
     setDocument({
       ...document,
       category: id
@@ -102,9 +105,12 @@ export function EditDocument({categories, document, setDocument}: Props) {
       </div>
       <div>
         <h3>カテゴリ</h3>
-        <select value={document.category} onChange={e => handleCategoryChange(e.target.value)}>
+        <select value={document.category ?? "__null__"} onChange={e => handleCategoryChange(e.target.value)}>
           {
             categories?.map((data, i) => <option key={`option-${i}`} value={data.id}>{data.title}</option>)
+          }
+          {
+            document.category ?? <option key={`option-null`} value={"__null__"}>カテゴリなし</option>
           }
         </select>
       </div>
