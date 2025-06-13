@@ -10,7 +10,7 @@ get:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/DocumentCategory.yml"
+              $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -28,14 +28,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/DocumentCategory.yml"
+          $ref: "../components/schemas/document_category/CreateDocumentCategory.yml"
   responses:
     '201':
       description: Changed
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/DocumentCategory.yml"
+            $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':

@@ -632,7 +632,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Document"][];
+                        "application/json": components["schemas"]["ReadDocument"][];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -662,7 +662,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["Document"];
+                    "application/json": components["schemas"]["CreateDocument"];
                 };
             };
             responses: {
@@ -672,7 +672,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Document"];
+                        "application/json": components["schemas"]["ReadDocument"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -691,6 +691,69 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/by-category": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 資料カテゴリと資料のマップを取得
+         * @description ### authの違いによる挙動の違い
+         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
+         *     - **admin_oidcの場合**: 存在する資料を全て取得可能
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 空のカテゴリも含めるかどうか。デフォルトは`false`。
+                     *     `true`の場合、資料が存在しないカテゴリも含まれる。
+                     *      */
+                    include_empty_categories?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            category: components["schemas"]["ReadDocumentCategory"] | null;
+                            documents: components["schemas"]["ReadDocument"][];
+                        }[];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -728,7 +791,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Document"];
+                        "application/json": components["schemas"]["ReadDocument"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -800,7 +863,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["Document"];
+                    "application/json": components["schemas"]["UpdateDocument"];
                 };
             };
             responses: {
@@ -810,7 +873,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Document"][];
+                        "application/json": components["schemas"]["ReadDocument"][];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -854,7 +917,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DocumentCategory"][];
+                        "application/json": components["schemas"]["ReadDocumentCategory"][];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -884,7 +947,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["DocumentCategory"];
+                    "application/json": components["schemas"]["CreateDocumentCategory"];
                 };
             };
             responses: {
@@ -894,7 +957,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DocumentCategory"];
+                        "application/json": components["schemas"]["ReadDocumentCategory"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -945,7 +1008,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DocumentCategory"];
+                        "application/json": components["schemas"]["ReadDocumentCategory"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -1017,7 +1080,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["DocumentCategory"];
+                    "application/json": components["schemas"]["UpdateDocumentCategory"];
                 };
             };
             responses: {
@@ -1027,7 +1090,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DocumentCategory"][];
+                        "application/json": components["schemas"]["ReadDocumentCategory"][];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -1068,7 +1131,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        file_name?: string;
+                        file_name: string;
                     };
                 };
             };
@@ -1080,8 +1143,8 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            presigned_url?: string;
-                            key?: string;
+                            presigned_url: string;
+                            key: string;
                         };
                     };
                 };
@@ -1413,51 +1476,113 @@ export interface components {
                 [key: string]: components["schemas"]["Answer"];
             };
         };
-        DocumentGeneric: {
+        ReadDocumentGeneric: {
             /** Format: uuid */
-            readonly id?: string;
+            id: string;
             /** Format: date-time */
-            readonly created_at?: string;
+            created_at: string;
             /** Format: date-time */
-            readonly updated_at?: string;
+            updated_at: string;
             /** Format: uuid */
-            created_by?: string;
+            created_by: string;
             /** Format: uuid */
-            updated_by?: string;
+            updated_by: string;
+            title: string;
+            /** Format: uuid */
+            category: string | null;
+            required_one_of_scopes: string[];
+        };
+        /** @description マークダウン形式の資料 */
+        ReadDocumentFormatMarkdown: {
+            content: string;
+        };
+        /** @description pdf形式の資料 */
+        ReadDocumentFormatPdf: {
+            file_key: string;
+            file_name: string;
+        };
+        /** @description 任意形式の資料 */
+        ReadDocumentFormatMisc: {
+            file_key: string;
+            file_name: string;
+        };
+        ReadDocument: components["schemas"]["ReadDocumentGeneric"] & {
+            format_markdown?: components["schemas"]["ReadDocumentFormatMarkdown"];
+            format_pdf?: components["schemas"]["ReadDocumentFormatPdf"];
+            format_misc?: components["schemas"]["ReadDocumentFormatMisc"];
+        };
+        CreateDocumentGeneric: {
+            title: string;
+            /** Format: uuid */
+            category: string | null;
+            required_one_of_scopes: string[];
+        };
+        /** @description マークダウン形式の資料 */
+        CreateDocumentFormatMarkdown: {
+            content: string;
+        };
+        /** @description pdf形式の資料 */
+        CreateDocumentFormatPdf: {
+            file_key: string;
+            file_name: string;
+        };
+        /** @description 任意形式の資料 */
+        CreateDocumentFormatMisc: {
+            file_key: string;
+            file_name: string;
+        };
+        CreateDocument: components["schemas"]["CreateDocumentGeneric"] & {
+            format_markdown?: components["schemas"]["CreateDocumentFormatMarkdown"];
+            format_pdf?: components["schemas"]["CreateDocumentFormatPdf"];
+            format_misc?: components["schemas"]["CreateDocumentFormatMisc"];
+        };
+        /** @description 資料のカテゴリー */
+        ReadDocumentCategory: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            title: string;
+            emoji: string | null;
+        };
+        UpdateDocumentGeneric: {
             title?: string;
             /** Format: uuid */
             category?: string | null;
             required_one_of_scopes?: string[];
         };
         /** @description マークダウン形式の資料 */
-        DocumentFormatMarkdown: {
+        UpdateDocumentFormatMarkdown: {
             content: string;
         };
         /** @description pdf形式の資料 */
-        DocumentFormatPdf: {
+        UpdateDocumentFormatPdf: {
             file_key: string;
             file_name: string;
         };
         /** @description 任意形式の資料 */
-        DocumentFormatMisc: {
+        UpdateDocumentFormatMisc: {
             file_key: string;
             file_name: string;
         };
-        Document: components["schemas"]["DocumentGeneric"] & {
-            format_markdown?: components["schemas"]["DocumentFormatMarkdown"];
-            format_pdf?: components["schemas"]["DocumentFormatPdf"];
-            format_misc?: components["schemas"]["DocumentFormatMisc"];
+        UpdateDocument: (components["schemas"]["UpdateDocumentGeneric"] & {
+            format_markdown?: components["schemas"]["UpdateDocumentFormatMarkdown"];
+        }) | (components["schemas"]["UpdateDocumentGeneric"] & {
+            format_pdf?: components["schemas"]["UpdateDocumentFormatPdf"];
+        }) | (components["schemas"]["UpdateDocumentGeneric"] & {
+            format_misc?: components["schemas"]["UpdateDocumentFormatMisc"];
+        }) | components["schemas"]["UpdateDocumentGeneric"];
+        /** @description 資料のカテゴリー */
+        CreateDocumentCategory: {
+            title: string;
+            emoji: string | null;
         };
         /** @description 資料のカテゴリー */
-        DocumentCategory: {
-            /** Format: uuid */
-            readonly id?: string;
-            /** Format: date-time */
-            readonly created_at?: string;
-            /** Format: date-time */
-            readonly updated_at?: string;
-          title?: string;
-          emoji?: string | null;
+        UpdateDocumentCategory: {
+            title?: string;
+            emoji?: string | null;
         };
     };
     responses: never;

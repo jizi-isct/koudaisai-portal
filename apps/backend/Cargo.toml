@@ -31,3 +31,4 @@ tower-http = { version = "0.6.2", features = ["fs", "cors"] }
 base64url = "0.1.0"
 aws-config = "1.6.2"
 aws-sdk-s3 = "1.83.0"
+linked-hash-map = "0.5.6"

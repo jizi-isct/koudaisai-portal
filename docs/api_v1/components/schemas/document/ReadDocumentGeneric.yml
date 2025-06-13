@@ -1,0 +1,36 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time
+  created_by:
+    type: string
+    format: uuid
+  updated_by:
+    type: string
+    format: uuid
+  title:
+    type: string
+  category:
+    type: string
+    format: uuid
+    nullable: true
+  required_one_of_scopes:
+    type: array
+    items:
+      type: string
+required:
+  - id
+  - created_at
+  - updated_at
+  - created_by
+  - updated_by
+  - title
+  - category
+  - required_one_of_scopes

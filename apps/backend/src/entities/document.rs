@@ -6,7 +6,7 @@ use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotS
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentFormat {
     FormatMarkdown { content: String },
@@ -158,7 +158,6 @@ pub enum DocumentUpdateActiveModel {
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentUpdate {
-    pub updated_by: Uuid,
     #[serde(default)]
     pub title: Option<String>,
     #[serde(default)]
@@ -171,8 +170,11 @@ pub struct DocumentUpdate {
 }
 
 impl DocumentUpdate {
-    fn into_active_model(self, id: Uuid) -> DocumentUpdateActiveModel {
-        let updated_by = Set(self.updated_by);
+    /// Converts the DocumentUpdate into an ActiveModel for updating the document.
+    /// # Arguments
+    /// * `id` - The ID of the document to update.
+    /// * `updated_by` - The ID of the user who is updating the document.
+    fn into_active_model(self, id: Uuid, updated_by: Uuid) -> DocumentUpdateActiveModel {
         let title = match self.title {
             None => NotSet,
             Some(title) => Set(title),
@@ -203,7 +205,7 @@ impl DocumentUpdate {
             created_at: Default::default(),
             updated_at: Default::default(),
             created_by: Default::default(),
-            updated_by,
+            updated_by: Set(updated_by),
             title,
             format,
             category,
@@ -246,8 +248,18 @@ impl DocumentUpdate {
         }
     }
 
-    pub async fn update(self, id: Uuid, db_conn: &DbConn) -> Result<DocumentRead> {
-        Ok(match self.into_active_model(id) {
+    /// Updates the document in the database.
+    /// # Arguments
+    /// * `id` - The ID of the document to update.
+    /// * `updated_by` - The ID of the user who is updating the document.
+    /// * `db_conn` - The database connection to use for the update.
+    pub async fn update(
+        self,
+        id: Uuid,
+        updated_by: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<DocumentRead> {
+        Ok(match self.into_active_model(id, updated_by) {
             DocumentUpdateActiveModel::Markdown(mut generic, mut markdown) => {
                 DocumentRead::from_markdown(
                     generic.update(db_conn).await?,
@@ -267,7 +279,7 @@ impl DocumentUpdate {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DocumentRead {
     pub id: Uuid,
     pub created_at: DateTime<Utc>,

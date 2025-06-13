@@ -62,3 +62,7 @@ export const $apiAdmin = createClient(fetchClientAdmin)
 export const fetchClientNoAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
 
 export const $apiNoAuth = createClient(fetchClientNoAuth)
+
+export type apiQueryClientType = typeof $apiNoAuth
+
+export type apiClientType = typeof fetchClientNoAuth

@@ -1,7 +1,7 @@
 "use client";
 
 import {Document, DocumentCategory, fetchClientNoAuth, getDownloadUrl, useDownload} from "@/lib";
-import {Heading2, Loading} from "@/components/generic";
+import {Heading2, LoadingScreen} from "@/components/generic";
 import React, {useEffect, useState} from "react";
 import {DocumentModal} from "../DocumentModal";
 import {ContentListDocument} from "@/components/show_document";
@@ -101,7 +101,7 @@ export function DocumentList({documents}: Props) {
     }
   }
 
-  if (!categories) return <Loading/>
+  if (!categories) return <LoadingScreen/>
 
 
   return (

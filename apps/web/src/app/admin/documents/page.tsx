@@ -2,7 +2,9 @@
 
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1} from "@/components/generic";
-import {EditDocumentList} from "@/components/edit_document";
+import {WriteDocumentProvider} from "@/contexts/WriteDocumentContext";
+import {$apiAdmin} from "@/lib";
+import {ManageDocuments} from "@/components/document/common/ManageDocuments";
 
 export default function Page() {
   return (
@@ -14,9 +16,9 @@ export default function Page() {
 
 function Inner() {
   return (
-    <div>
+    <WriteDocumentProvider queryClient={$apiAdmin}>
       <Heading1 emoji={"📚"}>資料管理画面</Heading1>
-      <EditDocumentList/>
-    </div>
+      <ManageDocuments/>
+    </WriteDocumentProvider>
   )
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import {Heading1, Loading} from "@/components/generic"
+import {Heading1, LoadingScreen} from "@/components/generic"
 import {DocumentList} from "@/components/show_document";
 import {$apiNoAuth} from "@/lib";
 
@@ -26,7 +26,7 @@ function Inner() {
   return (
     <>
       <Heading1 emoji="📚">資料一覧</Heading1>
-      {documents ? <DocumentList documents={documents}/> : <Loading/>}
+      {documents ? <DocumentList documents={documents}/> : <LoadingScreen/>}
     </>
   )
 }
