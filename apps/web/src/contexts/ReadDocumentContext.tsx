@@ -4,15 +4,15 @@ import {apiQueryClientType, DocumentCategoryRead, DocumentRead} from "@/lib";
 interface ReadDocumentContextType {
   documents: Array<{ category: DocumentCategoryRead | null, documents: DocumentRead[] }> | undefined;
   isLoading: boolean;
-  error: Error | null;
-  refreshDocuments: () => Promise<void>;
+  fetchError: Error | null;
+  refetch: () => Promise<void>;
 }
 
 const ReadDocumentContext = createContext<ReadDocumentContextType>({
   documents: undefined,
   isLoading: false,
-  error: null,
-  refreshDocuments: async () => {
+  fetchError: null,
+  refetch: async () => {
     return
   },
 });
@@ -26,34 +26,31 @@ type ReadDocumentProviderProps = {
 
 export function ReadDocumentProvider({children, queryClient}: ReadDocumentProviderProps) {
   // state
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [fetchError, setFetchError] = useState<Error | null>(null);
 
   // React Query
-  const {data: documents, refetch} = queryClient.useQuery("get", "/documents/by-category");
+  const {data: documents, refetch: refetch_, isLoading} = queryClient.useQuery("get", "/documents/by-category");
+
 
   // Callbacks
-  const refreshDocuments = useCallback(async () => {
-    setIsLoading(true);
+  const refetch = useCallback(async () => {
     try {
-      await refetch();
+      await refetch_();
     } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setIsLoading(false);
+      setFetchError(err instanceof Error ? err : new Error(String(err)));
     }
-  }, [refetch]);
+  }, [refetch_]);
 
   const contextValue = useMemo(() => ({
     documents,
     isLoading,
-    error,
-    refreshDocuments,
+    fetchError,
+    refetch,
   }), [
     documents,
     isLoading,
-    error,
-    refreshDocuments
+    fetchError,
+    refetch
   ]);
 
   return (
