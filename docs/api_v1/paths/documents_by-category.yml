@@ -1,0 +1,46 @@
+get:
+  summary: 資料カテゴリと資料のマップを取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
+    - **admin_oidcの場合**: 存在する資料を全て取得可能
+  tags:
+    - documents
+  parameters:
+    - in: query
+      name: include_empty_categories
+      schema:
+        type: boolean
+      description: |
+        空のカテゴリも含めるかどうか。デフォルトは`false`。
+        `true`の場合、資料が存在しないカテゴリも含まれる。
+      required: false
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                category:
+                  allOf:
+                    - $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
+                  nullable: true
+                documents:
+                  type: array
+                  items:
+                    $ref: "../components/schemas/document/ReadDocument.yml"
+              required:
+                - category
+                - documents
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all

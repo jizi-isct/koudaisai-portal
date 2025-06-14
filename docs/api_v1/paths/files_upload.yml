@@ -10,6 +10,8 @@ post:
           properties:
             file_name:
               type: string
+          required:
+            - file_name
   responses:
     '201':
       description: Changed
@@ -22,6 +24,9 @@ post:
                 type: string
               key:
                 type: string
+            required:
+              - presigned_url
+              - key
     '400':
       description: 不正なrequest bodyの形式
     '401':

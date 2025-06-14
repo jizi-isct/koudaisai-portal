@@ -21,7 +21,7 @@ export function Modal({isOpen, setOpen, children}: Props) {
     setOpen(false);
   }
 
-  const appElement = document.getElementById("app")!
+  const appElement = document.getElementById("app")
 
 
   return (
@@ -30,7 +30,8 @@ export function Modal({isOpen, setOpen, children}: Props) {
       onRequestClose={closeModal}
       className={styles.modalWindow}
       overlayClassName={styles.modalOverlay}
-      appElement={appElement}
+      appElement={appElement ?? undefined}
+      ariaHideApp={appElement !== null}
     >
       <div className={styles.children}>
         {children}

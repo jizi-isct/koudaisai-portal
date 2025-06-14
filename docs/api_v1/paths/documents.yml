@@ -14,7 +14,7 @@ get:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/Document.yml"
+              $ref: "../components/schemas/document/ReadDocument.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -32,14 +32,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/Document.yml"
+          $ref: "../components/schemas/document/CreateDocument.yml"
   responses:
     '201':
       description: Changed
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/Document.yml"
+            $ref: "../components/schemas/document/ReadDocument.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':

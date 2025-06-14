@@ -1,0 +1,10 @@
+type: object
+allOf:
+  - $ref: ./CreateDocumentGeneric.yml
+  - properties:
+      format_markdown:
+        $ref: ./CreateDocumentFormatMarkdown.yml
+      format_pdf:
+        $ref: ./CreateDocumentFormatPdf.yml
+      format_misc:
+        $ref: ./CreateDocumentFormatMisc.yml

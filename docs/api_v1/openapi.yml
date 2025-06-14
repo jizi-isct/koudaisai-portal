@@ -37,6 +37,8 @@ paths:
   # documents
   /documents:
     $ref: paths/documents.yml
+  /documents/by-category:
+    $ref: paths/documents_by-category.yml
   /documents/{document_id}:
     $ref: paths/documents_{document_id}.yml
   /document-categories:
