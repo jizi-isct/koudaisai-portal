@@ -69,17 +69,34 @@ export type apiClientType = typeof fetchClientNoAuth
 
 export type User = paths["/users/{user_id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export type Exhibitor = paths["/exhibitors/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+
 // ユーザ情報を取得する関数
-export const getUser = async (user_id: string): Promise<User> => {
+export const getUser = async (userId: string): Promise<User> => {
   const res = await fetchClientMembers.GET("/users/{user_id}", {
     params: {
       path: {
-        user_id,
+        user_id: userId,
       },
     },
   });
   if (!res.data) {
     throw new Error("ユーザー情報の取得に失敗しました");
+  }
+  return res.data;
+}
+
+// 参加団体情報を取得する関数
+export const getExhibitor = async (exhibitorId: string): Promise<Exhibitor> => {
+  const res = await fetchClientMembers.GET("/exhibitors/{id}", {
+    params: {
+      path: {
+        id: exhibitorId,
+      },
+    },
+  });
+  if (!res.data) {
+    throw new Error("参加団体情報の取得に失敗しました");
   }
   return res.data;
 }
