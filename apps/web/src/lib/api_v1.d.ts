@@ -1225,6 +1225,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ユーザーを全て取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserRead"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ユーザー情報を取得
+         * @description ### authの違いによる挙動の違い
+         *     - **exhibitor_bearerの場合**: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
+         *     - **admin_oidcの場合**: いかなるユーザー情報も取得可能
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーID */
+                    user_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserRead"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** ユーザー情報を更新 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーID */
+                    user_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UserUpdate"];
+                };
+            };
+            responses: {
+                /** @description 更新成功 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1583,6 +1730,60 @@ export interface components {
         UpdateDocumentCategory: {
             title?: string;
             emoji?: string | null;
+        };
+        UserRead: {
+            /**
+             * Format: uuid
+             * @description unique id
+             */
+            readonly id: string;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            readonly created_at: string;
+            /**
+             * Format: date-time
+             * @description 最終更新日時
+             */
+            readonly updated_at: string;
+            /**
+             * @description 名
+             * @example Paul
+             */
+            first_name: string;
+            /**
+             * @description 姓
+             * @example Johnson
+             */
+            last_name: string;
+            /**
+             * @description mアドレス(新旧どちらも含む)
+             * @example johnson.p.5703@m.isct.ac.jp
+             */
+            m_address: string;
+            /**
+             * @description 参加団体id
+             * @example T-001
+             */
+            exhibition_id: string;
+        };
+        UserUpdate: {
+            /**
+             * @description 名
+             * @example Paul
+             */
+            first_name?: string;
+            /**
+             * @description 姓
+             * @example Johnson
+             */
+            last_name?: string;
+            /**
+             * @description mアドレス(新旧どちらも含む)
+             * @example johnson.p.5703@m.isct.ac.jp
+             */
+            m_address?: string;
         };
     };
     responses: never;

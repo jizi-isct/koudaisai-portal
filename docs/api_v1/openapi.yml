@@ -50,6 +50,11 @@ paths:
     $ref: paths/files_upload.yml
   /files/download:
     $ref: paths/files_download.yml
+  # users
+  /users:
+    $ref: paths/users.yml
+  /users/{user_id}:
+    $ref: paths/users_{user_id}.yml
 
 components:
   securitySchemes:

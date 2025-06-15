@@ -1,0 +1,59 @@
+get:
+  summary: ユーザー情報を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
+    - **admin_oidcの場合**: いかなるユーザー情報も取得可能
+  tags:
+    - users
+  parameters:
+    - name: user_id
+      in: path
+      description: ユーザーID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/user/UserRead.yml
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all
+patch:
+  summary: ユーザー情報を更新
+  tags:
+    - users
+  parameters:
+    - name: user_id
+      in: path
+      description: ユーザーID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/user/UserUpdate.yml
+  responses:
+    '204':
+      description: 更新成功
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
