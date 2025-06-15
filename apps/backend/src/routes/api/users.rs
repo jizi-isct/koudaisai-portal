@@ -16,7 +16,7 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_users))
-        .route("/:user_id", get(get_user))
+        .route("/{user_id}", get(get_user))
 }
 
 #[instrument(name = "GET /api/v1/users", skip(state, current_user))]
@@ -34,7 +34,7 @@ async fn get_users(
     }
 }
 
-#[instrument(name = "GET /api/v1/users/:user_id", skip(state, current_user))]
+#[instrument(name = "GET /api/v1/users/{user_id}", skip(state, current_user))]
 async fn get_user(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -64,7 +64,7 @@ async fn get_user(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/users/:user_id", skip(state, current_user))]
+#[instrument(name = "PATCH /api/v1/users/{user_id}", skip(state, current_user))]
 async fn patch_user(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
