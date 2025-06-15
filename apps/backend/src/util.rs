@@ -2,6 +2,7 @@ use axum::response::{IntoResponse, Response};
 use http::StatusCode;
 use sea_orm::DbErr;
 use tracing::warn;
+use uuid::Uuid;
 
 pub(crate) mod jwt;
 pub mod oidc;
@@ -30,3 +31,7 @@ where
 }
 
 pub type AppResponse = Result<(StatusCode, Response), AppError>;
+
+pub fn contains_uuid(tuple: (Uuid, Uuid, Uuid), target: Uuid) -> bool {
+    tuple.0 == target || tuple.1 == target || tuple.2 == target
+}

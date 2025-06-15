@@ -4,9 +4,11 @@ use crate::util::jwt::Claims;
 use anyhow::Result;
 use chrono::DateTime;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{DbConn, EntityTrait};
+use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UserRead {
     pub id: Uuid,
     pub created_at: DateTime<chrono::Utc>,
@@ -48,6 +50,11 @@ impl UserRead {
         }
     }
 
+    pub async fn get_all(db_conn: &DbConn) -> Result<Vec<Self>> {
+        let users = sea_orm_entities::users::Entity::find().all(db_conn).await?;
+        Ok(users.into_iter().map(Into::into).collect())
+    }
+
     pub async fn get_exhibitor_read(&self, db_conn: &DbConn) -> Result<ExhibitorRead> {
         match ExhibitorRead::find_from_id(&self.exhibition_id, db_conn).await? {
             Some(value) => Ok(value),
@@ -56,13 +63,14 @@ impl UserRead {
     }
 }
 
-pub struct UserWrite {
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UserUpdate {
     pub first_name: String,
     pub last_name: String,
     pub m_address: String,
 }
 
-impl Into<sea_orm_entities::users::ActiveModel> for UserWrite {
+impl Into<sea_orm_entities::users::ActiveModel> for UserUpdate {
     fn into(self) -> sea_orm_entities::users::ActiveModel {
         sea_orm_entities::users::ActiveModel {
             id: Default::default(),
@@ -75,5 +83,19 @@ impl Into<sea_orm_entities::users::ActiveModel> for UserWrite {
             password_salt: Default::default(),
             exhibition_id: Default::default(),
         }
+    }
+}
+
+impl UserUpdate {
+    pub async fn update(
+        self,
+        user_id: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<sea_orm_entities::users::Model> {
+        let mut active_model: sea_orm_entities::users::ActiveModel = self.into();
+        active_model.id = Set(user_id);
+
+        let updated_user = active_model.update(db_conn).await?;
+        Ok(updated_user)
     }
 }

@@ -1,0 +1,25 @@
+type: object
+properties:
+  first_name:
+    description: 名
+    type: string
+    example: Paul
+  last_name:
+    description: 姓
+    type: string
+    example: Johnson
+  m_address:
+    description: mアドレス(新旧どちらも含む)
+    type: string
+    pattern: >-
+      ^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp|^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[a-z][a-z]@m\.titech\.ac\.jp
+    example: johnson.p.5703@m.isct.ac.jp
+  exhibition_id:
+    description: 参加団体id
+    type: string
+    pattern: '[A-Z]-[0-9][0-9][0-9]'
+    example: T-001
+required:
+  - first_name
+  - last_name
+  - m_address

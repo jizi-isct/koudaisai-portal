@@ -3,6 +3,7 @@ mod documents;
 mod exhibitors;
 mod files;
 mod forms;
+mod users;
 
 use crate::routes::AppState;
 use axum::Router;
@@ -20,4 +21,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
             document_categories::init_router(),
         )
         .nest("/v1/files", files::init_router())
+        .nest("/v1/users", users::init_router())
 }
