@@ -1,16 +1,18 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useEffect, useState} from 'react';
-import {getTokensMembers} from "@/lib";
-import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
+import {getTokensMembers, getUserIdFromAccessToken, getUser} from "@/lib";
+import {Footer, Header, Heading2, Heading1, MobileNavigator, Steps, Tab} from "@/components/generic";
 import "../globals.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
+import { set } from 'react-hook-form';
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [innerHeight, setInnerHeight] = useState(100);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -30,10 +32,34 @@ export default function Page() {
     window.addEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    (async () => {
+      const userId = await getUserIdFromAccessToken()
+      console.log("userId", userId);
+      if (userId) {
+        getUser(userId).then(setUser);
+      }
+    })();
+  }, []);
+
   return (
     <>
       {authenticated ? (
-        <h1>ログイン済みです</h1>
+        <>
+          <main className="content">
+            <Header header_type="members"></Header>
+            <h1>こんにちは、{user?.last_name} {user?.first_name} 👋</h1>
+            <h2>あなたはU7374の第2責任者です。</h2>
+            <Heading1 emoji={"📄"}>
+              企画情報
+            </Heading1>
+            <p>
+              このページは工大祭実行委員会のメンバー専用のページです。<br/>
+              メンバー以外の方は<a href="/">トップページ</a>からご覧ください。
+            </p>
+          </main>
+          <Footer />
+        </>
       ) : (
         <>
           <main className="content">
