@@ -66,3 +66,20 @@ export const $apiNoAuth = createClient(fetchClientNoAuth)
 export type apiQueryClientType = typeof $apiNoAuth
 
 export type apiClientType = typeof fetchClientNoAuth
+
+export type User = paths["/users/{user_id}"]["get"]["responses"]["200"]["content"]["application/json"];
+
+// ユーザ情報を取得する関数
+export const getUser = async (user_id: string): Promise<User> => {
+  const res = await fetchClientMembers.GET("/users/{user_id}", {
+    params: {
+      path: {
+        user_id,
+      },
+    },
+  });
+  if (!res.data) {
+    throw new Error("ユーザー情報の取得に失敗しました");
+  }
+  return res.data;
+}
