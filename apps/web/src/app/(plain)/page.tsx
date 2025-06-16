@@ -7,6 +7,7 @@ import "../globals.css";
 import styles from "./page.module.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
+import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import { set } from 'react-hook-form';
 
 export default function Page() {
@@ -72,6 +73,10 @@ export default function Page() {
             <Heading1 emoji={"📄"}>
               企画情報
             </Heading1>
+            <ExhibitorCard
+              exhibitor={exhibitor}
+              setExhibitor={setExhibitor}
+            />
           </main>
           <Footer />
         </>
