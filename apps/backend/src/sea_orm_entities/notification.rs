@@ -22,11 +22,19 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_one = "super::notification_type_markdown::Entity")]
     NotificationTypeMarkdown,
+    #[sea_orm(has_many = "super::read_notifications::Entity")]
+    ReadNotifications,
 }
 
 impl Related<super::notification_type_markdown::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::NotificationTypeMarkdown.def()
+    }
+}
+
+impl Related<super::read_notifications::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ReadNotifications.def()
     }
 }
 

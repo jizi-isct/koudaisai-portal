@@ -1,10 +1,11 @@
 use crate::entities::exhibitor::ExhibitorRead;
 use crate::sea_orm_entities;
+use crate::sea_orm_entities::read_notifications;
 use crate::util::jwt::Claims;
 use anyhow::{anyhow, Result};
 use chrono::DateTime;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -67,6 +68,21 @@ impl UserRead {
             Some(value) => Ok(value),
             None => Err(anyhow::anyhow!("Exhibitor not found")),
         }
+    }
+
+    pub async fn is_notification_read(
+        &self,
+        notification_id: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<bool> {
+        let result = read_notifications::Entity::find()
+            .filter(read_notifications::Column::UserId.eq(self.id))
+            .filter(read_notifications::Column::NotificationId.eq(notification_id))
+            .one(db_conn)
+            .await
+            .map_err(|e| anyhow::anyhow!("Database error: {}", e))?;
+
+        Ok(result.is_some())
     }
 }
 

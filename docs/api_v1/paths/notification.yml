@@ -1,9 +1,5 @@
 get:
   summary: 全ての通知を取得
-  description: |-
-    ### authの違いによる挙動の違い
-    - **exhibitor_bearerの場合**: 自分が通知対象である全ての通知を取得
-    - **admin_oidcの場合**: 存在する通知を全て取得
   tags:
     - notifications
   responses:
@@ -20,7 +16,6 @@ get:
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
     - admin_oidc:
         - k-portal:admin:all
 post:

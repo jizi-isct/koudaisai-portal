@@ -33,29 +33,11 @@ async fn get_notifications(
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
 ) -> AppResponse {
-    match current_user {
-        CurrentUser::Admin(_) => {
-            let notifications = NotificationRead::get_all(&state.db_conn).await?;
-            Ok((StatusCode::OK, Json(notifications).into_response()))
-        }
-        CurrentUser::User(claims) => {
-            let user = UserRead::from_claims(claims, &state.db_conn).await?;
-            let mut notifications = vec![];
-            // ユーザーがアクセス可能な通知を取得
-            for notification in NotificationRead::get_all(&state.db_conn).await? {
-                for target_specifier in &notification.target {
-                    if !target_specifier
-                        .does_user_match(Some(&user), &state.db_conn)
-                        .await?
-                    {
-                        continue;
-                    }
-                }
-                notifications.push(notification)
-            }
-            Ok((StatusCode::OK, Json(notifications).into_response()))
-        }
-        _ => Ok((StatusCode::FORBIDDEN, ().into_response())),
+    if let CurrentUser::Admin(_) = current_user {
+        let notifications = NotificationRead::get_all(&state.db_conn).await?;
+        Ok((StatusCode::OK, Json(notifications).into_response()))
+    } else {
+        Ok((StatusCode::FORBIDDEN, ().into_response()))
     }
 }
 

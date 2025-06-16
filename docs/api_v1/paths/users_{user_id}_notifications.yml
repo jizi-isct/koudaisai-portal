@@ -1,0 +1,25 @@
+get:
+  summary: そのユーザー向けの通知と既読状況を取得
+  tags:
+    - users
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                notification:
+                  $ref: "../components/schemas/notification/NotificationRead.yml"
+                is_read:
+                  type: boolean
+                  description: |
+                    その通知が既読かどうかを示すフラグ
+                    trueの場合、通知は既読であることを示す
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]

@@ -57,6 +57,8 @@ paths:
     $ref: paths/users.yml
   /users/{user_id}:
     $ref: paths/users_{user_id}.yml
+  /users/{user_id}/notifications:
+    $ref: paths/users_{user_id}_notifications.yml
   # notifications
   /notification:
     $ref: paths/notification.yml

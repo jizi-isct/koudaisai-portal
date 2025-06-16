@@ -14,5 +14,6 @@ pub use super::form_responses::Entity as FormResponses;
 pub use super::forms::Entity as Forms;
 pub use super::notification::Entity as Notification;
 pub use super::notification_type_markdown::Entity as NotificationTypeMarkdown;
+pub use super::read_notifications::Entity as ReadNotifications;
 pub use super::revoked_refresh_tokens::Entity as RevokedRefreshTokens;
 pub use super::users::Entity as Users;
