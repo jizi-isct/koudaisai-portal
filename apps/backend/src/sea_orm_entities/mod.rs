@@ -14,6 +14,8 @@ pub mod exhibitors_category_stage;
 pub mod exhibitors_root;
 pub mod form_responses;
 pub mod forms;
+pub mod notification;
+pub mod notification_type_markdown;
 pub mod revoked_refresh_tokens;
 pub mod sea_orm_active_enums;
 pub mod users;

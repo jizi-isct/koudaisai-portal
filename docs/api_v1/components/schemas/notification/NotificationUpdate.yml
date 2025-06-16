@@ -1,0 +1,11 @@
+type: object
+oneOf:
+  - allOf:
+      - $ref: "./NotificationUpdateGeneric.yml"
+      - properties:
+          type_markdown:
+            $ref: "./NotificationUpdateTypeMarkdown.yml"
+        required:
+          - type_markdown
+  - allOf:
+      - $ref: "./NotificationUpdateGeneric.yml"

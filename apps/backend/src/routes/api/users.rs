@@ -48,11 +48,9 @@ async fn get_user(
 
     // 一般ユーザーの場合: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
     if let CurrentUser::User(claims) = current_user {
-        let current_user = UserRead::find_from_id(claims.sub, &state.db_conn)
-            .await?
-            .unwrap();
+        let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
         let exhibitor_read = current_user.get_exhibitor_read(&state.db_conn).await?;
-        if !contains_uuid(exhibitor_read.representatives, claims.sub) {
+        if !contains_uuid(exhibitor_read.representatives, current_user.id) {
             return Ok((StatusCode::NOT_FOUND, ().into_response()));
         }
     }

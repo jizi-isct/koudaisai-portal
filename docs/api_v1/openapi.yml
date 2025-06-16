@@ -18,6 +18,8 @@ tags:
     description: 資料関連
   - name: files
     description: ファイル関連
+  - name: notifications
+    description: 通知機能関連
 paths:
   # exhibitions
   /exhibitors:
@@ -55,6 +57,11 @@ paths:
     $ref: paths/users.yml
   /users/{user_id}:
     $ref: paths/users_{user_id}.yml
+  # notifications
+  /notification:
+    $ref: paths/notification.yml
+  /notification/{notification_id}:
+    $ref: paths/notification_{notification_id}.yml
 
 components:
   securitySchemes:

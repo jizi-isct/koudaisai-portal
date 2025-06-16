@@ -3,6 +3,7 @@ mod documents;
 mod exhibitors;
 mod files;
 mod forms;
+mod notifications;
 mod users;
 
 use crate::routes::AppState;
@@ -22,4 +23,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
         .nest("/v1/files", files::init_router())
         .nest("/v1/users", users::init_router())
+        .nest("/v1/notifications", notifications::init_router())
 }

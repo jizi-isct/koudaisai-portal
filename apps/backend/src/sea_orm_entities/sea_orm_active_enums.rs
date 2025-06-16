@@ -25,6 +25,12 @@ pub enum ExhibitionType {
     Labo,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "notification_type")]
+pub enum NotificationType {
+    #[sea_orm(string_value = "MARKDOWN")]
+    Markdown,
+}
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "stage_type")]
 pub enum StageType {
     #[sea_orm(string_value = "OUTDOOR")]
