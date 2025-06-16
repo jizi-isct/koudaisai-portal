@@ -1,22 +1,42 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useEffect, useState} from 'react';
-import {getTokensMembers, getUserIdFromAccessToken, getUser, getExhibitor} from "@/lib";
+import {getTokensMembers, getUserIdFromAccessToken, getUser, getExhibitor, User, Exhibitor, updateExhibitor} from "@/lib";
 import {Footer, Header, Heading2, Heading1, MobileNavigator, Steps, Tab} from "@/components/generic";
 import "../globals.css";
 import styles from "./page.module.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
 import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
+import {Modal} from "@/components/generic/Modal/Modal";
+import {TextInput} from "@/components/generic/TextInput/TextInput";
 import { set } from 'react-hook-form';
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [innerHeight, setInnerHeight] = useState(100);
-  const [user, setUser] = useState(null);
-  const [exhibitor, setExhibitor] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [exhibitor, setExhibitor] = useState<Exhibitor | null>(null)
   const [representativeIndex, setRepresentativeIndex] = useState(null);
+  const [modal, setModal] = useState(false);
+
+  const setExhibitionName = (name: string) => {
+    setExhibitor({ ...exhibitor, exhibition_name: name });
+  };
+
+  const setDescription = (description: string) => {
+    setExhibitor({ ...exhibitor, description });
+  };
+  
+  const closeModal = async () => {
+    // モーダルを閉じる前に、変更があれば保存する
+    if (exhibitor) {
+      setModal(false); // 閉じる
+      await updateExhibitor(exhibitor);
+      
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -53,11 +73,11 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (exhibitor || user?.id) {
+    if (exhibitor && user?.id) {
       const index = exhibitor.representatives.indexOf(user?.id);
       setRepresentativeIndex(index + 1);
     }
-  }, [exhibitor]);
+  }, [exhibitor, user]);
 
 
   return (
@@ -75,8 +95,25 @@ export default function Page() {
             </Heading1>
             <ExhibitorCard
               exhibitor={exhibitor}
-              setExhibitor={setExhibitor}
+              openModal={() => setModal(true)}
             />
+            <Modal
+              isOpen={modal}
+              setOpen={closeModal}
+            >
+              <TextInput
+                label="企画名"
+                value={exhibitor?.exhibition_name || ""}
+                setValue={setExhibitionName}
+                paragraph={false}
+              />
+              <TextInput
+                label="企画内容"
+                value={exhibitor?.description || ""}
+                setValue={setDescription}
+                paragraph={true}
+              />
+            </Modal>
           </main>
           <Footer />
         </>

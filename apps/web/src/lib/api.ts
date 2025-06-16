@@ -100,3 +100,28 @@ export const getExhibitor = async (exhibitorId: string): Promise<Exhibitor> => {
   }
   return res.data;
 }
+
+// 参加団体情報を更新する関数
+export const updateExhibitor = async (exhibitor: Exhibitor): Promise<Exhibitor>  => {
+  const res = await fetchClientMembers.PUT("/exhibitors/{id}", {
+    params: {
+      path: {
+        id: exhibitor.id,
+      },
+    },
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: {
+      exhibition_name: exhibitor.exhibition_name ?? undefined,
+      icon_id: exhibitor.icon_id ?? undefined,
+      description: exhibitor.description ?? undefined,
+    },
+  });
+
+  if (!res.data) {
+    throw new Error("Failed to update exhibitor");
+  }
+
+  return res.data;
+}
