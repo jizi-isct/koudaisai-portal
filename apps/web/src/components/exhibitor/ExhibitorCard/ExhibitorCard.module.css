@@ -1,0 +1,24 @@
+.card {
+    width: 100%;
+    border: 1px solid var(--darkblue);
+    border-radius: 10px;
+    padding: 0.5em 15px;
+    box-shadow: 4px 4px 0 0 var(--darkblue);
+    margin: 2em 0;
+    background-color: white;
+}
+
+.exhibitor_logo {
+    border-radius: 15px;
+    border: 1px solid var(--darkblue);
+}
+
+.card h1{
+    font-size: 20px;
+    margin: 0.5em 0;
+}
+
+.card h4{
+    font-size: 12px;
+    margin: 0.5em 0;
+}
