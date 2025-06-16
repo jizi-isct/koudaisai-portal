@@ -1,14 +1,16 @@
 .button {
     align-items: center;
-    border-radius: 100vw;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s;
-    padding: 16px 30px;
+    padding: 10px 25px;
     display: inline-block;
     border: 1px solid;
-    font-size: 14px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 500;
     margin: 0 10px;
+    color: white;
+    background-color: var(--darkblue);
     box-shadow: 0px 0px 12px 0px rgba(37, 54, 97, 0.25);
 }

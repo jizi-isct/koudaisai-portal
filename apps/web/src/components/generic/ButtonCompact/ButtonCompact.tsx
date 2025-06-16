@@ -5,17 +5,14 @@ type ButtonCompactProps = { // ①
   color?: string;
   onClick: () => void;
   isClicked?: boolean;
+  className?: string;
 };
 
-export const ButtonCompact = ({text, color = '#0048FF', onClick, isClicked = false}: ButtonProps) => {
+export const ButtonCompact = ({text, color = '#0048FF', onClick, isClicked = false, className}: ButtonProps) => {
   return (
     <div
-      className={styles.button}
-      style={{
-        backgroundColor: isClicked ? color : 'white',
-        color: isClicked ? 'white' : 'black',
-        borderColor: color
-      }}
+      className={`${styles.button} ${className}`}
+      
       onClick={onClick}>
       {text}
     </div>

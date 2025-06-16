@@ -31,6 +31,7 @@ export const ExhibitorCard = ({exhibitor, openModal}: ExhibitorCardProps) => {
                 color="#0048FF"
                 onClick={() => openModal()}
                 isClicked={false}
+                className={styles.edit_button}
             />
         </div>
     );
