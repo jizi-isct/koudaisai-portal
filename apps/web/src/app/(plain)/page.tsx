@@ -1,6 +1,6 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {getTokensMembers, getUserIdFromAccessToken, getUser, getExhibitor, User, Exhibitor, updateExhibitor} from "@/lib";
 import {Footer, Header, Heading2, Heading1, MobileNavigator, Steps, Tab} from "@/components/generic";
 import "../globals.css";
@@ -10,6 +10,7 @@ import {Hero} from "@/components/Hero/Hero";
 import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import {Modal} from "@/components/generic/Modal/Modal";
 import {TextInput} from "@/components/generic/TextInput/TextInput";
+import {FileUploader} from "@/components/common/FileUploader";
 import { set } from 'react-hook-form';
 
 export default function Page() {
@@ -79,6 +80,10 @@ export default function Page() {
     }
   }, [exhibitor, user]);
 
+  const handleFileUpload = useCallback(async (fileKey: string, fileName: string) => {
+    setExhibitor({ ...exhibitor, icon_id: fileKey });
+  }, [exhibitor]);
+
 
   return (
     <>
@@ -113,6 +118,7 @@ export default function Page() {
                 setValue={setDescription}
                 paragraph={true}
               />
+              <FileUploader callback={handleFileUpload} isMembers={true}/>
             </Modal>
           </main>
           <Footer />

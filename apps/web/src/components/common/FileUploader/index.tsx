@@ -1,14 +1,15 @@
 import {useCallback, useState} from "react";
-import {fetchClientAdmin} from "@/lib";
+import {fetchClientAdmin, fetchClientMembers} from "@/lib";
 import {Loader} from "@/components/generic/Loader";
 import styles from "./FileUploader.module.css";
 
 type FileUploaderProps = {
   callback: (fileKey: string, fileName: string) => (void | Promise<void>),
-  fileType?: string
+  fileType?: string,
+  isMembers?: boolean,
 }
 
-export function FileUploader({callback, fileType}: FileUploaderProps) {
+export function FileUploader({callback, fileType, isMembers}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const handleFileUpload = useCallback(async (file: File | undefined) => {
@@ -17,11 +18,14 @@ export function FileUploader({callback, fileType}: FileUploaderProps) {
       setError("ファイルを指定してください")
       return
     }
-    const {data, error} = await fetchClientAdmin.POST("/files/upload", {
-      body: {
-        file_name: file.name,
-      }
-    });
+
+    const client = isMembers ? fetchClientMembers : fetchClientAdmin;
+
+    const { data, error } = await client.POST("/files/upload", {
+        body: {
+          file_name: file.name,
+        },
+      });
 
     if (data) {
       await fetch(data.presigned_url, {
