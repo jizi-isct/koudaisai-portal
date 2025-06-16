@@ -21,13 +21,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-main {
-    align-items: center;
-    margin: 0 auto;
-    padding: 0 1em;
-    max-width: 700px;
-}
-
 p {
     width: fit-content;
     margin: 1.5em auto;

@@ -1,8 +1,14 @@
 "use client";
 
-import "../globals.css";
 import {getTokensAdmin, Tokens} from "@/lib";
 import {ReactNode, useEffect, useState} from "react";
+import {Button, Flex, Layout, Menu, theme} from "antd";
+import {BookOutlined, FormOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined,} from "@ant-design/icons";
+import {Header} from "antd/lib/layout/layout";
+import Sider from "antd/es/layout/Sider";
+import {Content} from "antd/es/layout/layout";
+import Image from "next/image";
+import {LoadingScreen} from "@/components/generic";
 
 type Props = {
   children: ReactNode
@@ -16,17 +22,91 @@ export function Inner({children}: Props) {
       if (tokens) {
         setTokens(tokens)
       } else {
-        window.location.assign(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login")
+        window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/admin/login")
       }
     })()
   }, [])
-  if (tokens) {
-    return (
-      <>
-        {children}
-      </>
-    );
-  } else {
-    return <>Loading...</>
-  }
+
+  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
+  const {
+    token: {colorBgContainer, borderRadiusLG},
+  } = theme.useToken();
+
+  return (
+    <Layout style={{minHeight: '100vh', width: '100vw'}}>
+      <Sider collapsible collapsed={collapsed} style={{margin: 0, padding: 0}}>
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[window.location.pathname]}
+          style={{position: "sticky", top: 0}}
+          items={[
+            {
+              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/",
+              icon: <HomeOutlined/>,
+              label: 'ホーム',
+              onClick: () => {
+                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/")
+              }
+            },
+            {
+              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/",
+              icon: <FormOutlined/>,
+              label: 'フォーム',
+              onClick: () => {
+                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/")
+              }
+            },
+            {
+              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/",
+              icon: <BookOutlined/>,
+              label: '資料',
+              onClick: () => {
+                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/")
+              }
+            },
+          ]}
+        />
+      </Sider>
+      <Layout>
+        <Header style={{padding: 0, background: colorBgContainer}}>
+          <Flex>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: '16px',
+                width: 64,
+                height: 64,
+              }}
+            />
+            <a href={"/admin"} style={{color: "black"}}>
+              <Flex align={"center"} gap={10} justify={"center"}>
+                <Image
+                  src="/components/generic/Header/admin_logo.jpg"
+                  alt="Koudaisai Portal Admin Site Logo"
+                  width={32}
+                  height={32}
+                />
+                {<span>工大祭ポータル管理サイト</span>}
+              </Flex>
+            </a>
+          </Flex>
+        </Header>
+        <Content
+          style={{
+            margin: '24px 16px',
+            padding: 24,
+            background: colorBgContainer,
+            borderRadius: borderRadiusLG,
+            width: "auto",
+          }}
+        >
+          {tokens && children}
+          {!tokens && <LoadingScreen/>}
+        </Content>
+      </Layout>
+    </Layout>
+  );
 }

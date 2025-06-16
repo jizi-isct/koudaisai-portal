@@ -6,6 +6,7 @@ import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/component
 import "../globals.css";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
+import "../members.css"
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);

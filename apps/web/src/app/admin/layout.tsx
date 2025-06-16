@@ -1,8 +1,7 @@
-import type {Metadata} from "next";
 import {Noto_Sans_JP} from "next/font/google";
-import "../globals.css";
 import {Inner} from "@/app/admin/inner";
-import {Footer, Header, MobileNavigator} from "@/components/generic";
+import {Metadata} from "next";
+import "../globals.css"
 
 const notoSans = Noto_Sans_JP({
   subsets: ["latin"],
@@ -21,17 +20,13 @@ export default function RootLayout({
                                    }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="ja">
-    <body className={notoSans.className} id={"app"}>
-    <Header header_type="admin"/>
-    <main className="content">
-      <Inner>
-          {children}
-      </Inner>
-      <MobileNavigator header_type="admin"/>
-    </main>
-    <Footer/>
+    <body className={notoSans.className} style={{margin: 0}} id={"app"}>
+    <Inner>
+      {children}
+    </Inner>
     </body>
     </html>
   );
