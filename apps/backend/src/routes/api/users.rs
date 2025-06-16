@@ -16,7 +16,7 @@ use uuid::Uuid;
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_users))
-        .route("/:user_id", get(get_user))
+        .route("/{user_id}", get(get_user))
 }
 
 #[instrument(name = "GET /api/v1/users", skip(state, current_user))]
