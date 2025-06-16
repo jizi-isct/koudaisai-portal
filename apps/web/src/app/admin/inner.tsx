@@ -3,12 +3,21 @@
 import {getTokensAdmin, Tokens} from "@/lib";
 import {ReactNode, useEffect, useState} from "react";
 import {Button, Flex, Layout, Menu, theme} from "antd";
-import {BookOutlined, FormOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined,} from "@ant-design/icons";
+import {
+  BellOutlined,
+  BookOutlined,
+  FormOutlined,
+  HomeOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons";
 import {Header} from "antd/lib/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {Content} from "antd/es/layout/layout";
 import Image from "next/image";
 import {LoadingScreen} from "@/components/generic";
+import {usePathname, useRouter} from "next/navigation";
+import {useWindowWidth} from "@wojtekmaj/react-hooks";
 
 type Props = {
   children: ReactNode
@@ -22,15 +31,21 @@ export function Inner({children}: Props) {
       if (tokens) {
         setTokens(tokens)
       } else {
-        window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/admin/login")
+        await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/admin/login")
       }
     })()
   }, [])
 
-  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
+  const width = useWindowWidth() ?? 10000;
+  const [collapsed, setCollapsed] = useState(width < 768);
+
+
+  const router = useRouter()
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
+
+  const pathname = usePathname()
 
   return (
     <Layout style={{minHeight: '100vh', width: '100vw'}}>
@@ -38,31 +53,39 @@ export function Inner({children}: Props) {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[window.location.pathname]}
+          selectedKeys={[pathname]}
           style={{position: "sticky", top: 0}}
           items={[
             {
               key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/",
               icon: <HomeOutlined/>,
               label: 'ホーム',
-              onClick: () => {
-                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/")
+              onClick: async () => {
+                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/")
               }
             },
             {
               key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/",
               icon: <FormOutlined/>,
               label: 'フォーム',
-              onClick: () => {
-                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/")
+              onClick: async () => {
+                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/")
               }
             },
             {
               key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/",
               icon: <BookOutlined/>,
               label: '資料',
-              onClick: () => {
-                window.location.assign(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/")
+              onClick: async () => {
+                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/")
+              }
+            },
+            {
+              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/",
+              icon: <BellOutlined/>,
+              label: '通知',
+              onClick: async () => {
+                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/")
               }
             },
           ]}

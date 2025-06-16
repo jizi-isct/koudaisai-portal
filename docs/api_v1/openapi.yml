@@ -60,10 +60,10 @@ paths:
   /users/{user_id}/notifications:
     $ref: paths/users_{user_id}_notifications.yml
   # notifications
-  /notification:
-    $ref: paths/notification.yml
-  /notification/{notification_id}:
-    $ref: paths/notification_{notification_id}.yml
+  /notifications:
+    $ref: paths/notifications.yml
+  /notifications/{notification_id}:
+    $ref: paths/notifications_{notification_id}.yml
 
 components:
   securitySchemes:

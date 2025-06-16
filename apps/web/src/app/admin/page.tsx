@@ -14,6 +14,18 @@ export default function Page() {
                     height={150}
                 />
                 <h1>ようこそ</h1>
+              <h2>ページ一覧</h2>
+              <ul>
+                <li>
+                  <a href="/admin/forms">フォーム一覧</a>
+                </li>
+                <li>
+                  <a href="/admin/documents">資料一覧</a>
+                </li>
+                <li>
+                  <a href="/admin/notifications">通知一覧</a>
+                </li>
+              </ul>
             </main>
         </div>
     );

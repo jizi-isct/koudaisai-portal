@@ -1372,19 +1372,63 @@ export interface paths {
         };
         trace?: never;
     };
-    "/notification": {
+    "/users/{user_id}/notifications": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * 全ての通知を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が通知対象である全ての通知を取得
-         *     - **admin_oidcの場合**: 存在する通知を全て取得
-         */
+        /** そのユーザー向けの通知と既読状況を取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            notification?: components["schemas"]["NotificationRead"];
+                            /** @description その通知が既読かどうかを示すフラグ
+                             *     trueの場合、通知は既読であることを示す
+                             *      */
+                            is_read?: boolean;
+                        }[];
+                    };
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 全ての通知を取得 */
         get: {
             parameters: {
                 query?: never;
@@ -1463,7 +1507,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notification/{notification_id}": {
+    "/notifications/{notification_id}": {
         parameters: {
             query?: never;
             header?: never;
