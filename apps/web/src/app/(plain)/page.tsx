@@ -12,12 +12,19 @@ export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const tokens = await getTokensMembers()
-      if (tokens) {
-        setAuthenticated(true);
-      }
-    })();
+    // まずローカルストレージに access_token があるか確認
+    const token = localStorage.getItem("exhibitor_access_token");
+    if (token) {
+      setAuthenticated(true); // 仮認証（存在ベース）
+
+      // 非同期でトークンの有効性確認
+      (async () => {
+        const valid = await getTokensMembers();
+        if (!valid) {
+          setAuthenticated(false); // 無効なら認証状態をリセット
+        }
+      })();
+    }
   }, []);
 
   return (
