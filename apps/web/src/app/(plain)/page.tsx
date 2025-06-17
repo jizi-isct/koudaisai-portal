@@ -21,15 +21,6 @@ export default function Page() {
   const [exhibitor, setExhibitor] = useState<Exhibitor | null>(null)
   const [modal, setModal] = useState(false);
 
-  const closeModal = async () => {
-    // モーダルを閉じる前に、変更があれば保存する
-    if (exhibitor) {
-      setModal(false); // 閉じる
-      await updateExhibitor(exhibitor);
-      
-    }
-  }
-
   useEffect(() => {
     (async () => {
       const tokens = await getTokensMembers()
@@ -62,6 +53,15 @@ export default function Page() {
     if (!exhibitor) return;
     setExhibitor({ ...exhibitor, icon_id: fileKey });
   }, [exhibitor]);
+
+  const closeModal = async () => {
+    // モーダルを閉じる前に、変更があれば保存する
+    if (exhibitor) {
+      setModal(false); // 閉じる
+      await updateExhibitor(exhibitor);
+      
+    }
+  }
 
   return (
     <>
