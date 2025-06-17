@@ -1,7 +1,7 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useEffect, useState, useCallback} from 'react';
-import {getTokensMembers, getUserIdFromAccessToken, getUser, getExhibitor, User, Exhibitor, updateExhibitor} from "@/lib";
+import {getTokensMembers, getUser, getExhibitor, User, Exhibitor, updateExhibitor} from "@/lib";
 import {Footer, Header, Heading2, Heading1, MobileNavigator, Steps, Tab} from "@/components/generic";
 import "../globals.css";
 import styles from "./page.module.css";
@@ -11,7 +11,7 @@ import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard"
 import {Modal} from "@/components/generic/Modal/Modal";
 import {TextInput} from "@/components/generic/TextInput/TextInput";
 import {FileUploader} from "@/components/common/FileUploader";
-import { set } from 'react-hook-form';
+import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -19,17 +19,8 @@ export default function Page() {
   const [innerHeight, setInnerHeight] = useState(100);
   const [user, setUser] = useState<User | null>(null);
   const [exhibitor, setExhibitor] = useState<Exhibitor | null>(null)
-  const [representativeIndex, setRepresentativeIndex] = useState(null);
   const [modal, setModal] = useState(false);
 
-  const setExhibitionName = (name: string) => {
-    setExhibitor({ ...exhibitor, exhibition_name: name });
-  };
-
-  const setDescription = (description: string) => {
-    setExhibitor({ ...exhibitor, description });
-  };
-  
   const closeModal = async () => {
     // モーダルを閉じる前に、変更があれば保存する
     if (exhibitor) {
@@ -64,27 +55,13 @@ export default function Page() {
   }, [user]);
 
   useEffect(() => {
-    (async () => {
-      const userId = await getUserIdFromAccessToken()
-      console.log("userId", userId);
-      if (userId) {
-        getUser(userId).then(setUser);
-      }
-    })();
+    getUser().then(setUser);
   }, []);
 
-  useEffect(() => {
-    if (exhibitor && user?.id) {
-      const index = exhibitor.representatives.indexOf(user?.id);
-      setRepresentativeIndex(index + 1);
-    }
-  }, [exhibitor, user]);
-
   const handleFileUpload = useCallback(async (fileKey: string, fileName: string) => {
+    if (!exhibitor) return;
     setExhibitor({ ...exhibitor, icon_id: fileKey });
   }, [exhibitor]);
-
-
 
   return (
     <>
@@ -92,10 +69,7 @@ export default function Page() {
         <>
           <main className="content">
             <Header header_type="members"></Header>
-            <div className={styles.user}>
-              <h1>こんにちは、{user?.last_name} {user?.first_name} 👋</h1>
-              <h2>あなたは{exhibitor?.exhibitor_name}の第{representativeIndex}責任者です。</h2>
-            </div>
+            <UserInfoCard user={user} exhibitor={exhibitor} />
             <Heading1 emoji={"📄"}>
               企画情報
             </Heading1>
@@ -108,15 +82,17 @@ export default function Page() {
               setOpen={closeModal}
             >
               <TextInput
-                label="企画名"
                 value={exhibitor?.exhibition_name || ""}
-                setValue={setExhibitionName}
+                setValue={(value) => {
+                  setExhibitor(prev => prev ? { ...prev, exhibition_name: value } : prev);
+                }}
                 paragraph={false}
               />
               <TextInput
-                label="企画内容"
                 value={exhibitor?.description || ""}
-                setValue={setDescription}
+                setValue={(value) => {
+                  setExhibitor(prev => prev ? { ...prev, description: value } : prev);
+                }}
                 paragraph={true}
               />
               <FileUploader callback={handleFileUpload} isMembers={true}/>

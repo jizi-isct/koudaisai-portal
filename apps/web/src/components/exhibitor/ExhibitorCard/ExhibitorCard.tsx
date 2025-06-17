@@ -6,8 +6,8 @@ import {useEffect, useState} from "react";
 
 
 type ExhibitorCardProps = {
-    exhibitor: Exhibitor;
-    openModal: (boolean) => void;
+    exhibitor: Exhibitor | null;
+    openModal: () => void;
 };
 
 // typeのラベル変換マップ
@@ -20,9 +20,11 @@ const typeLabels: Record<string, string> = {
 
 export const ExhibitorCard = ({exhibitor, openModal}: ExhibitorCardProps) => {
     const {downloadUrl, error} = useDownloadUrl(exhibitor?.icon_id, "filename");
+    const fallbackImage = "/generic/no-image.png";
+    const imageSrc = downloadUrl || fallbackImage;
     return (
         <div className={styles.card}>
-            <Image src={downloadUrl} alt="Exhibitor Image" width={100} height={100} className={styles.exhibitor_logo} />
+            <Image src={imageSrc} alt="Exhibitor Image" width={100} height={100} className={styles.exhibitor_logo} />
             <h1>{exhibitor?.exhibition_name}</h1>
             <h4>{typeLabels[exhibitor?.type] || exhibitor?.type}</h4>
             <p>{exhibitor?.description}</p>

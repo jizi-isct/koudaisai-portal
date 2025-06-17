@@ -1,5 +1,5 @@
 import createClient from "openapi-react-query";
-import {getTokensAdmin, getTokensMembers} from "./auth";
+import {getTokensAdmin, getTokensMembers, getUserIdFromAccessToken} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
 
@@ -72,7 +72,8 @@ export type User = paths["/users/{user_id}"]["get"]["responses"]["200"]["content
 export type Exhibitor = paths["/exhibitors/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
 // ユーザ情報を取得する関数
-export const getUser = async (userId: string): Promise<User> => {
+export const getUser = async (): Promise<User> => {
+  const userId = await getUserIdFromAccessToken();
   const res = await fetchClientMembers.GET("/users/{user_id}", {
     params: {
       path: {
