@@ -150,7 +150,7 @@ function Inner({notificationId}: { notificationId: string }) {
         </Form.Item>
 
         <Form.Item name="markdown" label="markdownの内容">
-          <TextArea defaultValue={data.type_markdown.content}/>
+          <TextArea/>
         </Form.Item>
 
         <Form.Item>
