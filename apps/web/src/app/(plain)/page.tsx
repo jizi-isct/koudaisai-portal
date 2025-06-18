@@ -6,7 +6,8 @@ import "../globals.css";
 import styles from "./page.module.css";
 
 import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
-import {getTokensMembers, topPageData} from "@/lib/lib";
+import {getTokensMembers} from "@/lib";
+import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
 
 export default function Page() {
