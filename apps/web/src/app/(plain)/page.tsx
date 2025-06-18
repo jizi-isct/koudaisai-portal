@@ -1,43 +1,103 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useEffect, useState} from 'react';
-import {getTokensMembers} from "@/lib";
+import {useRouter} from 'next/navigation';
 import "../globals.css";
 import styles from "./page.module.css";
 
-import {TopPageUnauthenticated} from "@/components/TopPageUnauthenticated/TopPageUnauthenticated";
-import {TopPageAuthenticated} from "@/components/TopPageAuthenticated/TopPageAuthenticated";
+import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
+import {getTokensMembers, topPageData} from "@/lib/lib";
+import {Hero} from "@/components/Hero/Hero";
 
 export default function Page() {
+  const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [innerHeight, setInnerHeight] = useState(100);
 
   useEffect(() => {
-    // まずローカルストレージに access_token があるか確認
-    const token = localStorage.getItem("exhibitor_access_token");
-    if (token) {
-      setAuthenticated(true); // 仮認証（存在ベース）
-
-      // 非同期でトークンの有効性確認
-      (async () => {
-        const valid = await getTokensMembers();
-        if (!valid) {
-          setAuthenticated(false); // 無効なら認証状態をリセット
-        }
-      })();
-    }
+    (async () => {
+      const tokens = await getTokensMembers()
+      if (tokens) {
+        setAuthenticated(true);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    if (authenticated === true) {
+      router.replace('/dashboard'); // 認証されていなければリダイレクト
+    }
+  }, [authenticated, router]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+      setInnerHeight(window.innerHeight)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+  }, [])
 
   return (
     <>
-      {authenticated ? (
-        <>
-          <TopPageAuthenticated />
-        </>
-      ) : (
-        <>
-          <TopPageUnauthenticated />
-        </>
-      )}
+      <main className="content">
+        <Header
+          header_type="members"
+          titleColor={scrollY > innerHeight - 80 ? "black" : "white"}
+        ></Header>
+        <Hero />
+        <Heading2 emoji={"ℹ️"}>このサイトについて</Heading2>
+        <p>
+          このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。
+          <br />
+          このサイトを通じて工大祭への参加に関する各種手続きを行うことができます。
+          <br />
+          一緒に工大祭を創りあげましょう！
+        </p>
+        <Tab
+          tabs={
+            new Map([
+              [
+                "模擬店企画",
+                <>
+                  <Heading2 emoji={"🕺"}>参加申請までの流れ</Heading2>
+                  <Steps steps={topPageData.booth[0]} />
+                  <Heading2 emoji={"📅"}>工大祭までの流れ</Heading2>
+                  <Steps steps={topPageData.booth[1]} />
+                </>,
+              ],
+              [
+                "一般企画",
+                <>
+                  <Heading2 emoji={"🕺"}>参加申請までの流れ</Heading2>
+                  <Steps steps={topPageData.general[0]} />
+                  <Heading2 emoji={"📅"}>工大祭までの流れ</Heading2>
+                  <Steps steps={topPageData.general[1]} />
+                </>,
+              ],
+              [
+                "ステージ企画",
+                <>
+                  <Heading2 emoji={"🕺"}>参加申請までの流れ</Heading2>
+                  <Steps steps={topPageData.stage[0]} />
+                  <Heading2 emoji={"📅"}>工大祭までの流れ</Heading2>
+                  <Steps steps={topPageData.stage[1]} />
+                </>,
+              ],
+              [
+                "研究室企画",
+                <>
+                  <Heading2 emoji={"📅"}>工大祭までの流れ</Heading2>
+                  <Steps steps={topPageData.labo[0]} />
+                </>,
+              ],
+            ])
+          }
+        />
+        <MobileNavigator header_type="members" />
+    </main>
+    <Footer />
     </>
   );
 }
