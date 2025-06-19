@@ -1,7 +1,7 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useCallback} from "react";
-import {User, Exhibitor, updateExhibitor} from "@/lib";
+import {User, Exhibitor, updateExhibitor, fetchClientMembers} from "@/lib";
 import {Modal} from "@/components/generic/Modal/Modal";
 import {TextInput} from "@/components/generic/TextInput/TextInput";
 import {FileUploader} from "@/components/common/FileUploader";
@@ -49,7 +49,7 @@ export const EditModal = ({user, exhibitor, setExhibitor, modal, setModal}: Edit
             }}
             paragraph={true}
             />
-            <FileUploader callback={handleFileUpload} isMembers={true}/>
+            <FileUploader callback={handleFileUpload} client={fetchClientMembers}/>
         </Modal>
     );
 };

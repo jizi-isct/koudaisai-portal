@@ -1,15 +1,15 @@
 import {useCallback, useState} from "react";
-import {fetchClientAdmin, fetchClientMembers} from "@/lib";
+import type {apiQueryClientType} from "@/lib";
 import {Loader} from "@/components/generic/Loader";
 import styles from "./FileUploader.module.css";
 
 type FileUploaderProps = {
   callback: (fileKey: string, fileName: string) => (void | Promise<void>),
   fileType?: string,
-  isMembers?: boolean,
+  client: apiQueryClientType,
 }
 
-export function FileUploader({callback, fileType, isMembers}: FileUploaderProps) {
+export function FileUploader({callback, fileType, client}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const handleFileUpload = useCallback(async (file: File | undefined) => {
@@ -18,8 +18,6 @@ export function FileUploader({callback, fileType, isMembers}: FileUploaderProps)
       setError("ファイルを指定してください")
       return
     }
-
-    const client = isMembers ? fetchClientMembers : fetchClientAdmin;
 
     const { data, error } = await client.POST("/files/upload", {
         body: {

@@ -49,6 +49,7 @@ export default function Page() {
   if (authenticated === null) {
     return <LoadingScreen />;
   }
+
   return (
     <>
     <main className="content">
