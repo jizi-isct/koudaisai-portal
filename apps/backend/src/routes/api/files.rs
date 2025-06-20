@@ -39,7 +39,7 @@ async fn post_files_upload(
     Extension(current_user): Extension<CurrentUser>,
     Json(payload): Json<PostFilesUploadPayload>,
 ) -> AppResponse {
-    if let CurrentUser::Admin(..) = current_user {
+    if matches!(current_user, CurrentUser::Admin(..) | CurrentUser::User(..)) {
         let key = format!("{}-{}", Uuid::new_v4(), payload.file_name);
 
         let presigned = state
