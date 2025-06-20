@@ -31,7 +31,7 @@ export function Inner({children}: Props) {
       if (tokens) {
         setTokens(tokens)
       } else {
-        await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/admin/login")
+        await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/login")
       }
     })()
   }, [])
