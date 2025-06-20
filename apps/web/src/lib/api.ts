@@ -2,6 +2,7 @@ import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers, getUserIdFromAccessToken} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
+import {Exhibitor} from "@/lib/types";
 
 const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {
@@ -69,11 +70,12 @@ export type apiClientType = typeof fetchClientNoAuth
 
 export type User = paths["/users/{user_id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type Exhibitor = paths["/exhibitors/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
-
 // ユーザ情報を取得する関数
 export const getUser = async (): Promise<User> => {
   const userId = await getUserIdFromAccessToken();
+  if (!userId) {
+    throw new Error("不明なユーザーです");
+  }
   const res = await fetchClientMembers.GET("/users/{user_id}", {
     params: {
       path: {

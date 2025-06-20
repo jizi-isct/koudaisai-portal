@@ -3,7 +3,6 @@
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import "../globals.css";
-import styles from "./page.module.css";
 
 import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
 import {getTokensMembers} from "@/lib";
@@ -27,7 +26,7 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (authenticated === true) {
+    if (authenticated) {
       router.replace('/dashboard'); // 認証されていなければリダイレクト
     }
   }, [authenticated, router]);

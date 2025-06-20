@@ -1,6 +1,6 @@
 "use client";
 
-import {DocumentFormatPdfRead, DocumentFormatPdfUpdate, fetchClientAdmin} from "@/lib";
+import {$apiAdmin, DocumentFormatPdfRead, DocumentFormatPdfUpdate} from "@/lib";
 import {useCallback} from "react";
 import {FileUploader} from "@/components/common/FileUploader";
 
@@ -21,7 +21,7 @@ export function EditDocumentFormatPdf({updateFormat}: EditDocumentFormatPdfProps
     <>
       <label>
         pdfファイルをアップロード
-        <FileUploader callback={handleFileUpload} fileType={"application/pdf"} client={fetchClientAdmin}/>
+        <FileUploader callback={handleFileUpload} fileType={"application/pdf"} client={$apiAdmin}/>
       </label>
     </>
   )

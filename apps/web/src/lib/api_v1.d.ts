@@ -1680,7 +1680,7 @@ export interface components {
              */
             type: "booth" | "general" | "stage" | "labo";
             /** @description 第一責任者, 第二責任者, 第三責任者 */
-            representatives: unknown;
+            representatives: string[];
         };
         User: {
             /**
@@ -1732,7 +1732,7 @@ export interface components {
              */
             type: "booth" | "general" | "stage" | "labo";
             /** @description 第一責任者, 第二責任者, 第三責任者 */
-            representatives: unknown;
+            representatives: components["schemas"]["User"][];
         };
         NewExhibitionResponse: {
             /** @description 第一責任者, 第二責任者, 第三責任者のactivation token */

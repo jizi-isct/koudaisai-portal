@@ -2,11 +2,10 @@
 
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {getTokensMembers} from "@/lib";
+import {Exhibitor, getExhibitor, getTokensMembers, getUser, User} from "@/lib";
 import "../../globals.css";
 
-import {LoadingScreen, Heading1} from '@/components/generic';
-import {getUser, getExhibitor, User, Exhibitor} from "@/lib";
+import {Heading1, LoadingScreen} from '@/components/generic';
 import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
@@ -47,28 +46,38 @@ export default function Page() {
   }, []);
 
   if (authenticated === null) {
-    return <LoadingScreen />;
+    return <LoadingScreen/>;
   }
 
   return (
     <>
-    <main className="content">
-        <UserInfoCard user={user} exhibitor={exhibitor} />
+      <main className="content">
+        {
+          user && exhibitor &&
+                <UserInfoCard user={user} exhibitor={exhibitor}/>
+        }
         <Heading1 emoji={"📄"}>
-        企画情報
+          企画情報
         </Heading1>
-        <ExhibitorCard
-        exhibitor={exhibitor}
-        openModal={() => setModal(true)}
-        />
-        <EditModal
-        user={user}
-        exhibitor={exhibitor}
-        setExhibitor={setExhibitor}
-        modal={modal}
-        setModal={setModal}
-        />
-    </main>
+        {
+          exhibitor &&
+                <ExhibitorCard
+                        exhibitor={exhibitor}
+                        openModal={() => setModal(true)}
+                />
+        }
+
+        {
+          user && exhibitor &&
+                <EditModal
+                        user={user}
+                        exhibitor={exhibitor}
+                        setExhibitor={setExhibitor}
+                        modal={modal}
+                        setModal={setModal}
+                />
+        }
+      </main>
     </>
   );
 }
