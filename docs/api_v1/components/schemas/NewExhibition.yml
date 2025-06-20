@@ -19,6 +19,7 @@ properties:
     example: general
   representatives:
     description: 第一責任者, 第二責任者, 第三責任者
+    type: array
     uniqueItems: true
     minItems: 3
     maxItems: 3

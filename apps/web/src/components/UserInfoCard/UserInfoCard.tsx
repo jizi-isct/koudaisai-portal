@@ -1,4 +1,4 @@
-import { User, Exhibitor } from "@/lib";
+import {Exhibitor, User} from "@/lib";
 import styles from "./UserInfoCard.module.css";
 
 type UserInfoCardProps = {
@@ -16,7 +16,7 @@ const typeLabels: Record<string, string> = {
 export const UserInfoCard = ({user, exhibitor}: UserInfoCardProps) => {
     const representativeIndex = (user && exhibitor)
     ? exhibitor.representatives.indexOf(user.id) + 1
-    : null;
+      : "?";
     return (
     <div className={styles.user}>
         <h1>こんにちは、{user?.last_name} {user?.first_name} 👋</h1>

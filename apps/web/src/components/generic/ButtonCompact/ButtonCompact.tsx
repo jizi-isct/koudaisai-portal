@@ -8,7 +8,7 @@ type ButtonCompactProps = { // ①
   className?: string;
 };
 
-export const ButtonCompact = ({text, color = '#0048FF', onClick, isClicked = false, className}: ButtonProps) => {
+export const ButtonCompact = ({text, onClick, className}: ButtonCompactProps) => {
   return (
     <div
       className={`${styles.button} ${className}`}

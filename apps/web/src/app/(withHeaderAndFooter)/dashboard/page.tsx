@@ -2,16 +2,25 @@
 
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {getTokensMembers} from "@/lib";
+import {$apiMembers, Exhibitor, getExhibitor, getTokensMembers, getUser, User} from "@/lib";
 import "../../globals.css";
 
-import {LoadingScreen, Heading1} from '@/components/generic';
-import {getUser, getExhibitor, User, Exhibitor} from "@/lib";
+import {Heading1, LoadingScreen} from '@/components/generic';
 import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
+import {ViewNotifications} from "@/components/notification/ViewNotifications";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export default function Page() {
+  return (
+    <QueryClientProvider client={new QueryClient()}>
+      <Inner/>
+    </QueryClientProvider>
+  )
+}
+
+function Inner() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -47,28 +56,42 @@ export default function Page() {
   }, []);
 
   if (authenticated === null) {
-    return <LoadingScreen />;
+    return <LoadingScreen/>;
   }
 
   return (
     <>
-    <main className="content">
-        <UserInfoCard user={user} exhibitor={exhibitor} />
-        <Heading1 emoji={"📄"}>
-        企画情報
+      <main className="content">
+        {
+          user && exhibitor &&
+                <UserInfoCard user={user} exhibitor={exhibitor}/>
+        }
+        <Heading1 emoji={"🔔"}>
+          実行委員会からのお知らせ
         </Heading1>
-        <ExhibitorCard
-        exhibitor={exhibitor}
-        openModal={() => setModal(true)}
-        />
-        <EditModal
-        user={user}
-        exhibitor={exhibitor}
-        setExhibitor={setExhibitor}
-        modal={modal}
-        setModal={setModal}
-        />
-    </main>
+        <ViewNotifications client={$apiMembers}/>
+        <Heading1 emoji={"📄"}>
+          企画情報
+        </Heading1>
+        {
+          exhibitor &&
+                <ExhibitorCard
+                        exhibitor={exhibitor}
+                        openModal={() => setModal(true)}
+                />
+        }
+
+        {
+          user && exhibitor &&
+                <EditModal
+                        user={user}
+                        exhibitor={exhibitor}
+                        setExhibitor={setExhibitor}
+                        modal={modal}
+                        setModal={setModal}
+                />
+        }
+      </main>
     </>
   );
 }

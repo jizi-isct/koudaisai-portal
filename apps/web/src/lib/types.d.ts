@@ -23,5 +23,8 @@ export type DocumentFormatMiscUpdate = components["schemas"]["UpdateDocumentForm
 export type DocumentCategoryCreate = components["schemas"]["CreateDocumentCategory"];
 export type DocumentCategoryRead = components["schemas"]["ReadDocumentCategory"];
 export type DocumentCategoryUpdate = components["schemas"]["UpdateDocumentCategory"];
+export type NotificationCreate = components["schemas"]["NotificationCreate"];
+export type NotificationRead = components["schemas"]["NotificationRead"];
+export type NotificationUpdate = components["schemas"]["NotificationUpdate"];
 
 export type Exhibitor = components["schemas"]["Exhibitor"];

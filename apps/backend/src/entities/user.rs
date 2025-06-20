@@ -1,10 +1,11 @@
 use crate::entities::exhibitor::ExhibitorRead;
 use crate::sea_orm_entities;
+use crate::sea_orm_entities::read_notifications;
 use crate::util::jwt::Claims;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use chrono::DateTime;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -40,6 +41,13 @@ impl UserRead {
             None => Err(anyhow::anyhow!("User not found")),
         }
     }
+
+    pub async fn from_claims(claims: Claims, db_conn: &DbConn) -> Result<Self> {
+        Ok(Self::find_from_id(claims.sub, db_conn)
+            .await?
+            .ok_or(anyhow!("User not found"))?)
+    }
+
     pub async fn find_from_id(value: Uuid, db_conn: &DbConn) -> Result<Option<Self>> {
         match sea_orm_entities::users::Entity::find_by_id(value)
             .one(db_conn)
@@ -60,6 +68,21 @@ impl UserRead {
             Some(value) => Ok(value),
             None => Err(anyhow::anyhow!("Exhibitor not found")),
         }
+    }
+
+    pub async fn is_notification_read(
+        &self,
+        notification_id: Uuid,
+        db_conn: &DbConn,
+    ) -> Result<bool> {
+        let result = read_notifications::Entity::find()
+            .filter(read_notifications::Column::UserId.eq(self.id))
+            .filter(read_notifications::Column::NotificationId.eq(notification_id))
+            .one(db_conn)
+            .await
+            .map_err(|e| anyhow::anyhow!("Database error: {}", e))?;
+
+        Ok(result.is_some())
     }
 }
 

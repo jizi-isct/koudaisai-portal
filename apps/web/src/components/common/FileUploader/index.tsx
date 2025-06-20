@@ -12,6 +12,7 @@ type FileUploaderProps = {
 export function FileUploader({callback, fileType, client}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const {mutateAsync: mutateUploadFile} = client.useMutation("post", "/files/upload")
   const handleFileUpload = useCallback(async (file: File | undefined) => {
     setIsUploading(true)
     if (!file) {
@@ -19,24 +20,26 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
       return
     }
 
-    const { data, error } = await client.POST("/files/upload", {
+    try {
+      const response = await mutateUploadFile({
         body: {
           file_name: file.name,
         },
       });
 
-    if (data) {
-      await fetch(data.presigned_url, {
+      await fetch(response.presigned_url, {
         method: "PUT",
         body: file
       })
 
-      await callback(data.key, file.name)
-    } else {
-      setError(`エラー：${error}`)
+      await callback(response.key, file.name)
+    } catch (e) {
+      setError(`エラー：${e}`)
+    } finally {
+      setIsUploading(false)
     }
     setIsUploading(false)
-  }, [callback])
+  }, [callback, mutateUploadFile])
 
   return (
     <div className={styles.root}>

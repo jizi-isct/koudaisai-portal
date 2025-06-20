@@ -34,6 +34,8 @@ pub enum Relation {
     ExhibitorsRoot,
     #[sea_orm(has_many = "super::form_responses::Entity")]
     FormResponses,
+    #[sea_orm(has_many = "super::read_notifications::Entity")]
+    ReadNotifications,
 }
 
 impl Related<super::exhibitors_root::Entity> for Entity {
@@ -45,6 +47,12 @@ impl Related<super::exhibitors_root::Entity> for Entity {
 impl Related<super::form_responses::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::FormResponses.def()
+    }
+}
+
+impl Related<super::read_notifications::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ReadNotifications.def()
     }
 }
 

@@ -1,7 +1,11 @@
+"use client";
+
 import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers, getUserIdFromAccessToken} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
+import {Exhibitor} from "@/lib/types";
+import {useEffect, useState} from "react";
 
 const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {
@@ -45,6 +49,32 @@ export async function isLoggedInAdmin(): Promise<boolean> {
   return !!tokens;
 }
 
+export function useIsLoggedInMembers(): boolean | undefined {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const loggedIn = await isLoggedInMembers();
+      setIsLoggedIn(loggedIn);
+    })();
+  }, []);
+
+  return isLoggedIn;
+}
+
+export function useIsLoggedInAdmin(): boolean | undefined {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const loggedIn = await isLoggedInAdmin();
+      setIsLoggedIn(loggedIn);
+    })();
+  }, []);
+
+  return isLoggedIn;
+}
+
 //membersトークンを乗せたリクエストを送るclients
 export const fetchClientMembers = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL})
 fetchClientMembers.use(authMiddlewareMembers)
@@ -69,11 +99,12 @@ export type apiClientType = typeof fetchClientNoAuth
 
 export type User = paths["/users/{user_id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type Exhibitor = paths["/exhibitors/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
-
 // ユーザ情報を取得する関数
 export const getUser = async (): Promise<User> => {
   const userId = await getUserIdFromAccessToken();
+  if (!userId) {
+    throw new Error("不明なユーザーです");
+  }
   const res = await fetchClientMembers.GET("/users/{user_id}", {
     params: {
       path: {

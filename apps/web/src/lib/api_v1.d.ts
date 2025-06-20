@@ -1372,6 +1372,276 @@ export interface paths {
         };
         trace?: never;
     };
+    "/users/{user_id}/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** そのユーザー向けの通知と既読状況を取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーID */
+                    user_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            notification: components["schemas"]["NotificationRead"];
+                            /** @description その通知が既読かどうかを示すフラグ
+                             *     trueの場合、通知は既読であることを示す
+                             *      */
+                            is_read: boolean;
+                        }[];
+                    };
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 全ての通知を取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationRead"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** 通知を新規作成 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NotificationCreate"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/{notification_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 通知を取得
+         * @description ### authの違いによる挙動の違い
+         *     - **exhibitor_bearerの場合**: 自分が通知対象である場合通知を取得可能
+         *     - **admin_oidcの場合**: 存在する通知を全て取得可能
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 通知id */
+                    notification_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationRead"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** 通知を削除 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 通知ID */
+                    notification_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description フォームが存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 通知を更新 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 通知ID */
+                    notification_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NotificationUpdate"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1413,7 +1683,7 @@ export interface components {
              */
             type: "booth" | "general" | "stage" | "labo";
             /** @description 第一責任者, 第二責任者, 第三責任者 */
-            representatives: unknown;
+            representatives: string[];
         };
         User: {
             /**
@@ -1465,7 +1735,7 @@ export interface components {
              */
             type: "booth" | "general" | "stage" | "labo";
             /** @description 第一責任者, 第二責任者, 第三責任者 */
-            representatives: unknown;
+            representatives: components["schemas"]["User"][];
         };
         NewExhibitionResponse: {
             /** @description 第一責任者, 第二責任者, 第三責任者のactivation token */
@@ -1785,6 +2055,91 @@ export interface components {
              */
             m_address?: string;
         };
+        NotificationReadGeneric: {
+            /**
+             * Format: uuid
+             * @description 通知ID
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at: string;
+            /**
+             * Format: date-time
+             * @description 最終更新日時
+             */
+            updated_at: string;
+            /**
+             * Format: uuid
+             * @description 作成者のユーザーID
+             */
+            created_by: string;
+            /**
+             * Format: uuid
+             * @description 最終更新者のユーザーID
+             */
+            updated_by: string;
+            /** @description 通知のタイトル */
+            title: string;
+            /** @description 通知の対象を含む配列
+             *     - `exhibitor/type/general` - 一般企画責任者
+             *     - `exhibitor/type/booth` - 模擬店企画責任者
+             *     - `exhibitor/type/stage` - ステージ企画責任者
+             *     - `exhibitor/type/labo` - 研究室企画責任者
+             *     - `user/id/${user_id}` - 特定のユーザー
+             *     - `user/nologin` - ログインしていないユーザー
+             *      */
+            target: string[];
+        };
+        /** @description マークダウンタイプの通知 */
+        NotificationReadTypeMarkdown: {
+            content: string;
+        };
+        NotificationRead: components["schemas"]["NotificationReadGeneric"] & {
+            type_markdown: components["schemas"]["NotificationReadTypeMarkdown"];
+        };
+        NotificationCreateGeneric: {
+            /** @description 通知のタイトル */
+            title: string;
+            /** @description 通知の対象を含む配列
+             *     - `exhibitor/type/general` - 一般企画責任者
+             *     - `exhibitor/type/booth` - 模擬店企画責任者
+             *     - `exhibitor/type/stage` - ステージ企画責任者
+             *     - `exhibitor/type/labo` - 研究室企画責任者
+             *     - `user/id/${user_id}` - 特定のユーザー
+             *     - `user/nologin` - ログインしていないユーザー
+             *      */
+            target: string[];
+        };
+        /** @description マークダウンタイプの通知 */
+        NotificationCreateTypeMarkdown: {
+            content: string;
+        };
+        NotificationCreate: components["schemas"]["NotificationCreateGeneric"] & {
+            type_markdown: components["schemas"]["NotificationCreateTypeMarkdown"];
+        };
+        NotificationUpdateGeneric: {
+            /** @description 通知のタイトル */
+            title?: string;
+            /** @description 通知の対象を含む配列
+             *     - `exhibitor/type/general` - 一般企画責任者
+             *     - `exhibitor/type/booth` - 模擬店企画責任者
+             *     - `exhibitor/type/stage` - ステージ企画責任者
+             *     - `exhibitor/type/labo` - 研究室企画責任者
+             *     - `user/id/${user_id}` - 特定のユーザー
+             *     - `user/nologin` - ログインしていないユーザー
+             *      */
+            target?: string[];
+        };
+        /** @description マークダウンタイプの通知 */
+        NotificationUpdateTypeMarkdown: {
+            content?: string;
+        };
+        NotificationUpdate: (components["schemas"]["NotificationUpdateGeneric"] & {
+            type_markdown: components["schemas"]["NotificationUpdateTypeMarkdown"];
+        }) | components["schemas"]["NotificationUpdateGeneric"];
     };
     responses: never;
     parameters: never;

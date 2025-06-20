@@ -1,6 +1,6 @@
 "use client";
 
-import {DocumentFormatMiscRead, DocumentFormatMiscUpdate, fetchClientAdmin} from "@/lib";
+import {$apiAdmin, DocumentFormatMiscRead, DocumentFormatMiscUpdate} from "@/lib";
 import {useCallback} from "react";
 import {FileUploader} from "@/components/common/FileUploader";
 
@@ -21,7 +21,7 @@ export function EditDocumentFormatMisc({updateFormat}: EditDocumentFormatMiscPro
     <>
       <label>
         ファイルをアップロード
-        <FileUploader callback={handleFileUpload} client={fetchClientAdmin}/>
+        <FileUploader callback={handleFileUpload} client={$apiAdmin}/>
       </label>
     </>
   )
