@@ -1,7 +1,10 @@
+"use client";
+
 import nextBase64 from 'next-base64';
 import {paths} from "./auth_v1";
 import createFetchClient from "openapi-fetch";
 import createClient from "openapi-react-query";
+import {useEffect, useState} from "react";
 
 export type Tokens = {
   refresh_token: string,
@@ -23,6 +26,19 @@ export async function getUserIdFromAccessToken() : Promise<string | undefined> {
   }
   const access_token_payload = decodeAccessToken(access_token);
   return access_token_payload.sub;
+}
+
+export function useUserIdFromAccessToken(): string | undefined {
+  const [userId, setUserId] = useState<string | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const id = await getUserIdFromAccessToken();
+      setUserId(id);
+    })();
+  }, []);
+
+  return userId;
 }
 
 export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL})

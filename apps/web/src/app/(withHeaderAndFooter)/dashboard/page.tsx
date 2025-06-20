@@ -2,15 +2,25 @@
 
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {Exhibitor, getExhibitor, getTokensMembers, getUser, User} from "@/lib";
+import {$apiMembers, Exhibitor, getExhibitor, getTokensMembers, getUser, User} from "@/lib";
 import "../../globals.css";
 
 import {Heading1, LoadingScreen} from '@/components/generic';
 import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
+import {ViewNotifications} from "@/components/notification/ViewNotifications";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export default function Page() {
+  return (
+    <QueryClientProvider client={new QueryClient()}>
+      <Inner/>
+    </QueryClientProvider>
+  )
+}
+
+function Inner() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -56,6 +66,10 @@ export default function Page() {
           user && exhibitor &&
                 <UserInfoCard user={user} exhibitor={exhibitor}/>
         }
+        <Heading1 emoji={"🔔"}>
+          実行委員会からのお知らせ
+        </Heading1>
+        <ViewNotifications client={$apiMembers}/>
         <Heading1 emoji={"📄"}>
           企画情報
         </Heading1>

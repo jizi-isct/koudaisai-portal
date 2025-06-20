@@ -1,8 +1,11 @@
+"use client";
+
 import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers, getUserIdFromAccessToken} from "./auth";
 import {paths} from "./api_v1";
 import createFetchClient, {type Middleware} from "openapi-fetch";
 import {Exhibitor} from "@/lib/types";
+import {useEffect, useState} from "react";
 
 const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {
@@ -44,6 +47,32 @@ export async function isLoggedInMembers(): Promise<boolean> {
 export async function isLoggedInAdmin(): Promise<boolean> {
   const tokens = await getTokensAdmin();
   return !!tokens;
+}
+
+export function useIsLoggedInMembers(): boolean | undefined {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const loggedIn = await isLoggedInMembers();
+      setIsLoggedIn(loggedIn);
+    })();
+  }, []);
+
+  return isLoggedIn;
+}
+
+export function useIsLoggedInAdmin(): boolean | undefined {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const loggedIn = await isLoggedInAdmin();
+      setIsLoggedIn(loggedIn);
+    })();
+  }, []);
+
+  return isLoggedIn;
 }
 
 //membersトークンを乗せたリクエストを送るclients

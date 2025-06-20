@@ -1384,7 +1384,10 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    /** @description ユーザーID */
+                    user_id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -1396,11 +1399,11 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            notification?: components["schemas"]["NotificationRead"];
+                            notification: components["schemas"]["NotificationRead"];
                             /** @description その通知が既読かどうかを示すフラグ
                              *     trueの場合、通知は既読であることを示す
                              *      */
-                            is_read?: boolean;
+                            is_read: boolean;
                         }[];
                     };
                 };

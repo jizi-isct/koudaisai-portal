@@ -1,7 +1,7 @@
 "use client";
 
-import {Heading1} from "@/components/generic"
-import {$apiNoAuth} from "@/lib";
+import {Heading1, LoadingScreen} from "@/components/generic"
+import {$apiMembers, $apiNoAuth, useIsLoggedInMembers} from "@/lib";
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
@@ -19,9 +19,13 @@ export default function Page() {
 }
 
 function Inner() {
+  const isLoggedIn = useIsLoggedInMembers()
+  if (isLoggedIn === undefined) {
+    return <LoadingScreen/>
+  }
   return (
     <>
-      <ReadDocumentProvider queryClient={$apiNoAuth}>
+      <ReadDocumentProvider queryClient={isLoggedIn ? $apiMembers : $apiNoAuth}>
         <Heading1 emoji="📚">資料一覧</Heading1>
         <ViewDocuments/>
       </ReadDocumentProvider>
