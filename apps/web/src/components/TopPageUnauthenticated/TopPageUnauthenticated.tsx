@@ -1,47 +1,24 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import {useEffect, useState} from 'react';
-import {useRouter} from 'next/navigation';
-import "../globals.css";
-import styles from "./page.module.css";
-
 import {Footer, Header, Heading2, MobileNavigator, Steps, Tab} from "@/components/generic";
-import {getTokensMembers} from "@/lib";
 import {topPageData} from "@/lib/lib";
 import {Hero} from "@/components/Hero/Hero";
-import "../members.css"
 
-export default function Page() {
-  const router = useRouter();
-  const [authenticated, setAuthenticated] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [innerHeight, setInnerHeight] = useState(100);
+export const TopPageUnauthenticated = () => {
+    const [scrollY, setScrollY] = useState(0);
+    const [innerHeight, setInnerHeight] = useState(100);
+    
+    useEffect(() => {
+        const handleScroll = () => {
+          setScrollY(window.scrollY)
+          setInnerHeight(window.innerHeight)
+        }
+    
+        window.addEventListener("scroll", handleScroll)
+      }, [])
 
-  useEffect(() => {
-    (async () => {
-      const tokens = await getTokensMembers()
-      if (tokens) {
-        setAuthenticated(true);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (authenticated === true) {
-      router.replace('/dashboard'); // 認証されていなければリダイレクト
-    }
-  }, [authenticated, router]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-      setInnerHeight(window.innerHeight)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-  }, [])
-
-  return (
+    return (
     <>
       <main className="content">
         <Header
@@ -98,8 +75,10 @@ export default function Page() {
           }
         />
         <MobileNavigator header_type="members" />
-    </main>
-    <Footer />
+      </main>
+      <Footer />
     </>
   );
-}
+};
+
+export default TopPageUnauthenticated;

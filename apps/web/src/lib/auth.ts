@@ -8,6 +8,23 @@ export type Tokens = {
   access_token: string,
 }
 
+export const decodeAccessToken = (access_token: string): any => {
+  const access_token_payload_base64 = access_token.split(".")[1];
+  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64
+    .replace(/-/g, "+")
+    .replace(/_/g, "/")));
+  return access_token_payload;
+}
+
+export async function getUserIdFromAccessToken() : Promise<string | undefined> {
+  const access_token = localStorage.getItem("exhibitor_access_token");
+  if (!access_token) {
+    return undefined;
+  }
+  const access_token_payload = decodeAccessToken(access_token);
+  return access_token_payload.sub;
+}
+
 export const fetchClientAuth = createFetchClient<paths>({baseUrl: process.env.NEXT_PUBLIC_AUTH_BASE_URL})
 
 export const $auth = createClient(fetchClientAuth)
@@ -26,11 +43,7 @@ export async function getTokensMembers(): Promise<Tokens | undefined> {
   }
 
   //アクセストークンのexp確認
-  const access_token_payload_base64 = access_token!.split(".")[1]
-  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64
-    .replace(/-/g, "+")
-    .replace(/_/g, "/")))
-  const access_token_exp = access_token_payload.exp as number;
+  const access_token_exp = decodeAccessToken(access_token).exp as number;
   if (access_token_exp * 1000 >= Date.now()) {
     //有効期限OK
     return {
