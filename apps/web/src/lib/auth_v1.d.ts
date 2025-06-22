@@ -380,10 +380,10 @@ export interface components {
     schemas: {
         Activate: {
             /**
-             * Format: uuid
-             * @description ユーザーのuuid
+             * Format: email
+             * @description ユーザーのmアドレス
              */
-            uuid: string;
+            m_address?: string;
             /** @description ユーザーのactivation token */
             token: string;
             /**

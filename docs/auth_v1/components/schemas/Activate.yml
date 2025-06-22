@@ -1,8 +1,8 @@
 properties:
-  uuid:
-    description: ユーザーのuuid
+  m_address:
+    description: ユーザーのmアドレス
     type: string
-    format: uuid
+    format: email
   token:
     description: ユーザーのactivation token
     type: string

@@ -155,3 +155,27 @@ export async function getTokensAdmin(): Promise<Tokens | undefined> {
   }
 }
 
+export async function login(m_address: string, password: string): Promise<Tokens | undefined> {
+  const {data, response} = await fetchClientAuth.POST(
+    "/login",
+    {
+      body: {
+        m_address: m_address,
+        password: password
+      }
+    }
+  )
+
+  if (data) {
+    localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
+    localStorage.setItem("exhibitor_access_token", data.access_token)
+    return data
+  } else {
+    switch (response.status) {
+      case 401:
+        throw new Error("mアドレスまたはパスワードが間違えています。");
+      default:
+        throw new Error("内部エラー。開発者に問い合わせてください。");
+    }
+  }
+}
