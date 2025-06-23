@@ -29,6 +29,14 @@ properties:
   form_name:
     type: string
     description: Name of the form
+  summary:
+    type: string
+    description: Summary or description of the form
+  due_date:
+    type: string
+    format: date-time
+    description: Due date for the form submission
+    nullable: true
 required:
   - id
   - created_at
@@ -37,3 +45,5 @@ required:
   - updated_by
   - targets
   - form_name
+  - summary
+  - due_date

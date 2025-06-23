@@ -190,7 +190,7 @@ export interface paths {
         /**
          * アクセス可能なフォームをすべて取得
          * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能なフォームを取得
+         *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームを取得
          *     - **admin_oidcの場合**: 存在するフォームを全て取得
          */
         get: {
@@ -208,7 +208,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Form"][];
+                        "application/json": components["schemas"]["FormRead"][];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -238,18 +238,16 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["Form"];
+                    "application/json": components["schemas"]["FormCreate"];
                 };
             };
             responses: {
-                /** @description Changed */
-                201: {
+                /** @description NoContent */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": components["schemas"]["Form"];
-                    };
+                    content?: never;
                 };
                 /** @description 不正なrequest bodyの形式 */
                 400: {
@@ -283,7 +281,7 @@ export interface paths {
         /**
          * フォームを取得
          * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能なフォームな場合取得
+         *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームな場合取得
          *     - **admin_oidcの場合**: 存在するフォームを全て取得
          */
         get: {
@@ -304,7 +302,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Form"];
+                        "application/json": components["schemas"]["FormRead"];
                     };
                 };
                 /** @description 不正なrequest bodyの形式 */
@@ -323,48 +321,7 @@ export interface paths {
                 };
             };
         };
-        /** フォームを更新 */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["Form"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Form"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        put?: never;
         post?: never;
         /** フォームを削除 */
         delete: {
@@ -379,14 +336,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Changed */
-                201: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": components["schemas"]["Form"][];
-                    };
+                    content?: never;
                 };
                 /** @description 資格情報が無効だった場合 */
                 401: {
@@ -406,62 +361,8 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/{form_id}/responses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 閲覧可能なすべての回答を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の責任者が回答した回答を全て取得
-         *     - **admin_oidcの場合**: 存在する全ての回答を取得
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK/ */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["FormResponse"][];
-                    };
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        /** 新たに回答を作成 */
-        post: {
+        /** フォームを更新 */
+        patch: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -473,111 +374,19 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["FormResponse"];
+                    "application/json": components["schemas"]["FormUpdate"];
                 };
             };
             responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Form"][];
-                    };
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/{form_id}/responses/{response_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 回答を編集 */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                    /** @description 回答ID */
-                    response_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["FormResponse"];
-                };
-            };
-            responses: {
-                /** @description OK/ */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["FormResponse"][];
-                    };
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームまたは回答が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        post?: never;
-        /** 回答を削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                    /** @description 回答ID */
-                    response_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Changed. */
-                201: {
+                /** @description 不正なrequest bodyの形式 */
+                400: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -590,18 +399,8 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description フォームまたは回答が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
             };
         };
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/documents": {
@@ -1642,6 +1441,64 @@ export interface paths {
         };
         trace?: never;
     };
+    "/util/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ページのメタデータを取得 */
+        get: {
+            parameters: {
+                query: {
+                    /** @description フォームID */
+                    url: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description The title of the page. */
+                            title: string | null;
+                            /** @description The description of the page. */
+                            description: string | null;
+                        };
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1752,6 +1609,47 @@ export interface components {
             /** @description 企画概要 */
             description?: string;
         };
+        /** @description Target specifier for forms */
+        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown);
+        /** @description Generic form properties */
+        FormReadGeneric: {
+            /**
+             * Format: uuid
+             * @description Unique identifier
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Timestamp when the form was created
+             */
+            created_at: string;
+            /**
+             * Format: date-time
+             * @description Timestamp when the form was last updated
+             */
+            updated_at: string;
+            /**
+             * Format: uuid
+             * @description User ID of the creator
+             */
+            created_by: string;
+            /**
+             * Format: uuid
+             * @description User ID of the last updater
+             */
+            updated_by: string;
+            /** @description Target specifiers for the form */
+            targets: components["schemas"]["TargetSpecifier"][];
+            /** @description Name of the form */
+            form_name: string;
+            /** @description Summary or description of the form */
+            summary: string;
+            /**
+             * Format: date-time
+             * @description Due date for the form submission
+             */
+            due_date: string | null;
+        };
         /** @description フォームの一般情報 */
         Info: {
             /** @description 回答者に表示されるフォームのタイトル */
@@ -1816,11 +1714,6 @@ export interface components {
             item_page_break?: components["schemas"]["ItemPageBreak"];
             item_text?: components["schemas"]["ItemText"];
         };
-        /** @description フォームのアクセス制限 */
-        AccessControl: {
-            /** @description アクセス可能なロール */
-            roles: string[];
-        };
         /** @description フォーム */
         Form: {
             /**
@@ -1828,71 +1721,79 @@ export interface components {
              * @description フォームID
              */
             readonly form_id?: string;
-            /**
-             * Format: datetime
-             * @description 作成日時
-             */
-            readonly created_at?: string;
-            /**
-             * Format: datetime
-             * @description 更新日時
-             */
-            readonly updated_at?: string;
             info: components["schemas"]["Info"];
             /** @description フォームのアイテムのリスト（質問、改ページ、テキストなど） */
             items: components["schemas"]["Item"][];
-            access_control: components["schemas"]["AccessControl"];
         };
-        AnswerGeneric: {
+        /** @description External form type */
+        FormReadTypeExternal: {
             /**
-             * Format: uuid
-             * @description 項目のid
+             * Format: uri
+             * @description URL of the external form
              */
-            item_id: string;
+            form_url: string;
         };
-        /** @description 質問に対する回答をテキストで表したもの */
-        AnswerText: {
-            /** @description 回答の値
-             *     質問の種類ごとの回答の形式:
-             *     - Text: 回答者が入力したテキスト */
-            value: string;
+        /** @description Form read request */
+        FormRead: (components["schemas"]["FormReadGeneric"] & {
+            type_builtin: components["schemas"]["Form"];
+        }) | (components["schemas"]["FormReadGeneric"] & {
+            type_external: components["schemas"]["FormReadTypeExternal"];
+        });
+        /** @description Generic form properties */
+        FormCreateGeneric: {
+            /** @description Target specifiers for the form */
+            targets: components["schemas"]["TargetSpecifier"][];
+            /** @description Name of the form */
+            form_name: string;
+            /** @description Summary or description of the form */
+            summary: string;
+            /**
+             * Format: date-time
+             * @description Due date for the form submission
+             */
+            due_date: string | null;
         };
-        /** @description 質問に対する回答 */
-        Answer: components["schemas"]["AnswerGeneric"] & {
-            answer_text?: components["schemas"]["AnswerText"];
+        /** @description External form type */
+        FormCreateTypeExternal: {
+            /**
+             * Format: uri
+             * @description URL of the external form
+             */
+            form_url: string;
         };
-        /** @description フォームの回答 */
-        FormResponse: {
+        /** @description Form creation request */
+        FormCreate: components["schemas"]["FormCreateGeneric"] & ({
+            type_builtin: components["schemas"]["Form"];
+        } | {
+            type_external: components["schemas"]["FormCreateTypeExternal"];
+        });
+        /** @description Generic form properties */
+        FormUpdateGeneric: {
+            /** @description Target specifiers for the form */
+            targets?: components["schemas"]["TargetSpecifier"][];
+            /** @description Name of the form */
+            form_name?: string;
+            /** @description Summary or description of the form */
+            summary?: string;
             /**
-             * Format: uuid
-             * @description 回答のID
+             * Format: date-time
+             * @description Due date for the form submission
              */
-            readonly response_id?: string;
-            /**
-             * Format: datetime
-             * @description 作成日時
-             */
-            readonly created_at?: string;
-            /**
-             * Format: datetime
-             * @description 更新日時
-             */
-            readonly updated_at?: string;
-            /**
-             * Format: uuid
-             * @description フォームのID
-             */
-            readonly form_id?: string;
-            /**
-             * Format: uuid
-             * @description 回答者のID
-             */
-            readonly respondent_id?: string;
-            /** @description 質問に対する回答(item_idをキーとする) */
-            answers: {
-                [key: string]: components["schemas"]["Answer"];
-            };
+            due_date?: string | null;
         };
+        /** @description External form type */
+        FormUpdateTypeExternal: {
+            /**
+             * Format: uri
+             * @description URL of the external form
+             */
+            form_url?: string;
+        };
+        FormUpdate: (components["schemas"]["FormUpdateGeneric"] & {
+            type_builtin: components["schemas"]["Form"];
+        }) | (components["schemas"]["FormUpdateGeneric"] & {
+            type_external: components["schemas"]["FormUpdateTypeExternal"];
+        }) | components["schemas"]["FormUpdateGeneric"];
         ReadDocumentGeneric: {
             /** Format: uuid */
             id: string;

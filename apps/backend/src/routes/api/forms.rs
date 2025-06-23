@@ -23,7 +23,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .route("/", get(get_forms).post(post_forms))
         .route(
             "/{form_id}",
-            get(get_form).put(patch_form).delete(delete_form),
+            get(get_form).patch(patch_form).delete(delete_form),
         )
 }
 

@@ -28,7 +28,7 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
       label: '参加団体',
       children: [
         {
-          value: 'hangzhou',
+          value: 'type',
           label: '種類',
           children: [
             {

@@ -15,6 +15,9 @@ pub struct Model {
     pub targets: Vec<String>,
     #[sea_orm(column_type = "Text")]
     pub form_name: String,
+    #[sea_orm(column_type = "Text")]
+    pub summary: String,
+    pub due_date: Option<DateTimeWithTimeZone>,
     pub r#type: FormType,
 }
 

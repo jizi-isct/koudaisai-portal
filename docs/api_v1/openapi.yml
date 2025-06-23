@@ -20,6 +20,8 @@ tags:
     description: ファイル関連
   - name: notifications
     description: 通知機能関連
+  - name: util
+    description: ユーティリティ関連
 paths:
   # exhibitions
   /exhibitors:
@@ -59,6 +61,9 @@ paths:
     $ref: paths/notifications.yml
   /notifications/{notification_id}:
     $ref: paths/notifications_{notification_id}.yml
+  # util
+  /util/meta:
+    $ref: paths/util_meta.yml
 
 components:
   securitySchemes:

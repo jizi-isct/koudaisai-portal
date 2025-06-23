@@ -1,11 +1,12 @@
 use crate::entities::target_specifier::TargetSpecifier;
 use crate::sea_orm_entities;
+use crate::sea_orm_entities::sea_orm_active_enums;
 use crate::util::IntoActiveValue;
 use chrono::{DateTime, Utc};
 use sea_orm::prelude::DateTimeWithTimeZone;
 use sea_orm::ActiveValue::Set;
-use sea_orm::ColumnTrait;
 use sea_orm::QueryFilter;
+use sea_orm::{ActiveValue, ColumnTrait};
 use sea_orm::{DbConn, EntityTrait, NotSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -22,6 +23,8 @@ pub enum FormType {
 pub struct FormCreate {
     pub targets: Vec<TargetSpecifier>,
     pub form_name: String,
+    pub summary: String,
+    pub due_date: Option<DateTimeWithTimeZone>,
     #[serde(flatten)]
     pub form_type: FormType,
 }
@@ -35,6 +38,8 @@ pub struct FormRead {
     pub updated_by: Option<Uuid>,
     pub targets: Vec<TargetSpecifier>,
     pub form_name: String,
+    pub summary: String,
+    pub due_date: Option<DateTimeWithTimeZone>,
     #[serde(flatten)]
     pub form_type: FormType,
 }
@@ -45,6 +50,10 @@ pub struct FormUpdate {
     pub targets: Option<Vec<TargetSpecifier>>,
     #[serde(default)]
     pub form_name: Option<String>,
+    #[serde(default)]
+    pub summary: Option<String>,
+    #[serde(default)]
+    pub due_date: Option<Option<DateTimeWithTimeZone>>,
     #[serde(flatten, default)]
     pub form_type: Option<FormType>,
 }
@@ -75,22 +84,24 @@ impl FormCreate {
     pub fn into_active_model(self, created_by: Option<Uuid>) -> ActiveModelFormCreate {
         let id = Set(Uuid::new_v4());
         let form = sea_orm_entities::form::ActiveModel {
-            id,
+            id: id.clone(),
             created_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             created_by: Set(created_by),
             updated_by: Set(created_by),
             targets: Set(self.targets.iter().map(|t| t.into()).collect()),
             form_name: Set(self.form_name),
-            ..Default::default()
+            summary: Set(self.summary),
+            due_date: Set(self.due_date),
+            r#type: Set(sea_orm_active_enums::FormType::External),
         };
 
         match self.form_type {
             FormType::TypeExternal { form_url } => ActiveModelFormCreate::External(
                 form,
                 sea_orm_entities::form_type_external::ActiveModel {
+                    form_id: id,
                     form_url: Set(form_url),
-                    ..Default::default()
                 },
             ),
         }
@@ -120,17 +131,22 @@ impl FormUpdate {
         }
         let form = sea_orm_entities::form::ActiveModel {
             id: Set(id),
+            created_at: Default::default(),
             updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
+            created_by: Default::default(),
             updated_by: Set(updated_by),
             targets,
             form_name: self.form_name.into_active_value(),
-            ..Default::default()
+            summary: self.summary.into_active_value(),
+            due_date: ActiveValue::from(self.due_date.unwrap_or(None).into_active_value()),
+            r#type: Set(sea_orm_active_enums::FormType::External),
         };
 
         match self.form_type {
             Some(FormType::TypeExternal { form_url }) => ActiveModelFormUpdate::External(
                 form,
                 sea_orm_entities::form_type_external::ActiveModel {
+                    form_id: Set(id),
                     form_url: Set(form_url),
                     ..Default::default()
                 },
@@ -180,6 +196,8 @@ impl FormRead {
                     .map(|t| TargetSpecifier::from_string(t))
                     .collect(),
                 form_name: form.form_name,
+                summary: form.summary,
+                due_date: form.due_date,
                 form_type: FormType::TypeExternal {
                     form_url: external.form_url,
                 },

@@ -53,6 +53,8 @@ impl MigrationTrait for Migration {
                     updated_by uuid,
                     targets text[] NOT NULL,
                     form_name text NOT NULL,
+                    summary text NOT NULL,
+                    due_date timestamp with time zone,
                     type form_type NOT NULL
                 );
                 "#
