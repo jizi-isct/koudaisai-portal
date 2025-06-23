@@ -28,7 +28,9 @@ export function ActivationPhaseDone({m_address, password}: ActivationPhaseDonePr
 
   return (
     <main className={styles.root}>
-      <Logo className={styles.item} height={300}/>
+      <div className={styles.logoBig}>
+        <Logo className={styles.item}/>
+      </div>
       <p className={styles.item} style={{margin: 0}}>
         アカウントは有効化されました👍<br/>
         我々と一緒に工大祭を盛り上げましょう！

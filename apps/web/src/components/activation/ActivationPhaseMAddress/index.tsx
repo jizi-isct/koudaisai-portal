@@ -17,7 +17,9 @@ export function ActivationPhaseMAddress({next}: ActivationPhaseMAddressProps) {
   }
   return (
     <form className={styles.root} onSubmit={handleSubmit}>
-      <Logo className={styles.item}/>
+      <div className={styles.logoSmall}>
+        <Logo className={styles.item}/>
+      </div>
       <h1 className={styles.item}>工大祭ポータルへようこそ</h1>
       <p className={styles.item} style={{margin: 0}}>参加申請フォームに入力したmアドレスを入力してください。</p>
       <Input

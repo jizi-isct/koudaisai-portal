@@ -27,7 +27,9 @@ export function ActivationPhasePassword({mAddress, next}: ActivationPhasePasswor
   }
   return (
     <form className={styles.root} onSubmit={handleSubmit}>
-      <Logo className={styles.item}/>
+      <div className={styles.logoSmall}>
+        <Logo className={styles.item}/>
+      </div>
       <h1 className={styles.item}>工大祭ポータルへようこそ</h1>
       <p className={styles.item} style={{margin: 0}}>ログインに使用するパスワードを決めましょう</p>
       {/*パスワードマネージャーにmアドレスを認識させるためのダミーインプット*/}
