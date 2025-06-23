@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
-import {fetchClientAuth} from "@/lib";
+import {login} from "@/lib";
 
 type Inputs = {
     m_address: string,
@@ -15,29 +15,13 @@ export default function Login() {
         handleSubmit
     } = useForm<Inputs>()
     const onSubmit: SubmitHandler<Inputs> = async (inputs) => {
-        const {data, response} = await fetchClientAuth.POST(
-            "/login",
-            {
-                body: {
-                    m_address: inputs.m_address,
-                    password: inputs.password
-                }
-            })
-
-        if (data) {
-            localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
-            localStorage.setItem("exhibitor_access_token", data.access_token)
-            window.location.assign("/")
-        } else {
-            switch (response.status) {
-                case 401:
-                    setError("mアドレスまたはパスワードが間違えています。")
-                    break;
-                default:
-                    setError("内部エラー。開発者に問い合わせてください。")
-                    break;
-            }
+        try {
+            await login(inputs.m_address, inputs.password)
+        } catch (e) {
+            setError(`${e}`)
+            return
         }
+        window.location.assign("/")
     };
 
     return (

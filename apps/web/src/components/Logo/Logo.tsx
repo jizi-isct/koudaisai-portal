@@ -4,18 +4,20 @@ import styles from "./Logo.module.css";
 type LogoProps = { // ①
     height?: number;
     hasText?: boolean;
+  className?: string;
 };
 
-const Logo = ({height = 40, hasText = false}: LogoProps) => {
+const Logo = ({height = 40, hasText = false, className = ""}: LogoProps) => {
     return (
-        <div className={styles.logo}>
+      <div className={styles.logo + " " + className}>
             <Image
-                src="/components/Logo/logo_tmp.svg"
+              src="/components/generic/Header/members_logo.png"
                 alt="Koudaisai Portal Logo"
                 width={height}
                 height={height}
+              className={styles.image}
             />
-            <div className={styles.logoTextWrapper} style={{height: height}}>
+        <div className={styles.logoTextWrapper} style={{height: height, display: hasText ? 'inline-block' : 'none'}}>
                 <h1
                     className={styles.logoText}
                     style={{marginTop: height / 2, display: hasText ? 'inline-block' : 'none', fontSize: height * 0.4}}
