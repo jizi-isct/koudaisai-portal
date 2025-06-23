@@ -72,14 +72,14 @@ function Inner() {
 
             if (!result.data.title || !result.data.description) {
                 messageApi.destroy()
-                messageApi.error("外部フォームのメタデータにタイトルまたは要約が含まれていません")
-                return
+                messageApi.warning("外部フォームのメタデータにタイトルまたは要約が含まれていません")
+            } else {
+                messageApi.destroy()
+                messageApi.success('外部フォームのメタデータを取得しました')
             }
 
             result.data?.title && setFormName(result.data?.title)
             result.data?.description && setSummary(result.data?.description)
-            messageApi.destroy()
-            messageApi.success('外部フォームのメタデータを取得しました')
         } catch (e) {
             messageApi.destroy()
             messageApi.error("外部フォームのメタデータのfetchに失敗しました: " + e)
