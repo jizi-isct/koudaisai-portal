@@ -12,6 +12,7 @@ pub enum TargetSpecifier {
     ExhibitorTypeBooth,
     ExhibitorTypeStage,
     ExhibitorTypeLabo,
+    ExhibitorId(String),
     UserId(Uuid),
     UserNologin,
     Unknown(String),
@@ -60,6 +61,7 @@ impl Into<String> for &TargetSpecifier {
             TargetSpecifier::ExhibitorTypeBooth => "exhibitor/type/booth".into(),
             TargetSpecifier::ExhibitorTypeStage => "exhibitor/type/stage".into(),
             TargetSpecifier::ExhibitorTypeLabo => "exhibitor/type/labo".into(),
+            TargetSpecifier::ExhibitorId(id) => format!("exhibitor/id/{}", id),
             TargetSpecifier::UserId(user_id) => format!("user/id/{}", user_id).into(),
             TargetSpecifier::UserNologin => "user/nologin".into(),
             TargetSpecifier::Unknown(s) => s.into(),
@@ -136,6 +138,14 @@ impl TargetSpecifier {
                     } else {
                         Ok(false)
                     }
+                } else {
+                    Ok(false)
+                }
+            }
+            TargetSpecifier::ExhibitorId(id) => {
+                if let Some(user) = user {
+                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
+                    Ok(exhibitor.id == *id)
                 } else {
                     Ok(false)
                 }

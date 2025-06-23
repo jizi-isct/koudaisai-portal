@@ -110,7 +110,7 @@ function Inner({formId}: { formId: string }) {
             form_name: formName,
             targets: targets?.map((t) => t.join("/")),
             summary: summary,
-            due_date: dueDate,
+            due_date: dueDate ? new Date(dueDate).toISOString() : undefined,
             type_external: {
               form_url: url
             }
@@ -136,7 +136,7 @@ function Inner({formId}: { formId: string }) {
           summary: form.summary,
           targets: form.targets.map((t) => t.split("/")),
           url: 'type_external' in form ? form.type_external.form_url : "",
-          dueDate: form.due_date ? new Date(form.due_date).getUTCDate() : undefined
+          dueDate: form.due_date ? new Date(form.due_date).toISOString().slice(0, 16) : undefined
         }}
       >
         <h1>フォームを編集</h1>
