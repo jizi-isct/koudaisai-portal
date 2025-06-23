@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "form_responses")]
+#[sea_orm(table_name = "form_type_builtin_response")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub response_id: Uuid,
@@ -17,13 +17,13 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::forms::Entity",
+        belongs_to = "super::form_type_builtin::Entity",
         from = "Column::FormId",
-        to = "super::forms::Column::FormId",
+        to = "super::form_type_builtin::Column::FormId",
         on_update = "NoAction",
-        on_delete = "NoAction"
+        on_delete = "Cascade"
     )]
-    Forms,
+    FormTypeBuiltin,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::RespondentId",
@@ -34,9 +34,9 @@ pub enum Relation {
     Users,
 }
 
-impl Related<super::forms::Entity> for Entity {
+impl Related<super::form_type_builtin::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Forms.def()
+        Relation::FormTypeBuiltin.def()
     }
 }
 

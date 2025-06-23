@@ -1,0 +1,17 @@
+type: object
+description: Form creation request
+oneOf:
+  - allOf:
+      - $ref: "./FormCreateGeneric.yml"
+      - properties:
+          type_builtin:
+            $ref: "./FormCreateTypeBuiltin.yml"
+        required:
+          - type_builtin
+  - allOf:
+      - $ref: "./FormCreateGeneric.yml"
+      - properties:
+          type_external:
+            $ref: "./FormCreateTypeExternal.yml"
+        required:
+          - type_external

@@ -32,8 +32,8 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     ExhibitorsRoot,
-    #[sea_orm(has_many = "super::form_responses::Entity")]
-    FormResponses,
+    #[sea_orm(has_many = "super::form_type_builtin_response::Entity")]
+    FormTypeBuiltinResponse,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
 }
@@ -44,9 +44,9 @@ impl Related<super::exhibitors_root::Entity> for Entity {
     }
 }
 
-impl Related<super::form_responses::Entity> for Entity {
+impl Related<super::form_type_builtin_response::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::FormResponses.def()
+        Relation::FormTypeBuiltinResponse.def()
     }
 }
 

@@ -2,7 +2,7 @@ get:
   summary: フォームを取得
   description: |-
     ### authの違いによる挙動の違い
-    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能なフォームな場合取得
+    - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームな場合取得
     - **admin_oidcの場合**: 存在するフォームを全て取得
   tags:
     - forms
@@ -20,7 +20,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/Form.yml
+            $ref: "../components/schemas/form/FormRead.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -29,7 +29,7 @@ get:
     - exhibitor_bearer: [ ]
     - admin_oidc:
         - k-portal:admin:all
-put:
+patch:
   summary: フォームを更新
   tags:
     - forms
@@ -46,16 +46,10 @@ put:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/Form.yml
+          $ref: "../components/schemas/form/FormUpdate.yml"
   responses:
-    '201':
-      description: Changed
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: ../components/schemas/Form.yml
+    '204':
+      description: No Content
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -76,14 +70,8 @@ delete:
         type: string
         format: uuid
   responses:
-    '201':
-      description: Changed
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: ../components/schemas/Form.yml
+    '204':
+      description: No Content
     '401':
       description: 資格情報が無効だった場合
     '404':

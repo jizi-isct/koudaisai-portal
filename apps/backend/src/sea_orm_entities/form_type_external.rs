@@ -3,26 +3,29 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "forms")]
+#[sea_orm(table_name = "form_type_external")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub form_id: Uuid,
-    pub created_at: Option<DateTimeWithTimeZone>,
-    pub updated_at: Option<DateTimeWithTimeZone>,
-    pub info: Json,
-    pub items: Json,
-    pub access_control_roles: Vec<String>,
+    #[sea_orm(column_type = "Text")]
+    pub form_url: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::form_responses::Entity")]
-    FormResponses,
+    #[sea_orm(
+        belongs_to = "super::form::Entity",
+        from = "Column::FormId",
+        to = "super::form::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    Form,
 }
 
-impl Related<super::form_responses::Entity> for Entity {
+impl Related<super::form::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::FormResponses.def()
+        Relation::Form.def()
     }
 }
 

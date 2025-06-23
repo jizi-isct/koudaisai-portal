@@ -1,0 +1,11 @@
+type: object
+description: Generic form properties
+properties:
+  targets:
+    type: array
+    description: Target specifiers for the form
+    items:
+      $ref: "../common/TargetSpecifier.yml"
+  form_name:
+    type: string
+    description: Name of the form

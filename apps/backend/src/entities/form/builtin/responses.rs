@@ -49,7 +49,7 @@ pub struct AnswerText {
 
 impl FormResponse {
     pub fn from_model(
-        model: &crate::sea_orm_entities::form_responses::Model,
+        model: &crate::sea_orm_entities::form_type_builtin_response::Model,
     ) -> anyhow::Result<Self> {
         let response_id = model.response_id;
         let created_at = model.created_at.unwrap().into();

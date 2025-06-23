@@ -6,16 +6,6 @@ properties:
     type: string
     format: uuid
     readOnly: true
-  created_at:
-    description: 作成日時
-    type: string
-    format: datetime
-    readOnly: true
-  updated_at:
-    description: 更新日時
-    type: string
-    format: datetime
-    readOnly: true
   info:
     $ref: ./Info.yml
   items:
@@ -23,9 +13,6 @@ properties:
     type: array
     items:
       $ref: ./Item.yml
-  access_control:
-    $ref: ./AccessControl.yml
 required:
   - info
   - items
-  - access_control

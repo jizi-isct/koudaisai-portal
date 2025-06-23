@@ -31,11 +31,6 @@ paths:
     $ref: paths/forms.yml
   /forms/{form_id}:
     $ref: paths/forms_{form_id}.yml
-  # form_responses
-  /forms/{form_id}/responses:
-    $ref: paths/forms_{form_id}_responses.yml
-  /forms/{form_id}/responses/{response_id}:
-    $ref: paths/forms_{form_id}_responses_{response_id}.yml
   # documents
   /documents:
     $ref: paths/documents.yml

@@ -6,14 +6,14 @@ use std::fmt::Formatter;
 /// フォームの質問
 /// * `required` - 回答必須かどうか
 /// * `question` - 質問の種類とより詳細なプロパティ
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Question {
     pub required: bool,
     pub question: Questions,
 }
 
 /// 質問の種類
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Questions {
     Text(QuestionText),
     RadioButton(QuestionRadioButton),
@@ -22,21 +22,21 @@ pub enum Questions {
 
 /// テキスト
 /// * `paragraph` - trueの場合複数行にわたるテキスト。falseの場合一行の回答。
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct QuestionText {
     pub paragraph: bool,
 }
 
 /// ラジオボタン
 /// * `choices` - 選択肢
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct QuestionRadioButton {
     pub choices: Vec<String>,
 }
 
 /// チェックボックス
 /// * `choices` - 選択肢
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct QuestionCheckBox {
     pub choices: Vec<String>,
 }
