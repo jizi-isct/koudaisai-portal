@@ -5,7 +5,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={styles.button}
+      className={styles.input + " " + (props.className || "")}
     />
   )
 }

@@ -38,22 +38,20 @@ export function ActivationPhasePassword({mAddress, next}: ActivationPhasePasswor
         readOnly
         hidden
       />
-      <div className={styles.item}>
-        <Input
-          placeholder={"パスワードを入力してください"}
-          required
-          name={"password"}
-          type={"password"}
-        />
-      </div>
-      <div className={styles.item}>
-        <Input
-          placeholder={"パスワードをもう一度入力してください"}
-          required
-          name={"passwordConfirm"}
-          type={"password"}
-        />
-      </div>
+      <Input
+        placeholder={"パスワードを入力してください"}
+        required
+        name={"password"}
+        type={"password"}
+        className={styles.item}
+      />
+      <Input
+        placeholder={"パスワードをもう一度入力してください"}
+        required
+        name={"passwordConfirm"}
+        type={"password"}
+        className={styles.item}
+      />
       {error && <p className={styles.error}>{error}</p>}
       <div className={styles.item}>
         <NextPhaseButton type={"submit"} label={"次の画面へ進む"}/>

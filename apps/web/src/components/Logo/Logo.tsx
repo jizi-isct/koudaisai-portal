@@ -15,6 +15,7 @@ const Logo = ({height = 40, hasText = false, className = ""}: LogoProps) => {
                 alt="Koudaisai Portal Logo"
                 width={height}
                 height={height}
+              className={styles.image}
             />
         <div className={styles.logoTextWrapper} style={{height: height, display: hasText ? 'inline-block' : 'none'}}>
                 <h1

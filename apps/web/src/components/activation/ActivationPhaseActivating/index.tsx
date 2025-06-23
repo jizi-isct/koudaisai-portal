@@ -51,7 +51,9 @@ export function ActivationPhaseActivating({mAddress, password, token, next}: Act
   if (error) {
     return (
       <main className={styles.root}>
-        <Logo className={styles.item}/>
+        <div className={styles.logoBig}>
+          <Logo className={styles.item}/>
+        </div>
         <p className={styles.item} style={{color: "red"}}>アカウントの有効化に失敗しました</p>
         <p className={styles.item}>{error}</p>
       </main>
@@ -59,7 +61,9 @@ export function ActivationPhaseActivating({mAddress, password, token, next}: Act
   }
   return (
     <main className={styles.root}>
-      <Logo className={styles.item}/>
+      <div className={styles.logoBig}>
+        <Logo className={styles.item}/>
+      </div>
       <p className={styles.item}>アカウントを有効化中</p>
       <Loader/>
     </main>
