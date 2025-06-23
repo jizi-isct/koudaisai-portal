@@ -3,6 +3,7 @@ import {NextPhaseButton} from "@/components/activation/NextPhaseButton";
 import {Input} from "@/components/common/Input";
 import React, {useState} from "react";
 import Logo from "@/components/Logo/Logo";
+import {validatePassword} from "@/lib";
 
 type ActivationPhasePasswordProps = {
   mAddress: string;
@@ -20,6 +21,11 @@ export function ActivationPhasePassword({mAddress, next}: ActivationPhasePasswor
 
     if (password !== passwordConfirm) {
       setError("パスワードが一致しません。");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError("パスワードは8文字以上、英大文字、英小文字、数字、記号を含む必要があります。");
       return;
     }
 
