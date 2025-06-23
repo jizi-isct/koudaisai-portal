@@ -17,6 +17,7 @@ mod m20250513_161809_add_column_emoji_to_table_document_category;
 mod m20250615_160810_add_table_notification;
 mod m20250616_072948_add_table_read_notifications;
 mod m20250623_045042_add_external_form;
+mod m20250623_133336_email_validation;
 
 pub struct Migrator;
 
@@ -43,6 +44,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250615_160810_add_table_notification::Migration),
             Box::new(m20250616_072948_add_table_read_notifications::Migration),
             Box::new(m20250623_045042_add_external_form::Migration),
+            Box::new(m20250623_133336_email_validation::Migration),
         ]
     }
 }
