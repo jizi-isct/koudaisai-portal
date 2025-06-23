@@ -84,6 +84,10 @@ impl TargetSpecifier {
                     Err(_) => TargetSpecifier::Unknown(s.parse().unwrap()),
                 }
             }
+            s if s.starts_with("exhibitor/id/") => {
+                let exhibitor_id = &s[13..];
+                TargetSpecifier::ExhibitorId(exhibitor_id.to_owned())
+            }
             val => TargetSpecifier::Unknown(val.parse().unwrap()),
         }
     }
