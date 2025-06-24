@@ -1,0 +1,24 @@
+type: object
+description: Generic form properties
+properties:
+  targets:
+    type: array
+    description: Target specifiers for the form
+    items:
+      $ref: "../common/TargetSpecifier.yml"
+  form_name:
+    type: string
+    description: Name of the form
+  summary:
+    type: string
+    description: Summary or description of the form
+  due_date:
+    type: string
+    format: date-time
+    description: Due date for the form submission
+    nullable: true
+required:
+  - targets
+  - form_name
+  - summary
+  - due_date

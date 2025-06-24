@@ -1,0 +1,39 @@
+get:
+  summary: ページのメタデータを取得
+  tags:
+    - util
+  parameters:
+    - name: url
+      in: query
+      description: フォームID
+      required: true
+      schema:
+        type: string
+        format: uri
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                nullable: true
+                description: The title of the page.
+              description:
+                type: string
+                nullable: true
+                description: The description of the page.
+            required:
+              - title
+              - description
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc:
+        - k-portal:admin:all

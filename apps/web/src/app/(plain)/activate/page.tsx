@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {Suspense, useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {ActivationPhaseFirst} from "@/components/activation/ActivationPhaseFirst";
 import "../../globals.css";
@@ -15,6 +15,14 @@ import {ActivationPhaseDone} from "@/components/activation/ActivationPhaseDone";
 type ActivationPhase = "first" | "m_address" | "password" | "activating" | "done";
 
 export default function Page() {
+  return (
+    <Suspense>
+      <Inner1/>
+    </Suspense>
+  )
+}
+
+function Inner1() {
   const params = useSearchParams()
   const token = params.get("token")
   if (token === null) {
@@ -30,12 +38,12 @@ export default function Page() {
   }
   return (
     <QueryClientProvider client={new QueryClient()}>
-      <Inner token={token}/>
+      <Inner2 token={token}/>
     </QueryClientProvider>
   )
 }
 
-export function Inner({token}: { token: string }) {
+export function Inner2({token}: { token: string }) {
   const [phase, setPhase] = useState<ActivationPhase>("first")
   const [mAddress, setMAddress] = useState<string>("")
   const [password, setPassword] = useState<string>("")

@@ -5,6 +5,7 @@ mod files;
 mod forms;
 mod notifications;
 mod users;
+mod util;
 
 use crate::routes::AppState;
 use axum::Router;
@@ -24,4 +25,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .nest("/v1/files", files::init_router())
         .nest("/v1/users", users::init_router())
         .nest("/v1/notifications", notifications::init_router())
+        .nest("/v1/util", util::init_router())
 }

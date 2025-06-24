@@ -17,8 +17,9 @@ type TargetSpecifierProps = {
 
 export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
   const {data: users} = $apiAdmin.useQuery("get", "/users")
+  const {data: exhibitors} = $apiAdmin.useQuery("get", "/exhibitors")
 
-  if (!users) {
+  if (!users || !exhibitors) {
     return <LoadingScreen/>
   }
 
@@ -28,7 +29,7 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
       label: '参加団体',
       children: [
         {
-          value: 'hangzhou',
+          value: 'type',
           label: '種類',
           children: [
             {
@@ -49,6 +50,16 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
             }
           ],
         },
+        {
+          value: 'id',
+          label: '指定',
+          children: exhibitors.map((exhibitor) => (
+            {
+              value: exhibitor.id,
+              label: `${exhibitor.exhibitor_name}(${exhibitor.id})`
+            }
+          ))
+        }
       ],
     },
     {

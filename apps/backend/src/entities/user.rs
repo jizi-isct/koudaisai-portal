@@ -1,4 +1,5 @@
 use crate::entities::exhibitor::ExhibitorRead;
+use crate::entities::form::FormRead;
 use crate::sea_orm_entities;
 use crate::sea_orm_entities::read_notifications;
 use crate::util::jwt::Claims;
@@ -83,6 +84,20 @@ impl UserRead {
             .map_err(|e| anyhow::anyhow!("Database error: {}", e))?;
 
         Ok(result.is_some())
+    }
+
+    pub async fn get_forms(&self, db_conn: &DbConn) -> Result<Vec<FormRead>> {
+        let forms_ = FormRead::find_all(db_conn).await?;
+        let mut forms = vec![];
+        for form in forms_ {
+            for target in &form.targets {
+                if target.does_user_match(Some(self), db_conn).await? {
+                    forms.push(form);
+                    break;
+                }
+            }
+        }
+        Ok(forms)
     }
 }
 
