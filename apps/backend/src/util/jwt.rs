@@ -15,6 +15,15 @@ pub struct Claims {
     pub iat: i64,
     pub typ: Type,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PasswordResetTokenClaims {
+    pub iss: String,
+    pub sub: Uuid,
+    pub exp: i64,
+    pub iat: i64,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Type {
@@ -42,6 +51,7 @@ pub struct JWTManager {
     pub algorithm: Algorithm,
     pub access_token_expire_time: i64,
     pub refresh_token_expire_time: i64,
+    pub password_reset_token_expire_time: i64,
     pub iss: String,
     encoding_key: EncodingKey,
     decoding_key: DecodingKey,
@@ -53,6 +63,7 @@ impl JWTManager {
         algorithm: Algorithm,
         access_token_expire_time: i64,
         refresh_token_expire_time: i64,
+        password_reset_token_expire_time: i64,
         iss: impl ToString,
         encoding_key: EncodingKey,
         decoding_key: DecodingKey,
@@ -62,6 +73,7 @@ impl JWTManager {
             algorithm,
             access_token_expire_time,
             refresh_token_expire_time,
+            password_reset_token_expire_time,
             iss: iss.to_string(),
             encoding_key,
             decoding_key,
@@ -151,6 +163,41 @@ impl JWTManager {
             return false;
         }
 
+        // exp検証
+        if claims.exp < Utc::now().timestamp() {
+            return false;
+        }
+
+        true
+    }
+
+    pub fn issue_password_reset_token(&self, sub: Uuid) -> Result<String> {
+        let password_reset_token_claims = PasswordResetTokenClaims {
+            iss: self.iss.clone(),
+            sub,
+            exp: Utc::now().timestamp() + self.password_reset_token_expire_time,
+            iat: Utc::now().timestamp(),
+        };
+        let password_reset_token = jsonwebtoken::encode(
+            &Header::new(self.algorithm),
+            &password_reset_token_claims,
+            &self.encoding_key,
+        )?;
+        Ok(password_reset_token)
+    }
+
+    pub fn decode_password_reset_token(
+        &self,
+        token: &str,
+    ) -> Result<TokenData<PasswordResetTokenClaims>> {
+        Ok(jsonwebtoken::decode::<PasswordResetTokenClaims>(
+            token,
+            &self.decoding_key,
+            &Validation::new(self.algorithm),
+        )?)
+    }
+
+    pub fn is_password_reset_token_valid(&self, claims: &PasswordResetTokenClaims) -> bool {
         // exp検証
         if claims.exp < Utc::now().timestamp() {
             return false;

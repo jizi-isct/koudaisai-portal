@@ -1,4 +1,5 @@
 use axum::response::{IntoResponse, Response};
+use chrono::Duration;
 use http::StatusCode;
 use sea_orm::sqlx::Value;
 use sea_orm::{ActiveValue, DbErr};
@@ -48,4 +49,21 @@ impl<T: Into<migration::Value>> IntoActiveValue<T> for Option<T> {
             None => ActiveValue::NotSet,
         }
     }
+}
+
+pub fn format_secs_ja_full(duration: i64) -> String {
+    let hours = duration / 3600;
+    let minutes = (duration % 3600) / 60;
+    let seconds = duration % 60;
+
+    let mut parts = Vec::new();
+    if hours != 0 {
+        parts.push(format!("{}時間", hours));
+    }
+    if minutes != 0 || hours != 0 {
+        parts.push(format!("{}分", minutes));
+    }
+    parts.push(format!("{}秒", seconds));
+
+    parts.join("")
 }

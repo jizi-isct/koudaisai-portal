@@ -2,12 +2,19 @@ use crate::entities::exhibitor::ExhibitorRead;
 use crate::entities::form::FormRead;
 use crate::sea_orm_entities;
 use crate::sea_orm_entities::read_notifications;
+use crate::util::format_secs_ja_full;
 use crate::util::jwt::Claims;
+use crate::util::sha::SHAManager;
 use anyhow::{anyhow, Result};
 use chrono::DateTime;
+use chrono::Duration;
+use reqwest::Response;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, EntityTrait, QueryFilter};
+use sendgrid::v3::{Content, Email, Message, Personalization, Sender};
+use sendgrid::SendgridResult;
 use serde::{Deserialize, Serialize};
+use tracing::log::trace;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -59,6 +66,17 @@ impl UserRead {
         }
     }
 
+    pub async fn find_from_m_address(value: String, db_conn: &DbConn) -> Result<Option<Self>> {
+        match sea_orm_entities::users::Entity::find()
+            .filter(sea_orm_entities::users::Column::MAddress.eq(value.to_string()))
+            .one(db_conn)
+            .await?
+        {
+            Some(value) => Ok(Some(value.into())),
+            None => Ok(None),
+        }
+    }
+
     pub async fn get_all(db_conn: &DbConn) -> Result<Vec<Self>> {
         let users = sea_orm_entities::users::Entity::find().all(db_conn).await?;
         Ok(users.into_iter().map(Into::into).collect())
@@ -98,6 +116,76 @@ impl UserRead {
             }
         }
         Ok(forms)
+    }
+
+    /// Sends an email to the user using Sendgrid
+    pub async fn send_email_plain_text(
+        &self,
+        sender: &Sender,
+        from: Email,
+        subject: &str,
+        body: &str,
+    ) -> SendgridResult<Response> {
+        let message = Message::new(from)
+            .add_personalization(Personalization::new(Email::new(self.m_address.clone())))
+            .set_subject(subject)
+            .add_content(
+                Content::new()
+                    .set_content_type("text/plain")
+                    .set_value(body),
+            );
+
+        tracing::info!("Sending email to: {}", self.m_address);
+
+        let result = sender.send(&message).await;
+
+        trace!("Email sent to {}: {:?}", self.m_address, result);
+
+        result
+    }
+
+    pub async fn send_password_reset_email(
+        &self,
+        sender: &Sender,
+        from: Email,
+        reset_token: String,
+        template_subject: &str,
+        template_content: &str,
+        expire_time: i64,
+    ) -> SendgridResult<Response> {
+        self.send_email_plain_text(
+            sender,
+            from,
+            template_subject,
+            &template_content
+                .replace("{{reset_token}}", &reset_token)
+                .replace(
+                    "{{username}}",
+                    format!("{} {}", self.last_name, self.first_name).as_str(),
+                )
+                .replace("{{expires_at}}", &*format_secs_ja_full(expire_time)),
+        )
+        .await
+    }
+
+    pub async fn change_password(
+        &self,
+        db_conn: &DbConn,
+        password: String,
+        sha_manager: &SHAManager,
+    ) -> Result<()> {
+        let user_model = sea_orm_entities::users::Entity::find_by_id(self.id)
+            .one(db_conn)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("User not found"))?;
+        let salt = &*user_model.password_salt.clone();
+
+        let mut active_model: sea_orm_entities::users::ActiveModel = user_model.into();
+
+        active_model.password_hash = Set(Some(sha_manager.stretch_with_salt(&*password, salt)));
+
+        active_model.update(db_conn).await?;
+        Ok(())
     }
 }
 

@@ -189,7 +189,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reset": {
+  "/password/change": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** パスワードの変更 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PasswordChange"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/password/reset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * パスワードリセットリクエスト
+     * @description ユーザーがパスワードを忘れた場合に、パスワードリセットのためのメールを送信します。
+     *     メールアドレスを指定してリクエストを行います。
+     *
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PasswordReset"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/password/reset/confirm": {
         parameters: {
             query?: never;
             header?: never;
@@ -198,7 +307,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** パスワードをリセット */
+    /**
+     * パスワードのリセット承認
+     * @description パスワードリセットトークンが有効であることを確認し、パスワードリセットを承認します。
+     *
+     */
         post: {
             parameters: {
                 query?: never;
@@ -208,7 +321,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["Reset"];
+                  "application/json": components["schemas"]["PasswordResetConfirm"];
                 };
             };
             responses: {
@@ -426,7 +539,7 @@ export interface components {
              */
             refresh_token?: string;
         };
-        Reset: {
+      PasswordChange: {
             /**
              * Format: jwt
              * @description アクセストークン
@@ -444,6 +557,22 @@ export interface components {
              */
             new_password: string;
         };
+      PasswordReset: {
+        /**
+         * Format: email
+         * @description メールアドレス
+         */
+        m_address: string;
+      };
+      PasswordResetConfirm: {
+        /** @description パスワードリセットトークン */
+        reset_token?: string;
+        /**
+         * @description 新しいパスワード
+         * @example carry<3
+         */
+        new_password?: string;
+      };
         Revoke: {
             /**
              * Format: jwt
