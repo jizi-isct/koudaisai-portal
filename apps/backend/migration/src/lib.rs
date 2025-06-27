@@ -18,6 +18,7 @@ mod m20250615_160810_add_table_notification;
 mod m20250616_072948_add_table_read_notifications;
 mod m20250623_045042_add_external_form;
 mod m20250623_133336_email_validation;
+mod m20250626_132332_password_updated_at;
 
 pub struct Migrator;
 
@@ -45,6 +46,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250616_072948_add_table_read_notifications::Migration),
             Box::new(m20250623_045042_add_external_form::Migration),
             Box::new(m20250623_133336_email_validation::Migration),
+            Box::new(m20250626_132332_password_updated_at::Migration),
         ]
     }
 }

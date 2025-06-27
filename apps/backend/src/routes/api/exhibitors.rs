@@ -89,6 +89,7 @@ fn new_user_model(
         password_hash: ActiveValue::NotSet,
         password_salt: ActiveValue::NotSet,
         exhibition_id: ActiveValue::Set(exhibition_id),
+        password_updated_at: ActiveValue::NotSet,
     }
 }
 type PostExhibitorsResponse = (String, String, String);

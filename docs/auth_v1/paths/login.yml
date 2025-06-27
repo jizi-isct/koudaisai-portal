@@ -19,3 +19,5 @@ post:
       description: 不正なrequest bodyの形式
     '401':
       description: 資格情報が無効だった場合
+    '429':
+      description: リクエストが多すぎる場合

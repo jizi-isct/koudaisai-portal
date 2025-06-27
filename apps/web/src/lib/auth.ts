@@ -174,6 +174,8 @@ export async function login(m_address: string, password: string): Promise<Tokens
     switch (response.status) {
       case 401:
         throw new Error("mアドレスまたはパスワードが間違えています。");
+      case 429:
+        throw new Error("ログイン試行回数が多すぎます。しばらく時間を置いてから再度お試しください。");
       default:
         throw new Error("内部エラー。開発者に問い合わせてください。");
     }

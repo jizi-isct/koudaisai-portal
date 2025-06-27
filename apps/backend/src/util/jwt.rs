@@ -1,3 +1,4 @@
+use crate::entities::user::UserRead;
 use crate::sea_orm_entities::revoked_refresh_tokens;
 use anyhow::Result;
 use chrono::Utc;
@@ -157,7 +158,7 @@ impl JWTManager {
     /// 以下の条件がすべて満たされる場合true、それ以外はfalse
     /// - `claims.typ`が`Access_token`である。
     /// - 有効期限が切れていない
-    pub fn is_access_token_valid(&self, claims: &Claims) -> bool {
+    pub fn is_access_token_valid(&self, claims: &Claims, user: &UserRead) -> bool {
         // typ検証
         if claims.typ != Type::AccessToken {
             return false;
@@ -165,6 +166,11 @@ impl JWTManager {
 
         // exp検証
         if claims.exp < Utc::now().timestamp() {
+            return false;
+        }
+
+        // iat検証
+        if claims.iat < user.password_updated_at.timestamp() {
             return false;
         }
 
@@ -189,17 +195,26 @@ impl JWTManager {
     pub fn decode_password_reset_token(
         &self,
         token: &str,
-    ) -> Result<TokenData<PasswordResetTokenClaims>> {
-        Ok(jsonwebtoken::decode::<PasswordResetTokenClaims>(
+    ) -> Result<TokenData<PasswordResetTokenClaims>, jsonwebtoken::errors::Error> {
+        jsonwebtoken::decode::<PasswordResetTokenClaims>(
             token,
             &self.decoding_key,
             &Validation::new(self.algorithm),
-        )?)
+        )
     }
 
-    pub fn is_password_reset_token_valid(&self, claims: &PasswordResetTokenClaims) -> bool {
+    pub async fn is_password_reset_token_valid(
+        &self,
+        claims: &PasswordResetTokenClaims,
+        user: UserRead,
+    ) -> bool {
         // exp検証
         if claims.exp < Utc::now().timestamp() {
+            return false;
+        }
+
+        // iat検証
+        if claims.iat < user.password_updated_at.timestamp() {
             return false;
         }
 

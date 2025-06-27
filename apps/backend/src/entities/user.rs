@@ -26,6 +26,7 @@ pub struct UserRead {
     pub last_name: String,
     pub m_address: String,
     pub exhibition_id: String,
+    pub password_updated_at: DateTime<chrono::Utc>,
 }
 
 impl From<sea_orm_entities::users::Model> for UserRead {
@@ -38,6 +39,7 @@ impl From<sea_orm_entities::users::Model> for UserRead {
             last_name: value.last_name,
             m_address: value.m_address,
             exhibition_id: value.exhibition_id,
+            password_updated_at: value.password_updated_at.to_utc(),
         }
     }
 }
@@ -183,6 +185,7 @@ impl UserRead {
         let mut active_model: sea_orm_entities::users::ActiveModel = user_model.into();
 
         active_model.password_hash = Set(Some(sha_manager.stretch_with_salt(&*password, salt)));
+        active_model.password_updated_at = Set(chrono::Utc::now().into());
 
         active_model.update(db_conn).await?;
         Ok(())
@@ -208,6 +211,7 @@ impl Into<sea_orm_entities::users::ActiveModel> for UserUpdate {
             password_hash: Default::default(),
             password_salt: Default::default(),
             exhibition_id: Default::default(),
+            password_updated_at: Default::default(),
         }
     }
 }

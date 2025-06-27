@@ -1,5 +1,6 @@
 mod password;
 
+use crate::entities::user::UserRead;
 use crate::routes::{AppState, AuthSession};
 use crate::sea_orm_entities::prelude::Users;
 use crate::sea_orm_entities::{revoked_refresh_tokens, users};
@@ -253,9 +254,21 @@ async fn reset(
         }
     };
 
+    let user = match UserRead::find_from_id(access_token.claims.sub, &state.db_conn).await {
+        Ok(Some(user)) => user,
+        Ok(None) => {
+            warn!("jwt token with invalid user was provided.");
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+        Err(err) => {
+            warn!("internal error occurred while executing sql: {:?}", err);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+    };
+
     if state
         .jwt_manager
-        .is_access_token_valid(&access_token.claims)
+        .is_access_token_valid(&access_token.claims, &user)
     {
         let sub = access_token.claims.sub;
         let user = match users::Entity::find_by_id(sub).one(&state.db_conn).await {

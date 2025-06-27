@@ -122,6 +122,13 @@ export interface paths {
                 };
                 /** @description 資格情報が無効だった場合 */
                 401: {
+                  headers: {
+                    [name: string]: unknown;
+                  };
+                  content?: never;
+                };
+              /** @description リクエストが多すぎる場合 */
+              429: {
                     headers: {
                         [name: string]: unknown;
                     };

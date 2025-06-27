@@ -3,7 +3,8 @@ use crate::routes::AppState;
 use crate::sea_orm_entities::prelude::Users;
 use crate::sea_orm_entities::users;
 use crate::util::sha::digest;
-use crate::util::{format_secs_ja_full, AppResponse};
+use crate::util::{format_secs_ja_full, AppError, AppResponse};
+use anyhow::anyhow;
 use axum::extract::{ConnectInfo, State};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -14,6 +15,7 @@ use axum_gcra::real_ip::RealIp;
 use axum_gcra::RateLimitLayer;
 use chrono::DateTime;
 use http::StatusCode;
+use jsonwebtoken::errors::{Error, ErrorKind};
 use sea_orm::ActiveValue::Set;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
@@ -83,9 +85,21 @@ async fn post_change(
         }
     };
 
+    let user = match UserRead::find_from_id(access_token.claims.sub, &state.db_conn).await {
+        Ok(Some(user)) => user,
+        Ok(None) => {
+            warn!("jwt token with invalid user was provided.");
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+        Err(err) => {
+            warn!("internal error occurred while executing sql: {:?}", err);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+    };
+
     if state
         .jwt_manager
-        .is_access_token_valid(&access_token.claims)
+        .is_access_token_valid(&access_token.claims, &user)
     {
         let sub = access_token.claims.sub;
         let user = match users::Entity::find_by_id(sub).one(&state.db_conn).await {
@@ -210,13 +224,44 @@ async fn post_reset_confirm(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<PasswordResetConfirmPayload>,
 ) -> AppResponse {
-    let claims = state
+    let claims = match state
         .jwt_manager
-        .decode_password_reset_token(payload.reset_token.as_str())?
-        .claims;
-    if !state.jwt_manager.is_password_reset_token_valid(&claims) {
-        return Ok((StatusCode::UNAUTHORIZED, ().into_response()));
+        .decode_password_reset_token(payload.reset_token.as_str())
+    {
+        Ok(claims) => claims,
+        Err(err) => match err.into_kind() {
+            ErrorKind::InvalidToken => {
+                warn!("Invalid password reset token: {}", payload.reset_token);
+                return Ok((StatusCode::UNAUTHORIZED, "".into_response()));
+            }
+            ErrorKind::InvalidSignature => {
+                warn!(
+                    "Invalid signature for password reset token: {}",
+                    payload.reset_token
+                );
+                return Ok((StatusCode::UNAUTHORIZED, "".into_response()));
+            }
+            ErrorKind::InvalidKeyFormat => {
+                warn!(
+                    "Invalid key format for password reset token: {}",
+                    payload.reset_token
+                );
+                return Ok((StatusCode::UNAUTHORIZED, "".into_response()));
+            }
+            ErrorKind::ExpiredSignature => {
+                warn!("Password reset token expired: {}", payload.reset_token);
+                return Ok((StatusCode::UNAUTHORIZED, "".into_response()));
+            }
+            e => {
+                return Err(anyhow!(
+                    "internal error occurred while decoding password reset token: {:?}",
+                    e
+                )
+                .into());
+            }
+        },
     }
+    .claims;
 
     let user = match UserRead::find_from_id(claims.sub, &state.db_conn).await? {
         Some(user) => user,
