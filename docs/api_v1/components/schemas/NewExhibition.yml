@@ -24,7 +24,7 @@ properties:
     minItems: 3
     maxItems: 3
     items:
-      $ref: ./User.yml
+      $ref: ./user/UserCreate.yml
 required:
   - id
   - exhibitor_name

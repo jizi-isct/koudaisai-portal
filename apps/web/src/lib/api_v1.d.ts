@@ -1542,32 +1542,12 @@ export interface components {
             /** @description 第一責任者, 第二責任者, 第三責任者 */
             representatives: string[];
         };
-        User: {
+      UserCreate: {
             /**
-             * Format: uuid
-             * @description unique id
+             * @description 名前
+             * @example Paul Johnson
              */
-            readonly id: string;
-            /**
-             * Format: date-time
-             * @description 作成日時
-             */
-            readonly created_at: string;
-            /**
-             * Format: date-time
-             * @description 最終更新日時
-             */
-            readonly updated_at: string;
-            /**
-             * @description 名
-             * @example Paul
-             */
-            first_name: string;
-            /**
-             * @description 姓
-             * @example Johnson
-             */
-            last_name: string;
+            name: string;
             /**
              * @description mアドレス(新旧どちらも含む)
              * @example johnson.p.5703@m.isct.ac.jp
@@ -1592,7 +1572,7 @@ export interface components {
              */
             type: "booth" | "general" | "stage" | "labo";
             /** @description 第一責任者, 第二責任者, 第三責任者 */
-            representatives: components["schemas"]["User"][];
+            representatives: components["schemas"]["UserCreate"][];
         };
         NewExhibitionResponse: {
             /** @description 第一責任者, 第二責任者, 第三責任者のactivation token */
@@ -1610,7 +1590,7 @@ export interface components {
             description?: string;
         };
         /** @description Target specifier for forms */
-        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown);
+        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown | unknown);
         /** @description Generic form properties */
         FormReadGeneric: {
             /**
@@ -1919,15 +1899,10 @@ export interface components {
              */
             readonly updated_at: string;
             /**
-             * @description 名
-             * @example Paul
+             * @description 名前
+             * @example Paul Johnson
              */
-            first_name: string;
-            /**
-             * @description 姓
-             * @example Johnson
-             */
-            last_name: string;
+            name: string;
             /**
              * @description mアドレス(新旧どちらも含む)
              * @example johnson.p.5703@m.isct.ac.jp
@@ -1941,15 +1916,10 @@ export interface components {
         };
         UserUpdate: {
             /**
-             * @description 名
-             * @example Paul
+             * @description 名前
+             * @example Paul Johnson
              */
-            first_name?: string;
-            /**
-             * @description 姓
-             * @example Johnson
-             */
-            last_name?: string;
+            name?: string;
             /**
              * @description mアドレス(新旧どちらも含む)
              * @example johnson.p.5703@m.isct.ac.jp

@@ -15,8 +15,7 @@ pub struct UserRead {
     pub id: Uuid,
     pub created_at: DateTime<chrono::Utc>,
     pub updated_at: DateTime<chrono::Utc>,
-    pub first_name: String,
-    pub last_name: String,
+    pub name: String,
     pub m_address: String,
     pub exhibition_id: String,
 }
@@ -27,8 +26,7 @@ impl From<sea_orm_entities::users::Model> for UserRead {
             id: value.id,
             created_at: value.created_at.unwrap().to_utc(),
             updated_at: value.updated_at.unwrap().to_utc(),
-            first_name: value.first_name,
-            last_name: value.last_name,
+            name: value.name,
             m_address: value.m_address,
             exhibition_id: value.exhibition_id,
         }
@@ -103,8 +101,7 @@ impl UserRead {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserUpdate {
-    pub first_name: String,
-    pub last_name: String,
+    pub name: String,
     pub m_address: String,
 }
 
@@ -114,8 +111,7 @@ impl Into<sea_orm_entities::users::ActiveModel> for UserUpdate {
             id: Default::default(),
             created_at: Default::default(),
             updated_at: Default::default(),
-            first_name: Set(self.first_name),
-            last_name: Set(self.last_name),
+            name: Set(self.name),
             m_address: Set(self.m_address),
             password_hash: Default::default(),
             password_salt: Default::default(),
