@@ -126,7 +126,7 @@ impl JWTManager {
         }
 
         // exp検証
-        if claims.exp > Utc::now().timestamp() {
+        if claims.exp < Utc::now().timestamp() {
             return Ok(false);
         }
 
