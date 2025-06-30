@@ -9,7 +9,6 @@ import {Heading1, LoadingScreen} from '@/components/generic';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import useMessage from "antd/es/message/useMessage";
 
 export default function Page() {
   return (
@@ -20,12 +19,10 @@ export default function Page() {
 }
 
 function Inner() {
-  const [messageApi, contextHolder] = useMessage();
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [exhibitor, setExhibitor] = useState<Exhibitor | null>(null)
-  const [modal, setModal] = useState(false);
 
   // 認証状態を確認
   useEffect(() => {
@@ -61,7 +58,6 @@ function Inner() {
 
   return (
     <>
-      {contextHolder}
       <main className="content">
         {
           user && exhibitor &&
