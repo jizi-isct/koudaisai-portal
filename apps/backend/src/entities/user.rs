@@ -159,10 +159,7 @@ impl UserRead {
             template_subject,
             &template_content
                 .replace("{{reset_token}}", &reset_token)
-                .replace(
-                    "{{username}}",
-                    format!("{} {}", self.last_name, self.first_name).as_str(),
-                )
+                .replace("{{username}}", format!("{}", self.name).as_str())
                 .replace("{{expires_at}}", &*format_secs_ja_full(expire_time)),
         )
         .await
