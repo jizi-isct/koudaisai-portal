@@ -181,3 +181,8 @@ export async function login(m_address: string, password: string): Promise<Tokens
     }
   }
 }
+
+export async function logout() {
+  localStorage.removeItem("exhibitor_refresh_token");
+  localStorage.removeItem("exhibitor_access_token");
+}

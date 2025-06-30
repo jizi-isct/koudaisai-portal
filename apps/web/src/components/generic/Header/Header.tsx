@@ -3,8 +3,8 @@
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import {usePathname} from "next/navigation";
-import {isLoggedInAdmin, isLoggedInMembers} from "@/lib";
+import {usePathname, useRouter} from "next/navigation";
+import {isLoggedInAdmin, isLoggedInMembers, logout} from "@/lib";
 import {useEffect, useState} from "react";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 
@@ -19,8 +19,13 @@ type HeaderProps = {
 };
 
 export const Header = ({header_type, titleColor = "black"}: HeaderProps) => {
+    const router = useRouter();
     // ヘッダーのユーザアイコンのドロップダウンの状態を管理
     const [isOpen, setIsOpen] = useState(false);
+    const handleLogout = async () => {
+        await logout()
+        router.push("/")
+    }
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     }
@@ -106,8 +111,7 @@ export const Header = ({header_type, titleColor = "black"}: HeaderProps) => {
                       />
                   </div>
                   <div className={`${styles.userDropdownWrapper} ${isOpen ? styles.dropdownOpen : styles.dropdownClosed}`}>
-                      <Link href="" className={styles.userDropdown}>ログアウト</Link>
-                      <Link href="" className={styles.userDropdown}>ログアウト</Link>
+                      <a onClick={handleLogout} className={styles.userDropdown}>ログアウト</a>
                   </div>
               </div>
               <div className={`${styles.userWrapperLoggedOut} ${loggedIn ? styles.hiddenUserWrapper : ""}`}>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 import {usePathname, useRouter} from "next/navigation";
 import {ButtonCompact} from "@/components/generic/ButtonCompact";
-import {useIsLoggedInMembers} from "@/lib";
+import {logout, useIsLoggedInMembers} from "@/lib";
 
 
 type Props = {
@@ -16,12 +16,21 @@ export function MobileNavigator({header_type}: Props) {
   const router = useRouter();
   const isLoggedIn = useIsLoggedInMembers(); // 仮のログイン状態
   const currentPath = usePathname();
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  }
   return (
     <div className={styles.root}>
       {
-        !isLoggedIn && <div className={styles.login}>
-                <ButtonCompact text={"ログイン"} onClick={() => router.push("/login")}/>
-              </div>
+        isLoggedIn === undefined ? <></> :
+          isLoggedIn === true
+            ? <div className={styles.logout}>
+              <ButtonCompact text={"ログアウト"} onClick={handleLogout}/>
+            </div>
+            : <div className={styles.login}>
+              <ButtonCompact text={"ログイン"} onClick={() => router.push("/login")}/>
+            </div>
       }
       <nav className={`${styles.nav} ${header_type === "admin" ? styles.admin : styles.members}`}>
         {/* ヘッダーのナビゲーションボタン */}

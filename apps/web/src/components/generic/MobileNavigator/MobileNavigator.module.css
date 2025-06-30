@@ -10,10 +10,11 @@
 
         position: sticky;
         bottom: 0;
+        margin: 0 auto;
+        width: fit-content;
     }
 
-    .login {
-
+    .logout, .login {
     }
 
     .nav {
@@ -25,6 +26,7 @@
         align-items: center;
         gap: 12px;
         text-align: center;
+        width: fit-content;
     }
 
     .headerNav {
