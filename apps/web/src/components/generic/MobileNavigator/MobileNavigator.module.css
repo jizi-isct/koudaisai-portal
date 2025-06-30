@@ -9,14 +9,21 @@
         z-index: 1000;
 
         position: sticky;
-        gap: 12px;
-        padding: 2em 0;
         bottom: 0;
+    }
+
+    .login {
+
+    }
+
+    .nav {
+        padding: 2em 0;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         justify-content: center;
         align-items: center;
+        gap: 12px;
         text-align: center;
     }
 
