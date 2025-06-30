@@ -6,11 +6,10 @@ import {$apiMembers, Exhibitor, getExhibitor, getTokensMembers, getUser, User} f
 import "../../globals.css";
 
 import {Heading1, LoadingScreen} from '@/components/generic';
-import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard/ExhibitorCard";
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
-import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import useMessage from "antd/es/message/useMessage";
 
 export default function Page() {
   return (
@@ -21,6 +20,7 @@ export default function Page() {
 }
 
 function Inner() {
+  const [messageApi, contextHolder] = useMessage();
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -61,6 +61,7 @@ function Inner() {
 
   return (
     <>
+      {contextHolder}
       <main className="content">
         {
           user && exhibitor &&
@@ -70,27 +71,6 @@ function Inner() {
           実行委員会からのお知らせ
         </Heading1>
         <ViewNotifications client={$apiMembers}/>
-        <Heading1 emoji={"📄"}>
-          企画情報
-        </Heading1>
-        {
-          exhibitor &&
-                <ExhibitorCard
-                        exhibitor={exhibitor}
-                        openModal={() => setModal(true)}
-                />
-        }
-
-        {
-          user && exhibitor &&
-                <EditModal
-                        user={user}
-                        exhibitor={exhibitor}
-                        setExhibitor={setExhibitor}
-                        modal={modal}
-                        setModal={setModal}
-                />
-        }
       </main>
     </>
   );

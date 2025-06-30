@@ -17,6 +17,13 @@ export function ViewNotifications({client}: ViewNotificationsProps) {
   })
 
   if (userId && notifications) {
+    if (notifications.length === 0) {
+      return (
+        <div style={{textAlign: "center"}}>
+          <p>実行委員会からの通知はありません</p>
+        </div>
+      )
+    }
     return (
       <ContentList
         contents={
