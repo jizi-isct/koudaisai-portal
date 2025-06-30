@@ -1093,7 +1093,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1136,7 +1136,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1185,7 +1185,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1610,7 +1610,7 @@ export interface components {
             description?: string;
         };
         /** @description Target specifier for forms */
-        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown);
+        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown | unknown);
         /** @description Generic form properties */
         FormReadGeneric: {
             /**
@@ -1939,6 +1939,7 @@ export interface components {
              */
             exhibition_id: string;
         };
+        UserId: string | "me";
         UserUpdate: {
             /**
              * @description 名

@@ -15,6 +15,7 @@ pub struct Config {
     pub web: Web,
     pub db: Db,
     pub s3: S3,
+    pub sendgrid: Sendgrid,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -147,4 +148,59 @@ pub struct S3 {
     pub secret_access_key: String,
     pub endpoint: String,
     pub bucket: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Sendgrid {
+    pub sender_address: String,
+    pub api_key: String,
+    pub template: SendgridTemplate,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SendgridTemplate {
+    pub password_reset_email_subject: String,
+    pub password_reset_email_body: String,
+}
+
+impl Default for SendgridTemplate {
+    fn default() -> Self {
+        Self {
+            password_reset_email_subject: "工大祭ポータル - パスワードリセット".to_string(),
+            password_reset_email_body: r#"
+{{username}} 様
+
+いつも工大祭ポータルをご利用いただきありがとうございます。
+
+パスワードリセットのご依頼を受け付けました。
+以下のリンクより新しいパスワードを設定してください。
+
+パスワードリセットリンク:
+https://portal.koudaisai.jp/reset-password?token={{reset_token}}
+
+※ このリンクの有効期限は{{expires_at}}です。期限を過ぎると無効になりますのでご注意ください。
+
+※ 本メールは送信専用です。本メールへのご返信には対応しておりません。
+
+ご不明な点がございましたら、工大祭実行委員会までお問い合わせください。
+
+もしこのメールに心当たりがない場合は、このメールを破棄してください。
+
+今後とも工大祭実行委員会をよろしくお願いいたします。
+
+--------------------------------
+東京科学大学　工大祭実行委員会
+工大祭ポータル
+https://portal.koudaisai.jp/
+
+お問い合わせ先
+　模擬店企画/一般企画 sanka@koudaisai.jp
+　ステージ企画 stage@koudaisai.jp
+　研究室公開企画 laboratory@koudaisai.jp
+            "#
+            .trim()
+            .parse()
+            .unwrap(),
+        }
+    }
 }

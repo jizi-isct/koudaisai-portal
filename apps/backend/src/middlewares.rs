@@ -1,3 +1,4 @@
+use crate::entities::user::UserRead;
 use crate::routes::AppState;
 use crate::util::jwt;
 use axum::extract::{Request, State};
@@ -94,7 +95,23 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 return StatusCode::UNAUTHORIZED.into_response();
             }
         };
-        if state.jwt_manager.is_access_token_valid(&token.claims) {
+        // ユーザー情報取得
+        let user = match UserRead::find_from_id(token.claims.sub, &state.db_conn).await {
+            Ok(Some(user)) => user,
+            Ok(None) => {
+                warn!("Authorization error: user not found for token");
+                return StatusCode::UNAUTHORIZED.into_response();
+            }
+            Err(err) => {
+                warn!("Authorization error: database error {:?}", err);
+                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+            }
+        };
+
+        if state
+            .jwt_manager
+            .is_access_token_valid(&token.claims, &user)
+        {
             req.extensions_mut().insert(CurrentUser::User(token.claims));
             next.run(req).await
         } else {

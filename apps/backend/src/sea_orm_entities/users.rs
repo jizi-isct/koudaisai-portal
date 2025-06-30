@@ -20,6 +20,7 @@ pub struct Model {
     pub password_salt: String,
     #[sea_orm(column_type = "Text")]
     pub exhibition_id: String,
+    pub password_updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

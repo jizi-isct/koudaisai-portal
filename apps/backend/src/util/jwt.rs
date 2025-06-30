@@ -1,3 +1,4 @@
+use crate::entities::user::UserRead;
 use crate::sea_orm_entities::revoked_refresh_tokens;
 use anyhow::Result;
 use chrono::Utc;
@@ -15,6 +16,15 @@ pub struct Claims {
     pub iat: i64,
     pub typ: Type,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PasswordResetTokenClaims {
+    pub iss: String,
+    pub sub: Uuid,
+    pub exp: i64,
+    pub iat: i64,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Type {
@@ -42,6 +52,7 @@ pub struct JWTManager {
     pub algorithm: Algorithm,
     pub access_token_expire_time: i64,
     pub refresh_token_expire_time: i64,
+    pub password_reset_token_expire_time: i64,
     pub iss: String,
     encoding_key: EncodingKey,
     decoding_key: DecodingKey,
@@ -53,6 +64,7 @@ impl JWTManager {
         algorithm: Algorithm,
         access_token_expire_time: i64,
         refresh_token_expire_time: i64,
+        password_reset_token_expire_time: i64,
         iss: impl ToString,
         encoding_key: EncodingKey,
         decoding_key: DecodingKey,
@@ -62,6 +74,7 @@ impl JWTManager {
             algorithm,
             access_token_expire_time,
             refresh_token_expire_time,
+            password_reset_token_expire_time,
             iss: iss.to_string(),
             encoding_key,
             decoding_key,
@@ -145,7 +158,7 @@ impl JWTManager {
     /// 以下の条件がすべて満たされる場合true、それ以外はfalse
     /// - `claims.typ`が`Access_token`である。
     /// - 有効期限が切れていない
-    pub fn is_access_token_valid(&self, claims: &Claims) -> bool {
+    pub fn is_access_token_valid(&self, claims: &Claims, user: &UserRead) -> bool {
         // typ検証
         if claims.typ != Type::AccessToken {
             return false;
@@ -153,6 +166,55 @@ impl JWTManager {
 
         // exp検証
         if claims.exp < Utc::now().timestamp() {
+            return false;
+        }
+
+        // iat検証
+        if claims.iat < user.password_updated_at.timestamp() {
+            return false;
+        }
+
+        true
+    }
+
+    pub fn issue_password_reset_token(&self, sub: Uuid) -> Result<String> {
+        let password_reset_token_claims = PasswordResetTokenClaims {
+            iss: self.iss.clone(),
+            sub,
+            exp: Utc::now().timestamp() + self.password_reset_token_expire_time,
+            iat: Utc::now().timestamp(),
+        };
+        let password_reset_token = jsonwebtoken::encode(
+            &Header::new(self.algorithm),
+            &password_reset_token_claims,
+            &self.encoding_key,
+        )?;
+        Ok(password_reset_token)
+    }
+
+    pub fn decode_password_reset_token(
+        &self,
+        token: &str,
+    ) -> Result<TokenData<PasswordResetTokenClaims>, jsonwebtoken::errors::Error> {
+        jsonwebtoken::decode::<PasswordResetTokenClaims>(
+            token,
+            &self.decoding_key,
+            &Validation::new(self.algorithm),
+        )
+    }
+
+    pub async fn is_password_reset_token_valid(
+        &self,
+        claims: &PasswordResetTokenClaims,
+        user: UserRead,
+    ) -> bool {
+        // exp検証
+        if claims.exp < Utc::now().timestamp() {
+            return false;
+        }
+
+        // iat検証
+        if claims.iat < user.password_updated_at.timestamp() {
             return false;
         }
 

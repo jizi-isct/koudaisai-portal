@@ -2,7 +2,6 @@ use crate::entities::exhibitor::ExhibitionType;
 use crate::entities::user::UserRead;
 use sea_orm::DbConn;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::any::Any;
 use std::fmt;
 use uuid::Uuid;
 
