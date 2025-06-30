@@ -1,13 +1,9 @@
 type: object
 properties:
-  first_name:
-    description: 名
+  name:
+    description: 名前
     type: string
-    example: Paul
-  last_name:
-    description: 姓
-    type: string
-    example: Johnson
+    example: Paul Johnson
   m_address:
     description: mアドレス(新旧どちらも含む)
     type: string

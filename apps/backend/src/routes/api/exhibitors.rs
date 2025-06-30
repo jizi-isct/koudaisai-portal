@@ -69,8 +69,7 @@ impl From<sea_orm_active_enums::ExhibitionType> for ExhibitionType {
 }
 #[derive(Deserialize, Debug)]
 struct RepresentativeWrite {
-    first_name: String,
-    last_name: String,
+    name: String,
     m_address: String,
 }
 
@@ -83,8 +82,7 @@ fn new_user_model(
         id: ActiveValue::Set(uuid),
         created_at: ActiveValue::NotSet,
         updated_at: ActiveValue::NotSet,
-        first_name: ActiveValue::Set(representative.first_name.clone()),
-        last_name: ActiveValue::Set(representative.last_name.clone()),
+        name: ActiveValue::Set(representative.name.clone()),
         m_address: ActiveValue::Set(representative.m_address.clone()),
         password_hash: ActiveValue::NotSet,
         password_salt: ActiveValue::NotSet,

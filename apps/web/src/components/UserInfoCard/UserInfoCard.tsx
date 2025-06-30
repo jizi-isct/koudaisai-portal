@@ -19,7 +19,7 @@ export const UserInfoCard = ({user, exhibitor}: UserInfoCardProps) => {
       : "?";
     return (
     <div className={styles.user}>
-        <h1>こんにちは、{user?.last_name} {user?.first_name} 👋</h1>
+        <h1>こんにちは、{user?.name} 👋</h1>
         <h2>あなたは{exhibitor?.exhibitor_name}の第{typeLabels[representativeIndex] || representativeIndex}責任者です。</h2>
     </div>
     );

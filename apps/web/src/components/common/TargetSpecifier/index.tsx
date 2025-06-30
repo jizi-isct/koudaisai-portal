@@ -76,7 +76,7 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
           children: users.map((user) => (
             {
               value: user.id,
-              label: `${user.exhibition_id}の${user.last_name} ${user.first_name}`
+              label: `${user.exhibition_id}の${user.name}`
             }
           ))
         }

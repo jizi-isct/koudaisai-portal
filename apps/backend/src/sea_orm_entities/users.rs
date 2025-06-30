@@ -9,10 +9,6 @@ pub struct Model {
     pub id: Uuid,
     pub created_at: Option<DateTimeWithTimeZone>,
     pub updated_at: Option<DateTimeWithTimeZone>,
-    #[sea_orm(column_type = "Text")]
-    pub first_name: String,
-    #[sea_orm(column_type = "Text")]
-    pub last_name: String,
     #[sea_orm(column_type = "Text", unique)]
     pub m_address: String,
     #[sea_orm(column_type = "Text", nullable)]
@@ -20,6 +16,8 @@ pub struct Model {
     pub password_salt: String,
     #[sea_orm(column_type = "Text")]
     pub exhibition_id: String,
+    #[sea_orm(column_type = "Text")]
+    pub name: String,
     pub password_updated_at: DateTimeWithTimeZone,
 }
 
