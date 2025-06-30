@@ -1093,7 +1093,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1136,7 +1136,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1185,7 +1185,7 @@ export interface paths {
                 header?: never;
                 path: {
                     /** @description ユーザーID */
-                    user_id: string;
+                    user_id: components["schemas"]["UserId"];
                 };
                 cookie?: never;
             };
@@ -1914,6 +1914,7 @@ export interface components {
              */
             exhibition_id: string;
         };
+        UserId: string | "me";
         UserUpdate: {
             /**
              * @description 名前

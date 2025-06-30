@@ -53,6 +53,7 @@ async fn main() {
     let db = init_db(&config.db).await.unwrap();
     let app = init_routes(
         &config.web,
+        config.sendgrid,
         db,
         oidc_client,
         s3_client,

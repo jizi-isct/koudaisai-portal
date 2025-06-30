@@ -1,3 +1,6 @@
+mod password;
+
+use crate::entities::user::UserRead;
 use crate::routes::{AppState, AuthSession};
 use crate::sea_orm_entities::prelude::Users;
 use crate::sea_orm_entities::{revoked_refresh_tokens, users};
@@ -57,6 +60,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
         .route("/v1/admin/login", get(admin_login))
         .route("/v1/admin/redirect", post(admin_redirect))
+        .nest("/v1/password", password::init_router())
 }
 
 #[derive(Serialize, Deserialize)]
@@ -78,8 +82,7 @@ async fn activate(
         payload.m_address.to_string().as_str(),
         state.web.auth.activation_salt.as_str(),
         2_i32.pow(state.web.auth.stretch_cost as u32),
-    )
-    .await;
+    );
 
     if digest(&*payload.token) == digest(&*right_token) {
         //文字列比較の計算時間からトークンを推測されないようにdigestしてから比較
@@ -109,14 +112,11 @@ async fn activate(
 
         let mut user: users::ActiveModel = user.into();
 
-        user.password_hash = Set(Some(
-            stretch_with_salt(
-                payload.password.to_string().as_str(),
-                &*password_salt,
-                2_i32.pow(state.web.auth.stretch_cost as u32),
-            )
-            .await,
-        ));
+        user.password_hash = Set(Some(stretch_with_salt(
+            payload.password.to_string().as_str(),
+            &*password_salt,
+            2_i32.pow(state.web.auth.stretch_cost as u32),
+        )));
         match user.update(&state.db_conn).await {
             Ok(_) => StatusCode::OK,
             Err(err) => {
@@ -161,13 +161,10 @@ async fn login(
         }
     };
 
-    let prompted_hash = state
-        .sha_manager
-        .stretch_with_salt(
-            payload.password.to_string().as_str(),
-            user.password_salt.as_str(),
-        )
-        .await;
+    let prompted_hash = state.sha_manager.stretch_with_salt(
+        payload.password.to_string().as_str(),
+        user.password_salt.as_str(),
+    );
 
     let password_hash = match user.password_hash {
         Some(hash) => hash,
@@ -257,9 +254,21 @@ async fn reset(
         }
     };
 
+    let user = match UserRead::find_from_id(access_token.claims.sub, &state.db_conn).await {
+        Ok(Some(user)) => user,
+        Ok(None) => {
+            warn!("jwt token with invalid user was provided.");
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+        Err(err) => {
+            warn!("internal error occurred while executing sql: {:?}", err);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+    };
+
     if state
         .jwt_manager
-        .is_access_token_valid(&access_token.claims)
+        .is_access_token_valid(&access_token.claims, &user)
     {
         let sub = access_token.claims.sub;
         let user = match users::Entity::find_by_id(sub).one(&state.db_conn).await {
@@ -279,20 +288,14 @@ async fn reset(
             return StatusCode::UNAUTHORIZED;
         }
         let current_pwd_hash = user.password_hash.clone().unwrap();
-        let old_pwd_hash = state
-            .sha_manager
-            .stretch_with_salt(
-                payload.old_password.to_string().as_str(),
-                user.password_salt.as_str(),
-            )
-            .await;
-        let new_pwd_hash = state
-            .sha_manager
-            .stretch_with_salt(
-                payload.new_password.to_string().as_str(),
-                user.password_salt.as_str(),
-            )
-            .await;
+        let old_pwd_hash = state.sha_manager.stretch_with_salt(
+            payload.old_password.to_string().as_str(),
+            user.password_salt.as_str(),
+        );
+        let new_pwd_hash = state.sha_manager.stretch_with_salt(
+            payload.new_password.to_string().as_str(),
+            user.password_salt.as_str(),
+        );
 
         if digest(old_pwd_hash.as_str()) == digest(current_pwd_hash.as_str()) {
             let mut user = user.into_active_model();

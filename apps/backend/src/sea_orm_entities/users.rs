@@ -18,6 +18,7 @@ pub struct Model {
     pub exhibition_id: String,
     #[sea_orm(column_type = "Text")]
     pub name: String,
+    pub password_updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

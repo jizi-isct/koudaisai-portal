@@ -1,6 +1,6 @@
 mod api;
 mod auth;
-use crate::config::Web;
+use crate::config::{Sendgrid, SendgridTemplate, Web};
 use crate::middlewares;
 use crate::util::jwt::JWTManager;
 use crate::util::oidc::OIDCClient;
@@ -14,6 +14,7 @@ use oauth2::PkceCodeVerifier;
 use openidconnect::Nonce;
 use reqwest::Client;
 use sea_orm::DatabaseConnection;
+use sendgrid::v3::{Email, Sender};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -25,6 +26,7 @@ use tracing::{debug, instrument};
 #[instrument(skip(web))]
 pub fn init_routes(
     web: &Web,
+    sendgrid: Sendgrid,
     db_conn: DatabaseConnection,
     oidc_client: OIDCClient,
     s3_client: aws_sdk_s3::Client,
@@ -33,6 +35,9 @@ pub fn init_routes(
     debug!("Initializing routes");
     let state = Arc::new(AppState {
         web: web.clone(),
+        sendgrid_sender_email: Email::new(sendgrid.sender_address.clone()),
+        sendgrid_sender: Sender::new(sendgrid.api_key, None),
+        sendgrid_template: sendgrid.template,
         db_conn: db_conn.clone(),
         oidc_client,
         auth_sessions: Default::default(),
@@ -41,6 +46,7 @@ pub fn init_routes(
             Algorithm::RS256,
             600,
             60 * 60 * 24 * 30 * 6,
+            60 * 10, // 10 minutes
             "https://portal.koudaisai.jp",
             web.auth.get_jwt_encoding_key().unwrap(),
             web.auth.get_jwt_decoding_key().unwrap(),
@@ -71,6 +77,9 @@ pub fn init_routes(
 
 pub struct AppState {
     pub web: Web,
+    pub sendgrid_sender_email: Email,
+    pub sendgrid_sender: Sender,
+    pub sendgrid_template: SendgridTemplate,
     pub db_conn: DatabaseConnection,
     pub oidc_client: OIDCClient,
     pub auth_sessions: Mutex<HashMap<String, AuthSession>>,

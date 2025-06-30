@@ -16,8 +16,12 @@ paths:
     $ref: paths/login.yml
   /refresh:
     $ref: paths/refresh.yml
-  /reset:
-    $ref: paths/reset.yml
+  /password/change:
+    $ref: paths/password_change.yml
+  /password/reset:
+    $ref: paths/password_reset.yml
+  /password/reset/confirm:
+    $ref: paths/password_reset_confirm.yml
   /revoke:
     $ref: paths/revoke.yml
   /admin/login:

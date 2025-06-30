@@ -8,8 +8,7 @@ get:
       description: ユーザーID
       required: true
       schema:
-        type: string
-        format: uuid
+        $ref: "../components/schemas/common/UserId.yml"
   responses:
     '200':
       description: OK

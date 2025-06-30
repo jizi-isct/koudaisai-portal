@@ -1,5 +1,6 @@
 use crate::entities::notification::NotificationRead;
 use crate::entities::user::{UserRead, UserUpdate};
+use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::{contains_uuid, AppResponse};
@@ -26,26 +27,45 @@ async fn get_user(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
-    Path(user_id): Path<Uuid>,
+    Path(user_id): Path<UserId>,
 ) -> AppResponse {
-    // 非ログイン時: ユーザー情報は取得不可
-    if let CurrentUser::None = current_user {
-        return Ok((StatusCode::FORBIDDEN, ().into_response()));
-    }
-
-    // 一般ユーザーの場合: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
-    if let CurrentUser::User(claims) = current_user {
-        let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
-        let exhibitor_read = current_user.get_exhibitor_read(&state.db_conn).await?;
-        if !contains_uuid(exhibitor_read.representatives, current_user.id) {
-            return Ok((StatusCode::NOT_FOUND, ().into_response()));
+    match current_user {
+        CurrentUser::None => {
+            // 非ログイン時: ユーザー情報は取得不可
+            Ok((StatusCode::FORBIDDEN, ().into_response()))
         }
-    }
+        CurrentUser::User(claims) => {
+            // 一般ユーザーの場合: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
+            let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
 
-    // ユーザー情報を取得
-    match UserRead::find_from_id(user_id, &state.db_conn).await? {
-        Some(user) => Ok((StatusCode::OK, Json(user).into_response())),
-        None => Ok((StatusCode::NOT_FOUND, ().into_response())),
+            let user = match user_id {
+                UserId::Uuid(uuid) => UserRead::find_from_id(uuid, &state.db_conn).await?,
+                UserId::Me => Some(current_user),
+            };
+
+            match user {
+                Some(user) => {
+                    let exhibitor_read = user.get_exhibitor_read(&state.db_conn).await?;
+                    if !contains_uuid(exhibitor_read.representatives, user.id) {
+                        return Ok((StatusCode::NOT_FOUND, ().into_response()));
+                    }
+                    Ok((StatusCode::OK, Json(user).into_response()))
+                }
+                None => Ok((StatusCode::NOT_FOUND, ().into_response())),
+            }
+        }
+        CurrentUser::Admin(_) => {
+            // 管理者の場合: ユーザー情報を取得(me非対応)
+            let user = match user_id {
+                UserId::Uuid(uuid) => UserRead::find_from_id(uuid, &state.db_conn).await?,
+                UserId::Me => None,
+            };
+
+            match user {
+                Some(user) => Ok((StatusCode::OK, Json(user).into_response())),
+                None => Ok((StatusCode::NOT_FOUND, ().into_response())),
+            }
+        }
     }
 }
 
@@ -86,10 +106,14 @@ async fn get_notifications(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
-    Path(user_id): Path<Uuid>,
+    Path(user_id): Path<UserId>,
 ) -> AppResponse {
     match current_user {
         CurrentUser::Admin(_) => {
+            let user_id = match user_id {
+                UserId::Uuid(uuid) => uuid,
+                UserId::Me => return Ok((StatusCode::NOT_FOUND, ().into_response())),
+            };
             // 管理者の場合: 全てのユーザーの通知を取得可能
             // ユーザー情報を取得
             let user = UserRead::find_from_id(user_id, &state.db_conn).await?;
@@ -118,6 +142,10 @@ async fn get_notifications(
         CurrentUser::User(claims) => {
             // 一般ユーザーの場合: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
             let current_user = UserRead::from(claims, &state.db_conn).await?;
+            let user_id = match user_id {
+                UserId::Uuid(uuid) => uuid,
+                UserId::Me => current_user.id,
+            };
             let exhibition = current_user.get_exhibitor_read(&state.db_conn).await?;
             if !contains_uuid(exhibition.representatives, user_id) {
                 return Ok((StatusCode::NOT_FOUND, ().into_response()));

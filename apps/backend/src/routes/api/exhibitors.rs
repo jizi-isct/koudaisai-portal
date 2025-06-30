@@ -87,6 +87,7 @@ fn new_user_model(
         password_hash: ActiveValue::NotSet,
         password_salt: ActiveValue::NotSet,
         exhibition_id: ActiveValue::Set(exhibition_id),
+        password_updated_at: ActiveValue::NotSet,
     }
 }
 type PostExhibitorsResponse = (String, String, String);
@@ -220,20 +221,17 @@ async fn post_exhibitors(
             payload.representatives.0.m_address.as_str(),
             state.web.auth.activation_salt.as_str(),
             2_i32.pow(state.web.auth.stretch_cost as u32),
-        )
-        .await,
+        ),
         stretch_with_salt(
             payload.representatives.1.m_address.as_str(),
             state.web.auth.activation_salt.as_str(),
             2_i32.pow(state.web.auth.stretch_cost as u32),
-        )
-        .await,
+        ),
         stretch_with_salt(
             payload.representatives.2.m_address.as_str(),
             state.web.auth.activation_salt.as_str(),
             2_i32.pow(state.web.auth.stretch_cost as u32),
-        )
-        .await,
+        ),
     );
 
     Ok((StatusCode::CREATED, Json(activation_tokens).into_response()))
