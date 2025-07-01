@@ -22,7 +22,7 @@ export const Footer = () => {
                 <Link href="/questions/" className={styles.navItem}>よくある質問</Link>
             </div>
           <p className={styles.contacts}>
-            公式LINEアカウント：<a href={"https://lin.ee/43ugikz"}>https://lin.ee/43ugikz</a> <br/>
+            公式LINEアカウント：<a href={"https://lin.ee/9Sud7lK"}>https://lin.ee/9Sud7lK</a> <br/>
             メールアドレス([at]を@に置き換えてください)：sanka[at]koudaisai.jp
           </p>
             <p className={styles.copyrightText}>©︎ 2025 JIZI All Rights Reserved.</p>
