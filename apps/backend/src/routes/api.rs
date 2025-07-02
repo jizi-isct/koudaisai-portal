@@ -1,3 +1,4 @@
+mod approval_requests;
 mod document_categories;
 mod documents;
 mod exhibitors;
@@ -26,4 +27,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .nest("/v1/users", users::init_router())
         .nest("/v1/notifications", notifications::init_router())
         .nest("/v1/util", util::init_router())
+        .nest("/v1/approval-requests", approval_requests::init_router())
 }

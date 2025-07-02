@@ -1,0 +1,15 @@
+type: object
+description: Type for editing exhibition information
+properties:
+  exhibition_name:
+    type: string
+    description: Name of the exhibition
+    nullable: true
+  icon_id:
+    type: string
+    description: ID of the exhibition icon
+    nullable: true
+  description:
+    type: string
+    description: Description of the exhibition
+    nullable: true

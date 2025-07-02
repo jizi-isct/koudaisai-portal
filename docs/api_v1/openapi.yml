@@ -22,6 +22,8 @@ tags:
     description: 通知機能関連
   - name: util
     description: ユーティリティ関連
+  - name: approval_requests
+    description: 承認申請関連
 paths:
   # exhibitions
   /exhibitors:
@@ -56,6 +58,12 @@ paths:
     $ref: paths/users_{user_id}.yml
   /users/{user_id}/notifications:
     $ref: paths/users_{user_id}_notifications.yml
+  /users/{user_id}/approval_requests:
+    $ref: paths/users_{user_id}_approval_requests.yml
+  /users/{user_id}/approval_requests/{request_id}:
+    $ref: "paths/users_{user_id}_approval_requests_{request_id}.yml"
+  /users/{user_id}/approval_requests/{request_id}/close:
+    $ref: paths/users_{user_id}_approval_requests_{request_id}_close.yml
   # notifications
   /notifications:
     $ref: paths/notifications.yml
@@ -64,6 +72,15 @@ paths:
   # util
   /util/meta:
     $ref: paths/util_meta.yml
+  # approval requests
+  /approval-requests:
+    $ref: paths/approval_requests.yml
+  /approval-requests/{id}:
+    $ref: paths/approval_requests_{id}.yml
+  /approval-requests/{id}/approve:
+    $ref: paths/approval_requests_{id}_approve.yml
+  /approval-requests/{id}/reject:
+    $ref: paths/approval_requests_{id}_reject.yml
 
 components:
   securitySchemes:
