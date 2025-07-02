@@ -2572,13 +2572,7 @@ export interface components {
             approved_by?: string | null;
         } & components["schemas"]["ApprovalRequestType"];
         /** @description Request to create an approval request */
-        CreateApprovalRequest: {
-            /**
-             * Format: uuid
-             * @description ID of the user who issued the approval request
-             */
-            issued_by: string;
-        } & components["schemas"]["ApprovalRequestType"];
+        CreateApprovalRequest: components["schemas"]["ApprovalRequestType"];
         NotificationCreateGeneric: {
             /** @description 通知のタイトル */
             title: string;

@@ -1,12 +1,5 @@
 type: object
 description: Request to create an approval request
-allOf:
-  - type: object
-    properties:
-      issued_by:
-        type: string
-        format: uuid
-        description: ID of the user who issued the approval request
-    required:
-      - issued_by
-  - $ref: "./ApprovalRequestType.yml"
+oneOf:
+  - allOf:
+      - $ref: "./ApprovalRequestType.yml"

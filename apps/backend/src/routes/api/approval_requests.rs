@@ -4,7 +4,7 @@ use crate::routes::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use std::net::SocketAddr;
@@ -23,8 +23,8 @@ pub fn init_router() -> Router<Arc<AppState>> {
                 .patch(patch_approval_request)
                 .delete(delete_approval_request),
         )
-        .route("/{request_id}/approve", get(approve_approval_request))
-        .route("/{request_id}/reject", get(reject_approval_request))
+        .route("/{request_id}/approve", post(approve_approval_request))
+        .route("/{request_id}/reject", post(reject_approval_request))
 }
 
 #[instrument(name = "GET /api/v1/approval-requests", skip(state))]

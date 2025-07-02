@@ -32,5 +32,10 @@ export type FormUpdate = components["schemas"]["FormUpdate"];
 export type ApprovalRequestCreate = components["schemas"]["CreateApprovalRequest"];
 export type ApprovalRequestRead = components["schemas"]["ReadApprovalRequest"];
 export type ApprovalRequestUpdate = components["schemas"]["UpdateApprovalRequest"];
+export type ExhibitionUpdate = {
+  exhibition_name?: string | null;
+  description?: string | null;
+  icon_id?: string | null;
+};
 
 export type Exhibitor = components["schemas"]["Exhibitor"];

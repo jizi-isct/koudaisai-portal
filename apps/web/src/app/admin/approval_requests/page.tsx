@@ -1,11 +1,10 @@
 "use client";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
-import {$apiAdmin, ApprovalRequestRead, getDownloadUrl} from "@/lib";
+import {$apiAdmin, ApprovalRequestRead} from "@/lib";
 import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
-import {CheckOutlined, PlusOutlined} from "@ant-design/icons";
+import {CheckOutlined, CloseOutlined, PlusOutlined} from "@ant-design/icons";
 import {ReactNode, useMemo} from "react";
-import Image from "next/image";
 
 type ExpandedRowDataType = {
   key: string,
@@ -75,25 +74,17 @@ function Inner() {
     await refetch()
   }
 
-  const expandedRowRender = async (record: ApprovalRequestRead) => {
+  const expandedRowRender = (record: ApprovalRequestRead) => {
     const dataSource = [];
     dataSource.push({
       key: "企画",
       value: record.type_edit_exhibition_info.exhibition_name === undefined ? "変更なし" : record.type_edit_exhibition_info.exhibition_name
     })
     if (record.type_edit_exhibition_info.icon_id) {
-      const url = await getDownloadUrl(record.type_edit_exhibition_info.icon_id, "icon")
-      if (url.data?.presigned_url) {
-        dataSource.push({
-          key: "アイコン",
-          value: <Image src={url.data.presigned_url} alt="アイコン" style={{width: "100px", height: "100px"}}/>
-        })
-      } else {
-        dataSource.push({
-          key: "アイコン",
-          value: "エラー"
-        });
-      }
+      dataSource.push({
+        key: "アイコン",
+        value: "変更あり"
+      })
     } else if (record.type_edit_exhibition_info.icon_id === undefined) {
       dataSource.push({
         key: "アイコン",
@@ -142,22 +133,27 @@ function Inner() {
       }
     },
     {
+      key: "status",
+      title: "ステータス",
+      dataIndex: "status",
+      rowScope: "row",
+      render: (value) => {
+        switch (value) {
+          case "pending":
+            return <Tag color={"blue"}>審査中</Tag>;
+          case "approved":
+            return <Tag color={"green"}>承認済み</Tag>;
+          case "rejected":
+            return <Tag color={"red"}>却下済み</Tag>;
+          default:
+            return <Tag color={"grey"}>不明</Tag>;
+        }
+      }
+    },
+    {
       key: "issued_at",
       title: "発行日時",
       dataIndex: "issued_at",
-      rowScope: "row",
-      render: value => new Date(value).toLocaleString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      })
-    },
-    {
-      key: "updated_at",
-      title: "更新日時",
-      dataIndex: "updated_at",
       rowScope: "row",
       render: value => new Date(value).toLocaleString("ja-JP", {
         year: "numeric",
@@ -172,32 +168,38 @@ function Inner() {
       title: '操作',
       dataIndex: 'id',
       fixed: 'right',
-      render: (value) => <Flex gap={5}>
-        <Popconfirm
-          title={"承認"}
-          description="この承認申請を本当に承認しますか？この操作は元に戻せませんよ！！"
-          onConfirm={handleApprove(value)}
-          onCancel={() => {
-            return
-          }}
-          okText="はい"
-          cancelText="いいえ"
-        >
-          <Button danger><CheckOutlined/></Button>
-        </Popconfirm>
-        <Popconfirm
-          title={"却下"}
-          description="この承認申請を本当に却下しますか？この操作は元に戻せません！！"
-          onConfirm={handleReject(value)}
-          onCancel={() => {
-            return
-          }}
-          okText="はい"
-          cancelText="いいえ"
-        >
-          <Button danger><CheckOutlined/></Button>
-        </Popconfirm>
-      </Flex>,
+      render: (value, record) => {
+        if (record.status == "pending") {
+          return (<Flex gap={5}>
+            <Popconfirm
+              title={"承認"}
+              description="この承認申請を本当に承認しますか？この操作は元に戻せませんよ！！"
+              onConfirm={handleApprove(value)}
+              onCancel={() => {
+                return
+              }}
+              okText="はい"
+              cancelText="いいえ"
+            >
+              <Button><CheckOutlined/></Button>
+            </Popconfirm>
+            <Popconfirm
+              title={"却下"}
+              description="この承認申請を本当に却下しますか？この操作は元に戻せません！！"
+              onConfirm={handleReject(value)}
+              onCancel={() => {
+                return
+              }}
+              okText="はい"
+              cancelText="いいえ"
+            >
+              <Button danger><CloseOutlined/></Button>
+            </Popconfirm>
+          </Flex>)
+        } else {
+          return <span>操作不可</span>;
+        }
+      },
     },
   ]
 

@@ -378,7 +378,7 @@ impl UpdateApprovalRequest {
             }
             None => UpdateApprovalRequestActiveModel::Generic {
                 generic: sea_orm_entities::approval_request::ActiveModel {
-                    id: NotSet,
+                    id: Set(id),
                     issued_at: NotSet,
                     issued_by: NotSet,
                     r#type: self.r#type.map(|s| s.as_sea_orm()).into_active_value(),
