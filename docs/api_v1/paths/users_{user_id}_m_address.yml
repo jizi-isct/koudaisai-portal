@@ -1,0 +1,45 @@
+post:
+  summary: mアドレスを変更する
+  tags:
+    - users
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            m_address:
+              type: string
+              format: email
+              description: 新しいmアドレス
+          required:
+            - m_address
+  parameters:
+    - name: user_id
+      in: path
+      description: ユーザーのID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              activation_token:
+                type: string
+                description: 新規mアドレスを有効化するためのアクティベーショントークン
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+    '500':
+      description: サーバーエラー
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
