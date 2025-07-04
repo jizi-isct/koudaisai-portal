@@ -3,7 +3,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
 import {$apiAdmin, ApprovalRequestRead} from "@/lib";
 import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
-import {CheckOutlined, CloseOutlined, PlusOutlined} from "@ant-design/icons";
+import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import {ReactNode, useMemo} from "react";
 
 type ExpandedRowDataType = {
@@ -210,8 +210,6 @@ function Inner() {
     <>
       <Heading1 emoji={"📃"}>承認申請一覧</Heading1>
       <Flex gap={8} vertical>
-        <Button style={{width: "fit-content"}}
-                href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/new"}><PlusOutlined/>新規作成</Button>
         <Table<ApprovalRequestRead>
           dataSource={data.map(item => ({...item, key: item.id}))}
           columns={columns}
