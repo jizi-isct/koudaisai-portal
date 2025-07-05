@@ -2,11 +2,11 @@ import styles from "./FormCard.module.css";
 import {FormRead} from "@/lib";
 import {useMemo} from "react";
 
-type ListsProps = {
+type formCardProps = {
   form: FormRead
 };
 
-export function FormCard({form}: ListsProps) {
+export function FormCard({form}: formCardProps) {
   const formLink = useMemo(() => {
     if ('type_external' in form) {
       return form.type_external.form_url;
@@ -15,15 +15,25 @@ export function FormCard({form}: ListsProps) {
     }
   }, [form])
 
+  // フォームの回答期限を12/12 12:34のような形式で表示
+  const formattedDueDate = useMemo(() => {
+    if (!form.due_date) return "なし";
+
+    return new Intl.DateTimeFormat("ja-JP", {
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date(form.due_date));
+  }, [form.due_date]);
+
   return (
     <div key={form.id} className={styles.forms}>
       <a href={formLink}>
-        <div className={styles.titleWrapper}>
-          <h2 className={styles.title}>{form.form_name}</h2>
-          <h2
-            className={styles.dueDate}>回答期限: {form.due_date ? new Date(form.due_date).toLocaleString("ja-JP") : "なし"}</h2>
-        </div>
+        <h2 className={styles.title}>{form.form_name}</h2>
         <p className={styles.summary}>{form.summary}</p>
+        <h2 className={styles.dueDate}>回答期限: {formattedDueDate}</h2>
       </a>
     </div>
   )

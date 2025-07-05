@@ -1,45 +1,38 @@
 .forms {
-    width: 35%;
+    width: 50%;
     border: 1px solid var(--darkblue);
     border-radius: 10px;
     padding: 15px;
     box-shadow: 4px 4px 0px 0px var(--darkblue);
-    margin: 30px;
     min-height: 160px;
     background-color: white;
 }
 
-.titleWrapper {
-    text-align: right;
-    position: relative;
-    margin: 0 0 8px 0;
-}
-
-.titleWrapper h2 {
-    font-size: 17px;
+.title {
+    font-size: 16px;
     letter-spacing: 0.32px;
     font-style: normal;
     font-weight: 700;
 }
 
-.status, .dueDate, .title {
-    display: inline-block;
-}
-
-.status, .dueDate {
-    margin: 0 5px;
-}
-
-.title {
-    position: absolute;
-    top: 0;
-    left: 0;
+.dueDate {
+    font-size: 14px;
+    letter-spacing: 0.32px;
+    font-style: normal;
+    font-weight: 700;
+    text-align: right;
 }
 
 .summary {
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: 150%;
+    margin: 10px 0 5px;
     letter-spacing: 0.32px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* 表示する行数 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

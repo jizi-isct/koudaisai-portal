@@ -4,6 +4,7 @@ import {apiQueryClientType} from "@/lib";
 import {LoadingScreen} from "@/components/generic";
 import React from "react";
 import {FormCard} from "@/components/form/view/FormCard";
+import styles from "./ViewFormCards.module.css";
 
 type ViewFormCardsProps = {
   client: apiQueryClientType
@@ -17,5 +18,9 @@ export function ViewFormCards({client}: ViewFormCardsProps) {
   }
 
 
-  return forms.map((form) => <FormCard key={form.id} form={form}/>)
+  return (
+    <div className={styles.root}>
+      {forms.map((form) => <FormCard key={form.id} form={form}/>)}
+    </div>
+  )
 }
