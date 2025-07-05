@@ -3,6 +3,5 @@
     display: flex;
     justify-content: space-around;
     flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 40px;
+    flex-wrap: wrap;
 }
