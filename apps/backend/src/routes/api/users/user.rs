@@ -1,3 +1,5 @@
+mod approval_requests;
+
 use crate::entities::notification::NotificationRead;
 use crate::entities::user::{UserRead, UserUpdate};
 use crate::entities::user_id::UserId;
@@ -20,6 +22,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_user).patch(patch_user))
         .route("/notifications", get(get_notifications))
+        .nest("/approval_requests", approval_requests::init_router())
         .route("/m_address", post(post_m_address))
 }
 

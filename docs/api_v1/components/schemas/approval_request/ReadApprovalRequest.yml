@@ -1,0 +1,30 @@
+type: object
+description: Response for reading an approval request
+allOf:
+  - type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: ID of the approval request
+      issued_at:
+        type: string
+        format: date-time
+        description: Time when the approval request was issued
+      issued_by:
+        type: string
+        format: uuid
+        description: ID of the user who issued the approval request
+      status:
+        $ref: "./ApprovalRequestStatus.yml"
+      approved_by:
+        type: string
+        format: uuid
+        description: ID of the user who approved or rejected the request
+        nullable: true
+    required:
+      - id
+      - issued_at
+      - issued_by
+      - status
+  - $ref: "./ApprovalRequestType.yml"

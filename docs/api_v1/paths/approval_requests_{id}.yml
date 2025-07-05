@@ -1,0 +1,82 @@
+get:
+  summary: 承認申請を取得
+  tags:
+    - approval_requests
+  parameters:
+    - name: id
+      in: path
+      description: 承認申請のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/approval_request/ReadApprovalRequest.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+    '500':
+      description: サーバーエラー
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
+patch:
+  summary: 承認申請を更新
+  tags:
+    - approval_requests
+  parameters:
+    - name: id
+      in: path
+      description: 承認申請のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/approval_request/UpdateApprovalRequest.yml"
+  responses:
+    '204':
+      description: No Content
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+    '500':
+      description: サーバーエラー
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
+delete:
+  summary: 承認申請を削除
+  tags:
+    - approval_requests
+  parameters:
+    - name: id
+      in: path
+      description: 承認申請のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: 削除成功
+    '401':
+      description: 資格情報が無効だった場合
+    '404':
+      description: フォームが存在しない
+    '500':
+      description: サーバーエラー
+  security:
+    - admin_oidc:
+        - k-portal:admin:all

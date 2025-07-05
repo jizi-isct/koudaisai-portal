@@ -1296,6 +1296,241 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{user_id}/approval_requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 承認申請をすべて取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーのID */
+                    user_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReadApprovalRequest"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** 承認申請を新規作成 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーのID */
+                    user_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateApprovalRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/approval_requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 承認申請を取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーのID */
+                    user_id: string;
+                    /** @description 承認申請のID */
+                    request_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReadApprovalRequest"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 承認申請が存在しないか、アクセス権限がない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/approval_requests/{request_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 承認申請を取り下げる */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description ユーザーのID */
+                    user_id: string;
+                    /** @description 承認申請のID */
+                    request_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notifications": {
         parameters: {
             query?: never;
@@ -1572,6 +1807,327 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/approval-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 承認申請をすべて取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReadApprovalRequest"][];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 承認申請を取得 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 承認申請のID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReadApprovalRequest"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** 承認申請を削除 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 承認申請のID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 削除成功 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description フォームが存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 承認申請を更新 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 承認申請のID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateApprovalRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/approval-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 承認申請を承認 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 承認申請のID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 承認申請を却下 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 承認申請のID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 資格情報が無効だった場合 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1615,7 +2171,7 @@ export interface components {
             /** @description 第一責任者, 第二責任者, 第三責任者 */
             representatives: string[];
         };
-      UserCreate: {
+        UserCreate: {
             /**
              * @description 名前
              * @example Paul Johnson
@@ -2045,6 +2601,51 @@ export interface components {
         NotificationRead: components["schemas"]["NotificationReadGeneric"] & {
             type_markdown: components["schemas"]["NotificationReadTypeMarkdown"];
         };
+        /**
+         * @description Status of the approval request
+         * @example pending
+         * @enum {string}
+         */
+        ApprovalRequestStatus: "pending" | "approved" | "rejected";
+        /** @description Type for editing exhibition information */
+        ApprovalRequestTypeEditExhibitionInfo: {
+            /** @description Name of the exhibition */
+            exhibition_name?: string | null;
+            /** @description ID of the exhibition icon */
+            icon_id?: string | null;
+            /** @description Description of the exhibition */
+            description?: string | null;
+        };
+        /** @description Type of the approval request */
+        ApprovalRequestType: {
+            type_edit_exhibition_info: components["schemas"]["ApprovalRequestTypeEditExhibitionInfo"];
+        };
+        /** @description Response for reading an approval request */
+        ReadApprovalRequest: {
+            /**
+             * Format: uuid
+             * @description ID of the approval request
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Time when the approval request was issued
+             */
+            issued_at: string;
+            /**
+             * Format: uuid
+             * @description ID of the user who issued the approval request
+             */
+            issued_by: string;
+            status: components["schemas"]["ApprovalRequestStatus"];
+            /**
+             * Format: uuid
+             * @description ID of the user who approved or rejected the request
+             */
+            approved_by?: string | null;
+        } & components["schemas"]["ApprovalRequestType"];
+        /** @description Request to create an approval request */
+        CreateApprovalRequest: components["schemas"]["ApprovalRequestType"];
         NotificationCreateGeneric: {
             /** @description 通知のタイトル */
             title: string;
@@ -2085,6 +2686,16 @@ export interface components {
         NotificationUpdate: (components["schemas"]["NotificationUpdateGeneric"] & {
             type_markdown: components["schemas"]["NotificationUpdateTypeMarkdown"];
         }) | components["schemas"]["NotificationUpdateGeneric"];
+        /** @description Request to update an approval request */
+        UpdateApprovalRequest: {
+            status?: components["schemas"]["ApprovalRequestStatus"];
+            /**
+             * Format: uuid
+             * @description ID of the user who approved or rejected the request
+             */
+            approved_by?: string | null;
+            type?: components["schemas"]["ApprovalRequestType"];
+        };
     };
     responses: never;
     parameters: never;

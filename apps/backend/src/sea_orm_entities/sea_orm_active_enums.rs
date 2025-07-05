@@ -3,6 +3,32 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
+#[sea_orm(
+    rs_type = "String",
+    db_type = "Enum",
+    enum_name = "approval_request_status"
+)]
+pub enum ApprovalRequestStatus {
+    #[sea_orm(string_value = "pending")]
+    Pending,
+    #[sea_orm(string_value = "approved")]
+    Approved,
+    #[sea_orm(string_value = "rejected")]
+    Rejected,
+    #[sea_orm(string_value = "closed")]
+    Closed,
+}
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
+#[sea_orm(
+    rs_type = "String",
+    db_type = "Enum",
+    enum_name = "approval_request_type"
+)]
+pub enum ApprovalRequestType {
+    #[sea_orm(string_value = "type_edit_exhibition_info")]
+    TypeEditExhibitionInfo,
+}
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "document_format")]
 pub enum DocumentFormat {
     #[sea_orm(string_value = "PDF")]

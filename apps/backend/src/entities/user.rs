@@ -1,5 +1,8 @@
+use crate::entities::approval_request::ReadApprovalRequest;
 use crate::entities::exhibitor::ExhibitorRead;
 use crate::entities::form::FormRead;
+use crate::entities::user_id::UserId;
+use crate::middlewares::CurrentUser;
 use crate::sea_orm_entities;
 use crate::sea_orm_entities::read_notifications;
 use crate::util::jwt::Claims;
@@ -55,7 +58,7 @@ impl UserRead {
             .ok_or(anyhow!("User not found"))?)
     }
 
-    pub async fn find_from_id(value: Uuid, db_conn: &DbConn) -> Result<Option<Self>> {
+    pub async fn find_from_id(value: Uuid, db_conn: &DbConn) -> Result<Option<Self>, DbErr> {
         match sea_orm_entities::users::Entity::find_by_id(value)
             .one(db_conn)
             .await?
@@ -115,6 +118,21 @@ impl UserRead {
             }
         }
         Ok(forms)
+    }
+
+    pub async fn get_approval_requests(
+        &self,
+        db_conn: &DbConn,
+    ) -> Result<Vec<ReadApprovalRequest>> {
+        let exhibitor = self.get_exhibitor_read(db_conn).await?;
+        let requests = ReadApprovalRequest::get_all(db_conn).await?;
+        let mut user_requests = vec![];
+        for request in requests {
+            if contains_uuid(exhibitor.representatives, self.id) {
+                user_requests.push(request);
+            }
+        }
+        Ok(user_requests)
     }
 
     /// Sends an email to the user using Sendgrid
@@ -211,6 +229,19 @@ impl UserRead {
 
         active_model.update(db_conn).await?;
         Ok(())
+    }
+
+    pub async fn from_user_id(
+        user_id: UserId,
+        current_user: UserRead,
+        db_conn: &DbConn,
+    ) -> Result<Self> {
+        match user_id {
+            UserId::Uuid(uuid) => Ok(Self::find_from_id(uuid, db_conn)
+                .await?
+                .ok_or(anyhow!("User not found"))?),
+            UserId::Me => Ok(current_user),
+        }
     }
 }
 
