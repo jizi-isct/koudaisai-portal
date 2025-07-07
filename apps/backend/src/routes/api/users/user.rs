@@ -8,7 +8,7 @@ use crate::routes::AppState;
 use crate::util::{contains_uuid, AppResponse};
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -23,6 +23,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .route("/", get(get_user).patch(patch_user))
         .route("/notifications", get(get_notifications))
         .nest("/approval_requests", approval_requests::init_router())
+        .route("/m_address", post(post_m_address))
 }
 
 #[instrument(name = "GET /api/v1/users/:user_id", skip(state, current_user))]
@@ -193,5 +194,52 @@ async fn get_notifications(
             Ok((StatusCode::OK, Json(response_body).into_response()))
         }
         _ => Ok((StatusCode::FORBIDDEN, ().into_response())),
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PostMAddressPayload {
+    m_address: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PostMAddressResponse {
+    activation_token: String,
+}
+#[instrument(name = "POST /api/v1/users/{user_id}/m_address", skip(state))]
+async fn post_m_address(
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Extension(current_user): Extension<CurrentUser>,
+    Path(user_id): Path<UserId>,
+    Json(payload): Json<PostMAddressPayload>,
+) -> AppResponse {
+    if let CurrentUser::Admin(_) = current_user {
+        // ユーザー情報
+        let user = match user_id {
+            UserId::Uuid(uuid) => UserRead::find_from_id(uuid, &state.db_conn).await?,
+            UserId::Me => return Ok((StatusCode::FORBIDDEN, ().into_response())),
+        };
+        let user = match user {
+            Some(user) => user,
+            None => return Ok((StatusCode::NOT_FOUND, ().into_response())),
+        };
+
+        // mアドレスの更新
+        let activation_token = user
+            .change_m_address(
+                &state.db_conn,
+                payload.m_address.clone(),
+                state.web.auth.activation_salt.clone(),
+                state.web.auth.stretch_cost.clone() as i32,
+            )
+            .await?;
+
+        Ok((
+            StatusCode::OK,
+            Json(PostMAddressResponse { activation_token }).into_response(),
+        ))
+    } else {
+        Ok((StatusCode::FORBIDDEN, ().into_response()))
     }
 }

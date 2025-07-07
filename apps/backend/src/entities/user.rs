@@ -6,14 +6,13 @@ use crate::middlewares::CurrentUser;
 use crate::sea_orm_entities;
 use crate::sea_orm_entities::read_notifications;
 use crate::util::jwt::Claims;
-use crate::util::sha::SHAManager;
+use crate::util::sha::{stretch_with_salt, SHAManager};
 use crate::util::{contains_uuid, format_secs_ja_full};
 use anyhow::{anyhow, Result};
 use chrono::DateTime;
-use chrono::Duration;
 use reqwest::Response;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityTrait, NotSet, QueryFilter};
 use sendgrid::v3::{Content, Email, Message, Personalization, Sender};
 use sendgrid::SendgridResult;
 use serde::{Deserialize, Serialize};
@@ -181,6 +180,34 @@ impl UserRead {
                 .replace("{{expires_at}}", &*format_secs_ja_full(expire_time)),
         )
         .await
+    }
+
+    pub async fn change_m_address(
+        &self,
+        db_conn: &DbConn,
+        new_m_address: String,
+        salt: String,
+        stretch_cost: i32,
+    ) -> Result<String> {
+        let user_model = sea_orm_entities::users::Entity::find_by_id(self.id)
+            .one(db_conn)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("User not found"))?;
+
+        let mut active_model: sea_orm_entities::users::ActiveModel = user_model.into();
+        active_model.m_address = Set(new_m_address.clone());
+        active_model.updated_at = Set(Some(chrono::Utc::now().into()));
+        active_model.password_hash = Set(None);
+        active_model.password_updated_at = Set(chrono::Utc::now().into());
+
+        let result = active_model.update(db_conn).await?;
+        trace!("Updated user: {:?}", result);
+
+        Ok(stretch_with_salt(
+            new_m_address.as_str(),
+            salt.as_str(),
+            2_i32.pow(stretch_cost as u32),
+        ))
     }
 
     pub async fn change_password(

@@ -1218,6 +1218,79 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+      options?: never;
+      head?: never;
+      patch?: never;
+      trace?: never;
+    };
+  "/users/{user_id}/m_address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** mアドレスを変更する */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * Format: email
+             * @description 新しいmアドレス
+             */
+            m_address: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description 新規mアドレスを有効化するためのアクティベーショントークン */
+              activation_token?: string;
+            };
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
         options?: never;
         head?: never;
         patch?: never;

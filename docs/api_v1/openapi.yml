@@ -64,6 +64,8 @@ paths:
     $ref: "paths/users_{user_id}_approval_requests_{request_id}.yml"
   /users/{user_id}/approval_requests/{request_id}/close:
     $ref: paths/users_{user_id}_approval_requests_{request_id}_close.yml
+  /users/{user_id}/m_address:
+    $ref: paths/users_{user_id}_m_address.yml
   # notifications
   /notifications:
     $ref: paths/notifications.yml
