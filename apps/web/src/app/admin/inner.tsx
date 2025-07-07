@@ -31,7 +31,7 @@ export function Inner({children}: Props) {
       if (tokens) {
         setTokens(tokens)
       } else {
-        await router.push(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login")
+        router.push(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login")
       }
     })()
   }, [])
@@ -86,6 +86,14 @@ export function Inner({children}: Props) {
               label: '通知',
               onClick: async () => {
                 await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/")
+              }
+            },
+            {
+              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/",
+              icon: <BellOutlined/>,
+              label: '承認申請',
+              onClick: async () => {
+                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/")
               }
             },
           ]}

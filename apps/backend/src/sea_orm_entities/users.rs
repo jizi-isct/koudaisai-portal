@@ -23,6 +23,8 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::approval_request::Entity")]
+    ApprovalRequest,
     #[sea_orm(
         belongs_to = "super::exhibitors_root::Entity",
         from = "Column::ExhibitionId",
@@ -35,6 +37,12 @@ pub enum Relation {
     FormTypeBuiltinResponse,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
+}
+
+impl Related<super::approval_request::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ApprovalRequest.def()
+    }
 }
 
 impl Related<super::exhibitors_root::Entity> for Entity {

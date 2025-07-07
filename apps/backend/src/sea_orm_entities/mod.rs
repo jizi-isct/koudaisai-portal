@@ -2,6 +2,8 @@
 
 pub mod prelude;
 
+pub mod approval_request;
+pub mod approval_request_type_edit_exhibition_info;
 pub mod document;
 pub mod document_category;
 pub mod document_format_markdown;

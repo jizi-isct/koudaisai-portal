@@ -1,3 +1,4 @@
+pub mod approval_request;
 pub mod document;
 pub mod document_category;
 pub mod exhibitor;

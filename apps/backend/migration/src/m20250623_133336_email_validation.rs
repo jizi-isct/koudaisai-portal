@@ -21,17 +21,8 @@ impl MigrationTrait for Migration {
         Ok(())
     }
 
-    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .get_connection()
-            .execute(Statement::from_string(
-                manager.get_database_backend(),
-                r#"
-                ALTER TABLE users ADD CONSTRAINT users_m_address_check CHECK (m_address ~ '^[a-zA-Z0-9_+-]+\.[a-zA-Z0-9_+-]+\.[0-9][0-9][0-9][0-9]@m\.isct\.ac\.jp');
-                "#
-                    .trim(),
-            ))
-            .await?;
+    async fn down(&self, _manager: &SchemaManager) -> Result<(), DbErr> {
+        // バリデーションを元に戻すのはむずい(既存の行との競合)
 
         Ok(())
     }

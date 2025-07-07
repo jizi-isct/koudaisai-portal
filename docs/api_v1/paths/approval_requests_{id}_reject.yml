@@ -1,0 +1,24 @@
+post:
+  summary: 承認申請を却下
+  tags:
+    - approval_requests
+  parameters:
+    - name: id
+      in: path
+      description: 承認申請のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: No Content
+    '400':
+      description: 不正なrequest bodyの形式
+    '401':
+      description: 資格情報が無効だった場合
+    '500':
+      description: サーバーエラー
+  security:
+    - admin_oidc:
+        - k-portal:admin:all
