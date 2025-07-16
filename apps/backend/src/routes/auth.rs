@@ -58,6 +58,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
                     .default_handle_error(),
             ),
         )
+        .route("/v1/refresh", post(refresh))
         .route("/v1/admin/login", get(admin_login))
         .route("/v1/admin/redirect", post(admin_redirect))
         .nest("/v1/password", password::init_router())

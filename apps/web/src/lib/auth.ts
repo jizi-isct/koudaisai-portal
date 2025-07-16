@@ -73,6 +73,8 @@ export async function getTokensMembers(): Promise<Tokens | undefined> {
   const refresh_token_exp = refresh_token_payload.exp as number;
   if (refresh_token_exp * 1000 < Date.now()) {
     //有効期限ダメ
+    localStorage.removeItem("exhibitor_refresh_token")
+    localStorage.removeItem("exhibitor_access_token")
     return undefined
   }
 
@@ -88,7 +90,6 @@ export async function getTokensMembers(): Promise<Tokens | undefined> {
 
   //リフレッシュに成功した場合トークンを保存しreturn
   if (data) {
-    localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
     localStorage.setItem("exhibitor_access_token", data.access_token)
     return data
   } else {
