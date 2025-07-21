@@ -15,7 +15,7 @@ pub struct Model {
     pub password_hash: Option<String>,
     pub password_salt: String,
     #[sea_orm(column_type = "Text")]
-    pub exhibition_id: String,
+    pub group_id: String,
     #[sea_orm(column_type = "Text")]
     pub name: String,
     pub password_updated_at: DateTimeWithTimeZone,
@@ -25,16 +25,16 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::approval_request::Entity")]
     ApprovalRequest,
+    #[sea_orm(has_many = "super::form_type_builtin_response::Entity")]
+    FormTypeBuiltinResponse,
     #[sea_orm(
-        belongs_to = "super::exhibitors_root::Entity",
-        from = "Column::ExhibitionId",
-        to = "super::exhibitors_root::Column::Id",
+        belongs_to = "super::group::Entity",
+        from = "Column::GroupId",
+        to = "super::group::Column::Id",
         on_update = "NoAction",
         on_delete = "NoAction"
     )]
-    ExhibitorsRoot,
-    #[sea_orm(has_many = "super::form_type_builtin_response::Entity")]
-    FormTypeBuiltinResponse,
+    Group,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
 }
@@ -45,15 +45,15 @@ impl Related<super::approval_request::Entity> for Entity {
     }
 }
 
-impl Related<super::exhibitors_root::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::ExhibitorsRoot.def()
-    }
-}
-
 impl Related<super::form_type_builtin_response::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::FormTypeBuiltinResponse.def()
+    }
+}
+
+impl Related<super::group::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Group.def()
     }
 }
 

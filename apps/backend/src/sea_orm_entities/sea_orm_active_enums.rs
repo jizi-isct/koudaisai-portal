@@ -39,18 +39,6 @@ pub enum DocumentFormat {
     Misc,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
-#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "exhibition_type")]
-pub enum ExhibitionType {
-    #[sea_orm(string_value = "BOOTH")]
-    Booth,
-    #[sea_orm(string_value = "GENERAL")]
-    General,
-    #[sea_orm(string_value = "STAGE")]
-    Stage,
-    #[sea_orm(string_value = "LABO")]
-    Labo,
-}
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "form_type")]
 pub enum FormType {
     #[sea_orm(string_value = "BUILTIN")]
@@ -65,16 +53,14 @@ pub enum NotificationType {
     Markdown,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
-#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "stage_type")]
-pub enum StageType {
-    #[sea_orm(string_value = "OUTDOOR")]
-    Outdoor,
-    #[sea_orm(string_value = "AUDIOTORIUM")]
-    Audiotorium,
-    #[sea_orm(string_value = "WOOD_DECK")]
-    WoodDeck,
-    #[sea_orm(string_value = "TAKIPLAZA")]
-    Takiplaza,
-    #[sea_orm(string_value = "HALL")]
-    Hall,
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "plan_type")]
+pub enum PlanType {
+    #[sea_orm(string_value = "BOOTH")]
+    Booth,
+    #[sea_orm(string_value = "GENERAL")]
+    General,
+    #[sea_orm(string_value = "STAGE")]
+    Stage,
+    #[sea_orm(string_value = "LABO")]
+    Labo,
 }
