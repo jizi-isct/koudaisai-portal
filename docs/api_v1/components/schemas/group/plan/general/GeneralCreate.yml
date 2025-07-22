@@ -1,0 +1,12 @@
+type: object
+properties:
+  representative1:
+    $ref: '../../../user/UserCreate.yml'
+  representative2:
+    $ref: '../../../user/UserCreate.yml'
+  representative3:
+    $ref: '../../../user/UserCreate.yml'
+required:
+  - representative1
+  - representative2
+  - representative3

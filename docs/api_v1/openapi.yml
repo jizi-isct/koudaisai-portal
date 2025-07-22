@@ -1,15 +1,15 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
-  title: 工大祭API v1
+  title: 工大祭API v2
   description: 工大祭のapiです。
-  version: '1'
+  version: '2'
 servers:
-  - url: "https://portal.koudaisai.jp/api/v1"
+  - url: "https://portal.koudaisai.jp/api/v2"
 tags:
   - name: user
     description: ユーザー情報
-  - name: exhibitions
-    description: 参加団体関連
+  - name: groups
+    description: 団体関連
   - name: forms
     description: フォーム関連
   - name: form_responses
@@ -25,11 +25,11 @@ tags:
   - name: approval_requests
     description: 承認申請関連
 paths:
-  # exhibitions
-  /exhibitors:
-    $ref: paths/exhibitors.yml
-  /exhibitors/{id}:
-    $ref: paths/exhibitors_{id}.yml
+  # groups
+  /groups:
+    $ref: paths/groups/groups.yml
+  /groups/{id}:
+    $ref: paths/groups/groups_{id}.yml
   # forms
   /forms:
     $ref: paths/forms.yml

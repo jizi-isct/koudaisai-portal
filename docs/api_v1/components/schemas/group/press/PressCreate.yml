@@ -1,0 +1,6 @@
+type: object
+properties:
+  representative:
+    $ref: '../../user/UserCreate.yml'
+required:
+  - representative

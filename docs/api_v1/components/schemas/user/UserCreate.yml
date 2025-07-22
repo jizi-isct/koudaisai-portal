@@ -7,7 +7,6 @@ properties:
   m_address:
     description: mアドレス(新旧どちらも含む)
     type: string
-    pattern: >-
     example: johnson.p.5703@m.isct.ac.jp
 required:
   - name

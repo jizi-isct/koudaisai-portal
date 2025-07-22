@@ -1,0 +1,8 @@
+type: object
+properties:
+  representative:
+    description: 代表者ID
+    type: string
+    format: uuid
+required:
+  - representative
