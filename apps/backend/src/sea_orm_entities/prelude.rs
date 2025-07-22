@@ -17,6 +17,7 @@ pub use super::group_plan_booth::Entity as GroupPlanBooth;
 pub use super::group_plan_general::Entity as GroupPlanGeneral;
 pub use super::group_plan_labo::Entity as GroupPlanLabo;
 pub use super::group_plan_stage::Entity as GroupPlanStage;
+pub use super::group_press::Entity as GroupPress;
 pub use super::notification::Entity as Notification;
 pub use super::notification_type_markdown::Entity as NotificationTypeMarkdown;
 pub use super::read_notifications::Entity as ReadNotifications;

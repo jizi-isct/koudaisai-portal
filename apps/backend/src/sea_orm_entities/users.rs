@@ -35,6 +35,10 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Group,
+    #[sea_orm(has_many = "super::group_plan_labo::Entity")]
+    GroupPlanLabo,
+    #[sea_orm(has_many = "super::group_press::Entity")]
+    GroupPress,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
 }
@@ -54,6 +58,18 @@ impl Related<super::form_type_builtin_response::Entity> for Entity {
 impl Related<super::group::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Group.def()
+    }
+}
+
+impl Related<super::group_plan_labo::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::GroupPlanLabo.def()
+    }
+}
+
+impl Related<super::group_press::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::GroupPress.def()
     }
 }
 

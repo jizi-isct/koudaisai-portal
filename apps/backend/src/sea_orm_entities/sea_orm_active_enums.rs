@@ -47,6 +47,14 @@ pub enum FormType {
     External,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "group_type")]
+pub enum GroupType {
+    #[sea_orm(string_value = "plan")]
+    Plan,
+    #[sea_orm(string_value = "press")]
+    Press,
+}
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "notification_type")]
 pub enum NotificationType {
     #[sea_orm(string_value = "MARKDOWN")]

@@ -19,6 +19,7 @@ pub mod group_plan_booth;
 pub mod group_plan_general;
 pub mod group_plan_labo;
 pub mod group_plan_stage;
+pub mod group_press;
 pub mod notification;
 pub mod notification_type_markdown;
 pub mod read_notifications;

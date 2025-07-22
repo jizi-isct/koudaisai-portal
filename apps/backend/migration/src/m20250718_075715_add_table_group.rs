@@ -73,9 +73,7 @@ impl MigrationTrait for Migration {
             .execute_unprepared(
                 r#"CREATE TABLE group_plan_labo (
                     id TEXT PRIMARY KEY REFERENCES group_plan(id),
-                    representative1 UUID NOT NULL REFERENCES users(id),
-                    representative2 UUID NOT NULL REFERENCES users(id),
-                    representative3 UUID NOT NULL REFERENCES users(id)
+                    representative UUID NOT NULL REFERENCES users(id)
                 );"#,
             )
             .await?;
@@ -96,7 +94,7 @@ impl MigrationTrait for Migration {
             r#"INSERT INTO group_plan_stage (id, representative1, representative2, representative3) SELECT id, representative1, representative2, representative3 FROM "group" WHERE type = 'STAGE';"#
         ).await?;
         connection.execute_unprepared(
-            r#"INSERT INTO group_plan_labo (id, representative1, representative2, representative3) SELECT id, representative1, representative2, representative3 FROM "group" WHERE type = 'LABO';"#
+            r#"INSERT INTO group_plan_labo (id, representative) SELECT id, representative1 FROM "group" WHERE type = 'LABO';"#
         ).await?;
 
         // ダミーユーザーの削除
@@ -113,10 +111,10 @@ impl MigrationTrait for Migration {
         connection
             .execute_unprepared(
                 r#"DELETE FROM users u WHERE EXISTS (
-                SELECT 1 FROM group_plan_labo gpl
-                JOIN group_plan gp ON gp.id = gpl.id
+                SELECT 1 FROM "group" g
+                JOIN group_plan gp ON gp.id = g.id
                 WHERE gp.type = 'LABO'
-                AND (u.id = gpl.representative2 OR u.id = gpl.representative3)
+                AND (u.id = g.representative2 OR u.id = g.representative3)
             );"#,
             )
             .await?;
@@ -153,12 +151,18 @@ impl MigrationTrait for Migration {
                 ADD COLUMN icon_id text, 
                 ADD COLUMN description text, 
                 ADD COLUMN representative1 uuid REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED, 
-                ADD COLUMN representative2 uuid REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED, 
+                ADD COLUMN representative2 uuid REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED,
                 ADD COLUMN representative3 uuid REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED;"#,
             )
             .await?;
 
         // Create dummy users for representative2 and representative3 from group_plan_labo
+        connection.execute_unprepared(
+            "ALTER TABLE group_plan_labo ADD COLUMN representative2 uuid DEFAULT gen_random_uuid() NOT NULL;"
+        ).await?;
+        connection.execute_unprepared(
+            "ALTER TABLE group_plan_labo ADD COLUMN representative3 uuid DEFAULT gen_random_uuid() NOT NULL;"
+        ).await?;
         connection
             .execute_unprepared(
                 r#"WITH labo_representatives AS (
@@ -168,12 +172,12 @@ impl MigrationTrait for Migration {
                     WHERE gp.type = 'LABO'
                 )
                 INSERT INTO users (id, m_address, password_salt, exhibition_id, name, password_updated_at)
-                SELECT 
-                    representative2, 
-                    'dummy.' || id || '.rep2@m.isct.ac.jp', 
-                    md5(random()::text), 
-                    id, 
-                    'Dummy Representative 2 for ' || id, 
+                SELECT
+                    representative2,
+                    'dummy.' || id || '.rep2@m.isct.ac.jp',
+                    md5(random()::text),
+                    id,
+                    'Dummy Representative 2 for ' || id,
                     '1970-01-01 00:00:00+00'::timestamp with time zone
                 FROM labo_representatives
                 WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = representative2);"#,
@@ -189,12 +193,12 @@ impl MigrationTrait for Migration {
                     WHERE gp.type = 'LABO'
                 )
                 INSERT INTO users (id, m_address, password_salt, exhibition_id, name, password_updated_at)
-                SELECT 
-                    representative3, 
-                    'dummy.' || id || '.rep3@m.isct.ac.jp', 
-                    md5(random()::text), 
-                    id, 
-                    'Dummy Representative 3 for ' || id, 
+                SELECT
+                    representative3,
+                    'dummy.' || id || '.rep3@m.isct.ac.jp',
+                    md5(random()::text),
+                    id,
+                    'Dummy Representative 3 for ' || id,
                     '1970-01-01 00:00:00+00'::timestamp with time zone
                 FROM labo_representatives
                 WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = representative3);"#,
@@ -251,7 +255,7 @@ impl MigrationTrait for Migration {
         connection
             .execute_unprepared(
                 r#"UPDATE "group" g
-                SET representative1 = gpl.representative1,
+                SET representative1 = gpl.representative,
                     representative2 = gpl.representative2,
                     representative3 = gpl.representative3
                 FROM group_plan_labo gpl

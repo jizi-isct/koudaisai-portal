@@ -22,6 +22,7 @@ mod m20250626_132332_password_updated_at;
 mod m20250629_114156_change_column_name_name;
 mod m20250702_085908_new_table_approval_request;
 mod m20250718_075715_add_table_group;
+mod m20250721_153433_add_press_group;
 
 pub struct Migrator;
 
@@ -53,6 +54,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250629_114156_change_column_name_name::Migration),
             Box::new(m20250702_085908_new_table_approval_request::Migration),
             Box::new(m20250718_075715_add_table_group::Migration),
+            Box::new(m20250721_153433_add_press_group::Migration),
         ]
     }
 }
