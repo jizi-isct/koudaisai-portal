@@ -119,13 +119,46 @@ export interface paths {
         };
       };
     };
+    put?: never;
+    post?: never;
+    /** 団体を削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 団体が削除された */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 団体が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
     /**
      * 団体を編集
      * @description ### authの違いによる挙動の違い
      *     - **exhibitor_bearerの場合**: 自分が属する団体のみ編集可能
      *     - **admin_oidcの場合**: 存在する全ての団体を編集可能
      */
-    put: {
+    patch: {
       parameters: {
         query?: never;
         header?: never;
@@ -171,39 +204,6 @@ export interface paths {
         };
       };
     };
-    post?: never;
-    /** 団体を削除 */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 団体ID */
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description 団体が削除された */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description 団体が存在しない */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/forms": {
@@ -2155,9 +2155,7 @@ export interface paths {
     trace?: never;
   };
 }
-
 export type webhooks = Record<string, never>;
-
 export interface components {
   schemas: {
     BoothRead: {
@@ -2865,6 +2863,5 @@ export interface components {
   headers: never;
   pathItems: never;
 }
-
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

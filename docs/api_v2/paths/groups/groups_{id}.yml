@@ -26,7 +26,7 @@ get:
   security:
     - exhibitor_bearer: [ ]
     - admin_oidc: [ ]
-put:
+patch:
   summary: 団体を編集
   description: |-
     ### authの違いによる挙動の違い
