@@ -15,7 +15,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/notifications")]
+#[instrument(name = "init /api/v2/notifications")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_notifications).post(post_notifications))
@@ -27,7 +27,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
 }
 
-#[instrument(name = "GET /api/v1/notifications", skip(state, current_user))]
+#[instrument(name = "GET /api/v2/notifications", skip(state, current_user))]
 async fn get_notifications(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -41,7 +41,7 @@ async fn get_notifications(
     }
 }
 
-#[instrument(name = "POST /api/v1/notifications", skip(state, current_user))]
+#[instrument(name = "POST /api/v2/notifications", skip(state, current_user))]
 async fn post_notifications(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -63,7 +63,7 @@ async fn post_notifications(
 }
 
 #[instrument(
-    name = "GET /api/v1/notifications/{notification_id}",
+    name = "GET /api/v2/notifications/{notification_id}",
     skip(state, current_user)
 )]
 async fn get_notification(
@@ -103,7 +103,7 @@ async fn get_notification(
 }
 
 #[instrument(
-    name = "PATCH /api/v1/notifications/{notification_id}",
+    name = "PATCH /api/v2/notifications/{notification_id}",
     skip(state, current_user)
 )]
 async fn patch_notification(
@@ -129,7 +129,7 @@ async fn patch_notification(
 }
 
 #[instrument(
-    name = "DELETE /api/v1/notifications/{notification_id}",
+    name = "DELETE /api/v2/notifications/{notification_id}",
     skip(state, current_user)
 )]
 async fn delete_notification(

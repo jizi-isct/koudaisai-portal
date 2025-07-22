@@ -17,7 +17,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/users/{user_id}")]
+#[instrument(name = "init /api/v2/users/{user_id}")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_user).patch(patch_user))
@@ -26,7 +26,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .route("/m_address", post(post_m_address))
 }
 
-#[instrument(name = "GET /api/v1/users/:user_id", skip(state, current_user))]
+#[instrument(name = "GET /api/v2/users/:user_id", skip(state, current_user))]
 async fn get_user(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -73,7 +73,7 @@ async fn get_user(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/users/:user_id", skip(state, current_user))]
+#[instrument(name = "PATCH /api/v2/users/:user_id", skip(state, current_user))]
 async fn patch_user(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -103,7 +103,7 @@ struct GetNotificationsResponseEntry {
 }
 
 #[instrument(
-    name = "GET /api/v1/users/{user_id}/notifications",
+    name = "GET /api/v2/users/{user_id}/notifications",
     skip(state, current_user)
 )]
 async fn get_notifications(
@@ -206,7 +206,7 @@ struct PostMAddressPayload {
 struct PostMAddressResponse {
     activation_token: String,
 }
-#[instrument(name = "POST /api/v1/users/{user_id}/m_address", skip(state))]
+#[instrument(name = "POST /api/v2/users/{user_id}/m_address", skip(state))]
 async fn post_m_address(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

@@ -14,7 +14,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/users/{user_id}/approval-requests")]
+#[instrument(name = "init /api/v2/users/{user_id}/approval-requests")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_approval_requests).post(post_approval_request))
@@ -22,7 +22,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .route("/{request_id}/close", get(close_approval_request))
 }
 
-#[instrument(name = "GET /api/v1/users/{user_id}/approval-requests", skip(state))]
+#[instrument(name = "GET /api/v2/users/{user_id}/approval-requests", skip(state))]
 async fn get_approval_requests(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -45,7 +45,7 @@ async fn get_approval_requests(
     }
 }
 
-#[instrument(name = "POST /api/v1/users/{user_id}/approval-requests", skip(state))]
+#[instrument(name = "POST /api/v2/users/{user_id}/approval-requests", skip(state))]
 async fn post_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -69,7 +69,7 @@ async fn post_approval_request(
 }
 
 #[instrument(
-    name = "GET /api/v1/users/{user_id}/approval-requests/{request_id}",
+    name = "GET /api/v2/users/{user_id}/approval-requests/{request_id}",
     skip(state)
 )]
 async fn get_approval_request(
@@ -97,7 +97,7 @@ async fn get_approval_request(
 }
 
 #[instrument(
-    name = "POST /api/v1/users/{user_id}/approval-requests/{request_id}/close",
+    name = "POST /api/v2/users/{user_id}/approval-requests/{request_id}/close",
     skip(state)
 )]
 async fn close_approval_request(

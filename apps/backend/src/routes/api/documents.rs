@@ -25,7 +25,7 @@ use std::sync::Arc;
 use tracing::{error, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/documents")]
+#[instrument(name = "init /api/v2/documents")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_documents).post(post_documents))
@@ -38,7 +38,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
 }
 
-#[instrument(name = "GET /api/v1/documents", skip(state))]
+#[instrument(name = "GET /api/v2/documents", skip(state))]
 async fn get_documents(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -78,7 +78,7 @@ struct GetDocumentsByCategoryQuery {
     include_empty_categories: Option<bool>,
 }
 
-#[instrument(name = "GET /api/v1/documents/by-category", skip(state))]
+#[instrument(name = "GET /api/v2/documents/by-category", skip(state))]
 async fn get_documents_by_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -142,7 +142,7 @@ async fn get_documents_by_category(
     Ok((StatusCode::OK, Json(result).into_response()))
 }
 
-#[instrument(name = "POST /api/v1/documents", skip(state))]
+#[instrument(name = "POST /api/v2/documents", skip(state))]
 async fn post_documents(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -166,7 +166,7 @@ async fn post_documents(
     }
 }
 
-#[instrument(name = "GET /api/v1/documents/{document_id}", skip(state))]
+#[instrument(name = "GET /api/v2/documents/{document_id}", skip(state))]
 async fn get_document(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -201,7 +201,7 @@ async fn get_document(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/documents/{document_id}", skip(state))]
+#[instrument(name = "PATCH /api/v2/documents/{document_id}", skip(state))]
 async fn patch_document(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -238,7 +238,7 @@ async fn patch_document(
     }
 }
 
-#[instrument(name = "DELETE /api/v1/documents/{document_id}", skip(state))]
+#[instrument(name = "DELETE /api/v2/documents/{document_id}", skip(state))]
 async fn delete_document(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

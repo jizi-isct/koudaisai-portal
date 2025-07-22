@@ -13,7 +13,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/approval-requests")]
+#[instrument(name = "init /api/v2/approval-requests")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_approval_requests))
@@ -27,7 +27,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .route("/{request_id}/reject", post(reject_approval_request))
 }
 
-#[instrument(name = "GET /api/v1/approval-requests", skip(state))]
+#[instrument(name = "GET /api/v2/approval-requests", skip(state))]
 async fn get_approval_requests(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -42,7 +42,7 @@ async fn get_approval_requests(
     }
 }
 
-#[instrument(name = "GET /api/v1/approval-requests/{request_id}", skip(state))]
+#[instrument(name = "GET /api/v2/approval-requests/{request_id}", skip(state))]
 async fn get_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -58,7 +58,7 @@ async fn get_approval_request(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/approval-requests/{request_id}", skip(state))]
+#[instrument(name = "PATCH /api/v2/approval-requests/{request_id}", skip(state))]
 async fn patch_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -75,7 +75,7 @@ async fn patch_approval_request(
     }
 }
 
-#[instrument(name = "DELETE /api/v1/approval-requests/{request_id}", skip(state))]
+#[instrument(name = "DELETE /api/v2/approval-requests/{request_id}", skip(state))]
 async fn delete_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -91,7 +91,7 @@ async fn delete_approval_request(
     }
 }
 
-#[instrument(name = "POST /api/v1/approval-requests/approve", skip(state))]
+#[instrument(name = "POST /api/v2/approval-requests/approve", skip(state))]
 async fn approve_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -114,7 +114,7 @@ async fn approve_approval_request(
     }
 }
 
-#[instrument(name = "POST /api/v1/approval-requests/reject", skip(state))]
+#[instrument(name = "POST /api/v2/approval-requests/reject", skip(state))]
 async fn reject_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

@@ -1,9 +1,9 @@
 mod approval_requests;
 mod document_categories;
 mod documents;
-mod exhibitors;
 mod files;
 mod forms;
+mod groups;
 mod notifications;
 mod users;
 mod util;
@@ -16,16 +16,16 @@ use tracing::instrument;
 #[instrument(name = "init /api")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
-        .nest("/v1/forms", forms::init_router())
-        .nest("/v1/exhibitors", exhibitors::init_router())
-        .nest("/v1/documents", documents::init_router())
+        .nest("/v2/forms", forms::init_router())
+        .nest("/v2/documents", documents::init_router())
         .nest(
-            "/v1/document-categories",
+            "/v2/document-categories",
             document_categories::init_router(),
         )
-        .nest("/v1/files", files::init_router())
-        .nest("/v1/users", users::init_router())
-        .nest("/v1/notifications", notifications::init_router())
-        .nest("/v1/util", util::init_router())
-        .nest("/v1/approval-requests", approval_requests::init_router())
+        .nest("/v2/files", files::init_router())
+        .nest("/v2/users", users::init_router())
+        .nest("/v2/notifications", notifications::init_router())
+        .nest("/v2/util", util::init_router())
+        .nest("/v2/approval-requests", approval_requests::init_router())
+        .nest("/v2/groups", groups::init_router())
 }

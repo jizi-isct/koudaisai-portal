@@ -13,14 +13,14 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::instrument;
 
-#[instrument(name = "init /api/v1/users")]
+#[instrument(name = "init /api/v2/users")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_users))
         .nest("/{user_id}", user::init_router())
 }
 
-#[instrument(name = "GET /api/v1/users", skip(state, current_user))]
+#[instrument(name = "GET /api/v2/users", skip(state, current_user))]
 async fn get_users(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
