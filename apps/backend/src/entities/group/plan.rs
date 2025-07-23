@@ -10,7 +10,7 @@ pub mod labo;
 pub mod stage;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum PlanTypeCreate {
     TypeBooth(BoothCreate),
     TypeGeneral(GeneralCreate),
@@ -19,7 +19,7 @@ pub enum PlanTypeCreate {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum PlanTypeRead {
     TypeBooth(BoothRead),
     TypeGeneral(GeneralRead),
@@ -28,7 +28,7 @@ pub enum PlanTypeRead {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum PlanTypeUpdate {
     TypeBooth(BoothUpdate),
     TypeGeneral(GeneralUpdate),
@@ -38,15 +38,18 @@ pub enum PlanTypeUpdate {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PlanCreate {
+    #[serde(flatten)]
     pub r#type: PlanTypeCreate,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PlanRead {
+    #[serde(flatten)]
     pub r#type: PlanTypeRead,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PlanUpdate {
+    #[serde(flatten)]
     pub r#type: PlanTypeUpdate,
 }
