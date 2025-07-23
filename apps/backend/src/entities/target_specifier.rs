@@ -1,4 +1,5 @@
-use crate::entities::exhibitor::ExhibitionType;
+use crate::entities::group::plan::PlanTypeRead;
+use crate::entities::group::GroupTypeRead;
 use crate::entities::user::UserRead;
 use sea_orm::DbConn;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -7,11 +8,12 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub enum TargetSpecifier {
-    ExhibitorTypeGeneral,
-    ExhibitorTypeBooth,
-    ExhibitorTypeStage,
-    ExhibitorTypeLabo,
-    ExhibitorId(String),
+    GroupTypePlanGeneral,
+    GroupTypePlanBooth,
+    GroupTypePlanStage,
+    GroupTypePlanLabo,
+    GroupTypePress,
+    GroupId(String),
     UserId(Uuid),
     UserNologin,
     Unknown(String),
@@ -56,11 +58,12 @@ impl<'de> Deserialize<'de> for TargetSpecifier {
 impl Into<String> for &TargetSpecifier {
     fn into(self) -> String {
         match self {
-            TargetSpecifier::ExhibitorTypeGeneral => "exhibitor/type/general".into(),
-            TargetSpecifier::ExhibitorTypeBooth => "exhibitor/type/booth".into(),
-            TargetSpecifier::ExhibitorTypeStage => "exhibitor/type/stage".into(),
-            TargetSpecifier::ExhibitorTypeLabo => "exhibitor/type/labo".into(),
-            TargetSpecifier::ExhibitorId(id) => format!("exhibitor/id/{}", id),
+            TargetSpecifier::GroupTypePlanGeneral => "group/type/plan_general".into(),
+            TargetSpecifier::GroupTypePlanBooth => "group/type/plan_booth".into(),
+            TargetSpecifier::GroupTypePlanStage => "group/type/plan_stage".into(),
+            TargetSpecifier::GroupTypePlanLabo => "group/type/plan_labo".into(),
+            TargetSpecifier::GroupTypePress => "group/type/press".into(),
+            TargetSpecifier::GroupId(id) => format!("group/id/{}", id),
             TargetSpecifier::UserId(user_id) => format!("user/id/{}", user_id).into(),
             TargetSpecifier::UserNologin => "user/nologin".into(),
             TargetSpecifier::Unknown(s) => s.into(),
@@ -71,10 +74,21 @@ impl Into<String> for &TargetSpecifier {
 impl TargetSpecifier {
     pub fn from_string<S: Into<String>>(value: S) -> Self {
         match value.into().as_str() {
-            "exhibitor/type/general" => TargetSpecifier::ExhibitorTypeGeneral,
-            "exhibitor/type/booth" => TargetSpecifier::ExhibitorTypeBooth,
-            "exhibitor/type/stage" => TargetSpecifier::ExhibitorTypeStage,
-            "exhibitor/type/labo" => TargetSpecifier::ExhibitorTypeLabo,
+            // レガシーなタイプ
+            "exhibitor/type/general" => TargetSpecifier::GroupTypePlanGeneral,
+            "exhibitor/type/booth" => TargetSpecifier::GroupTypePlanBooth,
+            "exhibitor/type/stage" => TargetSpecifier::GroupTypePlanStage,
+            "exhibitor/type/labo" => TargetSpecifier::GroupTypePlanLabo,
+            s if s.starts_with("exhibitor/id/") => {
+                let exhibitor_id = &s[13..];
+                TargetSpecifier::GroupId(exhibitor_id.to_owned())
+            }
+
+            "group/type/plan_general" => TargetSpecifier::GroupTypePlanGeneral,
+            "group/type/plan_booth" => TargetSpecifier::GroupTypePlanBooth,
+            "group/type/plan_stage" => TargetSpecifier::GroupTypePlanStage,
+            "group/type/plan_labo" => TargetSpecifier::GroupTypePlanLabo,
+            "group/type/press" => TargetSpecifier::GroupTypePress,
             "user/nologin" => TargetSpecifier::UserNologin,
             s if s.starts_with("user/id/") => {
                 let user_id_str = &s[8..];
@@ -83,9 +97,9 @@ impl TargetSpecifier {
                     Err(_) => TargetSpecifier::Unknown(s.parse().unwrap()),
                 }
             }
-            s if s.starts_with("exhibitor/id/") => {
-                let exhibitor_id = &s[13..];
-                TargetSpecifier::ExhibitorId(exhibitor_id.to_owned())
+            s if s.starts_with("group/id/") => {
+                let group_id = &s[9..];
+                TargetSpecifier::GroupId(group_id.to_owned())
             }
             val => TargetSpecifier::Unknown(val.parse().unwrap()),
         }
@@ -97,10 +111,74 @@ impl TargetSpecifier {
         db_conn: &DbConn,
     ) -> anyhow::Result<bool> {
         match self {
-            TargetSpecifier::ExhibitorTypeGeneral => {
+            TargetSpecifier::GroupTypePlanGeneral => {
                 if let Some(user) = user {
-                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                    if let ExhibitionType::General { .. } = exhibitor.r#type {
+                    let exhibitor = user.get_group_read(db_conn).await?;
+                    if let GroupTypeRead::TypePlan(plan) = exhibitor.r#type {
+                        if let PlanTypeRead::TypeGeneral(..) = plan.r#type {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    } else {
+                        Ok(false)
+                    }
+                } else {
+                    Ok(false)
+                }
+            }
+            TargetSpecifier::GroupTypePlanBooth => {
+                if let Some(user) = user {
+                    let exhibitor = user.get_group_read(db_conn).await?;
+                    if let GroupTypeRead::TypePlan(plan) = exhibitor.r#type {
+                        if let PlanTypeRead::TypeBooth(..) = plan.r#type {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    } else {
+                        Ok(false)
+                    }
+                } else {
+                    Ok(false)
+                }
+            }
+            TargetSpecifier::GroupTypePlanStage => {
+                if let Some(user) = user {
+                    let exhibitor = user.get_group_read(db_conn).await?;
+                    if let GroupTypeRead::TypePlan(plan) = exhibitor.r#type {
+                        if let PlanTypeRead::TypeStage(..) = plan.r#type {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    } else {
+                        Ok(false)
+                    }
+                } else {
+                    Ok(false)
+                }
+            }
+            TargetSpecifier::GroupTypePlanLabo => {
+                if let Some(user) = user {
+                    let exhibitor = user.get_group_read(db_conn).await?;
+                    if let GroupTypeRead::TypePlan(plan) = exhibitor.r#type {
+                        if let PlanTypeRead::TypeLabo(..) = plan.r#type {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    } else {
+                        Ok(false)
+                    }
+                } else {
+                    Ok(false)
+                }
+            }
+            TargetSpecifier::GroupTypePress => {
+                if let Some(user) = user {
+                    let exhibitor = user.get_group_read(db_conn).await?;
+                    if let GroupTypeRead::TypePress(..) = exhibitor.r#type {
                         Ok(true)
                     } else {
                         Ok(false)
@@ -109,46 +187,10 @@ impl TargetSpecifier {
                     Ok(false)
                 }
             }
-            TargetSpecifier::ExhibitorTypeBooth => {
+            TargetSpecifier::GroupId(id) => {
                 if let Some(user) = user {
-                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                    if let ExhibitionType::Booth { .. } = exhibitor.r#type {
-                        Ok(true)
-                    } else {
-                        Ok(false)
-                    }
-                } else {
-                    Ok(false)
-                }
-            }
-            TargetSpecifier::ExhibitorTypeStage => {
-                if let Some(user) = user {
-                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                    if let ExhibitionType::Stage { .. } = exhibitor.r#type {
-                        Ok(true)
-                    } else {
-                        Ok(false)
-                    }
-                } else {
-                    Ok(false)
-                }
-            }
-            TargetSpecifier::ExhibitorTypeLabo => {
-                if let Some(user) = user {
-                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                    if let ExhibitionType::Labo { .. } = exhibitor.r#type {
-                        Ok(true)
-                    } else {
-                        Ok(false)
-                    }
-                } else {
-                    Ok(false)
-                }
-            }
-            TargetSpecifier::ExhibitorId(id) => {
-                if let Some(user) = user {
-                    let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                    Ok(exhibitor.id == *id)
+                    let group = user.get_group_read(db_conn).await?;
+                    Ok(group.id == *id)
                 } else {
                     Ok(false)
                 }
@@ -170,25 +212,30 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        // Test ExhibitorTypeGeneral
-        let target = TargetSpecifier::ExhibitorTypeGeneral;
+        // Test GroupTypePlanGeneral
+        let target = TargetSpecifier::GroupTypePlanGeneral;
         let serialized = serde_json::to_string(&target).unwrap();
-        assert_eq!(serialized, "\"exhibitor/type/general\"");
+        assert_eq!(serialized, "\"group/type/plan_general\"");
 
-        // Test ExhibitorTypeBooth
-        let target = TargetSpecifier::ExhibitorTypeBooth;
+        // Test GroupTypePlanBooth
+        let target = TargetSpecifier::GroupTypePlanBooth;
         let serialized = serde_json::to_string(&target).unwrap();
-        assert_eq!(serialized, "\"exhibitor/type/booth\"");
+        assert_eq!(serialized, "\"group/type/plan_booth\"");
 
-        // Test ExhibitorTypeStage
-        let target = TargetSpecifier::ExhibitorTypeStage;
+        // Test GroupTypePlanStage
+        let target = TargetSpecifier::GroupTypePlanStage;
         let serialized = serde_json::to_string(&target).unwrap();
-        assert_eq!(serialized, "\"exhibitor/type/stage\"");
+        assert_eq!(serialized, "\"group/type/plan_stage\"");
 
-        // Test ExhibitorTypeLabo
-        let target = TargetSpecifier::ExhibitorTypeLabo;
+        // Test GroupTypePlanLabo
+        let target = TargetSpecifier::GroupTypePlanLabo;
         let serialized = serde_json::to_string(&target).unwrap();
-        assert_eq!(serialized, "\"exhibitor/type/labo\"");
+        assert_eq!(serialized, "\"group/type/plan_labo\"");
+
+        // Test GroupTypePress
+        let target = TargetSpecifier::GroupTypePress;
+        let serialized = serde_json::to_string(&target).unwrap();
+        assert_eq!(serialized, "\"group/type/press\"");
 
         // Test UserId
         let user_id = Uuid::parse_str("12345678-1234-1234-1234-123456789012").unwrap();
@@ -199,6 +246,12 @@ mod tests {
             "\"user/id/12345678-1234-1234-1234-123456789012\""
         );
 
+        // Test GroupId
+        let group_id = "T-000";
+        let target = TargetSpecifier::GroupId(group_id.to_string());
+        let serialized = serde_json::to_string(&target).unwrap();
+        assert_eq!(serialized, "\"group/id/T-000\"");
+
         // Test UserNologin
         let target = TargetSpecifier::UserNologin;
         let serialized = serde_json::to_string(&target).unwrap();
@@ -207,28 +260,29 @@ mod tests {
 
     #[test]
     fn test_deserialize() {
+        // legacy specifiers
         // Test ExhibitorTypeGeneral
         let deserialized: TargetSpecifier =
             serde_json::from_str("\"exhibitor/type/general\"").unwrap();
         assert!(matches!(
             deserialized,
-            TargetSpecifier::ExhibitorTypeGeneral
+            TargetSpecifier::GroupTypePlanGeneral
         ));
 
         // Test ExhibitorTypeBooth
         let deserialized: TargetSpecifier =
             serde_json::from_str("\"exhibitor/type/booth\"").unwrap();
-        assert!(matches!(deserialized, TargetSpecifier::ExhibitorTypeBooth));
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanBooth));
 
         // Test ExhibitorTypeStage
         let deserialized: TargetSpecifier =
             serde_json::from_str("\"exhibitor/type/stage\"").unwrap();
-        assert!(matches!(deserialized, TargetSpecifier::ExhibitorTypeStage));
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanStage));
 
         // Test ExhibitorTypeLabo
         let deserialized: TargetSpecifier =
             serde_json::from_str("\"exhibitor/type/labo\"").unwrap();
-        assert!(matches!(deserialized, TargetSpecifier::ExhibitorTypeLabo));
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanLabo));
 
         // Test UserId
         let user_id = Uuid::parse_str("12345678-1234-1234-1234-123456789012").unwrap();
@@ -247,5 +301,38 @@ mod tests {
         // Test invalid format
         let result = serde_json::from_str::<TargetSpecifier>("\"invalid/format\"");
         assert!(result.is_err());
+
+        // Test GroupId
+        let group_id = "T-000";
+        let deserialized: TargetSpecifier =
+            serde_json::from_str(&format!("\"group/id/{}\"", group_id)).unwrap();
+        if let TargetSpecifier::GroupId(id) = deserialized {
+            assert_eq!(id, group_id);
+        } else {
+            panic!("Expected GroupId variant");
+        }
+
+        // Test GroupTypePress
+        let deserialized: TargetSpecifier = serde_json::from_str("\"group/type/press\"").unwrap();
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePress));
+        // Test GroupTypePlanGeneral
+        let deserialized: TargetSpecifier =
+            serde_json::from_str("\"group/type/plan_general\"").unwrap();
+        assert!(matches!(
+            deserialized,
+            TargetSpecifier::GroupTypePlanGeneral
+        ));
+        // Test GroupTypePlanBooth
+        let deserialized: TargetSpecifier =
+            serde_json::from_str("\"group/type/plan_booth\"").unwrap();
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanBooth));
+        // Test GroupTypePlanStage
+        let deserialized: TargetSpecifier =
+            serde_json::from_str("\"group/type/plan_stage\"").unwrap();
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanStage));
+        // Test GroupTypePlanLabo
+        let deserialized: TargetSpecifier =
+            serde_json::from_str("\"group/type/plan_labo\"").unwrap();
+        assert!(matches!(deserialized, TargetSpecifier::GroupTypePlanLabo));
     }
 }
