@@ -1,8 +1,8 @@
 properties:
   activation_tokens:
-    description: 第一責任者, 第二責任者, 第三責任者のactivation token
+    description: 団体新規作成により追加されたユーザーのactivation token
     uniqueItems: true
-    minItems: 3
+    minItems: 1
     maxItems: 3
     items:
       type: string

@@ -7,6 +7,7 @@ use crate::entities::group::plan::{
 };
 use crate::entities::group::press::{PressCreate, PressRead, PressUpdate};
 use crate::sea_orm_entities;
+use crate::util::sha::stretch_with_salt;
 use crate::util::IntoActiveValue;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
@@ -64,8 +65,23 @@ pub struct GroupUpdate {
 }
 
 impl GroupCreate {
-    pub async fn insert(self, db_conn: &DbConn, id: String) -> Result<(), DbErr> {
+    /// 新規団体をデータベースに挿入します。
+    /// # Arguments
+    /// * `db_conn` - データベース接続
+    /// * `activation_salt` - ユーザーのactivation tokenを生成するためのソルト
+    /// * `stretch_cost` - ユーザーのactivation tokenを生成するためのストレッチコスト
+    /// * `id` - 団体のID
+    /// # Returns
+    /// * `Result<Vec<String>, DbErr>` - 団体の挿入により生成されたユーザーのactivation tokenのリストまたはdbエラー
+    pub async fn insert(
+        self,
+        db_conn: &DbConn,
+        activation_salt: &str,
+        stretch_cost: u8,
+        id: String,
+    ) -> Result<Vec<String>, DbErr> {
         let transaction = db_conn.begin().await?;
+        let mut generated_users_m_addresses = vec![];
 
         let mut group_type;
         match self.r#type {
@@ -73,6 +89,9 @@ impl GroupCreate {
                 let mut plan_type;
                 match plan.r#type {
                     PlanTypeCreate::TypeBooth(booth) => {
+                        generated_users_m_addresses.push(booth.representative1.m_address.clone());
+                        generated_users_m_addresses.push(booth.representative2.m_address.clone());
+                        generated_users_m_addresses.push(booth.representative3.m_address.clone());
                         // 責任者アカウントを生成
                         let representative1_id = Uuid::new_v4();
                         let representative2_id = Uuid::new_v4();
@@ -103,6 +122,9 @@ impl GroupCreate {
                         plan_type = sea_orm_entities::sea_orm_active_enums::PlanType::Booth;
                     }
                     PlanTypeCreate::TypeGeneral(general) => {
+                        generated_users_m_addresses.push(general.representative1.m_address.clone());
+                        generated_users_m_addresses.push(general.representative2.m_address.clone());
+                        generated_users_m_addresses.push(general.representative3.m_address.clone());
                         // 責任者アカウントを生成
                         let representative1_id = Uuid::new_v4();
                         let representative2_id = Uuid::new_v4();
@@ -133,6 +155,9 @@ impl GroupCreate {
                         plan_type = sea_orm_entities::sea_orm_active_enums::PlanType::General;
                     }
                     PlanTypeCreate::TypeStage(stage) => {
+                        generated_users_m_addresses.push(stage.representative1.m_address.clone());
+                        generated_users_m_addresses.push(stage.representative2.m_address.clone());
+                        generated_users_m_addresses.push(stage.representative3.m_address.clone());
                         // 責任者アカウントを生成
                         let representative1_id = Uuid::new_v4();
                         let representative2_id = Uuid::new_v4();
@@ -163,6 +188,7 @@ impl GroupCreate {
                         plan_type = sea_orm_entities::sea_orm_active_enums::PlanType::Stage;
                     }
                     PlanTypeCreate::TypeLabo(labo) => {
+                        generated_users_m_addresses.push(labo.representative.m_address.clone());
                         // 責任者アカウントを生成
                         let representative_id = Uuid::new_v4();
                         labo.representative
@@ -191,6 +217,7 @@ impl GroupCreate {
                 group_type = sea_orm_entities::sea_orm_active_enums::GroupType::Plan;
             }
             GroupTypeCreate::TypePress(press) => {
+                generated_users_m_addresses.push(press.representative.m_address.clone());
                 let representative_id = Uuid::new_v4();
                 press
                     .representative
@@ -219,7 +246,17 @@ impl GroupCreate {
 
         transaction.commit().await?;
 
-        Ok(())
+        // ユーザーのactivation tokenを生成
+        let mut activation_tokens = vec![];
+        for m_address in generated_users_m_addresses {
+            activation_tokens.push(stretch_with_salt(
+                &m_address,
+                activation_salt,
+                stretch_cost as i32,
+            ))
+        }
+
+        Ok(activation_tokens)
     }
 }
 

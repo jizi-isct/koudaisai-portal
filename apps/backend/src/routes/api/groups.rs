@@ -9,6 +9,7 @@ use axum::routing::{delete, get, patch, put};
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use sea_orm::{DbConn, DbErr, EntityTrait};
+use serde::Serialize;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::instrument;
@@ -77,6 +78,11 @@ async fn get_group(
     }
 }
 
+#[derive(Serialize)]
+struct PutGroupResponse {
+    pub activation_tokens: Vec<String>,
+}
+
 #[instrument(name = "PUT /api/v2/groups/:id", skip(state, current_user))]
 async fn put_group(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
@@ -88,9 +94,19 @@ async fn put_group(
     match current_user {
         CurrentUser::Admin(_) => {
             // 管理者のみが団体を作成可能
-            let result = group_create.insert(&state.db_conn, id).await;
+            let result = group_create
+                .insert(
+                    &state.db_conn,
+                    state.web.auth.activation_salt.as_str(),
+                    state.web.auth.stretch_cost,
+                    id,
+                )
+                .await;
             match result {
-                Ok(_) => Ok((StatusCode::CREATED, ().into_response())),
+                Ok(activation_tokens) => Ok((
+                    StatusCode::CREATED,
+                    Json(PutGroupResponse { activation_tokens }).into_response(),
+                )),
                 Err(DbErr::RecordNotInserted) => Ok((StatusCode::CONFLICT, ().into_response())),
                 Err(e) => {
                     tracing::error!("Failed to create group: {}", e);

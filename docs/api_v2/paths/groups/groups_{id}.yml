@@ -47,6 +47,10 @@ put:
   responses:
     '201':
       description: 団体が追加された
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/PutGroupResponse.yml"
     '400':
       description: 不正なrequest bodyの形式
     '409':
