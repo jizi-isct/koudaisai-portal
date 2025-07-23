@@ -62,7 +62,7 @@ function Inner() {
       render: (value, record, _index) =>
         record.category ? <a
             style={{textDecoration: "underline"}}
-            href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/edit_category?category_id=${record.category.id}" + record.category.id}
+            href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/edit_category?category_id=" + record.category.id}
           >
             {record.category.emoji} {record.category.title}
           </a>
@@ -95,9 +95,8 @@ function Inner() {
     {
       key: "actions",
       title: '操作',
-      dataIndex: 'id',
       fixed: 'right',
-      render: (value) => <Flex gap={5}>
+      render: record => <Flex gap={5}>
         <Popconfirm
           title={"フォームを削除"}
           description="あなたは本当にこの資料カテゴリを削除する気ですか！？"
@@ -105,10 +104,11 @@ function Inner() {
             await mutateDocumentCategoryDelete({
               params: {
                 path: {
-                  category_id: value,
+                  category_id: record.category.id,
                 }
               }
             })
+            await refetch()
           }}
           onCancel={() => {
             return
@@ -245,7 +245,7 @@ function Inner() {
       footer={() =>
         <Button
           disabled={record.category === null}
-          href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/new?category_id=" + record.category.id}
+          href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/new?category_id=" + record.category?.id}
         >
           <PlusOutlined/>
           新規資料を作成
