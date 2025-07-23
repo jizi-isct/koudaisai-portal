@@ -33,43 +33,7 @@ export interface paths {
       };
     };
     put?: never;
-    /** 団体を追加 */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["GroupCreate"];
-        };
-      };
-      responses: {
-        /** @description 団体が追加された */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description 不正なrequest bodyの形式 */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description 団体またはユーザーがすでに存在する */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -119,7 +83,46 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    /** 団体を追加 */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["GroupCreate"];
+        };
+      };
+      responses: {
+        /** @description 団体が追加された */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 団体またはユーザーがすでに存在する */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
     post?: never;
     /** 団体を削除 */
     delete: {
@@ -174,15 +177,8 @@ export interface paths {
         };
       };
       responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
         /** @description 団体が編集された */
-        201: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
@@ -2577,7 +2573,8 @@ export interface components {
       title: string;
       /** Format: uuid */
       category: string | null;
-      required_one_of_scopes: string[];
+      /** @description Target specifiers for the form */
+      targets: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウン形式の資料 */
     ReadDocumentFormatMarkdown: {
@@ -2602,7 +2599,8 @@ export interface components {
       title: string;
       /** Format: uuid */
       category: string | null;
-      required_one_of_scopes: string[];
+      /** @description Target specifiers for the form */
+      targets: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウン形式の資料 */
     CreateDocumentFormatMarkdown: {
@@ -2638,7 +2636,8 @@ export interface components {
       title?: string;
       /** Format: uuid */
       category?: string | null;
-      required_one_of_scopes?: string[];
+      /** @description Target specifiers for the form */
+      targets?: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウン形式の資料 */
     UpdateDocumentFormatMarkdown: {
@@ -2698,10 +2697,10 @@ export interface components {
        */
       m_address: string;
       /**
-       * @description 参加団体id
+       * @description 団体id
        * @example T-001
        */
-      exhibition_id: string;
+      group_id: string;
     };
     UserId: string | "me";
     UserUpdate: {
@@ -2744,15 +2743,8 @@ export interface components {
       updated_by: string;
       /** @description 通知のタイトル */
       title: string;
-      /** @description 通知の対象を含む配列
-       *     - `exhibitor/type/general` - 一般企画責任者
-       *     - `exhibitor/type/booth` - 模擬店企画責任者
-       *     - `exhibitor/type/stage` - ステージ企画責任者
-       *     - `exhibitor/type/labo` - 研究室企画責任者
-       *     - `user/id/${user_id}` - 特定のユーザー
-       *     - `user/nologin` - ログインしていないユーザー
-       *      */
-      target: string[];
+      /** @description Target specifiers for the form */
+      target: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウンタイプの通知 */
     NotificationReadTypeMarkdown: {
@@ -2809,15 +2801,8 @@ export interface components {
     NotificationCreateGeneric: {
       /** @description 通知のタイトル */
       title: string;
-      /** @description 通知の対象を含む配列
-       *     - `exhibitor/type/general` - 一般企画責任者
-       *     - `exhibitor/type/booth` - 模擬店企画責任者
-       *     - `exhibitor/type/stage` - ステージ企画責任者
-       *     - `exhibitor/type/labo` - 研究室企画責任者
-       *     - `user/id/${user_id}` - 特定のユーザー
-       *     - `user/nologin` - ログインしていないユーザー
-       *      */
-      target: string[];
+      /** @description Target specifiers for the form */
+      target: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウンタイプの通知 */
     NotificationCreateTypeMarkdown: {
@@ -2829,15 +2814,8 @@ export interface components {
     NotificationUpdateGeneric: {
       /** @description 通知のタイトル */
       title?: string;
-      /** @description 通知の対象を含む配列
-       *     - `exhibitor/type/general` - 一般企画責任者
-       *     - `exhibitor/type/booth` - 模擬店企画責任者
-       *     - `exhibitor/type/stage` - ステージ企画責任者
-       *     - `exhibitor/type/labo` - 研究室企画責任者
-       *     - `user/id/${user_id}` - 特定のユーザー
-       *     - `user/nologin` - ログインしていないユーザー
-       *      */
-      target?: string[];
+      /** @description Target specifiers for the form */
+      target?: components["schemas"]["TargetSpecifier"][];
     };
     /** @description マークダウンタイプの通知 */
     NotificationUpdateTypeMarkdown: {

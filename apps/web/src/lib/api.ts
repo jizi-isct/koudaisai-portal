@@ -2,7 +2,7 @@
 
 import createClient from "openapi-react-query";
 import {getTokensAdmin, getTokensMembers, getUserIdFromAccessToken} from "./auth";
-import {paths} from "./api_v1";
+import {paths} from "./api_v2";
 import createFetchClient, {type Middleware} from "openapi-fetch";
 import {Exhibitor} from "@/lib/types";
 import {useEffect, useState} from "react";
