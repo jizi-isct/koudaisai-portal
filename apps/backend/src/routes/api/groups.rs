@@ -16,7 +16,7 @@ use tracing::instrument;
 #[instrument(name = "init /api/v2/groups")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new().route("/", get(get_groups)).route(
-        "/:id",
+        "/{id}",
         get(get_group)
             .put(put_group)
             .patch(patch_group)
