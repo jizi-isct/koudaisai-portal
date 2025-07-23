@@ -3,6 +3,7 @@ use crate::entities::document::{
     DocumentCreate, DocumentRead, DocumentUpdate, DocumentWriteActiveModel,
 };
 use crate::entities::document_category::DocumentCategoryRead;
+use crate::entities::target_specifier::TargetSpecifier;
 use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
@@ -46,18 +47,28 @@ async fn get_documents(
 ) -> AppResponse {
     // 権限確認
     let mut documents: Vec<DocumentRead> = match current_user {
-        CurrentUser::None => {
-            DocumentRead::find_from_required_one_of_scopes(&"none".to_string(), &state.db_conn)
-                .await?
-        }
+        CurrentUser::None => DocumentRead::get_all(&state.db_conn)
+            .await?
+            .into_iter()
+            .filter(|document| {
+                document
+                    .targets
+                    .iter()
+                    .any(|target| matches!(target, TargetSpecifier::UserNologin))
+            })
+            .collect(),
         CurrentUser::User(claims) => {
             let user = UserRead::from(claims, &state.db_conn).await?;
-            let exhibitor = user.get_exhibitor_read(&state.db_conn).await?;
-            DocumentRead::find_from_required_one_of_scopes(
-                &exhibitor.r#type.to_string(),
-                &state.db_conn,
-            )
-            .await?
+            let mut documents = vec![];
+            for document in DocumentRead::get_all(&state.db_conn).await? {
+                for target in &document.targets {
+                    if target.does_user_match(Some(&user), &state.db_conn).await? {
+                        documents.push(document);
+                        break;
+                    }
+                }
+            }
+            documents
         }
         CurrentUser::Admin(..) => DocumentRead::get_all(&state.db_conn).await?,
     };
@@ -89,17 +100,29 @@ async fn get_documents_by_category(
     // 権限確認
     let mut documents: Vec<DocumentRead> = match current_user {
         CurrentUser::None => {
-            DocumentRead::find_from_required_one_of_scopes(&"none".to_string(), &state.db_conn)
-                .await?
+            let mut documents = vec![];
+            for document in DocumentRead::get_all(&state.db_conn).await? {
+                for target in &document.targets {
+                    if matches!(target, TargetSpecifier::UserNologin) {
+                        documents.push(document);
+                        break;
+                    }
+                }
+            }
+            documents
         }
         CurrentUser::User(claims) => {
-            let user = UserRead::from(claims, &state.db_conn).await?;
-            let exhibitor = user.get_exhibitor_read(&state.db_conn).await?;
-            DocumentRead::find_from_required_one_of_scopes(
-                &exhibitor.r#type.to_string(),
-                &state.db_conn,
-            )
-            .await?
+            let user = UserRead::from_claims(claims, &state.db_conn).await?;
+            let mut documents = vec![];
+            for document in DocumentRead::get_all(&state.db_conn).await? {
+                for target in &document.targets {
+                    if target.does_user_match(Some(&user), &state.db_conn).await? {
+                        documents.push(document);
+                        break;
+                    }
+                }
+            }
+            documents
         }
         CurrentUser::Admin(..) => DocumentRead::get_all(&state.db_conn).await?,
     };
@@ -176,26 +199,21 @@ async fn get_document(
     let document: DocumentRead = DocumentRead::find_from_id(document_id, &state.db_conn).await?;
     match current_user {
         CurrentUser::None => {
-            if document
-                .required_one_of_scopes
-                .contains(&"none".to_string())
-            {
-                Ok((StatusCode::OK, Json(document).into_response()))
-            } else {
-                Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+            for target in &document.targets {
+                if matches!(target, TargetSpecifier::UserNologin) {
+                    return Ok((StatusCode::OK, Json(document).into_response()));
+                }
             }
+            Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
         }
         CurrentUser::User(claims) => {
             let user = UserRead::from(claims, &state.db_conn).await?;
-            let exhibitor = user.get_exhibitor_read(&state.db_conn).await?;
-            if document
-                .required_one_of_scopes
-                .contains(&exhibitor.r#type.to_string())
-            {
-                Ok((StatusCode::OK, Json(document).into_response()))
-            } else {
-                Ok((StatusCode::FORBIDDEN, "Access forbidden.".into_response()))
+            for target in &document.targets {
+                if target.does_user_match(Some(&user), &state.db_conn).await? {
+                    return Ok((StatusCode::OK, Json(document).into_response()));
+                }
             }
+            Ok((StatusCode::NOT_FOUND, "Not found.".into_response()))
         }
         CurrentUser::Admin(..) => Ok((StatusCode::OK, Json(document).into_response())),
     }
