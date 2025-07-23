@@ -6,11 +6,12 @@ properties:
     type: string
     format: uuid
     nullable: true
-  required_one_of_scopes:
+  targets:
     type: array
+    description: Target specifiers for the form
     items:
-      type: string
+      $ref: "../common/TargetSpecifier.yml"
 required:
   - title
   - category
-  - required_one_of_scopes
+  - targets
