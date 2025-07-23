@@ -45,7 +45,7 @@ function Inner() {
   const userNameMap = useMemo(() => {
     if (!users) return {};
     return users.reduce((acc, user) => {
-      acc[user.id] = user.exhibition_id + "の" + user.name;
+      acc[user.id] = user.group_id + "の" + user.name;
       return acc;
     }, {} as Record<string, string>);
   }, [users])

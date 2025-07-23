@@ -1,4 +1,4 @@
-import {components} from "./api_v1";
+import {components} from "./api_v2";
 
 export type Item = components["schemas"]["Item"];
 export type Form = components["schemas"]["Form"];
@@ -32,10 +32,7 @@ export type FormUpdate = components["schemas"]["FormUpdate"];
 export type ApprovalRequestCreate = components["schemas"]["CreateApprovalRequest"];
 export type ApprovalRequestRead = components["schemas"]["ReadApprovalRequest"];
 export type ApprovalRequestUpdate = components["schemas"]["UpdateApprovalRequest"];
-export type ExhibitionUpdate = {
-  exhibition_name?: string | null;
-  description?: string | null;
-  icon_id?: string | null;
-};
-
-export type Exhibitor = components["schemas"]["Exhibitor"];
+export type GroupCreate = components["schemas"]["GroupCreate"];
+export type GroupRead = components["schemas"]["GroupRead"];
+export type GroupUpdate = components["schemas"]["GroupUpdate"];
+export type UserRead = components["schemas"]["UserRead"];
