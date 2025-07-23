@@ -23,8 +23,8 @@ properties:
     description: mアドレス(新旧どちらも含む)
     type: string
     example: johnson.p.5703@m.isct.ac.jp
-  exhibition_id:
-    description: 参加団体id
+  group_id:
+    description: 団体id
     type: string
     pattern: '[A-Z]-[0-9][0-9][0-9]'
     example: T-001
@@ -34,4 +34,4 @@ required:
   - updated_at
   - name
   - m_address
-  - exhibition_id
+  - group_id
