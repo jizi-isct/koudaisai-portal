@@ -1,6 +1,6 @@
 use crate::entities::approval_request::ReadApprovalRequest;
-use crate::entities::exhibitor::ExhibitorRead;
 use crate::entities::form::FormRead;
+use crate::entities::group::GroupRead;
 use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
 use crate::sea_orm_entities;
@@ -9,15 +9,23 @@ use crate::util::jwt::Claims;
 use crate::util::sha::{stretch_with_salt, SHAManager};
 use crate::util::{contains_uuid, format_secs_ja_full};
 use anyhow::{anyhow, Result};
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use reqwest::Response;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityTrait, NotSet, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, ConnectionTrait, DbConn, DbErr, EntityTrait, NotSet, QueryFilter,
+};
 use sendgrid::v3::{Content, Email, Message, Personalization, Sender};
 use sendgrid::SendgridResult;
 use serde::{Deserialize, Serialize};
 use tracing::log::trace;
 use uuid::Uuid;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UserCreate {
+    pub name: String,
+    pub m_address: String,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UserRead {
@@ -26,8 +34,32 @@ pub struct UserRead {
     pub updated_at: DateTime<chrono::Utc>,
     pub name: String,
     pub m_address: String,
-    pub exhibition_id: String,
+    pub group_id: String,
     pub password_updated_at: DateTime<chrono::Utc>,
+}
+
+impl UserCreate {
+    pub async fn insert<C: ConnectionTrait>(
+        self,
+        db_conn: &C,
+        id: Uuid,
+        group_id: String,
+    ) -> Result<Uuid, DbErr> {
+        let active_model = sea_orm_entities::users::ActiveModel {
+            id: Set(id),
+            created_at: Set(Some(Utc::now().into())),
+            updated_at: Set(Some(Utc::now().into())),
+            name: Set(self.name),
+            m_address: Set(self.m_address),
+            password_hash: NotSet,
+            password_salt: NotSet,
+            group_id: Set(group_id),
+            password_updated_at: Set(Utc::now().into()),
+        };
+
+        let user = active_model.insert(db_conn).await?;
+        Ok(user.id)
+    }
 }
 
 impl From<sea_orm_entities::users::Model> for UserRead {
@@ -38,7 +70,7 @@ impl From<sea_orm_entities::users::Model> for UserRead {
             updated_at: value.updated_at.unwrap().to_utc(),
             name: value.name,
             m_address: value.m_address,
-            exhibition_id: value.exhibition_id,
+            group_id: value.group_id,
             password_updated_at: value.password_updated_at.to_utc(),
         }
     }
@@ -84,10 +116,10 @@ impl UserRead {
         Ok(users.into_iter().map(Into::into).collect())
     }
 
-    pub async fn get_exhibitor_read(&self, db_conn: &DbConn) -> Result<ExhibitorRead> {
-        match ExhibitorRead::find_from_id(&self.exhibition_id, db_conn).await? {
+    pub async fn get_group_read(&self, db_conn: &DbConn) -> Result<GroupRead> {
+        match GroupRead::find_by_id(db_conn, &self.group_id).await? {
             Some(value) => Ok(value),
-            None => Err(anyhow::anyhow!("Exhibitor not found")),
+            None => Err(anyhow::anyhow!("Group not found")),
         }
     }
 
@@ -124,11 +156,11 @@ impl UserRead {
         &self,
         db_conn: &DbConn,
     ) -> Result<Vec<ReadApprovalRequest>> {
-        let exhibitor = self.get_exhibitor_read(db_conn).await?;
+        let group = self.get_group_read(db_conn).await?;
         let requests = ReadApprovalRequest::get_all(db_conn).await?;
         let mut user_requests = vec![];
         for request in requests {
-            if contains_uuid(exhibitor.representatives, self.id) {
+            if self.group_id == group.id {
                 user_requests.push(request);
             }
         }
@@ -261,7 +293,7 @@ impl Into<sea_orm_entities::users::ActiveModel> for UserUpdate {
             m_address: Set(self.m_address),
             password_hash: Default::default(),
             password_salt: Default::default(),
-            exhibition_id: Default::default(),
+            group_id: Default::default(),
             password_updated_at: Default::default(),
         }
     }
