@@ -40,27 +40,27 @@ pub enum GroupTypeUpdate {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GroupCreate {
-    name: String,
+    pub name: String,
     #[serde(flatten)]
-    r#type: GroupTypeCreate,
+    pub r#type: GroupTypeCreate,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GroupRead {
-    id: String,
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
-    name: String,
+    pub id: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub name: String,
     #[serde(flatten)]
-    r#type: GroupTypeRead,
+    pub r#type: GroupTypeRead,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GroupUpdate {
     #[serde(default)]
-    name: Option<String>,
+    pub name: Option<String>,
     #[serde(flatten, default)]
-    r#type: Option<GroupTypeUpdate>,
+    pub r#type: Option<GroupTypeUpdate>,
 }
 
 impl GroupCreate {
@@ -224,7 +224,26 @@ impl GroupCreate {
 }
 
 impl GroupRead {
-    pub async fn find_by_id(db_conn: &DbConn, id: String) -> Result<Option<GroupRead>, DbErr> {
+    pub async fn get_all(db_conn: &DbConn) -> Result<Vec<Self>, DbErr> {
+        let groups = crate::sea_orm_entities::group::Entity::find()
+            .all(db_conn)
+            .await?;
+        let mut result = Vec::new();
+
+        for group in groups {
+            if let Some(group_read) = Self::find_by_id(db_conn, group.id.clone()).await? {
+                result.push(group_read);
+            }
+        }
+
+        Ok(result)
+    }
+
+    pub async fn find_by_id<S: Into<String>>(
+        db_conn: &DbConn,
+        id: S,
+    ) -> Result<Option<GroupRead>, DbErr> {
+        let id = id.into();
         let model_group = match sea_orm_entities::group::Entity::find_by_id(id.clone())
             .one(db_conn)
             .await
@@ -455,4 +474,13 @@ impl GroupUpdate {
         }
         transaction.commit().await
     }
+}
+
+pub async fn delete_group(db_conn: &DbConn, id: String) -> Result<(), DbErr> {
+    // 団体情報の削除
+    sea_orm_entities::group::Entity::delete_by_id(id.clone())
+        .exec(db_conn)
+        .await?;
+
+    Ok(())
 }
