@@ -6,7 +6,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 use uuid::Uuid;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TargetSpecifier {
     GroupTypePlanGeneral,
     GroupTypePlanBooth,

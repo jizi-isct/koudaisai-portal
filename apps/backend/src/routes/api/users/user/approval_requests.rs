@@ -3,7 +3,7 @@ use crate::entities::user::UserRead;
 use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
-use crate::util::{contains_uuid, AppResponse};
+use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -34,8 +34,7 @@ async fn get_approval_requests(
             let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
             let user =
                 UserRead::from_user_id(user_id, current_user.clone(), &state.db_conn).await?;
-            let exhibitor = current_user.get_exhibitor_read(&state.db_conn).await?;
-            if !contains_uuid(exhibitor.representatives, user.id) {
+            if user.group_id != current_user.group_id {
                 return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
             }
             let requests = user.get_approval_requests(&state.db_conn).await?;
@@ -84,9 +83,8 @@ async fn get_approval_request(
             let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
             let user =
                 UserRead::from_user_id(user_id, current_user.clone(), &state.db_conn).await?;
-            let exhibitor = current_user.get_exhibitor_read(&state.db_conn).await?;
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
-            if contains_uuid(exhibitor.representatives, user.id) {
+            if user.group_id == current_user.group_id {
                 Ok((StatusCode::OK, Json(request).into_response()))
             } else {
                 Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
@@ -110,7 +108,6 @@ async fn close_approval_request(
     match current_user {
         CurrentUser::User(claims) => {
             let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
-            let exhibitor = current_user.get_exhibitor_read(&state.db_conn).await?;
             let user =
                 UserRead::from_user_id(user_id, current_user.clone(), &state.db_conn).await?;
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
@@ -118,7 +115,7 @@ async fn close_approval_request(
                 Some(req) => req,
                 None => return Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
             };
-            if contains_uuid(exhibitor.representatives, user.id) {
+            if user.group_id == current_user.group_id {
                 request.close(&state.db_conn).await?;
                 Ok((StatusCode::NO_CONTENT, ().into_response()))
             } else {

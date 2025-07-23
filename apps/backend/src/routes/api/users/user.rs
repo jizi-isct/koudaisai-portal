@@ -5,7 +5,7 @@ use crate::entities::user::{UserRead, UserUpdate};
 use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
-use crate::util::{contains_uuid, AppResponse};
+use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -44,13 +44,12 @@ async fn get_user(
 
             let user = match user_id {
                 UserId::Uuid(uuid) => UserRead::find_from_id(uuid, &state.db_conn).await?,
-                UserId::Me => Some(current_user),
+                UserId::Me => Some(current_user.clone()),
             };
 
             match user {
                 Some(user) => {
-                    let exhibitor_read = user.get_exhibitor_read(&state.db_conn).await?;
-                    if !contains_uuid(exhibitor_read.representatives, user.id) {
+                    if user.group_id != current_user.group_id {
                         return Ok((StatusCode::NOT_FOUND, ().into_response()));
                     }
                     Ok((StatusCode::OK, Json(user).into_response()))
@@ -150,10 +149,6 @@ async fn get_notifications(
                 UserId::Uuid(uuid) => uuid,
                 UserId::Me => current_user.id,
             };
-            let exhibition = current_user.get_exhibitor_read(&state.db_conn).await?;
-            if !contains_uuid(exhibition.representatives, user_id) {
-                return Ok((StatusCode::NOT_FOUND, ().into_response()));
-            }
 
             // ユーザー情報を取得
             let user = UserRead::find_from_id(user_id, &state.db_conn).await?;
@@ -161,6 +156,11 @@ async fn get_notifications(
                 return Ok((StatusCode::NOT_FOUND, ().into_response()));
             }
             let user = user.unwrap();
+
+            // ユーザーが所属する団体と現在のユーザーの団体が一致しない場合は404を返す
+            if user.group_id != current_user.group_id {
+                return Ok((StatusCode::NOT_FOUND, ().into_response()));
+            }
 
             // ユーザーの通知を取得
             let mut notifications = vec![];
