@@ -111,7 +111,7 @@ impl GroupCreate {
 
                         // 模擬店情報を生成
                         sea_orm_entities::group_plan_booth::ActiveModel {
-                            id: Default::default(),
+                            id: Set(id.clone()),
                             representative1: Set(representative1_id),
                             representative2: Set(representative2_id),
                             representative3: Set(representative3_id),
@@ -144,7 +144,7 @@ impl GroupCreate {
 
                         // 一般企画情報を生成
                         sea_orm_entities::group_plan_general::ActiveModel {
-                            id: Default::default(),
+                            id: Set(id.clone()),
                             representative1: Set(representative1_id),
                             representative2: Set(representative2_id),
                             representative3: Set(representative3_id),
@@ -177,7 +177,7 @@ impl GroupCreate {
 
                         // ステージ企画情報を生成
                         sea_orm_entities::group_plan_stage::ActiveModel {
-                            id: Default::default(),
+                            id: Set(id.clone()),
                             representative1: Set(representative1_id),
                             representative2: Set(representative2_id),
                             representative3: Set(representative3_id),
@@ -197,7 +197,7 @@ impl GroupCreate {
 
                         // 研究室企画情報を生成
                         sea_orm_entities::group_plan_labo::ActiveModel {
-                            id: Default::default(),
+                            id: Set(id.clone()),
                             representative: Set(representative_id),
                         }
                         .insert(&transaction)
@@ -224,7 +224,7 @@ impl GroupCreate {
                     .insert(&transaction, representative_id.clone(), id.clone())
                     .await?;
                 sea_orm_entities::group_press::ActiveModel {
-                    id: Default::default(),
+                    id: Set(id.clone()),
                     representative: Set(representative_id),
                 }
                 .insert(&transaction)
