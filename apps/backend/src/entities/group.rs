@@ -252,7 +252,7 @@ impl GroupCreate {
             activation_tokens.push(stretch_with_salt(
                 &m_address,
                 activation_salt,
-                stretch_cost as i32,
+                2_i32.pow(stretch_cost as u32),
             ))
         }
 
