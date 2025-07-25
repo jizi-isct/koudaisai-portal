@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
             .execute_unprepared(
                 r#"
             UPDATE document
-            SET targets = (
+            SET targets = COALESCE((
                 SELECT array_agg(
                     CASE
                         WHEN val = 'none' THEN 'user/nologin'
@@ -29,7 +29,7 @@ impl MigrationTrait for Migration {
                     ORDER BY ordinality
                 )
                 FROM unnest(targets) WITH ORDINALITY AS t(val, ordinality)
-            );
+            ), '{}');
         "#,
             )
             .await?;
@@ -43,7 +43,7 @@ impl MigrationTrait for Migration {
         // データの変換: 'user/nologin' を 'none' に置き換え、他の値を 'group/type/plan_' プレフィックスを削除
         connection.execute_unprepared(r#"
             UPDATE document
-            SET targets = (
+            SET targets = COALESCE((
                 SELECT array_agg(new_val ORDER BY ordinality)
                 FROM (
                     SELECT
@@ -56,7 +56,7 @@ impl MigrationTrait for Migration {
                     FROM unnest(targets) WITH ORDINALITY AS t(val, ordinality)
                 ) sub
                 WHERE new_val IS NOT NULL
-            );
+            ), '{}');
         "#).await?;
 
         // Rename the column back from `targets` to `required_one_of_scopes`
