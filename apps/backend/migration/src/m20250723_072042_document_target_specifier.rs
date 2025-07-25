@@ -40,13 +40,6 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let connection = manager.get_connection();
 
-        // Rename the column back from `targets` to `required_one_of_scopes`
-        connection
-            .execute_unprepared(
-                "ALTER TABLE document RENAME COLUMN targets TO required_one_of_scopes;",
-            )
-            .await?;
-
         // データの変換: 'user/nologin' を 'none' に置き換え、他の値を 'group/type/plan_' プレフィックスを削除
         connection.execute_unprepared(r#"
             UPDATE document
@@ -65,6 +58,13 @@ impl MigrationTrait for Migration {
                 WHERE new_val IS NOT NULL
             );
         "#).await?;
+
+        // Rename the column back from `targets` to `required_one_of_scopes`
+        connection
+            .execute_unprepared(
+                "ALTER TABLE document RENAME COLUMN targets TO required_one_of_scopes;",
+            )
+            .await?;
 
         Ok(())
     }
