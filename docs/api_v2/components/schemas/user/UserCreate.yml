@@ -1,0 +1,13 @@
+type: object
+properties:
+  name:
+    description: 名前
+    type: string
+    example: Paul Johnson
+  m_address:
+    description: mアドレス(新旧どちらも含む)
+    type: string
+    example: johnson.p.5703@m.isct.ac.jp
+required:
+  - name
+  - m_address

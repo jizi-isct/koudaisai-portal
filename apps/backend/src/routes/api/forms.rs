@@ -17,7 +17,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/forms")]
+#[instrument(name = "init /api/v2/forms")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_forms).post(post_forms))
@@ -27,7 +27,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
 }
 
-#[instrument(name = "GET /api/v1/forms", skip(state))]
+#[instrument(name = "GET /api/v2/forms", skip(state))]
 async fn get_forms(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -57,7 +57,7 @@ async fn get_forms(
     Ok((StatusCode::OK, Json(forms).into_response()))
 }
 
-#[instrument(name = "POST /api/v1/forms", skip(state))]
+#[instrument(name = "POST /api/v2/forms", skip(state))]
 async fn post_forms(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -76,7 +76,7 @@ async fn post_forms(
     }
 }
 
-#[instrument(name = "GET /api/v1/forms/{form_id}", skip(state))]
+#[instrument(name = "GET /api/v2/forms/{form_id}", skip(state))]
 async fn get_form(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -127,7 +127,7 @@ async fn get_form(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/forms/{form_id}", skip(state))]
+#[instrument(name = "PATCH /api/v2/forms/{form_id}", skip(state))]
 async fn patch_form(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -148,7 +148,7 @@ async fn patch_form(
     }
 }
 
-#[instrument(name = "POST /api/v1/forms/delete", skip(state))]
+#[instrument(name = "POST /api/v2/forms/delete", skip(state))]
 async fn delete_form(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

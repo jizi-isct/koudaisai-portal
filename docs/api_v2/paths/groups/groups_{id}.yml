@@ -1,0 +1,110 @@
+get:
+  summary: 団体を取得
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する団体のみ取得可能
+    - **admin_oidcの場合**: 存在する全ての団体を取得可能
+  tags:
+    - groups
+  parameters:
+    - name: id
+      in: path
+      description: 団体ID
+      required: true
+      schema:
+        type: string
+        example: T-001
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/group/GroupRead.yml
+    '404':
+      description: 団体が存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc: [ ]
+put:
+  summary: 団体を追加
+  tags:
+    - groups
+  parameters:
+    - name: id
+      in: path
+      description: 団体ID
+      required: true
+      schema:
+        type: string
+        example: T-001
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/group/GroupCreate.yml
+  responses:
+    '201':
+      description: 団体が追加された
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/PutGroupResponse.yml"
+    '400':
+      description: 不正なrequest bodyの形式
+    '409':
+      description: 団体またはユーザーがすでに存在する
+  security:
+    - admin_oidc: [ ]
+patch:
+  summary: 団体を編集
+  description: |-
+    ### authの違いによる挙動の違い
+    - **exhibitor_bearerの場合**: 自分が属する団体のみ編集可能
+    - **admin_oidcの場合**: 存在する全ての団体を編集可能
+  tags:
+    - groups
+  parameters:
+    - name: id
+      in: path
+      description: 団体ID
+      required: true
+      schema:
+        type: string
+        example: T-001
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/group/GroupUpdate.yml
+  responses:
+    '204':
+      description: 団体が編集された
+    '400':
+      description: 不正なrequest bodyの形式
+    '404':
+      description: 団体が存在しない
+  security:
+    - exhibitor_bearer: [ ]
+    - admin_oidc: [ ]
+delete:
+  summary: 団体を削除
+  tags:
+    - groups
+  parameters:
+    - name: id
+      in: path
+      description: 団体ID
+      required: true
+      schema:
+        type: string
+        example: T-001
+  responses:
+    '204':
+      description: 団体が削除された
+    '404':
+      description: 団体が存在しない
+  security:
+    - admin_oidc: [ ]

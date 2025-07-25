@@ -1,0 +1,38 @@
+type: object
+properties:
+  id:
+    description: 通知ID
+    type: string
+    format: uuid
+  created_at:
+    description: 作成日時
+    type: string
+    format: date-time
+  updated_at:
+    description: 最終更新日時
+    type: string
+    format: date-time
+  created_by:
+    description: 作成者のユーザーID
+    type: string
+    format: uuid
+  updated_by:
+    description: 最終更新者のユーザーID
+    type: string
+    format: uuid
+  title:
+    description: 通知のタイトル
+    type: string
+  target:
+    type: array
+    description: Target specifiers for the form
+    items:
+      $ref: "../common/TargetSpecifier.yml"
+required:
+  - id
+  - created_at
+  - updated_at
+  - created_by
+  - updated_by
+  - title
+  - target

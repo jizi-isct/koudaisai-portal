@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: 工大祭API v2
+  description: 工大祭のapiです。
+  version: '2'
+servers:
+  - url: "https://portal.koudaisai.jp/api/v2"
+tags:
+  - name: user
+    description: ユーザー情報
+  - name: groups
+    description: 団体関連
+  - name: forms
+    description: フォーム関連
+  - name: form_responses
+    description: フォームの回答関連
+  - name: documents
+    description: 資料関連
+  - name: files
+    description: ファイル関連
+  - name: notifications
+    description: 通知機能関連
+  - name: util
+    description: ユーティリティ関連
+  - name: approval_requests
+    description: 承認申請関連
+paths:
+  # groups
+  /groups:
+    $ref: paths/groups/groups.yml
+  /groups/{id}:
+    $ref: paths/groups/groups_{id}.yml
+  # forms
+  /forms:
+    $ref: paths/forms.yml
+  /forms/{form_id}:
+    $ref: paths/forms_{form_id}.yml
+  # documents
+  /documents:
+    $ref: paths/documents.yml
+  /documents/by-category:
+    $ref: paths/documents_by-category.yml
+  /documents/{document_id}:
+    $ref: paths/documents_{document_id}.yml
+  /document-categories:
+    $ref: paths/document-categories.yml
+  /document-categories/{category_id}:
+    $ref: paths/document-categories_{category_id}.yml
+  # files
+  /files/upload:
+    $ref: paths/files_upload.yml
+  /files/download:
+    $ref: paths/files_download.yml
+  # users
+  /users:
+    $ref: paths/users.yml
+  /users/{user_id}:
+    $ref: paths/users_{user_id}.yml
+  /users/{user_id}/notifications:
+    $ref: paths/users_{user_id}_notifications.yml
+  /users/{user_id}/approval_requests:
+    $ref: paths/users_{user_id}_approval_requests.yml
+  /users/{user_id}/approval_requests/{request_id}:
+    $ref: "paths/users_{user_id}_approval_requests_{request_id}.yml"
+  /users/{user_id}/approval_requests/{request_id}/close:
+    $ref: paths/users_{user_id}_approval_requests_{request_id}_close.yml
+  /users/{user_id}/m_address:
+    $ref: paths/users_{user_id}_m_address.yml
+  # notifications
+  /notifications:
+    $ref: paths/notifications.yml
+  /notifications/{notification_id}:
+    $ref: paths/notifications_{notification_id}.yml
+  # util
+  /util/meta:
+    $ref: paths/util_meta.yml
+  # approval requests
+  /approval-requests:
+    $ref: paths/approval_requests.yml
+  /approval-requests/{id}:
+    $ref: paths/approval_requests_{id}.yml
+  /approval-requests/{id}/approve:
+    $ref: paths/approval_requests_{id}_approve.yml
+  /approval-requests/{id}/reject:
+    $ref: paths/approval_requests_{id}_reject.yml
+
+components:
+  securitySchemes:
+    admin_oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://auth2024.jizi.jp/realms/JIZI-Portal/.well-known/openid-configuration
+    exhibitor_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

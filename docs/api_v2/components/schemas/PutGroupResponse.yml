@@ -1,0 +1,10 @@
+properties:
+  activation_tokens:
+    description: 団体新規作成により追加されたユーザーのactivation token
+    uniqueItems: true
+    minItems: 1
+    maxItems: 3
+    items:
+      type: string
+required:
+  - activation_tokens

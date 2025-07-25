@@ -17,46 +17,50 @@ type TargetSpecifierProps = {
 
 export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
   const {data: users} = $apiAdmin.useQuery("get", "/users")
-  const {data: exhibitors} = $apiAdmin.useQuery("get", "/exhibitors")
+  const {data: groups} = $apiAdmin.useQuery("get", "/groups")
 
-  if (!users || !exhibitors) {
+  if (!users || !groups) {
     return <LoadingScreen/>
   }
 
   const options: Option[] = [
     {
-      value: 'exhibitor',
-      label: '参加団体',
+      value: 'group',
+      label: '団体',
       children: [
         {
           value: 'type',
           label: '種類',
           children: [
             {
-              value: 'general',
-              label: '一般',
+              value: 'plan_general',
+              label: '一般企画',
             },
             {
-              value: 'booth',
-              label: '模擬店'
+              value: 'plan_booth',
+              label: '模擬店企画'
             },
             {
-              value: 'stage',
-              label: 'ステージ',
+              value: 'plan_stage',
+              label: 'ステージ企画',
             },
             {
-              value: 'labo',
-              label: '研究室',
+              value: 'plan_labo',
+              label: '研究室企画',
+            },
+            {
+              value: 'press',
+              label: '学内取材団体',
             }
           ],
         },
         {
           value: 'id',
           label: '指定',
-          children: exhibitors.map((exhibitor) => (
+          children: groups.map((group) => (
             {
-              value: exhibitor.id,
-              label: `${exhibitor.exhibitor_name}(${exhibitor.id})`
+              value: group.id,
+              label: `${group.id} - ${group.name}`
             }
           ))
         }
@@ -76,7 +80,7 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
           children: users.map((user) => (
             {
               value: user.id,
-              label: `${user.exhibition_id}の${user.name}`
+              label: `${user.group_id}の${user.name}`
             }
           ))
         }

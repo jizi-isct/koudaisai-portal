@@ -1,0 +1,37 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time
+  created_by:
+    type: string
+    format: uuid
+  updated_by:
+    type: string
+    format: uuid
+  title:
+    type: string
+  category:
+    type: string
+    format: uuid
+    nullable: true
+  targets:
+    type: array
+    description: Target specifiers for the form
+    items:
+      $ref: "../common/TargetSpecifier.yml"
+required:
+  - id
+  - created_at
+  - updated_at
+  - created_by
+  - updated_by
+  - title
+  - category
+  - targets

@@ -14,7 +14,7 @@ use std::time::Duration;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/files")]
+#[instrument(name = "init /api/v2/files")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/upload", post(post_files_upload))
@@ -32,7 +32,7 @@ struct PostFilesUploadResponse {
     key: String,
 }
 
-#[instrument(name = "POST /api/v1/files/upload", skip(state))]
+#[instrument(name = "POST /api/v2/files/upload", skip(state))]
 async fn post_files_upload(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -78,7 +78,7 @@ struct GetFilesDownloadResponse {
     presigned_url: String,
 }
 
-#[instrument(name = "GET /api/v1/files/download", skip(state))]
+#[instrument(name = "GET /api/v2/files/download", skip(state))]
 async fn get_files_download(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

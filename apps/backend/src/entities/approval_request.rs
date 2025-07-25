@@ -1,8 +1,5 @@
-use crate::entities::exhibitor::ExhibitorUpdate;
-use crate::entities::user::UserRead;
 use crate::sea_orm_entities;
 use crate::util::IntoActiveValue;
-use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityTrait, NotSet};
@@ -265,18 +262,7 @@ impl ReadApprovalRequest {
                 icon_id,
                 description,
             } => {
-                let user = match UserRead::find_from_id(self.issued_by, db_conn).await? {
-                    Some(user) => user,
-                    None => return Err(anyhow!("User not found".to_string())),
-                };
-                let exhibitor = user.get_exhibitor_read(db_conn).await?;
-                ExhibitorUpdate {
-                    exhibition_name,
-                    icon_id,
-                    description,
-                }
-                .update(exhibitor.id, db_conn)
-                .await?;
+                // TODO: Implement the logic to update the exhibition info
             }
         }
         UpdateApprovalRequest {

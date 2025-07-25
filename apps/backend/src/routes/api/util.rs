@@ -14,7 +14,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use tracing::instrument;
 
-#[instrument(name = "init /api/v1/util")]
+#[instrument(name = "init /api/v2/util")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new().route("/meta", get(get_meta))
 }
@@ -30,7 +30,7 @@ struct MetaInfo {
     description: Option<String>,
 }
 
-#[instrument(name = "GET /api/v1/util/meta", skip(state))]
+#[instrument(name = "GET /api/v2/util/meta", skip(state))]
 async fn get_meta(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

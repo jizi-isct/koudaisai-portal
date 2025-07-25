@@ -1,0 +1,10 @@
+type: object
+properties:
+  type_booth:
+    $ref: './booth/BoothUpdate.yml'
+  type_general:
+    $ref: './general/GeneralUpdate.yml'
+  type_labo:
+    $ref: './labo/LaboUpdate.yml'
+  type_stage:
+    $ref: './stage/StageUpdate.yml'

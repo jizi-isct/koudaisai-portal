@@ -16,7 +16,7 @@ pub struct Model {
     pub title: String,
     pub format: DocumentFormat,
     pub category: Option<Uuid>,
-    pub required_one_of_scopes: Vec<String>,
+    pub targets: Vec<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

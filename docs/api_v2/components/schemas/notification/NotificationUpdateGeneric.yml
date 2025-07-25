@@ -1,0 +1,10 @@
+type: object
+properties:
+  title:
+    description: 通知のタイトル
+    type: string
+  target:
+    type: array
+    description: Target specifiers for the form
+    items:
+      $ref: "../common/TargetSpecifier.yml"

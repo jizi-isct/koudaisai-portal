@@ -21,6 +21,9 @@ mod m20250623_133336_email_validation;
 mod m20250626_132332_password_updated_at;
 mod m20250629_114156_change_column_name_name;
 mod m20250702_085908_new_table_approval_request;
+mod m20250718_075715_add_table_group;
+mod m20250721_153433_add_press_group;
+mod m20250723_072042_document_target_specifier;
 
 pub struct Migrator;
 
@@ -48,9 +51,12 @@ impl MigratorTrait for Migrator {
             Box::new(m20250616_072948_add_table_read_notifications::Migration),
             Box::new(m20250623_045042_add_external_form::Migration),
             Box::new(m20250623_133336_email_validation::Migration),
-            Box::new(m20250629_114156_change_column_name_name::Migration),
             Box::new(m20250626_132332_password_updated_at::Migration),
+            Box::new(m20250629_114156_change_column_name_name::Migration),
             Box::new(m20250702_085908_new_table_approval_request::Migration),
+            Box::new(m20250718_075715_add_table_group::Migration),
+            Box::new(m20250721_153433_add_press_group::Migration),
+            Box::new(m20250723_072042_document_target_specifier::Migration),
         ]
     }
 }

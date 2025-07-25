@@ -14,7 +14,7 @@ use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
 
-#[instrument(name = "init /api/v1/document-categories")]
+#[instrument(name = "init /api/v2/document-categories")]
 pub fn init_router() -> Router<Arc<AppState>> {
     Router::new()
         .route(
@@ -29,7 +29,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
         )
 }
 
-#[instrument(name = "GET /api/v1/document-categories", skip(state))]
+#[instrument(name = "GET /api/v2/document-categories", skip(state))]
 async fn get_document_categories(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -41,7 +41,7 @@ async fn get_document_categories(
     Ok((StatusCode::OK, Json(document_categories).into_response()))
 }
 
-#[instrument(name = "POST /api/v1/document-categories", skip(state))]
+#[instrument(name = "POST /api/v2/document-categories", skip(state))]
 async fn post_document_categories(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -59,7 +59,7 @@ async fn post_document_categories(
     }
 }
 
-#[instrument(name = "GET /api/v1/document-categories/{category_id}", skip(state))]
+#[instrument(name = "GET /api/v2/document-categories/{category_id}", skip(state))]
 async fn get_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -71,7 +71,7 @@ async fn get_document_category(
     }
 }
 
-#[instrument(name = "PATCH /api/v1/document-categories/{category_id}", skip(state))]
+#[instrument(name = "PATCH /api/v2/document-categories/{category_id}", skip(state))]
 async fn patch_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -94,7 +94,7 @@ async fn patch_document_category(
     }
 }
 
-#[instrument(name = "DELETE /api/v1/document-categories/{category_id}", skip(state))]
+#[instrument(name = "DELETE /api/v2/document-categories/{category_id}", skip(state))]
 async fn delete_document_category(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,

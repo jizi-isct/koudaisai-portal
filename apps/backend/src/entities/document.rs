@@ -1,3 +1,4 @@
+use crate::entities::target_specifier::TargetSpecifier;
 use crate::sea_orm_entities;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
@@ -35,7 +36,7 @@ pub struct DocumentCreate {
     pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
-    pub required_one_of_scopes: Vec<String>,
+    pub targets: Vec<TargetSpecifier>,
 }
 
 impl DocumentCreate {
@@ -62,7 +63,7 @@ impl DocumentCreate {
             title: Set(self.title),
             format: Set(format),
             category: Set(self.category),
-            required_one_of_scopes: Set(self.required_one_of_scopes),
+            targets: Set(self.targets.iter().map(|t| t.into()).collect()),
         };
 
         match self.format {
@@ -166,7 +167,7 @@ pub struct DocumentUpdate {
     #[serde(default)]
     pub format: Option<DocumentFormat>,
     #[serde(default)]
-    pub required_one_of_scopes: Option<Vec<String>>,
+    pub targets: Option<Vec<TargetSpecifier>>,
 }
 
 impl DocumentUpdate {
@@ -195,9 +196,9 @@ impl DocumentUpdate {
             None => NotSet,
             Some(category) => Set(category),
         };
-        let required_one_of_scopes = match self.required_one_of_scopes {
+        let targets = match self.targets {
             None => NotSet,
-            Some(required_one_of_scopes) => Set(required_one_of_scopes),
+            Some(targets) => Set(targets.iter().map(|t| t.into()).collect()),
         };
 
         let generic = sea_orm_entities::document::ActiveModel {
@@ -209,7 +210,7 @@ impl DocumentUpdate {
             title,
             format,
             category,
-            required_one_of_scopes,
+            targets,
         };
 
         match self.format {
@@ -290,7 +291,7 @@ pub struct DocumentRead {
     pub category: Option<Uuid>,
     #[serde(flatten)]
     pub format: DocumentFormat,
-    pub required_one_of_scopes: Vec<String>,
+    pub targets: Vec<TargetSpecifier>,
 }
 
 impl DocumentRead {
@@ -309,7 +310,11 @@ impl DocumentRead {
             format: DocumentFormat::FormatMarkdown {
                 content: markdown.content,
             },
-            required_one_of_scopes: generic.required_one_of_scopes,
+            targets: generic
+                .targets
+                .iter()
+                .map(|t| TargetSpecifier::from_string(t))
+                .collect(),
         }
     }
 
@@ -329,7 +334,11 @@ impl DocumentRead {
                 file_key: pdf.file_key,
                 file_name: pdf.file_name,
             },
-            required_one_of_scopes: generic.required_one_of_scopes,
+            targets: generic
+                .targets
+                .iter()
+                .map(|t| TargetSpecifier::from_string(t))
+                .collect(),
         }
     }
 
@@ -349,7 +358,11 @@ impl DocumentRead {
                 file_key: misc.file_key,
                 file_name: misc.file_name,
             },
-            required_one_of_scopes: generic.required_one_of_scopes,
+            targets: generic
+                .targets
+                .iter()
+                .map(|t| TargetSpecifier::from_string(t))
+                .collect(),
         }
     }
 
@@ -403,22 +416,6 @@ impl DocumentRead {
         for model in models {
             documents.push(DocumentRead::from(model, db_conn).await?)
         }
-        Ok(documents)
-    }
-
-    pub async fn find_from_required_one_of_scopes(
-        scope: &String,
-        db_conn: &DbConn,
-    ) -> Result<Vec<Self>> {
-        let all_documents = Self::get_all(db_conn).await?;
-        let mut documents = vec![];
-
-        for document in all_documents {
-            if document.required_one_of_scopes.contains(scope) {
-                documents.push(document);
-            }
-        }
-
         Ok(documents)
     }
 }
