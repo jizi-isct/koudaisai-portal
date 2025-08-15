@@ -166,15 +166,19 @@ async fn get_notifications(
             let mut notifications = vec![];
             // ユーザーがアクセス可能な通知を取得
             for notification in NotificationRead::get_all(&state.db_conn).await? {
+                let mut matches = false;
                 for target_specifier in &notification.target {
-                    if !target_specifier
+                    if target_specifier
                         .does_user_match(Some(&user), &state.db_conn)
                         .await?
                     {
-                        continue;
+                        matches = true;
+                        break; // 1つでもマッチすればOK
                     }
                 }
-                notifications.push(notification)
+                if matches {
+                    notifications.push(notification);
+                }
             }
 
             // ユーザーが既読かどうかを確認
