@@ -21,7 +21,7 @@ const authMiddlewareMembers: Middleware = {
   },
 }
 
-const authMiddlewareAdmin: Middleware = {
+export const authMiddlewareAdmin: Middleware = {
   async onRequest({request}) {
     const tokens = await getTokensAdmin();
 
