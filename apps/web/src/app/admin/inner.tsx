@@ -8,6 +8,7 @@ import {
   BookOutlined,
   FormOutlined,
   HomeOutlined,
+  InfoOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
@@ -25,6 +26,7 @@ type Props = {
 
 export function Inner({children}: Props) {
   const [tokens, setTokens] = useState<Tokens | null | undefined>();
+  const router = useRouter()
   useEffect(() => {
     (async () => {
       const tokens = await getTokensAdmin()
@@ -34,13 +36,12 @@ export function Inner({children}: Props) {
         router.push(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login")
       }
     })()
-  }, [])
+  }, [router, tokens])
 
   const width = useWindowWidth() ?? 10000;
   const [collapsed, setCollapsed] = useState(width < 768);
 
 
-  const router = useRouter()
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
@@ -50,6 +51,17 @@ export function Inner({children}: Props) {
   return (
     <Layout style={{minHeight: '100vh', width: '100vw'}}>
       <Sider collapsible collapsed={collapsed} style={{margin: 0, padding: 0}}>
+        <a href={"/admin"} style={{color: "white", padding: 10}}>
+          <Flex align={"center"} gap={10} justify={"center"}>
+            <Image
+              src="/components/generic/Header/admin_logo.jpg"
+              alt="Koudaisai Portal Admin Site Logo"
+              width={32}
+              height={32}
+            />
+            {<span>工大祭管理サイト</span>}
+          </Flex>
+        </a>
         <Menu
           theme="dark"
           mode="inline"
@@ -57,44 +69,66 @@ export function Inner({children}: Props) {
           style={{position: "sticky", top: 0}}
           items={[
             {
-              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/",
-              icon: <HomeOutlined/>,
-              label: 'ホーム',
-              onClick: async () => {
-                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/")
-              }
+              type: "group",
+              label: "工大祭ポータル",
+              key: "koudaisai-portal",
+              children: [
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/",
+                  icon: <HomeOutlined/>,
+                  label: 'ホーム',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/")
+                  }
+                },
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/",
+                  icon: <FormOutlined/>,
+                  label: 'フォーム',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/")
+                  }
+                },
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/",
+                  icon: <BookOutlined/>,
+                  label: '資料',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/")
+                  }
+                },
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/",
+                  icon: <BellOutlined/>,
+                  label: '通知',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/")
+                  }
+                },
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/",
+                  icon: <BellOutlined/>,
+                  label: '承認申請',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/")
+                  }
+                },
+              ]
             },
             {
-              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/",
-              icon: <FormOutlined/>,
-              label: 'フォーム',
-              onClick: async () => {
-                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/forms/")
-              }
-            },
-            {
-              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/",
-              icon: <BookOutlined/>,
-              label: '資料',
-              onClick: async () => {
-                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/documents/")
-              }
-            },
-            {
-              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/",
-              icon: <BellOutlined/>,
-              label: '通知',
-              onClick: async () => {
-                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/")
-              }
-            },
-            {
-              key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/",
-              icon: <BellOutlined/>,
-              label: '承認申請',
-              onClick: async () => {
-                await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/")
-              }
+              type: "group",
+              label: "その他",
+              key: "others",
+              children: [
+                {
+                  key: process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/plans_info/",
+                  icon: <InfoOutlined/>,
+                  label: '参加団体情報',
+                  onClick: async () => {
+                    await router.push(process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/plans_info/")
+                  }
+                },
+              ]
             },
           ]}
         />
@@ -112,17 +146,6 @@ export function Inner({children}: Props) {
                 height: 64,
               }}
             />
-            <a href={"/admin"} style={{color: "black"}}>
-              <Flex align={"center"} gap={10} justify={"center"}>
-                <Image
-                  src="/components/generic/Header/admin_logo.jpg"
-                  alt="Koudaisai Portal Admin Site Logo"
-                  width={32}
-                  height={32}
-                />
-                {<span>工大祭ポータル管理サイト</span>}
-              </Flex>
-            </a>
           </Flex>
         </Header>
         <Content
