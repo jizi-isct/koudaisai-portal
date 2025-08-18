@@ -5,11 +5,12 @@ mod files;
 mod forms;
 mod groups;
 mod notifications;
+mod plans_info;
 mod users;
 mod util;
 
 use crate::routes::AppState;
-use axum::Router;
+use axum::{Router, ServiceExt};
 use std::sync::Arc;
 use tracing::instrument;
 
@@ -28,4 +29,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .nest("/v2/util", util::init_router())
         .nest("/v2/approval-requests", approval_requests::init_router())
         .nest("/v2/groups", groups::init_router())
+        .nest_service("/plans_info", plans_info::init_service())
 }
