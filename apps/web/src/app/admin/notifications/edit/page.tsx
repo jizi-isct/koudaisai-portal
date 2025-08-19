@@ -84,7 +84,7 @@ function Inner({notificationId}: { notificationId: string }) {
     </Result>
   }
 
-  const handleSubmit = async ({title, target}: { title: string | undefined, target: string[][] | undefined }) => {
+  const handleSubmit = async ({title, target, markdown}: { title: string | undefined, target: string[][] | undefined, markdown: string | undefined }) => {
     setSubmitting(true)
     await mutateNotificationUpdate({
         params: {
@@ -94,7 +94,10 @@ function Inner({notificationId}: { notificationId: string }) {
         },
         body: {
           title: title,
-          target: target?.map((t) => t.join("/"))
+          target: target?.map((t) => t.join("/")),
+          type_markdown: {
+            content: markdown
+          }
         }
       }
     )
