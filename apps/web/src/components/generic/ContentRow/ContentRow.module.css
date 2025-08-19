@@ -2,24 +2,18 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-
     height: 2.5em;
-
-    padding: 0 0.5em;
-
+    padding: 0 20px;
     align-content: center;
-
     cursor: pointer;
+    gap: 20px;
+    font-size: 15px;
 }
 
 .date {
-
+    font-weight: 300;
 }
 
 .title {
     flex-grow: 100;
-}
-
-.author {
-
 }

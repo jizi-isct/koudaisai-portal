@@ -26,7 +26,8 @@ export function ContentRowNotification({notification}: ContentRowNotificationPro
         content={
           {
             title: notification.title,
-            date: new Date(notification.created_at).toLocaleString('ja-JP'),
+            date: new Date(notification.created_at)
+            .toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.'),
             onClick: () => {
               setIsModalOpen(true)
             }
