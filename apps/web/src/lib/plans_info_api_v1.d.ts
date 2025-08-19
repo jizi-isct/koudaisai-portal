@@ -4,744 +4,783 @@
  */
 
 export interface paths {
-  "/plans": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * 全ての企画情報を取得
-     * @description 工大祭の全ての企画情報を取得します。
-     */
-    get: {
-      parameters: {
-        query?: {
-          /** @description 企画タイプでフィルタリング */
-          type?: "booth" | "general" | "stage" | "labo";
-          /** @description おすすめ企画でフィルタリング */
-          recommended?: boolean;
-          /** @description 子供向け企画でフィルタリング */
-          child_friendly?: boolean;
-          /** @description 研究室ツアー参加企画でフィルタリング */
-          lab_tour?: boolean;
+    "/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description 企画情報のリスト */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              plans?: (components["schemas"]["BoothPlanRead"] | components["schemas"]["GeneralPlanRead"] | components["schemas"]["StagePlanRead"] | components["schemas"]["LaboPlanRead"])[];
+        /**
+         * 全ての企画情報を取得
+         * @description 工大祭の全ての企画情報を取得します。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 企画タイプでフィルタリング */
+                    type?: "booth" | "general" | "stage" | "labo";
+                    /** @description おすすめ企画でフィルタリング */
+                    recommended?: boolean;
+                    /** @description 子供向け企画でフィルタリング */
+                    child_friendly?: boolean;
+                    /** @description 研究室ツアー参加企画でフィルタリング */
+                    lab_tour?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
             };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/plans/{planId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * 特定の企画情報を取得
-     * @description 指定されたIDの企画情報を取得します。
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description 企画情報 */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["BoothPlanRead"] | components["schemas"]["GeneralPlanRead"] | components["schemas"]["StagePlanRead"] | components["schemas"]["LaboPlanRead"];
-          };
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    /**
-     * 新しい企画を作成
-     * @description 指定されたIDで新しい企画を作成します。すでに同じIDの企画が存在する場合はconflictエラーを返します。
-     */
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["BoothPlanCreate"] | components["schemas"]["GeneralPlanCreate"] | components["schemas"]["StagePlanCreate"] | components["schemas"]["LaboPlanCreate"];
-        };
-      };
-      responses: {
-        /** @description 企画が正常に作成されました */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description リクエストが無効です */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-        /** @description 指定されたIDの企画が既に存在します */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    post?: never;
-    /**
-     * 企画を削除
-     * @description 指定されたIDの企画を削除します。
-     */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description 企画が正常に削除されました */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    /**
-     * 企画情報を更新
-     * @description 指定されたIDの企画情報を更新します。企画が存在しない場合は404エラーを返します。
-     */
-    patch: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["BoothPlanUpdate"] | components["schemas"]["GeneralPlanUpdate"] | components["schemas"]["StagePlanUpdate"] | components["schemas"]["LaboPlanUpdate"];
-        };
-      };
-      responses: {
-        /** @description 企画が正常に更新されました */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description リクエストが無効です */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    trace?: never;
-  };
-  "/plans/{planId}/details": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * 企画の詳細情報を取得
-     * @description 指定されたIDの企画の詳細情報を取得します。
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description 企画詳細情報 */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["PlanDetails"];
-          };
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    /**
-     * 企画の詳細情報を作成・更新
-     * @description 指定されたIDの企画の詳細情報を作成または完全に更新します。
-     */
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["PlanDetails"];
-        };
-      };
-      responses: {
-        /** @description 詳細情報が正常に作成・更新されました */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description リクエストが無効です */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /**
-     * 企画の詳細情報を部分更新
-     * @description 指定されたIDの企画の詳細情報を部分的に更新します。
-     */
-    patch: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["PlanDetails"];
-        };
-      };
-      responses: {
-        /** @description 詳細情報が正常に更新されました */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description リクエストが無効です */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    trace?: never;
-  };
-  "/plans/{planId}/icon": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * 企画のアイコンダウンロードURLを取得
-     * @description 指定されたIDの企画のアイコン画像のダウンロードURLにリダイレクトします
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description アイコンダウンロードURLへのリダイレクト */
-        302: {
-          headers: {
-            /** @description アイコン画像のダウンロードURL */
-            Location?: string;
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description 企画またはアイコンが見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/plans/{planId}/icon/upload-url": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * 企画のアイコンアップロード用URLを取得
-     * @description 指定されたIDの企画のアイコン画像をアップロードするためのURLを取得します。
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description 企画ID */
-          planId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description アップロード用URL */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              /**
-               * Format: uri
-               * @description アイコン画像をアップロードするためのURL
-               * @example https://storage.example.com/upload/icons/M-001.png?signature=abc123&expires=1234567890
-               */
-              upload_url: string;
+            requestBody?: never;
+            responses: {
+                /** @description 企画情報のリスト */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            plans?: (components["schemas"]["BoothPlanRead"] | components["schemas"]["GeneralPlanRead"] | components["schemas"]["StagePlanRead"] | components["schemas"]["LaboPlanRead"])[];
+                        };
+                    };
+                };
             };
-          };
         };
-        /** @description 企画が見つかりません */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Error"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/plans/{planId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 特定の企画情報を取得
+         * @description 指定されたIDの企画情報を取得します。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 企画情報 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BoothPlanRead"] | components["schemas"]["GeneralPlanRead"] | components["schemas"]["StagePlanRead"] | components["schemas"]["LaboPlanRead"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /**
+         * 新しい企画を作成
+         * @description 指定されたIDで新しい企画を作成します。すでに同じIDの企画が存在する場合はconflictエラーを返します。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BoothPlanCreate"] | components["schemas"]["GeneralPlanCreate"] | components["schemas"]["StagePlanCreate"] | components["schemas"]["LaboPlanCreate"];
+                };
+            };
+            responses: {
+                /** @description 企画が正常に作成されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description 指定されたIDの企画が既に存在します */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * 企画を削除
+         * @description 指定されたIDの企画を削除します。
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 企画が正常に削除されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * 企画情報を更新
+         * @description 指定されたIDの企画情報を更新します。企画が存在しない場合は404エラーを返します。
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BoothPlanUpdate"] | components["schemas"]["GeneralPlanUpdate"] | components["schemas"]["StagePlanUpdate"] | components["schemas"]["LaboPlanUpdate"];
+                };
+            };
+            responses: {
+                /** @description 企画が正常に更新されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/plans/{planId}/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 企画の詳細情報を取得
+         * @description 指定されたIDの企画の詳細情報を取得します。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 企画詳細情報 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlanDetails"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /**
+         * 企画の詳細情報を作成・更新
+         * @description 指定されたIDの企画の詳細情報を作成または完全に更新します。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlanDetails"];
+                };
+            };
+            responses: {
+                /** @description 詳細情報が正常に作成・更新されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 企画の詳細情報を部分更新
+         * @description 指定されたIDの企画の詳細情報を部分的に更新します。
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlanDetails"];
+                };
+            };
+            responses: {
+                /** @description 詳細情報が正常に更新されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/plans/{planId}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 企画のアイコンダウンロードURLを取得
+         * @description 指定されたIDの企画のアイコン画像のダウンロードURLにリダイレクトします
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description アイコンダウンロードURLへのリダイレクト */
+                302: {
+                    headers: {
+                        /** @description アイコン画像のダウンロードURL */
+                        Location?: string;
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 企画またはアイコンが見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plans/{planId}/icon/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 企画のアイコンアップロード用URLを取得
+         * @description 指定されたIDの企画のアイコン画像をアップロードするためのURLを取得します。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description アップロード用URL */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * Format: uri
+                             * @description アイコン画像をアップロードするためのURL
+                             * @example https://storage.example.com/upload/icons/M-001.png?signature=abc123&expires=1234567890
+                             */
+                            upload_url: string;
+                        };
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-
 export type webhooks = Record<string, never>;
-
 export interface components {
-  schemas: {
-    IndoorLocation: {
-      /**
-       * @description 企画実施場所が屋内であることを示す
-       * @enum {string}
-       */
-      type: "indoor";
-      /** @description 建物名 */
-      building: string;
-      /** @description 部屋名 */
-      room: string;
+    schemas: {
+        IndoorLocation: {
+            /**
+             * @description 企画実施場所が屋内であることを示す
+             * @enum {string}
+             */
+            type: "indoor";
+            /** @description 建物名 */
+            building: string;
+            /** @description 部屋名 */
+            room: string;
+        };
+        OutdoorLocation: {
+            /**
+             * @description 企画実施場所が屋外であることを示す
+             * @enum {string}
+             */
+            type: "outdoor";
+            /** @description 企画実施場所の名称 */
+            name: string;
+        };
+        BasePlanRead: {
+            /** @description 企画の一意識別子 */
+            id: string;
+            /** @description 企画のタイプ */
+            type: string;
+            /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
+            organization_name: string;
+            /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
+            plan_name: string;
+            /** @description 企画内容紹介文 */
+            description: string;
+            /** @description 子供向け企画か否か */
+            is_child_friendly: boolean;
+            /** @description おすすめ企画か否か */
+            is_recommended: boolean;
+            /** @description 企画のスケジュール */
+            schedule: {
+                day1?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 10:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 17:00
+                     */
+                    end_time: string;
+                } | null;
+                day2?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 11:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 16:00
+                     */
+                    end_time: string;
+                } | null;
+            };
+            /** @description 企画実施場所一覧 */
+            location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+        };
+        BasePlanCreate: {
+            /** @description 企画のタイプ */
+            type: string;
+            /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
+            organization_name: string;
+            /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
+            plan_name: string;
+            /** @description 企画内容紹介文 */
+            description: string;
+            /** @description 子供向け企画か否か */
+            is_child_friendly: boolean;
+            /** @description おすすめ企画か否か */
+            is_recommended: boolean;
+            /** @description 企画のスケジュール */
+            schedule: {
+                day1?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 10:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 17:00
+                     */
+                    end_time: string;
+                } | null;
+                day2?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 11:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 16:00
+                     */
+                    end_time: string;
+                } | null;
+            };
+            /** @description 企画実施場所一覧 */
+            location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+        };
+        BasePlanUpdate: {
+            /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
+            organization_name?: string;
+            /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
+            plan_name?: string;
+            /** @description 企画内容紹介文 */
+            description?: string;
+            /** @description 子供向け企画か否か */
+            is_child_friendly?: boolean;
+            /** @description おすすめ企画か否か */
+            is_recommended?: boolean;
+            /** @description 企画のスケジュール */
+            schedule?: {
+                day1?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 10:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 17:00
+                     */
+                    end_time: string;
+                } | null;
+                day2?: {
+                    /**
+                     * @description 企画開始時間（HH:mm形式）
+                     * @example 11:00
+                     */
+                    start_time: string;
+                    /**
+                     * @description 企画終了時間（HH:mm形式）
+                     * @example 16:00
+                     */
+                    end_time: string;
+                } | null;
+            };
+            /** @description 企画実施場所一覧 */
+            location?: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+        };
+        PlanDetails: {
+            /** @description 当日販売される商品の一覧 */
+            products?: {
+                /** @description 商品名 */
+                name?: string;
+                /** @description 価格 */
+                price?: number;
+                /** @description 商品説明 */
+                description?: string;
+                /**
+                 * @description 販売状況
+                 * @enum {string}
+                 */
+                availability?: "available" | "limited" | "sold_out";
+            }[];
+            /** @description 追加情報（マークダウン形式） */
+            additional_info?: string;
+        };
+        BoothPlanRead: components["schemas"]["BasePlanRead"] & {
+            /** @description 模擬店企画ID（M-000形式） */
+            id?: string;
+            /** @enum {string} */
+            type: "booth";
+        };
+        BoothPlanCreate: components["schemas"]["BasePlanCreate"] & {
+            /** @enum {string} */
+            type: "booth";
+        };
+        BoothPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
+        /** @example {
+         *       "id": "I-001",
+         *       "type": "general",
+         *       "organization_name": "ゲーム制作サークル",
+         *       "plan_name": "オリジナルゲーム体験会",
+         *       "description": "サークルメンバーが制作したオリジナルゲームを体験できます。",
+         *       "is_child_friendly": true,
+         *       "is_recommended": true,
+         *       "schedule": {
+         *         "day1": {
+         *           "start_time": "10:00",
+         *           "end_time": "17:00"
+         *         }
+         *       },
+         *       "location": [
+         *         {
+         *           "type": "indoor",
+         *           "building": "第二校舎",
+         *           "room": "2F 201教室"
+         *         }
+         *       ]
+         *     } */
+        GeneralPlanRead: components["schemas"]["BasePlanRead"] & {
+            /** @description 一般企画ID（I-000形式） */
+            id?: string;
+            /** @enum {string} */
+            type: "general";
+        };
+        GeneralPlanCreate: components["schemas"]["BasePlanCreate"] & {
+            /** @enum {string} */
+            type: "general";
+        };
+        GeneralPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
+        /** @example {
+         *       "id": "S-001",
+         *       "type": "stage",
+         *       "organization_name": "軽音楽部",
+         *       "plan_name": "アコースティックライブ",
+         *       "description": "人気曲のカバーと部員によるオリジナル曲の演奏をお届けします。",
+         *       "is_child_friendly": true,
+         *       "is_recommended": true,
+         *       "schedule": {
+         *         "day1": {
+         *           "start_time": "13:00",
+         *           "end_time": "14:00"
+         *         }
+         *       },
+         *       "location": [
+         *         {
+         *           "type": "outdoor",
+         *           "name": "中央ステージ"
+         *         }
+         *       ]
+         *     } */
+        StagePlanRead: components["schemas"]["BasePlanRead"] & {
+            /** @description ステージ企画ID（S-000形式） */
+            id?: string;
+            /** @enum {string} */
+            type: "stage";
+        };
+        StagePlanCreate: components["schemas"]["BasePlanCreate"] & {
+            /** @enum {string} */
+            type: "stage";
+        };
+        StagePlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
+        /** @example {
+         *       "id": "L-001",
+         *       "type": "labo",
+         *       "organization_name": "ロボット工学研究室",
+         *       "plan_name": "ロボットプログラミング体験",
+         *       "description": "最新のロボット技術を体験し、簡単なプログラミングを学べます。",
+         *       "is_child_friendly": true,
+         *       "is_recommended": true,
+         *       "is_lab_tour": true,
+         *       "schedule": {
+         *         "day1": {
+         *           "start_time": "10:00",
+         *           "end_time": "16:00"
+         *         }
+         *       },
+         *       "location": [
+         *         {
+         *           "type": "indoor",
+         *           "building": "工学部棟",
+         *           "room": "3F 305研究室"
+         *         }
+         *       ]
+         *     } */
+        LaboPlanRead: components["schemas"]["BasePlanRead"] & {
+            /** @description 研究室企画ID（L-000形式） */
+            id?: string;
+            /** @enum {string} */
+            type: "labo";
+            /** @description 研究室ツアー参加企画か否か */
+            is_lab_tour: boolean;
+        };
+        LaboPlanCreate: components["schemas"]["BasePlanCreate"] & {
+            /** @enum {string} */
+            type: "labo";
+            /** @description 研究室ツアー参加企画か否か */
+            is_lab_tour: boolean;
+        };
+        LaboPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
+            /** @description 研究室ツアー参加企画か否か */
+            is_lab_tour?: boolean;
+        };
+        Error: {
+            /** Format: int32 */
+            code: number;
+            message: string;
+        };
     };
-    OutdoorLocation: {
-      /**
-       * @description 企画実施場所が屋外であることを示す
-       * @enum {string}
-       */
-      type: "outdoor";
-      /** @description 企画実施場所の名称 */
-      name: string;
-    };
-    BasePlanRead: {
-      /** @description 企画の一意識別子 */
-      id: string;
-      /** @description 企画のタイプ */
-      type: string;
-      /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
-      organization_name: string;
-      /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
-      plan_name: string;
-      /** @description 企画内容紹介文 */
-      description: string;
-      /** @description 子供向け企画か否か */
-      is_child_friendly: boolean;
-      /** @description おすすめ企画か否か */
-      is_recommended: boolean;
-      /** @description 企画のスケジュール一覧 */
-      schedule: {
-        /**
-         * Format: date-time
-         * @description 企画開始時間
-         */
-        start_time?: string;
-        /**
-         * Format: date-time
-         * @description 企画終了時間
-         */
-        end_time?: string;
-      }[];
-      /** @description 企画実施場所一覧 */
-      location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
-    };
-    BasePlanCreate: {
-      /** @description 企画のタイプ */
-      type: string;
-      /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
-      organization_name: string;
-      /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
-      plan_name: string;
-      /** @description 企画内容紹介文 */
-      description: string;
-      /** @description 子供向け企画か否か */
-      is_child_friendly: boolean;
-      /** @description おすすめ企画か否か */
-      is_recommended: boolean;
-      /** @description 企画のスケジュール一覧 */
-      schedule: {
-        /**
-         * Format: date-time
-         * @description 企画開始時間
-         */
-        start_time?: string;
-        /**
-         * Format: date-time
-         * @description 企画終了時間
-         */
-        end_time?: string;
-      }[];
-      /** @description 企画実施場所一覧 */
-      location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
-    };
-    BasePlanUpdate: {
-      /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
-      organization_name?: string;
-      /** @description 企画名（企画内容申請時のものを掲載、変更原則なし） */
-      plan_name?: string;
-      /** @description 企画内容紹介文 */
-      description?: string;
-      /** @description 子供向け企画か否か */
-      is_child_friendly?: boolean;
-      /** @description おすすめ企画か否か */
-      is_recommended?: boolean;
-      /** @description 企画のスケジュール一覧 */
-      schedule?: {
-        /**
-         * Format: date-time
-         * @description 企画開始時間
-         */
-        start_time?: string;
-        /**
-         * Format: date-time
-         * @description 企画終了時間
-         */
-        end_time?: string;
-      }[];
-      /** @description 企画実施場所一覧 */
-      location?: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
-    };
-    PlanDetails: {
-      /** @description 当日販売される商品の一覧 */
-      products?: {
-        /** @description 商品名 */
-        name?: string;
-        /** @description 価格 */
-        price?: number;
-        /** @description 商品説明 */
-        description?: string;
-        /**
-         * @description 販売状況
-         * @enum {string}
-         */
-        availability?: "available" | "limited" | "sold_out";
-      }[];
-      /** @description 追加情報（マークダウン形式） */
-      additional_info?: string;
-    };
-    BoothPlanRead: components["schemas"]["BasePlanRead"] & {
-      /** @description 模擬店企画ID（M-000形式） */
-      id?: string;
-      /** @enum {string} */
-      type: "booth";
-    };
-    BoothPlanCreate: components["schemas"]["BasePlanCreate"] & {
-      /** @enum {string} */
-      type: "booth";
-    };
-    BoothPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-    /** @example {
-     *       "id": "I-001",
-     *       "type": "general",
-     *       "organization_name": "ゲーム制作サークル",
-     *       "plan_name": "オリジナルゲーム体験会",
-     *       "description": "サークルメンバーが制作したオリジナルゲームを体験できます。",
-     *       "is_child_friendly": true,
-     *       "is_recommended": true,
-     *       "schedule": [
-     *         {
-     *           "start_time": "2025-10-25T10:00:00+09:00",
-     *           "end_time": "2025-10-25T17:00:00+09:00"
-     *         }
-     *       ],
-     *       "location": [
-     *         {
-     *           "type": "indoor",
-     *           "building": "第二校舎",
-     *           "room": "2F 201教室"
-     *         }
-     *       ]
-     *     } */
-    GeneralPlanRead: components["schemas"]["BasePlanRead"] & {
-      /** @description 一般企画ID（I-000形式） */
-      id?: string;
-      /** @enum {string} */
-      type: "general";
-    };
-    GeneralPlanCreate: components["schemas"]["BasePlanCreate"] & {
-      /** @enum {string} */
-      type: "general";
-    };
-    GeneralPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-    /** @example {
-     *       "id": "S-001",
-     *       "type": "stage",
-     *       "organization_name": "軽音楽部",
-     *       "plan_name": "アコースティックライブ",
-     *       "description": "人気曲のカバーと部員によるオリジナル曲の演奏をお届けします。",
-     *       "is_child_friendly": true,
-     *       "is_recommended": true,
-     *       "schedule": [
-     *         {
-     *           "start_time": "2025-10-25T13:00:00+09:00",
-     *           "end_time": "2025-10-25T14:00:00+09:00"
-     *         }
-     *       ],
-     *       "location": [
-     *         {
-     *           "type": "outdoor",
-     *           "name": "中央ステージ"
-     *         }
-     *       ]
-     *     } */
-    StagePlanRead: components["schemas"]["BasePlanRead"] & {
-      /** @description ステージ企画ID（S-000形式） */
-      id?: string;
-      /** @enum {string} */
-      type: "stage";
-    };
-    StagePlanCreate: components["schemas"]["BasePlanCreate"] & {
-      /** @enum {string} */
-      type: "stage";
-    };
-    StagePlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-    /** @example {
-     *       "id": "L-001",
-     *       "type": "labo",
-     *       "organization_name": "ロボット工学研究室",
-     *       "plan_name": "ロボットプログラミング体験",
-     *       "description": "最新のロボット技術を体験し、簡単なプログラミングを学べます。",
-     *       "is_child_friendly": true,
-     *       "is_recommended": true,
-     *       "is_lab_tour": true,
-     *       "schedule": [
-     *         {
-     *           "start_time": "2025-10-25T10:00:00+09:00",
-     *           "end_time": "2025-10-25T16:00:00+09:00"
-     *         }
-     *       ],
-     *       "location": [
-     *         {
-     *           "type": "indoor",
-     *           "building": "工学部棟",
-     *           "room": "3F 305研究室"
-     *         }
-     *       ]
-     *     } */
-    LaboPlanRead: components["schemas"]["BasePlanRead"] & {
-      /** @description 研究室企画ID（L-000形式） */
-      id?: string;
-      /** @enum {string} */
-      type: "labo";
-      /** @description 研究室ツアー参加企画か否か */
-      is_lab_tour: boolean;
-    };
-    LaboPlanCreate: components["schemas"]["BasePlanCreate"] & {
-      /** @enum {string} */
-      type: "labo";
-      /** @description 研究室ツアー参加企画か否か */
-      is_lab_tour: boolean;
-    };
-    LaboPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
-      /** @description 研究室ツアー参加企画か否か */
-      is_lab_tour?: boolean;
-    };
-    Error: {
-      /** Format: int32 */
-      code: number;
-      message: string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

@@ -36,7 +36,7 @@ export function Inner({children}: Props) {
         router.push(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login")
       }
     })()
-  }, [router, tokens])
+  }, [router])
 
   const width = useWindowWidth() ?? 10000;
   const [collapsed, setCollapsed] = useState(width < 768);
