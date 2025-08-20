@@ -1,6 +1,6 @@
 use axum::response::{IntoResponse, Response};
 use chrono::Duration;
-use http::StatusCode;
+use http::{HeaderName, StatusCode};
 use sea_orm::sqlx::Value;
 use sea_orm::{ActiveValue, DbErr};
 use tracing::warn;
@@ -66,4 +66,19 @@ pub fn format_secs_ja_full(duration: i64) -> String {
     parts.push(format!("{}秒", seconds));
 
     parts.join("")
+}
+
+/// 与えられたヘッダー名がhop by hopヘッダーであるかどうか
+pub fn is_hop_by_hop(name: &HeaderName) -> bool {
+    matches!(
+        name.as_str().to_ascii_lowercase().as_str(),
+        "connection"
+            | "keep-alive"
+            | "proxy-authenticate"
+            | "proxy-authorization"
+            | "te"
+            | "trailers"
+            | "transfer-encoding"
+            | "upgrade"
+    )
 }
