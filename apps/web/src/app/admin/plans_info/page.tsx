@@ -2,7 +2,7 @@
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
 import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tag, Tooltip, Upload} from "antd";
-import {DeleteOutlined, DownloadOutlined, PlusOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined, UploadOutlined} from "@ant-design/icons";
 import {$plansInfoApi} from "@/lib/plansInfoApi";
 import {
   BasePlanRead,
@@ -598,9 +598,9 @@ function Inner() {
       rowScope: "row",
       render: (_value, record, _index) => {
         if (record.is_child_friendly) {
-          return <Tooltip title={"true"}><Checkbox value={true} disabled={true}/></Tooltip>
+          return <Tooltip title={"true"}><Checkbox checked={true} disabled={true}/></Tooltip>
         } else {
-          return <Tooltip title={"false"}><Checkbox value={false} disabled={true}/></Tooltip>
+          return <Tooltip title={"false"}><Checkbox checked={false} disabled={true}/></Tooltip>
         }
       }
     },
@@ -611,9 +611,9 @@ function Inner() {
       rowScope: "row",
       render: (_value, record, _index) => {
         if (record.is_recommended) {
-          return <Tooltip title={"true"}><Checkbox value={true} disabled={true}/></Tooltip>
+          return <Tooltip title={"true"}><Checkbox checked={true} disabled={true}/></Tooltip>
         } else {
-          return <Tooltip title={"false"}><Checkbox value={false} disabled={true}/></Tooltip>
+          return <Tooltip title={"false"}><Checkbox checked={false} disabled={true}/></Tooltip>
         }
       }
     },
@@ -647,9 +647,6 @@ function Inner() {
     <>
       {contextHolder}
       <Heading1 emoji={"💁"}>企画情報</Heading1>
-      <Flex gap={8} align={"center"} wrap={"wrap"} style={{marginBottom: "16px"}}>
-        <Button icon={<PlusOutlined/>}>新規追加</Button>
-      </Flex>
       <Flex gap={8} align={"center"} wrap={"wrap"} style={{marginBottom: "16px"}}>
         <Upload
           maxCount={1}
