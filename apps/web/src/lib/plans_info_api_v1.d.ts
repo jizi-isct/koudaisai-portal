@@ -381,8 +381,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 企画のアイコンダウンロードURLを取得
-         * @description 指定されたIDの企画のアイコン画像のダウンロードURLにリダイレクトします
+         * 企画のアイコンを取得
+         * @description 指定されたIDの企画のアイコン画像を直接ダウンロードします
          */
         get: {
             parameters: {
@@ -396,14 +396,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description アイコンダウンロードURLへのリダイレクト */
-                302: {
+                /** @description アイコン画像ファイル */
+                200: {
                     headers: {
-                        /** @description アイコン画像のダウンロードURL */
-                        Location?: string;
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "image/png": string;
+                        "image/jpeg": string;
+                        "image/gif": string;
+                        "image/webp": string;
+                    };
                 };
                 /** @description 企画またはアイコンが見つかりません */
                 404: {
@@ -416,26 +419,11 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/plans/{planId}/icon/upload-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         /**
-         * 企画のアイコンアップロード用URLを取得
-         * @description 指定されたIDの企画のアイコン画像をアップロードするためのURLを取得します。
+         * 企画のアイコンをアップロード
+         * @description 指定されたIDの企画のアイコン画像をアップロードします．アップロード時にアイコン画像が最適化されます．
          */
-        get: {
+        put: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -445,26 +433,24 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/gif": string;
+                    "image/webp": string;
+                };
+            };
             responses: {
-                /** @description アップロード用URL */
-                200: {
+                /** @description アイコンが正常にアップロードされました */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /**
-                             * Format: uri
-                             * @description アイコン画像をアップロードするためのURL
-                             * @example https://storage.example.com/upload/icons/M-001.png?signature=abc123&expires=1234567890
-                             */
-                            upload_url: string;
-                        };
-                    };
+                    content?: never;
                 };
-                /** @description 企画が見つかりません */
-                404: {
+                /** @description 画像最適化に失敗しました */
+                502: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -474,7 +460,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
         post?: never;
         delete?: never;
         options?: never;

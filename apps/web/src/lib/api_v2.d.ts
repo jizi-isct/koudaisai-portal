@@ -1987,53 +1987,7 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        /** 承認申請を更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateApprovalRequest"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/approval-requests/{id}/approve": {
@@ -2772,12 +2726,9 @@ export interface components {
             /** @description 企画内容説明文 */
             description?: string;
             /** @description 子供向け企画か否か */
-            is_child_friendly?: string;
-            /**
-             * Format: binary
-             * @description 企画アイコン．正方形の画像である必要があります．
-             */
-            icon?: string;
+            is_child_friendly?: boolean;
+            /** @description 企画アイコンのキー． */
+            icon_key?: string;
         };
         /** @description Type of the approval request */
         ApprovalRequestType: {
@@ -2835,16 +2786,6 @@ export interface components {
         NotificationUpdate: (components["schemas"]["NotificationUpdateGeneric"] & {
             type_markdown: components["schemas"]["NotificationUpdateTypeMarkdown"];
         }) | components["schemas"]["NotificationUpdateGeneric"];
-        /** @description Request to update an approval request */
-        UpdateApprovalRequest: {
-            status?: components["schemas"]["ApprovalRequestStatus"];
-            /**
-             * Format: uuid
-             * @description ID of the user who approved or rejected the request
-             */
-            approved_by?: string | null;
-            type?: components["schemas"]["ApprovalRequestType"];
-        };
     };
     responses: never;
     parameters: never;

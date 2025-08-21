@@ -2,29 +2,28 @@
 
 import {Suspense, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {$apiMembers, getTokensMembers} from "@/lib";
+import {$apiMembers, getTokensMembers, GroupRead, UserRead} from "@/lib";
 import "../../globals.css";
-
 import {Heading1, LoadingScreen} from '@/components/generic';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard";
-import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
+import {PlanCard} from "@/components/group/PlanCard";
+import {EditModal} from "@/components/group/EditModal/EditModal";
+import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
+import {BasePlanRead} from "@/lib/plansInfoTypes";
 
 export default function Page() {
   return (
     <Suspense fallback={<LoadingScreen/>}>
       <QueryClientProvider client={new QueryClient()}>
-        <Inner/>
+        <Inner1/>
       </QueryClientProvider>
     </Suspense>
   )
 }
 
-function Inner() {
-  const router = useRouter();
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+function Inner1() {
   const {data: user} = $apiMembers.useQuery("get", "/users/{user_id}", {
     params: {
       path: {
@@ -33,6 +32,14 @@ function Inner() {
     },
     suspense: true
   })
+  if (user) {
+    return <Inner2 user={user}/>
+  } else {
+    return <LoadingScreen/>
+  }
+}
+
+function Inner2({user}: { user: UserRead }) {
   const {data: group} = $apiMembers.useQuery("get", "/groups/{id}", {
     params: {
       path: {
@@ -42,6 +49,24 @@ function Inner() {
     suspense: true,
     enabled: !!user
   })
+  if (group) {
+    return <Inner3 user={user} group={group}/>
+  } else {
+    return <LoadingScreen/>
+  }
+}
+
+function Inner3({user, group}: { user: UserRead, group: GroupRead }) {
+  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const {data: plan} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
+    params: {
+      path: {
+        planId: group.id
+      }
+    }
+  })
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 認証状態を確認
   useEffect(() => {
@@ -80,19 +105,22 @@ function Inner() {
           企画情報
         </Heading1>
         {
-          exhibitor &&
-                <ExhibitorCard
-                        exhibitor={exhibitor}
-                        openModal={() => setIsModalOpen(true)}
-                />
+          plan ?
+            <PlanCard
+              plan={plan as BasePlanRead}
+              openModal={() => setIsModalOpen(true)}
+            />
+            :
+            <LoadingScreen/>
         }
 
         {
-          user && exhibitor &&
-                <EditModal
-                        user={user}
+          plan && <EditModal
                         modal={isModalOpen}
                         setModal={setIsModalOpen}
+                        initPlanName={plan.plan_name}
+                        initDescription={plan.description}
+                        initIsChildFriendly={plan.is_child_friendly}
                 />
         }
       </main>

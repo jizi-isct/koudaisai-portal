@@ -29,7 +29,10 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
 
       await fetch(response.presigned_url, {
         method: "PUT",
-        body: file
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+        },
       })
 
       await callback(response.key, file.name)

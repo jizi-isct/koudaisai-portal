@@ -3,7 +3,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
 import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tag, Tooltip, Upload} from "antd";
 import {DeleteOutlined, DownloadOutlined, UploadOutlined} from "@ant-design/icons";
-import {$plansInfoApi} from "@/lib/plansInfoApi";
+import {$plansInfoApiAdmin} from "@/lib/plansInfoApi";
 import {
   BasePlanRead,
   BoothPlanCreate,
@@ -62,10 +62,10 @@ export default function Page() {
 function Inner() {
   const download = useDownload()
   const [messageApi, contextHolder] = message.useMessage();
-  const {data, isLoading, refetch} = $plansInfoApi.useQuery("get", "/plans")
-  const {mutateAsync: mutatePlanCreate} = $plansInfoApi.useMutation("put", "/plans/{planId}")
-  const {mutateAsync: mutatePlanUpdate} = $plansInfoApi.useMutation("patch", "/plans/{planId}")
-  const {mutateAsync: mutatePlanDelete} = $plansInfoApi.useMutation("delete", "/plans/{planId}")
+  const {data, isLoading, refetch} = $plansInfoApiAdmin.useQuery("get", "/plans")
+  const {mutateAsync: mutatePlanCreate} = $plansInfoApiAdmin.useMutation("put", "/plans/{planId}")
+  const {mutateAsync: mutatePlanUpdate} = $plansInfoApiAdmin.useMutation("patch", "/plans/{planId}")
+  const {mutateAsync: mutatePlanDelete} = $plansInfoApiAdmin.useMutation("delete", "/plans/{planId}")
 
   const handleDelete = (id: string) => async () => {
     await mutatePlanDelete({
