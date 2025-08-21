@@ -13,9 +13,7 @@ pub struct Model {
     pub icon_id: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
-    pub is_exhibition_name_explicit_null: bool,
-    pub is_icon_id_explicit_null: bool,
-    pub is_description_explicit_null: bool,
+    pub is_child_friendly: Option<bool>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -8,7 +8,7 @@ properties:
     type: string
     description: 企画内容説明文
   is_child_friendly:
-    type: string
+    type: boolean
     description: 子供向け企画か否か
   icon_key:
     type: string
