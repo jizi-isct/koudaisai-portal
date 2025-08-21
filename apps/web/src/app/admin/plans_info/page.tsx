@@ -18,6 +18,7 @@ import {
 import Papa from "papaparse";
 import objectHash from "object-hash";
 import {useDownload} from "@/lib";
+import Image from "next/image";
 
 type BulkCreateRow = {
   id: string;
@@ -619,6 +620,20 @@ function Inner() {
           default:
             return <Tag color={"warning"}>不明</Tag>
         }
+      }
+    },
+    {
+      key: "icon",
+      title: <Tooltip title={"icon"}>アイコン</Tooltip>,
+      dataIndex: "id",
+      rowScope: "row",
+      render: (value, record) => {
+        return <Image
+          src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${record.id}/icon`}
+          alt={"企画のアイコン"}
+          width={128}
+          height={128}
+        />
       }
     },
     {
