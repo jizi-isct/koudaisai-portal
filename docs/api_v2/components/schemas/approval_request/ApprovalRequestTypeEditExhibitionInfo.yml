@@ -1,15 +1,15 @@
 type: object
-description: Type for editing exhibition information
+description: 企画情報訂正申請
 properties:
-  exhibition_name:
+  plan_name:
     type: string
-    description: Name of the exhibition
-    nullable: true
-  icon_id:
-    type: string
-    description: ID of the exhibition icon
-    nullable: true
+    description: 企画名
   description:
     type: string
-    description: Description of the exhibition
-    nullable: true
+    description: 企画内容説明文
+  is_child_friendly:
+    type: string
+    description: 子供向け企画か否か
+  icon_key:
+    type: string
+    description: 企画アイコンのキー．

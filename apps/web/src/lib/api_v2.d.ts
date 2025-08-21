@@ -2765,14 +2765,19 @@ export interface components {
          * @enum {string}
          */
         ApprovalRequestStatus: "pending" | "approved" | "rejected";
-        /** @description Type for editing exhibition information */
+        /** @description 企画情報訂正申請 */
         ApprovalRequestTypeEditExhibitionInfo: {
-            /** @description Name of the exhibition */
-            exhibition_name?: string | null;
-            /** @description ID of the exhibition icon */
-            icon_id?: string | null;
-            /** @description Description of the exhibition */
-            description?: string | null;
+            /** @description 企画名 */
+            plan_name?: string;
+            /** @description 企画内容説明文 */
+            description?: string;
+            /** @description 子供向け企画か否か */
+            is_child_friendly?: string;
+            /**
+             * Format: binary
+             * @description 企画アイコン．正方形の画像である必要があります．
+             */
+            icon?: string;
         };
         /** @description Type of the approval request */
         ApprovalRequestType: {
