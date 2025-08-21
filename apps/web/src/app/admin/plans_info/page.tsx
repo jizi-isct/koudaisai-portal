@@ -477,7 +477,7 @@ function Inner() {
           }).then(() => {
             i2++
             messageApi.destroy(hash)
-            messageApi.error({
+            messageApi.loading({
               content: `画像のインポート中...(${i2}/${n2})`,
               key: hash,
               duration: 0
