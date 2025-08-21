@@ -9,6 +9,8 @@ import {Heading1, LoadingScreen} from '@/components/generic';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ExhibitorCard} from "@/components/exhibitor/ExhibitorCard";
+import {EditModal} from "@/components/exhibitor/EditModal/EditModal";
 
 export default function Page() {
   return (
@@ -74,25 +76,25 @@ function Inner() {
           実行委員会からのお知らせ
         </Heading1>
         <ViewNotifications client={$apiMembers}/>
-        {/*<Heading1 emoji={"📄"}>*/}
-        {/*  企画情報*/}
-        {/*</Heading1>*/}
-        {/*{*/}
-        {/*  exhibitor &&*/}
-        {/*        <ExhibitorCard*/}
-        {/*                exhibitor={exhibitor}*/}
-        {/*                openModal={() => setIsModalOpen(true)}*/}
-        {/*        />*/}
-        {/*}*/}
+        <Heading1 emoji={"📄"}>
+          企画情報
+        </Heading1>
+        {
+          exhibitor &&
+                <ExhibitorCard
+                        exhibitor={exhibitor}
+                        openModal={() => setIsModalOpen(true)}
+                />
+        }
 
-        {/*{*/}
-        {/*  user && exhibitor &&*/}
-        {/*        <EditModal*/}
-        {/*                user={user}*/}
-        {/*                modal={isModalOpen}*/}
-        {/*                setModal={setIsModalOpen}*/}
-        {/*        />*/}
-        {/*}*/}
+        {
+          user && exhibitor &&
+                <EditModal
+                        user={user}
+                        modal={isModalOpen}
+                        setModal={setIsModalOpen}
+                />
+        }
       </main>
     </>
   );
