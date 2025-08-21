@@ -561,6 +561,7 @@ function Inner() {
         building,
         location,
         is_lab_tour: "is_lab_tour" in plan ? (plan.is_lab_tour ? "true" : "false") : "false",
+        icon_url: "https://api2025.jizi.jp/v1/plans/" + plan.id + "/icon"
       }
     }) ?? []
 
