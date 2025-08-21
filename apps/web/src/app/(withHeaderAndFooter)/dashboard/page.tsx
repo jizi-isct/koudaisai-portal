@@ -40,6 +40,8 @@ function Inner1() {
 }
 
 function Inner2({user}: { user: UserRead }) {
+  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const {data: group} = $apiMembers.useQuery("get", "/groups/{id}", {
     params: {
       path: {
@@ -49,24 +51,6 @@ function Inner2({user}: { user: UserRead }) {
     suspense: true,
     enabled: !!user
   })
-  if (group) {
-    return <Inner3 user={user} group={group}/>
-  } else {
-    return <LoadingScreen/>
-  }
-}
-
-function Inner3({user, group}: { user: UserRead, group: GroupRead }) {
-  const router = useRouter();
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const {data: plan} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
-    params: {
-      path: {
-        planId: group.id
-      }
-    }
-  })
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 認証状態を確認
   useEffect(() => {
@@ -90,40 +74,58 @@ function Inner3({user, group}: { user: UserRead, group: GroupRead }) {
     return <LoadingScreen/>;
   }
 
+  if (group) {
+    return <main className="content">
+      {
+        user && group &&
+              <UserInfoCard user={user} group={group}/>
+      }
+      <Heading1 emoji={"🔔"}>
+        実行委員会からのお知らせ
+      </Heading1>
+      <ViewNotifications client={$apiMembers}/>
+      {group.type_plan && <Inner3 user={user} group={group}/>}
+    </main>
+  } else {
+    return <LoadingScreen/>
+  }
+}
+
+function Inner3({group}: { user: UserRead, group: GroupRead }) {
+  const {data: plan} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
+    params: {
+      path: {
+        planId: group.id
+      }
+    }
+  })
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
   return (
     <>
-      <main className="content">
-        {
-          user && group &&
-                <UserInfoCard user={user} group={group}/>
-        }
-        <Heading1 emoji={"🔔"}>
-          実行委員会からのお知らせ
-        </Heading1>
-        <ViewNotifications client={$apiMembers}/>
-        <Heading1 emoji={"📄"}>
-          企画情報
-        </Heading1>
-        {
-          plan ?
-            <PlanCard
-              plan={plan as BasePlanRead}
-              openModal={() => setIsModalOpen(true)}
-            />
-            :
-            <LoadingScreen/>
-        }
+      <Heading1 emoji={"📄"}>
+        企画情報
+      </Heading1>
+      {
+        plan ?
+          <PlanCard
+            plan={plan as BasePlanRead}
+            openModal={() => setIsModalOpen(true)}
+          />
+          :
+          <LoadingScreen/>
+      }
 
-        {
-          plan && <EditModal
-                        modal={isModalOpen}
-                        setModal={setIsModalOpen}
-                        initPlanName={plan.plan_name}
-                        initDescription={plan.description}
-                        initIsChildFriendly={plan.is_child_friendly}
-                />
-        }
-      </main>
+      {
+        plan && <EditModal
+                      modal={isModalOpen}
+                      setModal={setIsModalOpen}
+                      initPlanName={plan.plan_name}
+                      initDescription={plan.description}
+                      initIsChildFriendly={plan.is_child_friendly}
+              />
+      }
     </>
   );
 }
