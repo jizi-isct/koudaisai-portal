@@ -78,14 +78,14 @@ function Inner() {
     const dataSource = [];
     dataSource.push({
       key: "企画",
-      value: record.type_edit_exhibition_info.exhibition_name === undefined ? "変更なし" : record.type_edit_exhibition_info.exhibition_name
+      value: record.type_edit_exhibition_info.plan_name === undefined ? "変更なし" : record.type_edit_exhibition_info.plan_name
     })
-    if (record.type_edit_exhibition_info.icon_id) {
+    if (record.type_edit_exhibition_info.icon_key) {
       dataSource.push({
         key: "アイコン",
         value: "変更あり"
       })
-    } else if (record.type_edit_exhibition_info.icon_id === undefined) {
+    } else if (record.type_edit_exhibition_info.icon_key === undefined) {
       dataSource.push({
         key: "アイコン",
         value: "変更なし"
@@ -99,6 +99,17 @@ function Inner() {
     } else {
       dataSource.push({
         key: "説明",
+        value: "変更なし"
+      })
+    }
+    if (record.type_edit_exhibition_info.is_child_friendly) {
+      dataSource.push({
+        key: "子供向け企画か否か",
+        value: record.type_edit_exhibition_info.is_child_friendly
+      })
+    } else {
+      dataSource.push({
+        key: "子供向け企画か否か",
         value: "変更なし"
       })
     }
