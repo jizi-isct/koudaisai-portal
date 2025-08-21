@@ -230,6 +230,82 @@ export interface paths {
         };
         trace?: never;
     };
+    "/plans:bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 企画の一括作成
+         * @description 指定されたIDの企画を複数まとめて作成します。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        [key: string]: components["schemas"]["BasePlanCreate"];
+                    };
+                };
+            };
+            responses: {
+                /** @description 企画が正常に一括作成されました */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 一部の企画作成に失敗しました */
+                207: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 失敗したエントリーのエラー情報 */
+                            errors?: (components["schemas"]["Error"] & {
+                                /** @description 失敗した企画のID */
+                                plan_id: string;
+                            })[];
+                        };
+                    };
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/plans/{planId}/details": {
         parameters: {
             query?: never;
@@ -461,6 +537,75 @@ export interface paths {
             };
         };
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plans/{planId}/icon:import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * URLからアイコンをインポート
+         * @description 指定されたURLからアイコンをダウンロードして企画のアイコンとして設定します
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画の一意識別子 */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: uri
+                         * @description インポートするアイコンのURL
+                         * @example https://example.com/icon.png
+                         */
+                        url: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description アイコンが正常にインポートされました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 無効なリクエスト（URLが無効など） */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description アイコンのダウンロードまたは処理に失敗しました */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
