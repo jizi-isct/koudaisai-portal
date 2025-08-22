@@ -6,7 +6,7 @@ use axum::extract::{ConnectInfo, Query, State};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
-use http::StatusCode;
+use http::{HeaderMap, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -71,6 +71,8 @@ async fn post_files_upload(
 struct GetFilesDownloadParams {
     key: String,
     file_name: String,
+    #[serde(default)]
+    redirect: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -97,11 +99,17 @@ async fn get_files_download(
         )
         .await?;
 
-    Ok((
-        StatusCode::OK,
-        Json(GetFilesDownloadResponse {
-            presigned_url: presigned.uri().to_string(),
-        })
-        .into_response(),
-    ))
+    if params.redirect {
+        let mut header_map = HeaderMap::new();
+        header_map.insert("Location", presigned.uri().to_string().parse()?);
+        Ok((StatusCode::FOUND, header_map.into_response()))
+    } else {
+        Ok((
+            StatusCode::OK,
+            Json(GetFilesDownloadResponse {
+                presigned_url: presigned.uri().to_string(),
+            })
+            .into_response(),
+        ))
+    }
 }
