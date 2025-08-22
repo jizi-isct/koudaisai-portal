@@ -1,6 +1,6 @@
 import styles from "./PlanCard.module.css";
 import {ButtonCompact} from "@/components/generic/ButtonCompact/ButtonCompact";
-import {PlanIcon} from "@/components/group/PlanIcon";
+import {PlanIcon} from "@/components/plan/PlanIcon";
 import {BasePlanRead} from "@/lib/plansInfoTypes";
 
 

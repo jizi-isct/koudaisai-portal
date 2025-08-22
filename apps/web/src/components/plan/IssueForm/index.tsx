@@ -2,7 +2,6 @@
 
 import React from "react";
 import {$apiMembers} from "@/lib";
-import {Modal} from "@/components/generic/Modal/Modal";
 import {TextInput} from "@/components/generic/TextInput/TextInput";
 import {FileUploader} from "@/components/common/FileUploader";
 import {ButtonCompact} from "@/components/generic/ButtonCompact";
@@ -10,20 +9,18 @@ import {Heading1} from "@/components/generic";
 
 
 type EditModalProps = {
+  refetch: () => Promise<void>;
   initPlanName: string;
   initDescription: string;
   initIsChildFriendly: boolean;
-  modal: boolean;
-  setModal: (isOpen: boolean) => void;
 };
 
-export const EditModal = (
+export const EditIssueForm = (
   {
+    refetch,
     initPlanName,
     initDescription,
     initIsChildFriendly,
-    modal,
-    setModal
   }: EditModalProps) => {
   const [planName, setPlanName] = React.useState<string>(initPlanName);
   const [description, setDescription] = React.useState<string>(initDescription);
@@ -64,14 +61,12 @@ export const EditModal = (
         }
       }
     )
-    setModal(false)
+
+    await refetch()
   }
 
   return (
-    <Modal
-      isOpen={modal}
-      setOpen={setModal}
-    >
+    <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
 
       <label>
@@ -103,6 +98,6 @@ export const EditModal = (
         <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
       </label>
       <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
-    </Modal>
+    </div>
   );
 };

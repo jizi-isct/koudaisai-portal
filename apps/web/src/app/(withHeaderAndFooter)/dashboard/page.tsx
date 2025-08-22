@@ -8,8 +8,8 @@ import {Heading1, LoadingScreen} from '@/components/generic';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {PlanCard} from "@/components/group/PlanCard";
-import {EditModal} from "@/components/group/EditModal/EditModal";
+import {PlanCard} from "@/components/plan/PlanCard";
+import {EditModal} from "@/components/plan/EditModal/EditModal";
 import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
 import {BasePlanRead} from "@/lib/plansInfoTypes";
 
@@ -119,6 +119,7 @@ function Inner3({group}: { user: UserRead, group: GroupRead }) {
 
       {
         plan && <EditModal
+                      planId={plan.id}
                       modal={isModalOpen}
                       setModal={setIsModalOpen}
                       initPlanName={plan.plan_name}
