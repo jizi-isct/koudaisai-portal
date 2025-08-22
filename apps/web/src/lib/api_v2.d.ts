@@ -1006,6 +1006,8 @@ export interface paths {
                 query: {
                     key: string;
                     file_name: string;
+                    /** @description リダイレクトするかどうか．デフォルト値は`false` */
+                    redirect?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -1023,6 +1025,13 @@ export interface paths {
                             presigned_url?: string;
                         };
                     };
+                };
+                /** @description redirect=trueの場合に返される．リソースへのリダイレクト */
+                302: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
                 /** @description 不正なrequest bodyの形式 */
                 400: {

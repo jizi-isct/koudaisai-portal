@@ -13,6 +13,11 @@ get:
       schema:
         type: string
       required: true
+    - in: query
+      name: redirect
+      schema:
+        type: boolean
+      description: リダイレクトするかどうか．デフォルト値は`false`
   responses:
     '201':
       description: Changed
@@ -23,6 +28,8 @@ get:
             properties:
               presigned_url:
                 type: string
+    '302':
+      description: redirect=trueの場合に返される．リソースへのリダイレクト
     '400':
       description: 不正なrequest bodyの形式
     '401':
