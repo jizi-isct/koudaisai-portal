@@ -162,6 +162,8 @@ function Inner() {
             return <Tag color={"green"}>承認済み</Tag>;
           case "rejected":
             return <Tag color={"red"}>却下済み</Tag>;
+          case "closed":
+            return <Tag color={"purple"}>取り下げ済み</Tag>
           default:
             return <Tag color={"grey"}>不明</Tag>;
         }
