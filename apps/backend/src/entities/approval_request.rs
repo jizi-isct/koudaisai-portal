@@ -338,7 +338,7 @@ impl ReadApprovalRequest {
         // Since API schema doesn't have Closed status, we'll use Rejected for close operations
         let model = sea_orm_entities::approval_request::ActiveModel {
             id: Set(self.id),
-            status: Set(ApprovalRequestStatus::Rejected.into_sea_orm()),
+            status: Set(ApprovalRequestStatus::Closed.into_sea_orm()),
             ..Default::default()
         };
         model.update(db_conn).await?;
