@@ -1,10 +1,11 @@
 "use client";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
-import {$apiAdmin, ApprovalRequestRead} from "@/lib";
+import {$apiAdmin, ApprovalRequestRead, getFilesRedirectUrl} from "@/lib";
 import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
 import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import {ReactNode, useMemo} from "react";
+import Image from "next/image";
 
 type ExpandedRowDataType = {
   key: string,
@@ -83,7 +84,12 @@ function Inner() {
     if (record.type_edit_exhibition_info.icon_key) {
       dataSource.push({
         key: "アイコン",
-        value: "変更あり"
+        value: <Image
+          src={getFilesRedirectUrl(record.type_edit_exhibition_info.icon_key)}
+          alt={""}
+          width={128}
+          height={128}
+        />
       })
     } else if (record.type_edit_exhibition_info.icon_key === undefined) {
       dataSource.push({

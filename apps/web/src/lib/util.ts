@@ -106,6 +106,6 @@ export function getRepresentativeIndex(user: UserRead, group: GroupRead): string
   return undefined
 }
 
-export function getFilesRedirectUrl(fileKey: string, fileName: string) {
-  return `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/download?key=${fileKey}&file_name=${fileName}&redirect=true`
+export function getFilesRedirectUrl(fileKey: string) {
+  return `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/download?key=${fileKey}&file_name=${fileKey}&redirect=true`
 }
