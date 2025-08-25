@@ -52,6 +52,25 @@ function Inner() {
       title: "ステータス",
       dataIndex: "status",
       rowScope: "row",
+      filters: [
+        {
+          text: "審査中",
+          value: "pending"
+        },
+        {
+          text: "承認済み",
+          value: "approved"
+        },
+        {
+          text: "却下済み",
+          value: "rejected"
+        },
+        {
+          text: "取り下げ済み",
+          value: "closed"
+        }
+      ],
+      onFilter: (value, record) => record.status === value,
       render: (value) => {
         switch (value) {
           case "pending":
