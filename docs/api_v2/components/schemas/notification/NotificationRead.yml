@@ -7,3 +7,10 @@ oneOf:
             $ref: "./NotificationReadTypeMarkdown.yml"
         required:
           - type_markdown
+  - allOf:
+      - $ref: "./NotificationReadGeneric.yml"
+      - properties:
+          type_approval_request:
+            $ref: "./NotificationReadTypeApprovalRequest.yml"
+        required:
+          - type_approval_request

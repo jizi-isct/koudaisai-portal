@@ -9,3 +9,8 @@ oneOf:
           - type_markdown
   - allOf:
       - $ref: "./NotificationUpdateGeneric.yml"
+      - properties:
+          type_approval_request:
+            $ref: "./NotificationUpdateTypeApprovalRequest.yml"
+        required:
+          - type_approval_request

@@ -1,0 +1,9 @@
+description: 承認申請の通知タイプ
+type: object
+properties:
+  approval_request_id:
+    type: string
+    format: uuid
+    description: 承認申請のID
+required:
+  - approval_request_id
