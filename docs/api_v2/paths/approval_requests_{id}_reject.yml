@@ -10,6 +10,19 @@ post:
       schema:
         type: string
         format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            approval_reason:
+              type: string
+              nullable: true
+              description: 承認理由
+          required:
+            - approval_reason
   responses:
     '204':
       description: No Content

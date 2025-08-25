@@ -135,6 +135,7 @@ async fn reject_approval_request(
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
     Path(request_id): Path<Uuid>,
+    Json(approve_request): Json<ApproveRequest>,
 ) -> AppResponse {
     match current_user {
         CurrentUser::Admin(claims) => {
@@ -143,7 +144,9 @@ async fn reject_approval_request(
             match request {
                 Some(request) => {
                     let issuer_id = request.issued_by;
-                    request.reject(&state.db_conn, Some(uuid), None).await?;
+                    request
+                        .reject(&state.db_conn, Some(uuid), approve_request.approval_reason)
+                        .await?;
 
                     // Send notification to issuer
                     let notification = NotificationCreate {
