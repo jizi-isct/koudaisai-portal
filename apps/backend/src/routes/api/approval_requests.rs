@@ -1,4 +1,6 @@
 use crate::entities::approval_request::{delete_by_id, ReadApprovalRequest};
+use crate::entities::notification::{NotificationCreate, NotificationType};
+use crate::entities::target_specifier::TargetSpecifier;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -93,11 +95,12 @@ async fn approve_approval_request(
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
             match request {
                 Some(request) => {
+                    let issuer_id = request.issued_by;
                     request
                         .approve(
                             Some(uuid),
                             approve_request.approval_reason,
-                            state,
+                            state.clone(),
                             header_map
                                 .get::<&str>("Authorization")
                                 .unwrap()
@@ -107,6 +110,16 @@ async fn approve_approval_request(
                                 .unwrap(),
                         )
                         .await?;
+
+                    // Send notification to issuer
+                    let notification = NotificationCreate {
+                        target: vec![TargetSpecifier::UserId(issuer_id)],
+                        notification_type: NotificationType::TypeApprovalRequest {
+                            approval_request_id: request_id,
+                        },
+                    };
+                    notification.insert(&state.db_conn, Some(uuid)).await?;
+
                     Ok((StatusCode::NO_CONTENT, ().into_response()))
                 }
                 None => Ok((StatusCode::NOT_FOUND, "Request not found.".into_response())),
@@ -129,7 +142,18 @@ async fn reject_approval_request(
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
             match request {
                 Some(request) => {
+                    let issuer_id = request.issued_by;
                     request.reject(&state.db_conn, Some(uuid), None).await?;
+
+                    // Send notification to issuer
+                    let notification = NotificationCreate {
+                        target: vec![TargetSpecifier::UserId(issuer_id)],
+                        notification_type: NotificationType::TypeApprovalRequest {
+                            approval_request_id: request_id,
+                        },
+                    };
+                    notification.insert(&state.db_conn, Some(uuid)).await?;
+
                     Ok((StatusCode::NO_CONTENT, ().into_response()))
                 }
                 None => Ok((StatusCode::NOT_FOUND, "Request not found.".into_response())),
