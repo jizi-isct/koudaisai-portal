@@ -20,10 +20,18 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_one = "super::notification_type_approval_request::Entity")]
+    NotificationTypeApprovalRequest,
     #[sea_orm(has_one = "super::notification_type_markdown::Entity")]
     NotificationTypeMarkdown,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
+}
+
+impl Related<super::notification_type_approval_request::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NotificationTypeApprovalRequest.def()
+    }
 }
 
 impl Related<super::notification_type_markdown::Entity> for Entity {

@@ -19,6 +19,7 @@ pub use super::group_plan_labo::Entity as GroupPlanLabo;
 pub use super::group_plan_stage::Entity as GroupPlanStage;
 pub use super::group_press::Entity as GroupPress;
 pub use super::notification::Entity as Notification;
+pub use super::notification_type_approval_request::Entity as NotificationTypeApprovalRequest;
 pub use super::notification_type_markdown::Entity as NotificationTypeMarkdown;
 pub use super::read_notifications::Entity as ReadNotifications;
 pub use super::revoked_refresh_tokens::Entity as RevokedRefreshTokens;

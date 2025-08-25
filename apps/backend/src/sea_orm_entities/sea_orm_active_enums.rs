@@ -59,6 +59,8 @@ pub enum GroupType {
 pub enum NotificationType {
     #[sea_orm(string_value = "MARKDOWN")]
     Markdown,
+    #[sea_orm(string_value = "APPROVAL_REQUEST")]
+    ApprovalRequest,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "plan_type")]
