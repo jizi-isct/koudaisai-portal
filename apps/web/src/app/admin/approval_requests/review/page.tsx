@@ -1,7 +1,7 @@
 "use client";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
-import {Button, Card, Flex, Form, Result, Tag} from 'antd';
+import {Button, Card, Flex, Form, message, Result, Tag} from 'antd';
 import {useEffect, useState} from "react";
 import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
@@ -44,7 +44,8 @@ export default function Page() {
 }
 
 function Inner({approvalRequestId}: { approvalRequestId: string }) {
-  const {data: approvalRequest, error} = $apiAdmin.useQuery(
+  const [messageApi, contextHolder] = message.useMessage();
+  const {data: approvalRequest, error, refetch} = $apiAdmin.useQuery(
     "get",
     "/approval-requests/{id}",
     {
@@ -110,39 +111,62 @@ function Inner({approvalRequestId}: { approvalRequestId: string }) {
   }
 
   const handleApprove = async () => {
+    messageApi.loading({
+      content: "処理中...",
+      duration: 0,
+    })
     let reqApprovalReason = null
     if (approvalReason !== "") {
       reqApprovalReason = approvalReason
     }
-    await mutateApprove({
-      params: {
-        path: {
-          id: approvalRequestId
+    try {
+      await mutateApprove({
+        params: {
+          path: {
+            id: approvalRequestId
+          }
+        },
+        body: {
+          approval_reason: reqApprovalReason
         }
-      },
-      body: {
-        approval_reason: reqApprovalReason
-      }
-    })
+      })
+    } catch (e) {
+      messageApi.destroy()
+      messageApi.error("エラーが発生しました：" + JSON.stringify(e))
+    }
+
+    await refetch()
+    messageApi.destroy()
+    messageApi.success("処理が成功しました")
   }
   const handleReject = async () => {
     let reqApprovalReason = null
     if (approvalReason !== "") {
       reqApprovalReason = approvalReason
     }
-    await mutateReject({
-      params: {
-        path: {
-          id: approvalRequestId
+    try {
+      await mutateReject({
+        params: {
+          path: {
+            id: approvalRequestId
+          }
+        },
+        body: {
+          approval_reason: reqApprovalReason
         }
-      },
-      body: {
-        approval_reason: reqApprovalReason
-      }
-    })
+      })
+    } catch (e) {
+      messageApi.destroy()
+      messageApi.error("エラーが発生しました：" + JSON.stringify(e))
+    }
+
+    await refetch()
+    messageApi.destroy()
+    messageApi.success("処理が成功しました")
   }
   return (
     <>
+      {contextHolder}
       <Form<FormValues>>
         <h1>承認申請の審査</h1>
         <Form.Item label={"種類"}>

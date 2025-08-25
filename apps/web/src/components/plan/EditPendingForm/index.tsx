@@ -3,9 +3,10 @@
 import React from "react";
 import {$apiMembers, ApprovalRequestRead} from "@/lib";
 import {ButtonCompact} from "@/components/generic/ButtonCompact";
-import {Heading1} from "@/components/generic";
+import {Heading1, LoadingScreen} from "@/components/generic";
 import {Loader} from "@/components/generic/Loader";
 import {ViewPendingEditExhibitionInfoRequest} from "@/components/plan/ViewPendingEditExhibitionInfoRequest";
+import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
 
 
 type Props = {
@@ -22,6 +23,14 @@ export function EditPendingForm({
   const {mutateAsync: closeApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests/{request_id}/close")
   const [isClosing, setIsClosing] = React.useState<boolean>(false);
 
+  const {data: plan} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
+    params: {
+      path: {
+        planId: planId
+      }
+    }
+  })
+
   const handleClose = async () => {
     setIsClosing(true);
     await closeApprovalRequest({
@@ -36,10 +45,14 @@ export function EditPendingForm({
     await refetch();
   }
 
+  if (!plan) {
+    return <LoadingScreen/>
+  }
+
   return (<div>
     <Heading1 emoji={"📝"}>企画情報訂正申請は現在審査中です</Heading1>
 
-    <ViewPendingEditExhibitionInfoRequest approvalRequest={approvalRequest} planId={planId}/>
+    <ViewPendingEditExhibitionInfoRequest approvalRequest={approvalRequest} plan={plan}/>
     {
       isClosing ? <Loader/> :
         <ButtonCompact text={"企画情報訂正申請を取り下げる"} onClick={handleClose}/>
