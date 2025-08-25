@@ -14,6 +14,10 @@ pub struct Model {
     pub r#type: ApprovalRequestType,
     pub status: ApprovalRequestStatus,
     pub approved_by: Option<Uuid>,
+    #[sea_orm(column_type = "Text")]
+    pub issue_reason: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub approval_reason: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

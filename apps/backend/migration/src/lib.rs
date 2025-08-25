@@ -25,6 +25,7 @@ mod m20250718_075715_add_table_group;
 mod m20250721_153433_add_press_group;
 mod m20250723_072042_document_target_specifier;
 mod m20250821_130758_alter_table_approval_request;
+mod m20250825_105324_fix_approval_table_schema;
 
 pub struct Migrator;
 
@@ -59,6 +60,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250721_153433_add_press_group::Migration),
             Box::new(m20250723_072042_document_target_specifier::Migration),
             Box::new(m20250821_130758_alter_table_approval_request::Migration),
+            Box::new(m20250825_105324_fix_approval_table_schema::Migration),
         ]
     }
 }

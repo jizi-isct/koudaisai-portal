@@ -8,12 +8,9 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     #[sea_orm(column_type = "Text", nullable)]
-    pub exhibition_name: Option<String>,
-    #[sea_orm(column_type = "Text", nullable)]
     pub icon_id: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
-    pub is_child_friendly: Option<bool>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
