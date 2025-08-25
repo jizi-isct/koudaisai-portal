@@ -4,4 +4,5 @@ enum:
   - pending
   - approved
   - rejected
+  - closed
 example: pending
