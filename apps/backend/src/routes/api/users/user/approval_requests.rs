@@ -75,8 +75,7 @@ async fn get_approval_request(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
-    Path(user_id): Path<UserId>,
-    Path(request_id): Path<Uuid>,
+    Path((user_id, request_id)): Path<(UserId, Uuid)>,
 ) -> AppResponse {
     match current_user {
         CurrentUser::User(claims) => {
