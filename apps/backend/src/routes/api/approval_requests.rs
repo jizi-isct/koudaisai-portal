@@ -7,11 +7,17 @@ use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
 use http::{HeaderMap, StatusCode};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
 use tracing::instrument;
 use uuid::Uuid;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ApproveRequest {
+    pub approval_reason: Option<String>,
+}
 
 #[instrument(name = "init /api/v2/approval-requests")]
 pub fn init_router() -> Router<Arc<AppState>> {
@@ -79,6 +85,7 @@ async fn approve_approval_request(
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
     Path(request_id): Path<Uuid>,
+    Json(approve_request): Json<ApproveRequest>,
 ) -> AppResponse {
     match current_user {
         CurrentUser::Admin(claims) => {
@@ -89,6 +96,7 @@ async fn approve_approval_request(
                     request
                         .approve(
                             Some(uuid),
+                            approve_request.approval_reason,
                             state,
                             header_map
                                 .get::<&str>("Authorization")
@@ -121,7 +129,7 @@ async fn reject_approval_request(
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
             match request {
                 Some(request) => {
-                    request.reject(&state.db_conn, Some(uuid)).await?;
+                    request.reject(&state.db_conn, Some(uuid), None).await?;
                     Ok((StatusCode::NO_CONTENT, ().into_response()))
                 }
                 None => Ok((StatusCode::NOT_FOUND, "Request not found.".into_response())),

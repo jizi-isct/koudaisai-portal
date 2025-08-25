@@ -15,11 +15,7 @@ use uuid::Uuid;
 pub enum ApprovalRequestType {
     TypeEditExhibitionInfo {
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        plan_name: Option<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         description: Option<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        is_child_friendly: Option<bool>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         icon_key: Option<String>,
     },
@@ -86,6 +82,7 @@ impl ApprovalRequestStatus {
 pub struct CreateApprovalRequest {
     #[serde(flatten)]
     pub r#type: ApprovalRequestType,
+    pub issue_reason: String,
 }
 
 pub enum CreateApprovalRequestActiveModel {
@@ -100,31 +97,25 @@ impl CreateApprovalRequest {
         let id = Uuid::new_v4();
         match &self.r#type {
             ApprovalRequestType::TypeEditExhibitionInfo {
-                plan_name,
                 description,
-                is_child_friendly,
                 icon_key,
-            } => {
-                // Map plan_name to exhibition_name in database
-                CreateApprovalRequestActiveModel::TypeEditExhibitionInfo {
-                    generic: sea_orm_entities::approval_request::ActiveModel {
-                        id: Set(id.clone()),
-                        issued_at: Set(Utc::now().into()),
-                        issued_by: Set(issued_by),
-                        r#type: Set(self.r#type.as_sea_orm()),
-                        status: Set(ApprovalRequestStatus::Pending.into_sea_orm()),
-                        approved_by: Set(None),
-                    },
-                    r#type:
-                        sea_orm_entities::approval_request_type_edit_exhibition_info::ActiveModel {
-                            id: Set(id),
-                            exhibition_name: plan_name.clone().into_active_value(),
-                            icon_id: icon_key.clone().into_active_value(),
-                            description: description.clone().into_active_value(),
-                            is_child_friendly: is_child_friendly.into_active_value(),
-                        },
-                }
-            }
+            } => CreateApprovalRequestActiveModel::TypeEditExhibitionInfo {
+                generic: sea_orm_entities::approval_request::ActiveModel {
+                    id: Set(id.clone()),
+                    issued_at: Set(Utc::now().into()),
+                    issued_by: Set(issued_by),
+                    r#type: Set(self.r#type.as_sea_orm()),
+                    status: Set(ApprovalRequestStatus::Pending.into_sea_orm()),
+                    approved_by: Set(None),
+                    issue_reason: Set(self.issue_reason.clone()),
+                    approval_reason: Set(None),
+                },
+                r#type: sea_orm_entities::approval_request_type_edit_exhibition_info::ActiveModel {
+                    id: Set(id),
+                    icon_id: icon_key.clone().into_active_value(),
+                    description: description.clone().into_active_value(),
+                },
+            },
         }
     }
 
@@ -148,6 +139,8 @@ pub struct ReadApprovalRequest {
     pub r#type: ApprovalRequestType,
     pub status: ApprovalRequestStatus,
     pub approved_by: Option<Uuid>,
+    pub issue_reason: String,
+    pub approval_reason: Option<String>,
 }
 
 pub enum ReadApprovalRequestModel {
@@ -161,11 +154,8 @@ impl ReadApprovalRequest {
     pub fn from_model(model: ReadApprovalRequestModel) -> Self {
         match model {
             ReadApprovalRequestModel::TypeEditExhibitionInfo { generic, r#type } => {
-                // Map exhibition_name to plan_name
-                let plan_name = r#type.exhibition_name.clone();
                 // Map icon_id to icon_key
                 let icon_key = r#type.icon_id.clone();
-                let is_child_friendly = r#type.is_child_friendly.clone();
                 let description = r#type.description.clone();
 
                 ReadApprovalRequest {
@@ -173,13 +163,13 @@ impl ReadApprovalRequest {
                     issued_at: generic.issued_at.to_utc(),
                     issued_by: generic.issued_by,
                     r#type: ApprovalRequestType::TypeEditExhibitionInfo {
-                        plan_name,
                         description,
-                        is_child_friendly,
                         icon_key,
                     },
                     status: ApprovalRequestStatus::from_sea_orm(generic.status),
                     approved_by: generic.approved_by,
+                    issue_reason: generic.issue_reason,
+                    approval_reason: generic.approval_reason,
                 }
             }
         }
@@ -230,14 +220,13 @@ impl ReadApprovalRequest {
     pub async fn approve(
         self,
         approved_by: Option<Uuid>,
+        approval_reason: Option<String>,
         state: Arc<AppState>,
         token: &str,
     ) -> anyhow::Result<()> {
         match self.r#type {
             ApprovalRequestType::TypeEditExhibitionInfo {
-                plan_name,
                 description,
-                is_child_friendly,
                 icon_key,
             } => {
                 // 団体情報
@@ -249,14 +238,8 @@ impl ReadApprovalRequest {
 
                 // 企画情報の更新(アイコン以外)
                 let mut body = HashMap::new();
-                if let Some(plan_name) = plan_name {
-                    body.insert("plan_name", plan_name);
-                }
                 if let Some(description) = description {
                     body.insert("description", description);
-                }
-                if let Some(is_child_friendly) = is_child_friendly {
-                    body.insert("is_child_friendly", is_child_friendly.to_string());
                 }
                 let response = state
                     .http_client
@@ -317,17 +300,24 @@ impl ReadApprovalRequest {
             id: Set(self.id),
             status: Set(ApprovalRequestStatus::Approved.into_sea_orm()),
             approved_by: Set(approved_by),
+            approval_reason: Set(approval_reason),
             ..Default::default()
         };
         model.update(&state.db_conn).await?;
         Ok(())
     }
 
-    pub async fn reject(self, db_conn: &DbConn, approved_by: Option<Uuid>) -> Result<(), DbErr> {
+    pub async fn reject(
+        self,
+        db_conn: &DbConn,
+        approved_by: Option<Uuid>,
+        approval_reason: Option<String>,
+    ) -> Result<(), DbErr> {
         let model = sea_orm_entities::approval_request::ActiveModel {
             id: Set(self.id),
             status: Set(ApprovalRequestStatus::Rejected.into_sea_orm()),
             approved_by: Set(approved_by),
+            approval_reason: Set(approval_reason),
             ..Default::default()
         };
         model.update(db_conn).await?;
@@ -354,6 +344,8 @@ pub struct UpdateApprovalRequest {
     pub approved_by: Option<Option<Uuid>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub r#type: Option<ApprovalRequestType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approval_reason: Option<String>,
 }
 
 pub enum UpdateApprovalRequestActiveModel {
@@ -370,22 +362,22 @@ impl UpdateApprovalRequest {
     pub fn into_active_model(self, id: Uuid) -> UpdateApprovalRequestActiveModel {
         match &self.r#type {
             Some(ApprovalRequestType::TypeEditExhibitionInfo {
-                plan_name,
                 description,
-                is_child_friendly,
                 icon_key,
             }) => UpdateApprovalRequestActiveModel::TypeEditExhibitionInfo {
                 generic: sea_orm_entities::approval_request::ActiveModel {
                     id: Set(id.clone()),
                     status: self.status.map(|s| Set(s.into_sea_orm())).unwrap_or(NotSet),
                     approved_by: self.approved_by.map(|ab| Set(ab)).unwrap_or(NotSet),
+                    approval_reason: self
+                        .approval_reason
+                        .map(|ar| Set(Some(ar)))
+                        .unwrap_or(NotSet),
                     ..Default::default()
                 },
                 r#type: sea_orm_entities::approval_request_type_edit_exhibition_info::ActiveModel {
                     id: Set(id),
-                    exhibition_name: plan_name.clone().into_active_value(),
                     icon_id: icon_key.clone().into_active_value(),
-                    is_child_friendly: is_child_friendly.into_active_value(),
                     description: description.clone().into_active_value(),
                 },
             },
@@ -394,6 +386,10 @@ impl UpdateApprovalRequest {
                     id: Set(id),
                     status: self.status.map(|s| Set(s.into_sea_orm())).unwrap_or(NotSet),
                     approved_by: self.approved_by.map(|ab| Set(ab)).unwrap_or(NotSet),
+                    approval_reason: self
+                        .approval_reason
+                        .map(|ar| Set(Some(ar)))
+                        .unwrap_or(NotSet),
                     ..Default::default()
                 },
             },

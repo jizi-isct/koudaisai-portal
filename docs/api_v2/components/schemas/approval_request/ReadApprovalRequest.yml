@@ -22,9 +22,18 @@ allOf:
         format: uuid
         description: ID of the user who approved or rejected the request
         nullable: true
+      issue_reason:
+        type: string
+        description: Reason for issuing the approval request
+      approval_reason:
+        type: string
+        description: Reason for approving or rejecting the request
+        nullable: true
     required:
       - id
       - issued_at
       - issued_by
       - status
+      - issue_reason
+      - approval_reason
   - $ref: "./ApprovalRequestType.yml"
