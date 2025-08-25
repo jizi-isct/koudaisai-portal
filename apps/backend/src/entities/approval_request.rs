@@ -259,39 +259,38 @@ impl ReadApprovalRequest {
                 }
 
                 // アイコンの更新
-                if icon_key.is_none() {
-                    return Ok(());
-                }
-                let icon_key = icon_key.unwrap();
-                let object = state
-                    .s3_client
-                    .get_object()
-                    .bucket(&state.s3_bucket)
-                    .key(&icon_key)
-                    .send()
-                    .await?;
-                let content_type = object.content_type;
-                if content_type.is_none() {
-                    return Err(anyhow::anyhow!("Content type not found"));
-                }
-                let content_type = content_type.unwrap();
-                let body = object.body.collect().await?.into_bytes();
-                let response = state
-                    .http_client
-                    .request(
-                        Method::PUT,
-                        format!("https://api2025.jizi.jp/v1/plans/{}/icon", issuer.group_id),
-                    )
-                    .body(body)
-                    .header("Content-Type", content_type)
-                    .bearer_auth(token)
-                    .send()
-                    .await?;
-                if !response.status().is_success() {
-                    return Err(anyhow::anyhow!(
-                        "Failed to upload icon: {}",
-                        response.text().await.unwrap_or("Error".into())
-                    ));
+                if icon_key.is_some() {
+                    let icon_key = icon_key.unwrap();
+                    let object = state
+                        .s3_client
+                        .get_object()
+                        .bucket(&state.s3_bucket)
+                        .key(&icon_key)
+                        .send()
+                        .await?;
+                    let content_type = object.content_type;
+                    if content_type.is_none() {
+                        return Err(anyhow::anyhow!("Content type not found"));
+                    }
+                    let content_type = content_type.unwrap();
+                    let body = object.body.collect().await?.into_bytes();
+                    let response = state
+                        .http_client
+                        .request(
+                            Method::PUT,
+                            format!("https://api2025.jizi.jp/v1/plans/{}/icon", issuer.group_id),
+                        )
+                        .body(body)
+                        .header("Content-Type", content_type)
+                        .bearer_auth(token)
+                        .send()
+                        .await?;
+                    if !response.status().is_success() {
+                        return Err(anyhow::anyhow!(
+                            "Failed to upload icon: {}",
+                            response.text().await.unwrap_or("Error".into())
+                        ));
+                    }
                 }
             }
         }
