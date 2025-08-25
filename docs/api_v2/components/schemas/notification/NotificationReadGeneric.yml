@@ -20,9 +20,6 @@ properties:
     description: 最終更新者のユーザーID
     type: string
     format: uuid
-  title:
-    description: 通知のタイトル
-    type: string
   target:
     type: array
     description: Target specifiers for the form
@@ -34,5 +31,4 @@ required:
   - updated_at
   - created_by
   - updated_by
-  - title
   - target

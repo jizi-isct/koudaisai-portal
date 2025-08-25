@@ -12,8 +12,6 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
     pub created_by: Option<Uuid>,
     pub updated_by: Option<Uuid>,
-    #[sea_orm(column_type = "Text")]
-    pub title: String,
     pub target: Vec<String>,
     pub r#type: NotificationType,
 }

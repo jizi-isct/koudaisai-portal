@@ -3,7 +3,6 @@ use crate::sea_orm_entities::{
     notification, notification_type_approval_request, notification_type_markdown,
     sea_orm_active_enums,
 };
-use crate::util::IntoActiveValue;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
@@ -14,13 +13,12 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
-    TypeMarkdown { content: String },
+    TypeMarkdown { title: String, content: String },
     TypeApprovalRequest { approval_request_id: Uuid },
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct NotificationCreate {
-    pub title: String,
     pub target: Vec<TargetSpecifier>,
     #[serde(flatten)]
     pub notification_type: NotificationType,
@@ -44,7 +42,6 @@ pub struct NotificationRead {
     pub updated_at: DateTime<Utc>,
     pub created_by: Uuid,
     pub updated_by: Uuid,
-    pub title: String,
     pub target: Vec<TargetSpecifier>,
     #[serde(flatten)]
     pub notification_type: NotificationType,
@@ -83,7 +80,7 @@ pub enum NotificationUpdateActiveModel {
 impl NotificationCreate {
     pub fn into_active_model(self, created_by: Option<Uuid>) -> NotificationCreateActiveModel {
         match self.notification_type {
-            NotificationType::TypeMarkdown { content } => {
+            NotificationType::TypeMarkdown { title, content } => {
                 let id = Uuid::new_v4();
                 let notification_model = notification::ActiveModel {
                     id: Set(id.clone()),
@@ -91,13 +88,13 @@ impl NotificationCreate {
                     updated_at: Set(Utc::now().into()),
                     created_by: Set(created_by),
                     updated_by: Set(created_by),
-                    title: Set(self.title),
                     target: Set(self.target.iter().map(|t| t.into()).collect()),
                     r#type: Set(sea_orm_active_enums::NotificationType::Markdown),
                 };
                 let markdown_model = notification_type_markdown::ActiveModel {
                     id: Set(id),
-                    content: Set(content), // Placeholder, actual content should be set
+                    title: Set(title),
+                    content: Set(content),
                 };
                 NotificationCreateActiveModel::TypeMarkdown(notification_model, markdown_model)
             }
@@ -111,7 +108,6 @@ impl NotificationCreate {
                     updated_at: Set(Utc::now().into()),
                     created_by: Set(created_by),
                     updated_by: Set(created_by),
-                    title: Set(self.title),
                     target: Set(self.target.iter().map(|t| t.into()).collect()),
                     r#type: Set(sea_orm_active_enums::NotificationType::ApprovalRequest),
                 };
@@ -156,13 +152,13 @@ impl NotificationRead {
                 updated_at: notification.updated_at.into(),
                 created_by: notification.created_by.unwrap_or(Uuid::new_v4()),
                 updated_by: notification.updated_by.unwrap_or(Uuid::new_v4()),
-                title: notification.title,
                 target: notification
                     .target
                     .iter()
                     .map(|t| TargetSpecifier::from_string(t))
                     .collect(),
                 notification_type: NotificationType::TypeMarkdown {
+                    title: markdown.title,
                     content: markdown.content,
                 },
             }),
@@ -173,7 +169,6 @@ impl NotificationRead {
                     updated_at: notification.updated_at.into(),
                     created_by: notification.created_by.unwrap_or(Uuid::new_v4()),
                     updated_by: notification.updated_by.unwrap_or(Uuid::new_v4()),
-                    title: notification.title,
                     target: notification
                         .target
                         .iter()
@@ -271,21 +266,21 @@ impl NotificationUpdate {
             Some(targets) => Set(targets.iter().map(|t| t.into()).collect::<Vec<String>>()),
             None => Default::default(),
         };
-        let mut notification_model = notification::ActiveModel {
+        let notification_model = notification::ActiveModel {
             id: Set(id),
             created_at: Default::default(),
             updated_at: Set(Utc::now().into()),
             created_by: Default::default(),
             updated_by: Set(updated_by),
-            title: self.title.into_active_value(),
             target,
             r#type: Default::default(),
         };
 
         match self.notification_type {
-            Some(NotificationType::TypeMarkdown { content }) => {
+            Some(NotificationType::TypeMarkdown { title, content }) => {
                 let markdown_model = notification_type_markdown::ActiveModel {
                     id: Set(id),
+                    title: Set(title),
                     content: Set(content),
                 };
                 Ok(NotificationUpdateActiveModel::TypeMarkdown(
