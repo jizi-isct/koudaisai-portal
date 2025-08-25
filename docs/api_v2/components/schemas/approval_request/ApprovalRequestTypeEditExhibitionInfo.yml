@@ -1,15 +1,9 @@
 type: object
 description: 企画情報訂正申請
 properties:
-  plan_name:
-    type: string
-    description: 企画名
   description:
     type: string
     description: 企画内容説明文
-  is_child_friendly:
-    type: boolean
-    description: 子供向け企画か否か
   icon_key:
     type: string
     description: 企画アイコンのキー．
