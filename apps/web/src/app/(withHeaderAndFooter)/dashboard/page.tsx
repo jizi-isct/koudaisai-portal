@@ -122,9 +122,7 @@ function Inner3({group}: { user: UserRead, group: GroupRead }) {
                       planId={plan.id}
                       modal={isModalOpen}
                       setModal={setIsModalOpen}
-                      initPlanName={plan.plan_name}
                       initDescription={plan.description}
-                      initIsChildFriendly={plan.is_child_friendly}
               />
       }
     </>

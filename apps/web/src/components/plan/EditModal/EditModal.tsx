@@ -10,9 +10,7 @@ import {EditPendingForm} from "@/components/plan/EditPendingForm";
 
 type EditModalProps = {
   planId: string;
-  initPlanName: string;
   initDescription: string;
-  initIsChildFriendly: boolean;
   modal: boolean;
   setModal: (isOpen: boolean) => void;
 };
@@ -20,9 +18,7 @@ type EditModalProps = {
 export const EditModal = (
   {
     planId,
-    initPlanName,
     initDescription,
-    initIsChildFriendly,
     modal,
     setModal
   }: EditModalProps) => {
@@ -41,9 +37,6 @@ export const EditModal = (
   if (!approvalRequests || !pendingPlanEditRequests) {
     return <LoadingScreen/>
   }
-  console.log(approvalRequests)
-  console.log(pendingPlanEditRequests)
-  console.log(pendingPlanEditRequests.length)
 
   return (
     <Modal
@@ -56,18 +49,13 @@ export const EditModal = (
             refetch={async () => {
               await refetch()
             }}
-            initPlanName={initPlanName}
             initDescription={initDescription}
-            initIsChildFriendly={initIsChildFriendly}
           /> :
           <EditPendingForm
             planId={planId}
             refetch={async () => {
               await refetch()
             }}
-            initPlanName={initPlanName}
-            initDescription={initDescription}
-            initIsChildFriendly={initIsChildFriendly}
             approvalRequest={pendingPlanEditRequests[0]}
           />
       }

@@ -10,37 +10,24 @@ import {Heading1} from "@/components/generic";
 
 type EditModalProps = {
   refetch: () => Promise<void>;
-  initPlanName: string;
   initDescription: string;
-  initIsChildFriendly: boolean;
 };
 
 export const EditIssueForm = (
   {
     refetch,
-    initPlanName,
     initDescription,
-    initIsChildFriendly,
   }: EditModalProps) => {
-  const [planName, setPlanName] = React.useState<string>(initPlanName);
   const [description, setDescription] = React.useState<string>(initDescription);
-  const [isChildFriendly, setIsChildFriendly] = React.useState<boolean>(initIsChildFriendly);
   const [iconKey, setIconKey] = React.useState<string | undefined>();
+  const [issueReason, setIssueReason] = React.useState<string>("")
   const {mutateAsync: createApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests")
 
   const handleSubmit = async () => {
-    let reqPlanName: string | undefined = planName;
     let reqDescription: string | undefined = description;
-    let reqIsChildFriendly: boolean | undefined = isChildFriendly;
 
-    if (planName === initPlanName) {
-      reqPlanName = undefined;
-    }
     if (description === initDescription) {
       reqDescription = undefined;
-    }
-    if (isChildFriendly === reqIsChildFriendly) {
-      reqIsChildFriendly = undefined;
     }
 
     // 申請
@@ -53,11 +40,10 @@ export const EditIssueForm = (
         },
         body: {
           type_edit_exhibition_info: {
-            plan_name: reqPlanName,
             description: reqDescription,
-            is_child_friendly: reqIsChildFriendly,
-            icon_key: iconKey
-          }
+            icon_key: iconKey,
+          },
+          issue_reason: issueReason
         }
       }
     )
@@ -68,15 +54,6 @@ export const EditIssueForm = (
   return (
     <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
-
-      <label>
-        企画名
-        <TextInput
-          value={planName}
-          setValue={setPlanName}
-          paragraph={false}
-        />
-      </label>
       <label>
         企画概要
         <TextInput
@@ -86,16 +63,16 @@ export const EditIssueForm = (
         />
       </label>
       <label>
-        子供向け企画か否か<br/>
-        <input
-          type="checkbox"
-          checked={isChildFriendly}
-          onChange={(e) => setIsChildFriendly(e.target.checked)}
-        />
-      </label><br/>
-      <label>
         アイコン画像
         <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
+      </label>
+      <label>
+        訂正理由
+        <TextInput
+          value={issueReason}
+          setValue={setIssueReason}
+          paragraph={true}
+        />
       </label>
       <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
     </div>

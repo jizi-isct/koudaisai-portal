@@ -2084,7 +2084,14 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description 承認理由 */
+                        approval_reason: string | null;
+                    };
+                };
+            };
             responses: {
                 /** @description No Content */
                 204: {
@@ -2744,7 +2751,7 @@ export interface components {
          * @example pending
          * @enum {string}
          */
-        ApprovalRequestStatus: "pending" | "approved" | "rejected";
+        ApprovalRequestStatus: "pending" | "approved" | "rejected" | "closed";
         /** @description 企画情報訂正申請 */
         ApprovalRequestTypeEditExhibitionInfo: {
             /** @description 企画内容説明文 */
