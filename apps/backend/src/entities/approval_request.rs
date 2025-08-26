@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ApprovalRequestType {
     TypeEditExhibitionInfo {
@@ -78,7 +78,7 @@ impl ApprovalRequestStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateApprovalRequest {
     #[serde(flatten)]
     pub r#type: ApprovalRequestType,
@@ -93,8 +93,7 @@ pub enum CreateApprovalRequestActiveModel {
 }
 
 impl CreateApprovalRequest {
-    pub fn into_active_model(self, issued_by: Uuid) -> CreateApprovalRequestActiveModel {
-        let id = Uuid::new_v4();
+    pub fn into_active_model(self, id: &Uuid, issued_by: Uuid) -> CreateApprovalRequestActiveModel {
         match &self.r#type {
             ApprovalRequestType::TypeEditExhibitionInfo {
                 description,
@@ -111,7 +110,7 @@ impl CreateApprovalRequest {
                     approval_reason: Set(None),
                 },
                 r#type: sea_orm_entities::approval_request_type_edit_exhibition_info::ActiveModel {
-                    id: Set(id),
+                    id: Set(id.clone()),
                     icon_id: icon_key.clone().into_active_value(),
                     description: description.clone().into_active_value(),
                 },
@@ -119,14 +118,15 @@ impl CreateApprovalRequest {
         }
     }
 
-    pub async fn insert(self, db_conn: &DbConn, issued_by: Uuid) -> Result<(), DbErr> {
-        match self.into_active_model(issued_by) {
+    pub async fn insert(self, db_conn: &DbConn, issued_by: Uuid) -> Result<Uuid, DbErr> {
+        let id = Uuid::new_v4();
+        match self.into_active_model(&id, issued_by) {
             CreateApprovalRequestActiveModel::TypeEditExhibitionInfo { generic, r#type } => {
                 generic.insert(db_conn).await?;
                 r#type.insert(db_conn).await?;
             }
         }
-        Ok(())
+        Ok(id)
     }
 }
 

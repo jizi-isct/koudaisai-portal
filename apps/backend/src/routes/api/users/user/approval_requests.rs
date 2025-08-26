@@ -8,6 +8,7 @@ use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
+use axum_extra::extract::Host;
 use http::StatusCode;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -46,6 +47,7 @@ async fn get_approval_requests(
 
 #[instrument(name = "POST /api/v2/users/{user_id}/approval-requests", skip(state))]
 async fn post_approval_request(
+    Host(host): Host,
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
@@ -58,8 +60,20 @@ async fn post_approval_request(
             if !matches!(user_id, UserId::Me) {
                 return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
             }
-            approval_request
+            let approval_request_id = approval_request
+                .clone()
                 .insert(&state.db_conn, current_user.id)
+                .await?;
+            state
+                .discord
+                .send_approval_request_issue_message(
+                    &*format!("https://{}", host),
+                    &approval_request_id,
+                    &approval_request,
+                    &current_user,
+                    &state.s3_client,
+                    &state.s3_bucket,
+                )
                 .await?;
             Ok((StatusCode::CREATED, ().into_response()))
         }

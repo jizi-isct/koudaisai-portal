@@ -1,6 +1,7 @@
 use crate::entities::approval_request::{delete_by_id, ReadApprovalRequest};
 use crate::entities::notification::{NotificationCreate, NotificationType};
 use crate::entities::target_specifier::TargetSpecifier;
+use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -8,6 +9,7 @@ use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
+use axum_extra::extract::Host;
 use http::{HeaderMap, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
@@ -82,6 +84,7 @@ async fn delete_approval_request(
 
 #[instrument(name = "POST /api/v2/approval-requests/approve", skip(state))]
 async fn approve_approval_request(
+    Host(host): Host,
     header_map: HeaderMap,
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
@@ -120,6 +123,26 @@ async fn approve_approval_request(
                     };
                     notification.insert(&state.db_conn, Some(uuid)).await?;
 
+                    // Send discord webhook
+                    let approval_request =
+                        ReadApprovalRequest::find_from_id(request_id, &state.db_conn)
+                            .await?
+                            .unwrap();
+                    let issued_by =
+                        UserRead::find_from_id(approval_request.issued_by, &state.db_conn)
+                            .await?
+                            .unwrap();
+                    state
+                        .discord
+                        .send_approval_request_approval_message(
+                            &*format!("https://{}", host),
+                            &request_id,
+                            &approval_request,
+                            &issued_by,
+                            &claims,
+                        )
+                        .await?;
+
                     Ok((StatusCode::NO_CONTENT, ().into_response()))
                 }
                 None => Ok((StatusCode::NOT_FOUND, "Request not found.".into_response())),
@@ -131,6 +154,7 @@ async fn approve_approval_request(
 
 #[instrument(name = "POST /api/v2/approval-requests/reject", skip(state))]
 async fn reject_approval_request(
+    Host(host): Host,
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
@@ -156,6 +180,26 @@ async fn reject_approval_request(
                         },
                     };
                     notification.insert(&state.db_conn, Some(uuid)).await?;
+
+                    // Send discord webhook
+                    let approval_request =
+                        ReadApprovalRequest::find_from_id(request_id, &state.db_conn)
+                            .await?
+                            .unwrap();
+                    let issued_by =
+                        UserRead::find_from_id(approval_request.issued_by, &state.db_conn)
+                            .await?
+                            .unwrap();
+                    state
+                        .discord
+                        .send_approval_request_approval_message(
+                            &*format!("https://{}", host),
+                            &request_id,
+                            &approval_request,
+                            &issued_by,
+                            &claims,
+                        )
+                        .await?;
 
                     Ok((StatusCode::NO_CONTENT, ().into_response()))
                 }
