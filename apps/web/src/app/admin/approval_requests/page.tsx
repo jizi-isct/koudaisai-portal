@@ -2,34 +2,10 @@
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
 import {$apiAdmin, ApprovalRequestRead} from "@/lib";
-import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
-import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
-import {ReactNode, useMemo} from "react";
+import {Button, Flex, Table, TableProps, Tag, Tooltip} from "antd";
+import {MoreOutlined} from "@ant-design/icons";
+import {useMemo} from "react";
 
-type ExpandedRowDataType = {
-  key: string,
-  value: ReactNode;
-}
-
-const expandedColumns: TableProps<ExpandedRowDataType>['columns'] = [
-  {
-    key: "key",
-    title: "項目名",
-    dataIndex: "key",
-    rowScope: "row",
-    render: (value, record, _index) => <span>
-        {value}
-      </span>
-  }, {
-    key: "value",
-    title: "項目",
-    dataIndex: "value",
-    rowScope: "row",
-    render: (value, record, _index) => <span>
-        {value}
-      </span>
-  },
-]
 
 export default function Page() {
   return (
@@ -40,7 +16,7 @@ export default function Page() {
 }
 
 function Inner() {
-  const {data, isLoading, refetch} = $apiAdmin.useQuery("get", "/approval-requests")
+  const {data, isLoading} = $apiAdmin.useQuery("get", "/approval-requests")
   const {data: users} = $apiAdmin.useQuery("get", "/users")
   const userNameMap = useMemo(() => {
     if (!users) return {};
@@ -49,67 +25,6 @@ function Inner() {
       return acc;
     }, {} as Record<string, string>);
   }, [users])
-  const {mutateAsync: mutateApprove} = $apiAdmin.useMutation("post", "/approval-requests/{id}/approve");
-  const {mutateAsync: mutateReject} = $apiAdmin.useMutation("post", "/approval-requests/{id}/reject");
-
-  const handleApprove = (id: string) => async () => {
-    await mutateApprove({
-      params: {
-        path: {
-          id: id
-        }
-      }
-    })
-    await refetch()
-  }
-
-  const handleReject = (id: string) => async () => {
-    await mutateReject({
-      params: {
-        path: {
-          id: id
-        }
-      }
-    })
-    await refetch()
-  }
-
-  const expandedRowRender = (record: ApprovalRequestRead) => {
-    const dataSource = [];
-    dataSource.push({
-      key: "企画",
-      value: record.type_edit_exhibition_info.exhibition_name === undefined ? "変更なし" : record.type_edit_exhibition_info.exhibition_name
-    })
-    if (record.type_edit_exhibition_info.icon_id) {
-      dataSource.push({
-        key: "アイコン",
-        value: "変更あり"
-      })
-    } else if (record.type_edit_exhibition_info.icon_id === undefined) {
-      dataSource.push({
-        key: "アイコン",
-        value: "変更なし"
-      })
-    }
-    if (record.type_edit_exhibition_info.description) {
-      dataSource.push({
-        key: "説明",
-        value: record.type_edit_exhibition_info.description
-      })
-    } else {
-      dataSource.push({
-        key: "説明",
-        value: "変更なし"
-      })
-    }
-    return (
-      <Table<ExpandedRowDataType>
-        columns={expandedColumns}
-        dataSource={dataSource}
-        pagination={false}
-      />
-    )
-  }
 
   const columns: TableProps<ApprovalRequestRead>['columns'] = [
     {
@@ -137,6 +52,25 @@ function Inner() {
       title: "ステータス",
       dataIndex: "status",
       rowScope: "row",
+      filters: [
+        {
+          text: "審査中",
+          value: "pending"
+        },
+        {
+          text: "承認済み",
+          value: "approved"
+        },
+        {
+          text: "却下済み",
+          value: "rejected"
+        },
+        {
+          text: "取り下げ済み",
+          value: "closed"
+        }
+      ],
+      onFilter: (value, record) => record.status === value,
       render: (value) => {
         switch (value) {
           case "pending":
@@ -145,6 +79,8 @@ function Inner() {
             return <Tag color={"green"}>承認済み</Tag>;
           case "rejected":
             return <Tag color={"red"}>却下済み</Tag>;
+          case "closed":
+            return <Tag color={"purple"}>取り下げ済み</Tag>
           default:
             return <Tag color={"grey"}>不明</Tag>;
         }
@@ -168,37 +104,16 @@ function Inner() {
       title: '操作',
       dataIndex: 'id',
       fixed: 'right',
-      render: (value, record) => {
-        if (record.status == "pending") {
-          return (<Flex gap={5}>
-            <Popconfirm
-              title={"承認"}
-              description="この承認申請を本当に承認しますか？この操作は元に戻せませんよ！！"
-              onConfirm={handleApprove(value)}
-              onCancel={() => {
-                return
-              }}
-              okText="はい"
-              cancelText="いいえ"
+      render: (value) => {
+        return <Tooltip
+          title={"詳細"}
             >
-              <Button><CheckOutlined/></Button>
-            </Popconfirm>
-            <Popconfirm
-              title={"却下"}
-              description="この承認申請を本当に却下しますか？この操作は元に戻せません！！"
-              onConfirm={handleReject(value)}
-              onCancel={() => {
-                return
-              }}
-              okText="はい"
-              cancelText="いいえ"
-            >
-              <Button danger><CloseOutlined/></Button>
-            </Popconfirm>
-          </Flex>)
-        } else {
-          return <span>操作不可</span>;
-        }
+          <Button
+            href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/review?approval_request_id=" + value}
+          >
+            <MoreOutlined/> 詳細
+          </Button>
+        </Tooltip>
       },
     },
   ]
@@ -214,7 +129,6 @@ function Inner() {
           dataSource={data.map(item => ({...item, key: item.id}))}
           columns={columns}
           bordered
-          expandable={{expandedRowRender}}
           scroll={{x: 'max-content'}}
         />
       </Flex>

@@ -31,9 +31,9 @@ function Inner() {
     try {
       await mutateNotificationCreate({
           body: {
-            title: title,
             target: target.map((t) => t.join("/")),
             type_markdown: {
+              title: title,
               content: markdown
             }
           }

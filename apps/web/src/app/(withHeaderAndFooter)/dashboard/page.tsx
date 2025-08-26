@@ -2,27 +2,28 @@
 
 import {Suspense, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {$apiMembers, getTokensMembers} from "@/lib";
+import {$apiMembers, getTokensMembers, GroupRead, UserRead} from "@/lib";
 import "../../globals.css";
-
 import {Heading1, LoadingScreen} from '@/components/generic';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {PlanCard} from "@/components/plan/PlanCard";
+import {EditModal} from "@/components/plan/EditModal/EditModal";
+import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
+import {BasePlanRead} from "@/lib/plansInfoTypes";
 
 export default function Page() {
   return (
     <Suspense fallback={<LoadingScreen/>}>
       <QueryClientProvider client={new QueryClient()}>
-        <Inner/>
+        <Inner1/>
       </QueryClientProvider>
     </Suspense>
   )
 }
 
-function Inner() {
-  const router = useRouter();
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+function Inner1() {
   const {data: user} = $apiMembers.useQuery("get", "/users/{user_id}", {
     params: {
       path: {
@@ -31,6 +32,16 @@ function Inner() {
     },
     suspense: true
   })
+  if (user) {
+    return <Inner2 user={user}/>
+  } else {
+    return <LoadingScreen/>
+  }
+}
+
+function Inner2({user}: { user: UserRead }) {
+  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const {data: group} = $apiMembers.useQuery("get", "/groups/{id}", {
     params: {
       path: {
@@ -63,37 +74,57 @@ function Inner() {
     return <LoadingScreen/>;
   }
 
+  if (group) {
+    return <main className="content">
+      {
+        user && group &&
+              <UserInfoCard user={user} group={group}/>
+      }
+      <Heading1 emoji={"🔔"}>
+        実行委員会からのお知らせ
+      </Heading1>
+      <ViewNotifications client={$apiMembers}/>
+      {group.type_plan && <Inner3 user={user} group={group}/>}
+    </main>
+  } else {
+    return <LoadingScreen/>
+  }
+}
+
+function Inner3({group}: { user: UserRead, group: GroupRead }) {
+  const {data: plan} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
+    params: {
+      path: {
+        planId: group.id
+      }
+    }
+  })
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
   return (
     <>
-      <main className="content">
-        {
-          user && group &&
-                <UserInfoCard user={user} group={group}/>
-        }
-        <Heading1 emoji={"🔔"}>
-          実行委員会からのお知らせ
-        </Heading1>
-        <ViewNotifications client={$apiMembers}/>
-        {/*<Heading1 emoji={"📄"}>*/}
-        {/*  企画情報*/}
-        {/*</Heading1>*/}
-        {/*{*/}
-        {/*  exhibitor &&*/}
-        {/*        <ExhibitorCard*/}
-        {/*                exhibitor={exhibitor}*/}
-        {/*                openModal={() => setIsModalOpen(true)}*/}
-        {/*        />*/}
-        {/*}*/}
+      <Heading1 emoji={"📄"}>
+        企画情報
+      </Heading1>
+      {
+        plan ?
+          <PlanCard
+            plan={plan as BasePlanRead}
+            openModal={() => setIsModalOpen(true)}
+          />
+          :
+          <LoadingScreen/>
+      }
 
-        {/*{*/}
-        {/*  user && exhibitor &&*/}
-        {/*        <EditModal*/}
-        {/*                user={user}*/}
-        {/*                modal={isModalOpen}*/}
-        {/*                setModal={setIsModalOpen}*/}
-        {/*        />*/}
-        {/*}*/}
-      </main>
+      {
+        plan && <EditModal
+                      planId={plan.id}
+                      modal={isModalOpen}
+                      setModal={setIsModalOpen}
+                      initDescription={plan.description}
+              />
+      }
     </>
   );
 }

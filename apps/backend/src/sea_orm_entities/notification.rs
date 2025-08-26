@@ -12,18 +12,24 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
     pub created_by: Option<Uuid>,
     pub updated_by: Option<Uuid>,
-    #[sea_orm(column_type = "Text")]
-    pub title: String,
     pub target: Vec<String>,
     pub r#type: NotificationType,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_one = "super::notification_type_approval_request::Entity")]
+    NotificationTypeApprovalRequest,
     #[sea_orm(has_one = "super::notification_type_markdown::Entity")]
     NotificationTypeMarkdown,
     #[sea_orm(has_many = "super::read_notifications::Entity")]
     ReadNotifications,
+}
+
+impl Related<super::notification_type_approval_request::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NotificationTypeApprovalRequest.def()
+    }
 }
 
 impl Related<super::notification_type_markdown::Entity> for Entity {

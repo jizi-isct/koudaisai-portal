@@ -16,6 +16,7 @@ pub struct Config {
     pub db: Db,
     pub s3: S3,
     pub sendgrid: Sendgrid,
+    pub discord: Discord,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -203,4 +204,9 @@ https://portal.koudaisai.jp/
             .unwrap(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Discord {
+    pub approval_request_url: String,
 }

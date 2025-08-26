@@ -1,6 +1,8 @@
 use crate::entities::target_specifier::TargetSpecifier;
-use crate::sea_orm_entities::{notification, notification_type_markdown, sea_orm_active_enums};
-use crate::util::IntoActiveValue;
+use crate::sea_orm_entities::{
+    notification, notification_type_approval_request, notification_type_markdown,
+    sea_orm_active_enums,
+};
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
@@ -11,12 +13,12 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
-    TypeMarkdown { content: String },
+    TypeMarkdown { title: String, content: String },
+    TypeApprovalRequest { approval_request_id: Uuid },
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct NotificationCreate {
-    pub title: String,
     pub target: Vec<TargetSpecifier>,
     #[serde(flatten)]
     pub notification_type: NotificationType,
@@ -27,6 +29,10 @@ pub enum NotificationCreateActiveModel {
         notification::ActiveModel,
         notification_type_markdown::ActiveModel,
     ),
+    TypeApprovalRequest(
+        notification::ActiveModel,
+        notification_type_approval_request::ActiveModel,
+    ),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -36,7 +42,6 @@ pub struct NotificationRead {
     pub updated_at: DateTime<Utc>,
     pub created_by: Uuid,
     pub updated_by: Uuid,
-    pub title: String,
     pub target: Vec<TargetSpecifier>,
     #[serde(flatten)]
     pub notification_type: NotificationType,
@@ -44,6 +49,10 @@ pub struct NotificationRead {
 
 pub enum NotificationReadModel {
     TypeMarkdown(notification::Model, notification_type_markdown::Model),
+    TypeApprovalRequest(
+        notification::Model,
+        notification_type_approval_request::Model,
+    ),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -61,13 +70,17 @@ pub enum NotificationUpdateActiveModel {
         notification::ActiveModel,
         notification_type_markdown::ActiveModel,
     ),
+    TypeApprovalRequest(
+        notification::ActiveModel,
+        notification_type_approval_request::ActiveModel,
+    ),
     NoTypeSpecified(notification::ActiveModel),
 }
 
 impl NotificationCreate {
     pub fn into_active_model(self, created_by: Option<Uuid>) -> NotificationCreateActiveModel {
         match self.notification_type {
-            NotificationType::TypeMarkdown { content } => {
+            NotificationType::TypeMarkdown { title, content } => {
                 let id = Uuid::new_v4();
                 let notification_model = notification::ActiveModel {
                     id: Set(id.clone()),
@@ -75,15 +88,37 @@ impl NotificationCreate {
                     updated_at: Set(Utc::now().into()),
                     created_by: Set(created_by),
                     updated_by: Set(created_by),
-                    title: Set(self.title),
                     target: Set(self.target.iter().map(|t| t.into()).collect()),
                     r#type: Set(sea_orm_active_enums::NotificationType::Markdown),
                 };
                 let markdown_model = notification_type_markdown::ActiveModel {
                     id: Set(id),
-                    content: Set(content), // Placeholder, actual content should be set
+                    title: Set(title),
+                    content: Set(content),
                 };
                 NotificationCreateActiveModel::TypeMarkdown(notification_model, markdown_model)
+            }
+            NotificationType::TypeApprovalRequest {
+                approval_request_id,
+            } => {
+                let id = Uuid::new_v4();
+                let notification_model = notification::ActiveModel {
+                    id: Set(id.clone()),
+                    created_at: Set(Utc::now().into()),
+                    updated_at: Set(Utc::now().into()),
+                    created_by: Set(created_by),
+                    updated_by: Set(created_by),
+                    target: Set(self.target.iter().map(|t| t.into()).collect()),
+                    r#type: Set(sea_orm_active_enums::NotificationType::ApprovalRequest),
+                };
+                let approval_request_model = notification_type_approval_request::ActiveModel {
+                    id: Set(id),
+                    approval_request_id: Set(approval_request_id),
+                };
+                NotificationCreateActiveModel::TypeApprovalRequest(
+                    notification_model,
+                    approval_request_model,
+                )
             }
         }
     }
@@ -94,6 +129,14 @@ impl NotificationCreate {
             NotificationCreateActiveModel::TypeMarkdown(notification_model, markdown_model) => {
                 notification_model.insert(db).await?;
                 markdown_model.insert(db).await?;
+                Ok(())
+            }
+            NotificationCreateActiveModel::TypeApprovalRequest(
+                notification_model,
+                approval_request_model,
+            ) => {
+                notification_model.insert(db).await?;
+                approval_request_model.insert(db).await?;
                 Ok(())
             }
         }
@@ -109,35 +152,67 @@ impl NotificationRead {
                 updated_at: notification.updated_at.into(),
                 created_by: notification.created_by.unwrap_or(Uuid::new_v4()),
                 updated_by: notification.updated_by.unwrap_or(Uuid::new_v4()),
-                title: notification.title,
                 target: notification
                     .target
                     .iter()
                     .map(|t| TargetSpecifier::from_string(t))
                     .collect(),
                 notification_type: NotificationType::TypeMarkdown {
+                    title: markdown.title,
                     content: markdown.content,
                 },
             }),
+            NotificationReadModel::TypeApprovalRequest(notification, approval_request) => {
+                Ok(NotificationRead {
+                    id: notification.id,
+                    created_at: notification.created_at.into(),
+                    updated_at: notification.updated_at.into(),
+                    created_by: notification.created_by.unwrap_or(Uuid::new_v4()),
+                    updated_by: notification.updated_by.unwrap_or(Uuid::new_v4()),
+                    target: notification
+                        .target
+                        .iter()
+                        .map(|t| TargetSpecifier::from_string(t))
+                        .collect(),
+                    notification_type: NotificationType::TypeApprovalRequest {
+                        approval_request_id: approval_request.approval_request_id,
+                    },
+                })
+            }
         }
     }
     pub async fn find_by_id(db: &DbConn, id: Uuid) -> Result<Option<NotificationRead>> {
         let notification = notification::Entity::find_by_id(id).one(db).await?;
         if let Some(notification) = notification {
-            let markdown = notification_type_markdown::Entity::find_by_id(id)
-                .one(db)
-                .await?
-                .unwrap_or(notification_type_markdown::Model {
-                    id,
-                    content: "".to_string(), // Placeholder, actual content should be set
-                });
-            Ok(Some(
-                NotificationRead::from_model(NotificationReadModel::TypeMarkdown(
-                    notification,
-                    markdown,
-                ))
-                .await?,
-            ))
+            match notification.r#type {
+                sea_orm_active_enums::NotificationType::Markdown => {
+                    let markdown = notification_type_markdown::Entity::find_by_id(id)
+                        .one(db)
+                        .await?
+                        .ok_or(anyhow!("No Markdown content found."))?;
+                    Ok(Some(
+                        NotificationRead::from_model(NotificationReadModel::TypeMarkdown(
+                            notification,
+                            markdown,
+                        ))
+                        .await?,
+                    ))
+                }
+                sea_orm_active_enums::NotificationType::ApprovalRequest => {
+                    let approval_request =
+                        notification_type_approval_request::Entity::find_by_id(id)
+                            .one(db)
+                            .await?
+                            .ok_or(anyhow!("No ApprovalRequest content found."))?;
+                    Ok(Some(
+                        NotificationRead::from_model(NotificationReadModel::TypeApprovalRequest(
+                            notification,
+                            approval_request,
+                        ))
+                        .await?,
+                    ))
+                }
+            }
         } else {
             Ok(None)
         }
@@ -154,9 +229,24 @@ impl NotificationRead {
                         .await?
                         .ok_or(anyhow!("No Markdown content found."))?;
                     results.push(
-                        NotificationRead::from_model(
-                            NotificationReadModel::TypeMarkdown(notification, markdown).into(),
-                        )
+                        NotificationRead::from_model(NotificationReadModel::TypeMarkdown(
+                            notification,
+                            markdown,
+                        ))
+                        .await?,
+                    );
+                }
+                sea_orm_active_enums::NotificationType::ApprovalRequest => {
+                    let approval_request =
+                        notification_type_approval_request::Entity::find_by_id(notification.id)
+                            .one(db)
+                            .await?
+                            .ok_or(anyhow!("No ApprovalRequest content found."))?;
+                    results.push(
+                        NotificationRead::from_model(NotificationReadModel::TypeApprovalRequest(
+                            notification,
+                            approval_request,
+                        ))
                         .await?,
                     );
                 }
@@ -176,26 +266,38 @@ impl NotificationUpdate {
             Some(targets) => Set(targets.iter().map(|t| t.into()).collect::<Vec<String>>()),
             None => Default::default(),
         };
-        let mut notification_model = notification::ActiveModel {
+        let notification_model = notification::ActiveModel {
             id: Set(id),
             created_at: Default::default(),
             updated_at: Set(Utc::now().into()),
             created_by: Default::default(),
             updated_by: Set(updated_by),
-            title: self.title.into_active_value(),
             target,
             r#type: Default::default(),
         };
 
         match self.notification_type {
-            Some(NotificationType::TypeMarkdown { content }) => {
+            Some(NotificationType::TypeMarkdown { title, content }) => {
                 let markdown_model = notification_type_markdown::ActiveModel {
                     id: Set(id),
+                    title: Set(title),
                     content: Set(content),
                 };
                 Ok(NotificationUpdateActiveModel::TypeMarkdown(
                     notification_model,
                     markdown_model,
+                ))
+            }
+            Some(NotificationType::TypeApprovalRequest {
+                approval_request_id,
+            }) => {
+                let approval_request_model = notification_type_approval_request::ActiveModel {
+                    id: Set(id),
+                    approval_request_id: Set(approval_request_id),
+                };
+                Ok(NotificationUpdateActiveModel::TypeApprovalRequest(
+                    notification_model,
+                    approval_request_model,
                 ))
             }
             None => Ok(NotificationUpdateActiveModel::NoTypeSpecified(
@@ -210,6 +312,14 @@ impl NotificationUpdate {
             NotificationUpdateActiveModel::TypeMarkdown(notification_model, markdown_model) => {
                 notification_model.update(db).await?;
                 markdown_model.update(db).await?;
+                Ok(())
+            }
+            NotificationUpdateActiveModel::TypeApprovalRequest(
+                notification_model,
+                approval_request_model,
+            ) => {
+                notification_model.update(db).await?;
+                approval_request_model.update(db).await?;
                 Ok(())
             }
             NotificationUpdateActiveModel::NoTypeSpecified(notification_model) => {

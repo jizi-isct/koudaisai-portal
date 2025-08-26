@@ -21,6 +21,7 @@ pub mod group_plan_labo;
 pub mod group_plan_stage;
 pub mod group_press;
 pub mod notification;
+pub mod notification_type_approval_request;
 pub mod notification_type_markdown;
 pub mod read_notifications;
 pub mod revoked_refresh_tokens;

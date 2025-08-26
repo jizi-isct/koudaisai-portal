@@ -14,12 +14,18 @@ pub struct Model {
     pub r#type: ApprovalRequestType,
     pub status: ApprovalRequestStatus,
     pub approved_by: Option<Uuid>,
+    #[sea_orm(column_type = "Text")]
+    pub issue_reason: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub approval_reason: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(has_one = "super::approval_request_type_edit_exhibition_info::Entity")]
     ApprovalRequestTypeEditExhibitionInfo,
+    #[sea_orm(has_many = "super::notification_type_approval_request::Entity")]
+    NotificationTypeApprovalRequest,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::IssuedBy",
@@ -33,6 +39,12 @@ pub enum Relation {
 impl Related<super::approval_request_type_edit_exhibition_info::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::ApprovalRequestTypeEditExhibitionInfo.def()
+    }
+}
+
+impl Related<super::notification_type_approval_request::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NotificationTypeApprovalRequest.def()
     }
 }
 

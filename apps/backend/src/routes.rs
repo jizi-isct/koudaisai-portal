@@ -2,6 +2,7 @@ mod api;
 mod auth;
 use crate::config::{Sendgrid, SendgridTemplate, Web};
 use crate::middlewares;
+use crate::service::discord::Discord;
 use crate::util::jwt::JWTManager;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::SHAManager;
@@ -31,6 +32,7 @@ pub fn init_routes(
     oidc_client: OIDCClient,
     s3_client: aws_sdk_s3::Client,
     s3_bucket: String,
+    discord: Discord,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
@@ -57,6 +59,7 @@ pub fn init_routes(
         },
         s3_client,
         s3_bucket,
+        discord,
     });
 
     let serve_dir =
@@ -88,6 +91,7 @@ pub struct AppState {
     pub sha_manager: SHAManager,
     pub s3_client: aws_sdk_s3::Client,
     pub s3_bucket: String,
+    pub discord: Discord,
 }
 
 pub struct AuthSession {

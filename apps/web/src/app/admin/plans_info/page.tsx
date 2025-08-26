@@ -3,7 +3,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Heading1, LoadingScreen} from "@/components/generic";
 import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tag, Tooltip, Upload} from "antd";
 import {DeleteOutlined, DownloadOutlined, UploadOutlined} from "@ant-design/icons";
-import {$plansInfoApi} from "@/lib/plansInfoApi";
+import {$plansInfoApiAdmin} from "@/lib/plansInfoApi";
 import {
   BasePlanRead,
   BoothPlanCreate,
@@ -18,6 +18,7 @@ import {
 import Papa from "papaparse";
 import objectHash from "object-hash";
 import {useDownload} from "@/lib";
+import Image from "next/image";
 
 type BulkCreateRow = {
   id: string;
@@ -33,6 +34,7 @@ type BulkCreateRow = {
   building: string;
   location: string;
   is_lab_tour: string;
+  icon_url: string;
 }
 
 type BulkUpdateRow = {
@@ -49,6 +51,7 @@ type BulkUpdateRow = {
   building?: string;
   location?: string;
   is_lab_tour?: string;
+  icon_url?: string;
 }
 
 export default function Page() {
@@ -62,10 +65,11 @@ export default function Page() {
 function Inner() {
   const download = useDownload()
   const [messageApi, contextHolder] = message.useMessage();
-  const {data, isLoading, refetch} = $plansInfoApi.useQuery("get", "/plans")
-  const {mutateAsync: mutatePlanCreate} = $plansInfoApi.useMutation("put", "/plans/{planId}")
-  const {mutateAsync: mutatePlanUpdate} = $plansInfoApi.useMutation("patch", "/plans/{planId}")
-  const {mutateAsync: mutatePlanDelete} = $plansInfoApi.useMutation("delete", "/plans/{planId}")
+  const {data, isLoading, refetch} = $plansInfoApiAdmin.useQuery("get", "/plans")
+  const {mutateAsync: mutatePlanBulkCreate} = $plansInfoApiAdmin.useMutation("post", "/plans:bulk")
+  const {mutateAsync: mutatePlanIconImport} = $plansInfoApiAdmin.useMutation("post", "/plans/{planId}/icon:import")
+  const {mutateAsync: mutatePlanUpdate} = $plansInfoApiAdmin.useMutation("patch", "/plans/{planId}")
+  const {mutateAsync: mutatePlanDelete} = $plansInfoApiAdmin.useMutation("delete", "/plans/{planId}")
 
   const handleDelete = (id: string) => async () => {
     await mutatePlanDelete({
@@ -81,206 +85,206 @@ function Inner() {
   const handleBulkCreate = async (csv: string) => {
     const hash = objectHash(csv)
     const plans: Map<string, BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate> = new Map();
+    const iconUrls: Map<string, string> = new Map();
     let isAborted = false;
 
     Papa.parse<BulkCreateRow>(csv, {
-      header: true,
-      skipEmptyLines: true,
-      worker: true,           // Web Workerでパース（UIをブロックしない）
-      encoding: "UTF-8",      // Shift_JISなら "Shift_JIS" に変更（不明なら自前検知→二度読みが安全）
-      step: (result, parser) => {
-        try {
-          const data = result.data;
+        header: true,
+        skipEmptyLines: true,
+        worker: true,           // Web Workerでパース（UIをブロックしない）
+        encoding: "UTF-8",      // Shift_JISなら "Shift_JIS" に変更（不明なら自前検知→二度読みが安全）
+        step: (result, parser) => {
+          try {
+            const data = result.data;
 
-          // type
-          let type;
-          switch (data.id.charAt(0)) {
-            case "M":
-              type = "booth";
-              break;
-            case "I":
-              type = "general";
-              break;
-            case "S":
-              type = "stage";
-              break;
-            case "L":
-              type = "labo";
-              break;
-            default:
-              throw "企画番号の頭文字はM, I, S, Lのいずれかである必要があります。"
-          }
-
-          // organization_name
-          const organization_name = data.organization_name;
-
-          // plan_name
-          const plan_name = data.plan_name;
-
-          // description
-          const description = data.description;
-
-          // is_child_friendly
-          const is_child_friendly = data.is_child_friendly === "true";
-
-          // is_recommended
-          const is_recommended = data.is_recommended === "true";
-
-          // schedule
-          let day1 = null
-          let day2 = null
-          if (data.day1_start_time !== "" && data.day1_end_time !== "") {
-            day1 = {
-              start_time: data.day1_start_time,
-              end_time: data.day1_end_time
+            // type
+            let type;
+            switch (data.id.charAt(0)) {
+              case "M":
+                type = "booth";
+                break;
+              case "I":
+                type = "general";
+                break;
+              case "S":
+                type = "stage";
+                break;
+              case "L":
+                type = "labo";
+                break;
+              default:
+                throw "企画番号の頭文字はM, I, S, Lのいずれかである必要があります。"
             }
-          }
-          if (data.day2_start_time !== "" && data.day2_end_time !== "") {
-            day2 = {
-              start_time: data.day2_start_time,
-              end_time: data.day2_end_time
+
+            // organization_name
+            const organization_name = data.organization_name;
+
+            // plan_name
+            const plan_name = data.plan_name;
+
+            // description
+            const description = data.description;
+
+            // is_child_friendly
+            const is_child_friendly = data.is_child_friendly === "true";
+
+            // is_recommended
+            const is_recommended = data.is_recommended === "true";
+
+            // schedule
+            let day1 = null
+            let day2 = null
+            if (data.day1_start_time !== "" && data.day1_end_time !== "") {
+              day1 = {
+                start_time: data.day1_start_time,
+                end_time: data.day1_end_time
+              }
             }
-          }
+            if (data.day2_start_time !== "" && data.day2_end_time !== "") {
+              day2 = {
+                start_time: data.day2_start_time,
+                end_time: data.day2_end_time
+              }
+            }
 
-          // location
-          let location
-          if (data.building !== "") {
-            location = [{
-              type: "indoor",
-              building: data.building,
-              room: data.location
-            }]
-          } else {
-            location = [{
-              type: "outdoor",
-              name: data.location
-            }]
-          }
+            // location
+            let location
+            if (data.building !== "") {
+              location = [{
+                type: "indoor",
+                building: data.building,
+                room: data.location
+              }]
+            } else {
+              location = [{
+                type: "outdoor",
+                name: data.location
+              }]
+            }
 
-          // is_lab_tour
-          let is_lab_tour = undefined;
-          if (type === "labo") {
-            is_lab_tour = data.is_lab_tour.toLowerCase() === "true";
-          }
+            // is_lab_tour
+            let is_lab_tour = undefined;
+            if (type === "labo") {
+              is_lab_tour = data.is_lab_tour.toLowerCase() === "true";
+            }
 
-          plans.set(data.id, {
-            type,
-            organization_name,
-            plan_name,
-            description,
-            is_child_friendly,
-            is_recommended,
-            schedule: {
-              day1,
-              day2
-            },
-            location,
-            is_lab_tour
-          })
-        } catch (error) {
-          console.error('Error in step processing:', error);
-          messageApi.error({
-            content: `行の処理中にエラーが発生しました：${error}`,
-            key: hash
-          });
-          isAborted = true;
-          parser.abort();
-        }
-      },
-      complete: async () => {
-        // If parsing was aborted due to an error, don't proceed with complete callback
-        if (isAborted) {
-          return;
-        }
+            plans.set(data.id, {
+              type,
+              organization_name,
+              plan_name,
+              description,
+              is_child_friendly,
+              is_recommended,
+              schedule: {
+                day1,
+                day2
+              },
+              location,
+              is_lab_tour
+            })
 
-        const n = plans.size
-        let i = 1;
-        let isError = false;
-        const isCreated = [];
-        try {
-          for (const [id, plan] of plans.entries()) {
-            messageApi.destroy(hash)
-            messageApi.loading({
-              content: `作成中(${i}/${n} - ${id})... ブラウザを閉じないでください`,
-              key: hash,
-              duration: 0
+            //アイコン
+            if (data.icon_url !== "") {
+              iconUrls.set(data.id, data.icon_url)
+            }
+          } catch (error) {
+            console.error('Error in step processing:', error);
+            messageApi.error({
+              content: `行の処理中にエラーが発生しました：${error}`,
+              key: hash
             });
+            isAborted = true;
+            parser.abort();
+          }
+        },
+        complete: async () => {
+          // If parsing was aborted due to an error, don't proceed with complete callback
+          if (isAborted) {
+            return;
+          }
 
-            try {
-              await mutatePlanCreate({
-                params: {
-                  path: {
-                    planId: id
-                  }
-                },
-                body: plan
-              })
-            } catch (err) {
+          let isError = false;
+          messageApi.destroy(hash)
+          messageApi.loading({
+            content: `企画情報を挿入中... ブラウザを閉じないでください`,
+            key: hash,
+            duration: 0
+          });
+
+          try {
+            await mutatePlanBulkCreate({
+              body: Object.fromEntries(plans)
+            })
+          } catch (err) {
+            messageApi.destroy(hash)
+            messageApi.error({
+              content: `作成中にエラーが発生しました:${JSON.stringify(err)}`,
+              key: hash
+            });
+            console.error(err)
+            return;
+          }
+
+          messageApi.destroy(hash)
+          messageApi.loading({
+            content: `画像のインポート中...`,
+            key: hash,
+            duration: 0
+          });
+          let i = 0
+          const n = iconUrls.size
+          await Promise.all(iconUrls.entries().map(([id, iconUrl]) => {
+            return mutatePlanIconImport({
+              params: {
+                path: {
+                  planId: id
+                }
+              },
+              body: {
+                url: iconUrl
+              }
+            }).then(() => {
+              i++
+              messageApi.destroy(hash)
+              messageApi.loading({
+                content: `画像のインポート中...(${i}/${n})`,
+                key: hash,
+                duration: 0
+              });
+            }).catch((err) => {
               messageApi.destroy(hash)
               messageApi.error({
-                content: `作成中にエラーが発生しました:${JSON.stringify(err)}(${i}/${n} - ${id})`,
+                content: `画像インポート中にエラーが発生しました(${iconUrl}):${JSON.stringify(err)}`,
                 key: hash
               });
               isError = true;
-              break;
-            }
-            isCreated.push(id)
+              console.error(err)
+            })
+          }))
 
-            i++
+          if (!isError) {
+            messageApi.destroy(hash)
+            messageApi.success({
+              content: "新規作成が完了しました。反映には最長で１分ほどかかる可能性があります。",
+              key: hash
+            });
           }
-        } catch (e) {
-          messageApi.destroy(hash)
+        },
+        error: (error: never) => {
+          console.error(error);
           messageApi.error({
-            content: `エラーが発生しました：${e}(${i}/${n})`,
+            content: `CSVの読み込み中にエラーが発生しました：${error}`,
             key: hash
           });
-        }
-
-        if (isError) {
-          messageApi.loading({
-            content: "ロールバック中... ブラウザを閉じないでください．",
-            key: hash + "_rollback",
-            duration: 0
-          })
-
-          for (const id of isCreated) {
-            try {
-              await mutatePlanDelete({
-                params: {
-                  path: {
-                    planId: id
-                  }
-                }
-              })
-            } catch (e) {
-              messageApi.error(`${id} の削除に失敗しました: ${JSON.stringify(e)}`)
-            }
-          }
-          messageApi.destroy(hash + "_rollback")
-          messageApi.info({
-            content: "ロールバック処理が終了しました．",
-          })
-        } else {
-          messageApi.destroy(hash)
-          messageApi.success({
-            content: "新規作成が完了しました。反映には最長で１分ほどかかる可能性があります。",
-            key: hash
-          });
-        }
-      },
-      error: (error: never) => {
-        console.error(error);
-        messageApi.error({
-          content: `CSVの読み込み中にエラーが発生しました：${error}`,
-          key: hash
-        });
-      },
-    })
+        },
+      }
+    )
   }
 
   const handleBulkUpdate = async (csv: string) => {
     const hash = objectHash(csv)
     const plans: Map<string, BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate> = new Map();
+    const iconUrls: Map<string, string> = new Map();
     let isAborted = false;
 
     Papa.parse<BulkUpdateRow>(csv, {
@@ -388,6 +392,11 @@ function Inner() {
             location,
             is_lab_tour
           })
+
+          //アイコン
+          if (data.icon_url && data.icon_url !== "") {
+            iconUrls.set(data.id, data.icon_url)
+          }
         } catch (error) {
           console.error('Error in step processing:', error);
           messageApi.error({
@@ -446,6 +455,43 @@ function Inner() {
             key: hash
           });
         }
+
+        messageApi.destroy(hash)
+        messageApi.loading({
+          content: `画像のインポート中...`,
+          key: hash,
+          duration: 0
+        });
+        let i2 = 1
+        const n2 = iconUrls.size
+        await Promise.all(iconUrls.entries().map(([id, iconUrl]) => {
+          return mutatePlanIconImport({
+            params: {
+              path: {
+                planId: id
+              }
+            },
+            body: {
+              url: iconUrl
+            }
+          }).then(() => {
+            i2++
+            messageApi.destroy(hash)
+            messageApi.loading({
+              content: `画像のインポート中...(${i2}/${n2})`,
+              key: hash,
+              duration: 0
+            });
+          }).catch((err) => {
+            messageApi.destroy(hash)
+            messageApi.error({
+              content: `画像インポート中にエラーが発生しました(${iconUrl}):${JSON.stringify(err)}`,
+              key: hash
+            });
+            isError = true;
+            console.error(err)
+          })
+        }))
 
         if (isError) {
           messageApi.loading({
@@ -516,6 +562,7 @@ function Inner() {
         building,
         location,
         is_lab_tour: "is_lab_tour" in plan ? (plan.is_lab_tour ? "true" : "false") : "false",
+        icon_url: "https://api2025.jizi.jp/v1/plans/" + plan.id + "/icon"
       }
     }) ?? []
 
@@ -528,7 +575,9 @@ function Inner() {
     return
   }
 
-  const columns: TableProps<BasePlanRead>['columns'] = [
+  const columns
+    :
+    TableProps<BasePlanRead> ['columns'] = [
     {
       key: "id",
       title: <Tooltip title={"id"}>企画番号</Tooltip>,
@@ -571,6 +620,20 @@ function Inner() {
           default:
             return <Tag color={"warning"}>不明</Tag>
         }
+      }
+    },
+    {
+      key: "icon",
+      title: <Tooltip title={"icon"}>アイコン</Tooltip>,
+      dataIndex: "id",
+      rowScope: "row",
+      render: (value, record) => {
+        return <Image
+          src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${record.id}/icon`}
+          alt={"企画のアイコン"}
+          width={128}
+          height={128}
+        />
       }
     },
     {

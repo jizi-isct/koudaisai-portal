@@ -6,7 +6,7 @@ import {paths} from "./api_v2";
 import createFetchClient, {type Middleware} from "openapi-fetch";
 import {useEffect, useState} from "react";
 
-const authMiddlewareMembers: Middleware = {
+export const authMiddlewareMembers: Middleware = {
   async onRequest({request}) {
     const tokens = await getTokensMembers();
 

@@ -56,8 +56,8 @@ function Inner({notificationId}: { notificationId: string }) {
   )
   const [submitting, setSubmitting] = useState(false)
 
-  const formType = useMemo(() => {
-    if (data?.type_markdown) {
+  const notificationType = useMemo(() => {
+    if ("type_markdown" in (data ?? {})) {
       return "markdown"
     }
     return "markdown"
@@ -93,9 +93,9 @@ function Inner({notificationId}: { notificationId: string }) {
           }
         },
         body: {
-          title: title,
           target: target?.map((t) => t.join("/")),
           type_markdown: {
+            title: title,
             content: markdown
           }
         }
@@ -105,12 +105,29 @@ function Inner({notificationId}: { notificationId: string }) {
     messageApi.success('保存しました')
   }
 
+  if (!("type_markdown" in data)) {
+    return <Result
+      status="error"
+      title="この種類の通知は編集できません"
+      subTitle={error}
+      extra={
+        <Button
+          href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications"}
+          type="primary"
+        >
+          戻る
+        </Button>
+      }
+    >
+    </Result>
+  }
+
   return (
     <>
       <Form
         onFinish={handleSubmit}
         initialValues={{
-          title: data.title,
+          title: data.type_markdown.title,
           target: data.target.map((t) => t.split("/")),
           markdown: data.type_markdown.content
         }}
@@ -147,7 +164,7 @@ function Inner({notificationId}: { notificationId: string }) {
           </Form.List>
         </Form.Item>
         <Form.Item label="通知の種類">
-          <Radio.Group defaultValue={formType}>
+          <Radio.Group defaultValue={notificationType}>
             <Radio.Button value="markdown">MD</Radio.Button>
           </Radio.Group>
         </Form.Item>

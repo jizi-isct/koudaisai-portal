@@ -7,3 +7,10 @@ oneOf:
             $ref: "./NotificationCreateTypeMarkdown.yml"
         required:
           - type_markdown
+  - allOf:
+      - $ref: "./NotificationCreateGeneric.yml"
+      - properties:
+          type_approval_request:
+            $ref: "./NotificationCreateTypeApprovalRequest.yml"
+        required:
+          - type_approval_request

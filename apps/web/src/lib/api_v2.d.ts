@@ -1006,6 +1006,8 @@ export interface paths {
                 query: {
                     key: string;
                     file_name: string;
+                    /** @description リダイレクトするかどうか．デフォルト値は`false` */
+                    redirect?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -1023,6 +1025,13 @@ export interface paths {
                             presigned_url?: string;
                         };
                     };
+                };
+                /** @description redirect=trueの場合に返される．リソースへのリダイレクト */
+                302: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
                 /** @description 不正なrequest bodyの形式 */
                 400: {
@@ -1987,53 +1996,7 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        /** 承認申請を更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateApprovalRequest"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/approval-requests/{id}/approve": {
@@ -2056,7 +2019,14 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description 承認理由 */
+                        approval_reason: string | null;
+                    };
+                };
+            };
             responses: {
                 /** @description No Content */
                 204: {
@@ -2114,7 +2084,14 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description 承認理由 */
+                        approval_reason: string | null;
+                    };
+                };
+            };
             responses: {
                 /** @description No Content */
                 204: {
@@ -2747,32 +2724,40 @@ export interface components {
              * @description 最終更新者のユーザーID
              */
             updated_by: string;
-            /** @description 通知のタイトル */
-            title: string;
             /** @description Target specifiers for the form */
             target: components["schemas"]["TargetSpecifier"][];
         };
         /** @description マークダウンタイプの通知 */
         NotificationReadTypeMarkdown: {
+            /** @description 通知のタイトル */
+            title: string;
             content: string;
         };
-        NotificationRead: components["schemas"]["NotificationReadGeneric"] & {
-            type_markdown: components["schemas"]["NotificationReadTypeMarkdown"];
+        /** @description 承認申請の通知タイプ */
+        NotificationReadTypeApprovalRequest: {
+            /**
+             * Format: uuid
+             * @description 承認申請のID
+             */
+            approval_request_id: string;
         };
+        NotificationRead: (components["schemas"]["NotificationReadGeneric"] & {
+            type_markdown: components["schemas"]["NotificationReadTypeMarkdown"];
+        }) | (components["schemas"]["NotificationReadGeneric"] & {
+            type_approval_request: components["schemas"]["NotificationReadTypeApprovalRequest"];
+        });
         /**
          * @description Status of the approval request
          * @example pending
          * @enum {string}
          */
-        ApprovalRequestStatus: "pending" | "approved" | "rejected";
-        /** @description Type for editing exhibition information */
+        ApprovalRequestStatus: "pending" | "approved" | "rejected" | "closed";
+        /** @description 企画情報訂正申請 */
         ApprovalRequestTypeEditExhibitionInfo: {
-            /** @description Name of the exhibition */
-            exhibition_name?: string | null;
-            /** @description ID of the exhibition icon */
-            icon_id?: string | null;
-            /** @description Description of the exhibition */
-            description?: string | null;
+            /** @description 企画内容説明文 */
+            description?: string;
+            /** @description 企画アイコンのキー． */
+            icon_key?: string;
         };
         /** @description Type of the approval request */
         ApprovalRequestType: {
@@ -2801,45 +2786,62 @@ export interface components {
              * @description ID of the user who approved or rejected the request
              */
             approved_by?: string | null;
+            /** @description Reason for issuing the approval request */
+            issue_reason: string;
+            /** @description Reason for approving or rejecting the request */
+            approval_reason: string | null;
         } & components["schemas"]["ApprovalRequestType"];
         /** @description Request to create an approval request */
-        CreateApprovalRequest: components["schemas"]["ApprovalRequestType"];
+        CreateApprovalRequest: components["schemas"]["ApprovalRequestType"] & {
+            /** @description 承認申請の理由 */
+            issue_reason?: string;
+        };
         NotificationCreateGeneric: {
-            /** @description 通知のタイトル */
-            title: string;
             /** @description Target specifiers for the form */
             target: components["schemas"]["TargetSpecifier"][];
         };
         /** @description マークダウンタイプの通知 */
         NotificationCreateTypeMarkdown: {
+            /** @description 通知のタイトル */
+            title: string;
             content: string;
         };
-        NotificationCreate: components["schemas"]["NotificationCreateGeneric"] & {
-            type_markdown: components["schemas"]["NotificationCreateTypeMarkdown"];
+        /** @description 承認申請の通知タイプ */
+        NotificationCreateTypeApprovalRequest: {
+            /**
+             * Format: uuid
+             * @description 承認申請のID
+             */
+            approval_request_id: string;
         };
+        NotificationCreate: (components["schemas"]["NotificationCreateGeneric"] & {
+            type_markdown: components["schemas"]["NotificationCreateTypeMarkdown"];
+        }) | (components["schemas"]["NotificationCreateGeneric"] & {
+            type_approval_request: components["schemas"]["NotificationCreateTypeApprovalRequest"];
+        });
         NotificationUpdateGeneric: {
-            /** @description 通知のタイトル */
-            title?: string;
             /** @description Target specifiers for the form */
             target?: components["schemas"]["TargetSpecifier"][];
         };
         /** @description マークダウンタイプの通知 */
         NotificationUpdateTypeMarkdown: {
+          /** @description 通知のタイトル */
+          title?: string;
             content?: string;
+        };
+        /** @description 承認申請の通知タイプ */
+        NotificationUpdateTypeApprovalRequest: {
+            /**
+             * Format: uuid
+             * @description 承認申請のID
+             */
+            approval_request_id?: string;
         };
         NotificationUpdate: (components["schemas"]["NotificationUpdateGeneric"] & {
             type_markdown: components["schemas"]["NotificationUpdateTypeMarkdown"];
-        }) | components["schemas"]["NotificationUpdateGeneric"];
-        /** @description Request to update an approval request */
-        UpdateApprovalRequest: {
-            status?: components["schemas"]["ApprovalRequestStatus"];
-            /**
-             * Format: uuid
-             * @description ID of the user who approved or rejected the request
-             */
-            approved_by?: string | null;
-            type?: components["schemas"]["ApprovalRequestType"];
-        };
+        }) | (components["schemas"]["NotificationUpdateGeneric"] & {
+            type_approval_request: components["schemas"]["NotificationUpdateTypeApprovalRequest"];
+        });
     };
     responses: never;
     parameters: never;

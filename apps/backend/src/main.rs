@@ -1,5 +1,6 @@
 use crate::config::{init_config, Db, Logging};
 use crate::routes::init_routes;
+use crate::service::discord::Discord;
 use crate::util::oidc::OIDCClient;
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::config::Credentials;
@@ -17,6 +18,7 @@ pub mod entities;
 pub mod middlewares;
 mod routes;
 pub mod sea_orm_entities;
+mod service;
 pub mod util;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();
@@ -51,6 +53,7 @@ async fn main() {
 
     //app init
     let db = init_db(&config.db).await.unwrap();
+    let discord = Discord::new(&config.discord.approval_request_url);
     let app = init_routes(
         &config.web,
         config.sendgrid,
@@ -58,6 +61,7 @@ async fn main() {
         oidc_client,
         s3_client,
         config.s3.bucket.clone(),
+        discord,
     );
 
     let listener = tokio::net::TcpListener::bind(format!(
