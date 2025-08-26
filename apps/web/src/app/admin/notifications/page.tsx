@@ -32,21 +32,39 @@ function Inner() {
     {
       key: "title",
       title: "タイトル",
-      dataIndex: "title",
+      dataIndex: "",
       rowScope: "row",
-      render: (value, record, _index) => <a
-        style={{textDecoration: "underline"}}
-        href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/edit?notification_id=" + record.id}
-      >
-        {value}
-      </a>
+      render: (value, record, _index) => {
+        if ("type_markdown" in record) {
+          return <a
+            style={{textDecoration: "underline"}}
+            href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/notifications/edit?notification_id=" + record.id}
+          >
+            {
+              "type_markdown" in record ? record.type_markdown.title : "なし"
+            }
+          </a>
+        } else if ("type_approval_request" in record) {
+          return <a
+            style={{textDecoration: "underline"}}
+            href={process.env.NEXT_PUBLIC_ADMIN_BASE_PATH + "/approval_requests/review?approval_request_id=" + record.type_approval_request.approval_request_id}
+          >
+            承認申請結果
+          </a>
+        } else {
+          return <span>不明</span>
+        }
+
+      }
     },
     {
       key: "type",
       title: "種類",
       render: (_value, record, _index) => {
-        if (record.type_markdown) {
+        if ("type_markdown" in record) {
           return <Tag color={"green"}>MD</Tag>;
+        } else if ("type_approval_request" in record) {
+          return <Tag color={"blue"}>承認申請結果</Tag>
         } else {
           return <Tag color={"red"}>不明</Tag>
         }

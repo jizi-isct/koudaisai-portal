@@ -2820,13 +2820,13 @@ export interface components {
             type_approval_request: components["schemas"]["NotificationCreateTypeApprovalRequest"];
         });
         NotificationUpdateGeneric: {
-            /** @description 通知のタイトル */
-            title?: string;
             /** @description Target specifiers for the form */
             target?: components["schemas"]["TargetSpecifier"][];
         };
         /** @description マークダウンタイプの通知 */
         NotificationUpdateTypeMarkdown: {
+          /** @description 通知のタイトル */
+          title?: string;
             content?: string;
         };
         /** @description 承認申請の通知タイプ */
