@@ -57,6 +57,12 @@ aside {
     min-height: 100vh;
 }
 
+small {
+    font-size: 10px;
+    color: #1a1a1a;
+    line-height: 1.25;
+}
+
 @media screen and ( max-width : 768px ) {
     .content {
         margin-top: 100px;
