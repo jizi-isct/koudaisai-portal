@@ -312,7 +312,7 @@ function Inner() {
               type = "labo";
               break;
             default:
-              throw "企画番号の頭文字はM, I, S, Lのいずれかである必要があります。"
+              type = undefined;
           }
 
           // organization_name
