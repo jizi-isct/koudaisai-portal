@@ -38,7 +38,12 @@ async fn get_approval_requests(
             if user.group_id != current_user.group_id {
                 return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
             }
+            let group = user.get_group_read(&state.db_conn).await?;
             let requests = user.get_approval_requests(&state.db_conn).await?;
+            let requests = requests
+                .into_iter()
+                .filter(|r| group.contains_user_in_representatives(r.issued_by))
+                .collect::<Vec<ReadApprovalRequest>>();
             Ok((StatusCode::OK, Json(requests).into_response()))
         }
         _ => Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response())),

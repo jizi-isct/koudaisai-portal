@@ -435,6 +435,30 @@ impl GroupRead {
             }
         }
     }
+
+    pub fn contains_user_in_representatives(&self, uuid: Uuid) -> bool {
+        match &self.r#type {
+            GroupTypeRead::TypePlan(plan) => match &plan.r#type {
+                PlanTypeRead::TypeBooth(booth) => {
+                    booth.representative1 == uuid
+                        || booth.representative2 == uuid
+                        || booth.representative3 == uuid
+                }
+                PlanTypeRead::TypeGeneral(general) => {
+                    general.representative1 == uuid
+                        || general.representative2 == uuid
+                        || general.representative3 == uuid
+                }
+                PlanTypeRead::TypeStage(stage) => {
+                    stage.representative3 == uuid
+                        || stage.representative2 == uuid
+                        || stage.representative3 == uuid
+                }
+                PlanTypeRead::TypeLabo(labo) => labo.representative == uuid,
+            },
+            GroupTypeRead::TypePress(press) => press.representative == uuid,
+        }
+    }
 }
 
 impl GroupUpdate {
