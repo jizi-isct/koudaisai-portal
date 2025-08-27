@@ -38,12 +38,7 @@ async fn get_approval_requests(
             if user.group_id != current_user.group_id {
                 return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
             }
-            let group = user.get_group_read(&state.db_conn).await?;
             let requests = user.get_approval_requests(&state.db_conn).await?;
-            let requests = requests
-                .into_iter()
-                .filter(|r| group.contains_user_in_representatives(r.issued_by))
-                .collect::<Vec<ReadApprovalRequest>>();
             Ok((StatusCode::OK, Json(requests).into_response()))
         }
         _ => Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response())),
@@ -101,11 +96,19 @@ async fn get_approval_request(
             let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
             let user =
                 UserRead::from_user_id(user_id, current_user.clone(), &state.db_conn).await?;
-            let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
-            if user.group_id == current_user.group_id {
+            if user.group_id != current_user.group_id {
+                return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
+            }
+            let group = user.get_group_read(&state.db_conn).await?;
+            let request =
+                match ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await? {
+                    Some(req) => req,
+                    None => return Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
+                };
+            if group.contains_user_in_representatives(request.issued_by) {
                 Ok((StatusCode::OK, Json(request).into_response()))
             } else {
-                Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
+                Ok((StatusCode::NOT_FOUND, "Not Found.".into_response()))
             }
         }
         _ => Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response())),
@@ -127,16 +130,20 @@ async fn close_approval_request(
             let current_user = UserRead::from_claims(claims, &state.db_conn).await?;
             let user =
                 UserRead::from_user_id(user_id, current_user.clone(), &state.db_conn).await?;
+            if user.group_id != current_user.group_id {
+                return Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()));
+            }
+            let group = user.get_group_read(&state.db_conn).await?;
             let request = ReadApprovalRequest::find_from_id(request_id, &state.db_conn).await?;
             let request = match request {
                 Some(req) => req,
                 None => return Ok((StatusCode::NOT_FOUND, "Not found.".into_response())),
             };
-            if user.group_id == current_user.group_id {
+            if group.contains_user_in_representatives(request.issued_by) {
                 request.close(&state.db_conn).await?;
                 Ok((StatusCode::NO_CONTENT, ().into_response()))
             } else {
-                Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response()))
+                Ok((StatusCode::NOT_FOUND, "Not Found.".into_response()))
             }
         }
         _ => Ok((StatusCode::FORBIDDEN, "Forbidden.".into_response())),
