@@ -312,7 +312,7 @@ function Inner() {
               type = "labo";
               break;
             default:
-              throw "企画番号の頭文字はM, I, S, Lのいずれかである必要があります。"
+              type = undefined;
           }
 
           // organization_name
@@ -494,29 +494,11 @@ function Inner() {
         }))
 
         if (isError) {
-          messageApi.loading({
-            content: "ロールバック中... ブラウザを閉じないでください．",
-            key: hash + "_rollback",
-            duration: 0
-          })
-
-          for (const id of isCreated) {
-            try {
-              await mutatePlanDelete({
-                params: {
-                  path: {
-                    planId: id
-                  }
-                },
-              })
-            } catch (e) {
-              messageApi.destroy(`${id} の削除に失敗しました${JSON.stringify(e)}`)
-            }
-          }
-          messageApi.destroy(hash + "_rollback")
-          messageApi.info({
-            content: "ロールバック処理が終了しました．",
-          })
+          messageApi.destroy(hash)
+          messageApi.error({
+            content: `一部の更新に失敗しました。${isCreated.length}件更新しました。反映には最長で１分ほどかかる可能性があります。`,
+            key: hash
+          });
         } else {
           messageApi.destroy(hash)
           messageApi.success({
