@@ -1,5 +1,8 @@
 import {useCallback, useState} from "react";
 import type {apiQueryClientType} from "@/lib";
+import { Upload, Button, message } from "antd";
+import type { UploadProps } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import {Loader} from "@/components/generic/Loader";
 import styles from "./FileUploader.module.css";
 
@@ -16,10 +19,9 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
   const handleFileUpload = useCallback(async (file: File | undefined) => {
     setIsUploading(true)
     if (!file) {
-      setError("ファイルを指定してください")
+      message.error(`ファイルを指定してください`);
       return
     }
-
     try {
       const response = await mutateUploadFile({
         body: {
@@ -42,17 +44,19 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
       setIsUploading(false)
     }
     setIsUploading(false)
+    message.success(`ファイルがアップロードされました`);
   }, [callback, mutateUploadFile])
 
   return (
-    <div className={styles.root}>
-      <input
-        type="file"
-        accept={fileType}
-        onChange={e => handleFileUpload(e.target.files?.[0])}
-      />
+    <>
+      <Upload beforeUpload={(file) => {
+        handleFileUpload(file); // ファイル選択後に自分の関数を呼ぶ
+        return false; // アップロードは自動で行わない
+      }} accept={fileType} maxCount={1}>
+        <Button icon={<UploadOutlined />}>アップロードする</Button>
+      </Upload>
       {isUploading && <><Loader/><span>アップロード中</span></>}
       {error && <span style={{color: "red"}}>{error}</span>}
-    </div>
+    </>
   )
 }
