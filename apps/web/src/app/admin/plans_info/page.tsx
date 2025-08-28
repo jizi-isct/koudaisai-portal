@@ -548,8 +548,11 @@ function Inner() {
       }
     }) ?? []
 
-    const csv = Papa.unparse(rows)
-    const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+    const csv = Papa.unparse(rows, {
+      newline: "\r\n"
+    })
+    const bom = "\uFEFF"
+    const blob = new Blob([bom + csv], {type: "text/csv;charset=utf-8;"});
     const url = URL.createObjectURL(blob);
 
     download(url, "plans.csv")
