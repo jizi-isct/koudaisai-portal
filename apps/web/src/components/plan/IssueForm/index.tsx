@@ -2,7 +2,7 @@
 
 import React from "react";
 import {$apiMembers} from "@/lib";
-import { Flex, Input, Typography, Button, Upload } from "antd";
+import { ConfigProvider, App, Flex, Input, Typography, Button, Upload } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import {TextInput} from "@/components/generic/TextInput/TextInput";
@@ -72,21 +72,26 @@ export const EditIssueForm = (
   return (
     <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
-      <Flex vertical gap={16}>
-        <>
-          <Typography.Title level={5}>企画概要</Typography.Title>
-          <TextInput defaultValue={description} rows={2} onChange={(e) => setDescription(e.target.value)} />
-        </>
-        <>
-          <Typography.Title level={5}>アイコン画像</Typography.Title>
-          <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
-        </>
-        <>
-          <Typography.Title level={5}>訂正理由</Typography.Title>
-          <TextInput placeholder="理由を入力してください" onChange={(e) => setIssueReason(e.target.value)} />
-        </>
-      </Flex>
-      <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
+      
+        <ConfigProvider>
+          <App>
+            <Flex vertical gap={16}>
+              <>
+                <Typography.Title level={5}>企画概要</Typography.Title>
+                <TextInput defaultValue={description} rows={2} onChange={(e) => setDescription(e.target.value)} />
+              </>
+              <>
+                <Typography.Title level={5}>アイコン画像</Typography.Title>
+                <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
+              </>
+              <>
+                <Typography.Title level={5}>訂正理由</Typography.Title>
+                <TextInput placeholder="理由を入力してください" onChange={(e) => setIssueReason(e.target.value)} />
+              </>
+            </Flex>
+            <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
+          </App>
+        </ConfigProvider>
     </div>
   );
 };

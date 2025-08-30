@@ -14,12 +14,12 @@ type FileUploaderProps = {
 
 export function FileUploader({callback, fileType, client}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [messageApi, contextHolder] = message.useMessage();
   const {mutateAsync: mutateUploadFile} = client.useMutation("post", "/files/upload")
   const handleFileUpload = useCallback(async (file: File | undefined) => {
     setIsUploading(true)
     if (!file) {
-      message.error(`ファイルを指定してください`);
+      messageApi.error(`ファイルを指定してください`);
       return
     }
     try {
@@ -39,16 +39,17 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
 
       await callback(response.key, file.name)
     } catch (e) {
-      setError(`エラー：${e}`)
+      messageApi.error(`エラー：${e}`);
     } finally {
       setIsUploading(false)
     }
     setIsUploading(false)
-    message.success(`ファイルがアップロードされました`);
-  }, [callback, mutateUploadFile])
+    messageApi.success(`ファイルがアップロードされました`);
+  }, [messageApi, callback, mutateUploadFile])
 
   return (
     <>
+      {contextHolder}
       <Upload beforeUpload={(file) => {
         handleFileUpload(file); // ファイル選択後に自分の関数を呼ぶ
         return false; // アップロードは自動で行わない
@@ -56,7 +57,6 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
         <Button icon={<UploadOutlined />}>アップロードする</Button>
       </Upload>
       {isUploading && <><Loader/><span>アップロード中</span></>}
-      {error && <span style={{color: "red"}}>{error}</span>}
     </>
   )
 }
