@@ -1,9 +1,7 @@
 import {useCallback, useState} from "react";
 import type {apiQueryClientType} from "@/lib";
-import { Upload, Button, message } from "antd";
-import type { UploadProps } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import {Loader} from "@/components/generic/Loader";
+import { Flex, Upload, Button, message, Spin } from "antd";
+import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 import styles from "./FileUploader.module.css";
 
 type FileUploaderProps = {
@@ -56,7 +54,10 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
       }} accept={fileType} maxCount={1}>
         <Button icon={<UploadOutlined />}>アップロードする</Button>
       </Upload>
-      {isUploading && <><Loader/><span>アップロード中</span></>}
+      {isUploading && <Flex>
+        <Spin indicator={<LoadingOutlined spin />} size="small" />
+        <span>アップロード中</span>
+      </Flex>}
     </>
   )
 }
