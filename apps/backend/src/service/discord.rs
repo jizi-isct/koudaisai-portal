@@ -7,6 +7,7 @@ use aws_sdk_s3::error::SdkError;
 use aws_sdk_s3::operation::get_object::GetObjectError;
 use aws_sdk_s3::Client as S3Client;
 use openidconnect::core::CoreUserInfoClaims;
+use reqwest::Url;
 use serenity::all::CreateAttachment;
 use serenity::builder::{CreateEmbed, ExecuteWebhook};
 use serenity::http::Http;
@@ -18,6 +19,7 @@ use uuid::Uuid;
 #[derive(Clone, Debug, Default)]
 pub struct Discord {
     pub approval_request_url: String,
+    pub approval_request_thread_id: Option<u64>,
 }
 
 #[derive(Error, Debug)]
@@ -31,8 +33,18 @@ pub enum SendApprovalRequestIssueMessageError {
 }
 impl Discord {
     pub fn new<T: Into<String>>(approval_request_url: T) -> Discord {
+        let url_string = approval_request_url.into();
+        let approval_request_thread_id = if let Ok(url) = Url::parse(&url_string) {
+            url.query_pairs()
+                .find(|(key, _)| key == "thread_id")
+                .and_then(|(_, value)| value.parse::<u64>().ok())
+        } else {
+            None
+        };
+
         Self {
-            approval_request_url: approval_request_url.into(),
+            approval_request_url: url_string,
+            approval_request_thread_id,
         }
     }
 
@@ -93,6 +105,11 @@ impl Discord {
                             .attachment(icon_text)
                             .color(0x0a9fd6)
                     );
+
+                // Add thread_id using builder.in_thread method
+                if let Some(thread_id) = self.approval_request_thread_id {
+                    builder = builder.in_thread(thread_id);
+                }
 
                 // Download the icon from S3 if icon_key exists
                 if let Some(key) = icon_key {
@@ -156,7 +173,12 @@ impl Discord {
                     embed = embed.field("承認/却下理由", approval_reason, false);
                 }
 
-                let builder = ExecuteWebhook::new().username(approver_name).embed(embed);
+                let mut builder = ExecuteWebhook::new().username(approver_name).embed(embed);
+
+                // Add thread_id using builder.in_thread method
+                if let Some(thread_id) = self.approval_request_thread_id {
+                    builder = builder.in_thread(thread_id);
+                }
 
                 webhook.execute(&http, false, builder).await?;
             }

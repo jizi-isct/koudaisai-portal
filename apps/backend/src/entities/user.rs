@@ -160,7 +160,7 @@ impl UserRead {
         let requests = ReadApprovalRequest::get_all(db_conn).await?;
         let mut user_requests = vec![];
         for request in requests {
-            if self.group_id == group.id {
+            if group.contains_user_in_representatives(request.issued_by) {
                 user_requests.push(request);
             }
         }
