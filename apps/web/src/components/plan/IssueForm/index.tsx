@@ -2,11 +2,11 @@
 
 import React from "react";
 import {$apiMembers} from "@/lib";
-import { ConfigProvider, Flex, Typography } from "antd";
-import {TextInput} from "@/components/generic/TextInput/TextInput";
+import { ConfigProvider, Flex, Typography, Button, Input } from "antd";
 import {FileUploader} from "@/components/common/FileUploader";
-import {ButtonCompact} from "@/components/generic/ButtonCompact";
 import {Heading1} from "@/components/generic";
+
+const { TextArea } = Input;
 
 type EditModalProps = {
   refetch: () => Promise<void>;
@@ -55,11 +55,17 @@ export const EditIssueForm = (
     <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
       
-        <ConfigProvider>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#0048FF",
+            },
+          }}
+        >
           <Flex vertical gap={20}>
             <Flex vertical gap={4}>
               <Typography.Title level={5}>企画概要</Typography.Title>
-              <TextInput defaultValue={description} rows={2} onChange={(e) => setDescription(e.target.value)} />
+              <TextArea defaultValue={description} rows={2} onChange={(e) => setDescription(e.target.value)} />
             </Flex>
             <Flex vertical gap={8}>
               <Typography.Title level={5}>アイコン画像</Typography.Title>
@@ -67,9 +73,9 @@ export const EditIssueForm = (
             </Flex>
             <Flex vertical gap={8}>
               <Typography.Title level={5}>訂正理由</Typography.Title>
-              <TextInput placeholder="理由を入力してください" onChange={(e) => setIssueReason(e.target.value)} />
+              <TextArea placeholder="理由を入力してください" onChange={(e) => setIssueReason(e.target.value)} />
             </Flex>
-            <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
+            <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
           </Flex>
         </ConfigProvider>
     </div>
