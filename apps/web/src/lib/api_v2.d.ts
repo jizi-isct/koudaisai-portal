@@ -2358,7 +2358,7 @@ export interface components {
             type_press?: components["schemas"]["PressUpdate"];
         };
         /** @description Target specifier for forms */
-        TargetSpecifier: string & (("exhibitor/type/general" | "exhibitor/type/booth" | "exhibitor/type/stage" | "exhibitor/type/labo" | "user/nologin") | unknown | unknown);
+        TargetSpecifier: string & (("group/type/plan_general" | "group/type/plan_booth" | "group/type/plan_stage" | "group/type/plan_labo" | "group/type/press" | "user/nologin") | unknown | unknown);
         /** @description Generic form properties */
         FormReadGeneric: {
             /**
