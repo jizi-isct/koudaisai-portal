@@ -1,4 +1,5 @@
 import styles from "./PlanCard.module.css";
+import { Button } from "antd";
 import {ButtonCompact} from "@/components/generic/ButtonCompact/ButtonCompact";
 import {PlanIcon} from "@/components/plan/PlanIcon";
 import {BasePlanRead} from "@/lib/plansInfoTypes";
@@ -24,13 +25,12 @@ export const PlanCard = ({plan, openModal}: ExhibitorCardProps) => {
       <h1>{plan.plan_name}</h1>
       <h4>{typeLabels[plan.type] || plan.type}</h4>
       <p>{plan.description}</p>
-      <ButtonCompact
-        text="訂正する"
-        color="#0048FF"
+      <Button
+        type="primary"
+        style={{ alignSelf: "flex-start" }}
         onClick={() => openModal()}
-        isClicked={false}
         className={styles.edit_button}
-      />
+      >訂正する</Button>
     </div>
   );
 };
