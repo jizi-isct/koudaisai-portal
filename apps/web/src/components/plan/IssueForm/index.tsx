@@ -20,10 +20,12 @@ export const EditIssueForm = (
   }: EditModalProps) => {
   const [description, setDescription] = React.useState<string>(initDescription);
   const [iconKey, setIconKey] = React.useState<string | undefined>();
-  const [issueReason, setIssueReason] = React.useState<string>("")
-  const {mutateAsync: createApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests")
+  const [issueReason, setIssueReason] = React.useState<string>("");
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  const {mutateAsync: createApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests");
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     let reqDescription: string | undefined = description;
 
     if (description === initDescription) {
@@ -67,7 +69,7 @@ export const EditIssueForm = (
           <Typography.Title level={5}>訂正理由</Typography.Title>
           <TextArea placeholder="理由を入力してください" style={{ resize: 'none'}} onChange={(e) => setIssueReason(e.target.value)} />
         </Flex>
-        <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
+        <Button type="primary" style={{ alignSelf: "flex-start" }} loading={isSubmitting} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
       </Flex>
     </div>
   );
