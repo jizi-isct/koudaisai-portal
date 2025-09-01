@@ -1,9 +1,7 @@
 import styles from "./PlanCard.module.css";
 import { Button } from "antd";
-import {ButtonCompact} from "@/components/generic/ButtonCompact/ButtonCompact";
 import {PlanIcon} from "@/components/plan/PlanIcon";
 import {BasePlanRead} from "@/lib/plansInfoTypes";
-
 
 type ExhibitorCardProps = {
   plan: BasePlanRead;
