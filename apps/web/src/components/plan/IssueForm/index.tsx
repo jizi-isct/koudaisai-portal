@@ -2,7 +2,7 @@
 
 import React from "react";
 import {$apiMembers} from "@/lib";
-import { ConfigProvider, Flex, Typography, Button, Input } from "antd";
+import { Flex, Typography, Button, Input } from "antd";
 import {FileUploader} from "@/components/common/FileUploader";
 import {Heading1} from "@/components/generic";
 
@@ -54,37 +54,21 @@ export const EditIssueForm = (
   return (
     <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
-      
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: "#0048FF",
-              "borderRadius": 8,
-            },
-            components: {
-              Button: {
-                contentFontSize: 12,
-                paddingInline: 17,
-              },
-            },
-          }}
-        >
-          <Flex vertical gap={20}>
-            <Flex vertical gap={4}>
-              <Typography.Title level={5}>企画概要</Typography.Title>
-              <TextArea defaultValue={description} style={{ resize: 'none'}} rows={2} onChange={(e) => setDescription(e.target.value)} />
-            </Flex>
-            <Flex vertical gap={8}>
-              <Typography.Title level={5}>アイコン画像</Typography.Title>
-              <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
-            </Flex>
-            <Flex vertical gap={8}>
-              <Typography.Title level={5}>訂正理由</Typography.Title>
-              <TextArea placeholder="理由を入力してください" style={{ resize: 'none'}} onChange={(e) => setIssueReason(e.target.value)} />
-            </Flex>
-            <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
-          </Flex>
-        </ConfigProvider>
+      <Flex vertical gap={20}>
+        <Flex vertical gap={4}>
+          <Typography.Title level={5}>企画概要</Typography.Title>
+          <TextArea defaultValue={description} style={{ resize: 'none'}} rows={2} onChange={(e) => setDescription(e.target.value)} />
+        </Flex>
+        <Flex vertical gap={8}>
+          <Typography.Title level={5}>アイコン画像</Typography.Title>
+          <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
+        </Flex>
+        <Flex vertical gap={8}>
+          <Typography.Title level={5}>訂正理由</Typography.Title>
+          <TextArea placeholder="理由を入力してください" style={{ resize: 'none'}} onChange={(e) => setIssueReason(e.target.value)} />
+        </Flex>
+        <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
+      </Flex>
     </div>
   );
 };
