@@ -59,13 +59,20 @@ export const EditIssueForm = (
           theme={{
             token: {
               colorPrimary: "#0048FF",
+              "borderRadius": 8,
+            },
+            components: {
+              Button: {
+                contentFontSize: 12,
+                paddingInline: 17,
+              },
             },
           }}
         >
           <Flex vertical gap={20}>
             <Flex vertical gap={4}>
               <Typography.Title level={5}>企画概要</Typography.Title>
-              <TextArea defaultValue={description} rows={2} onChange={(e) => setDescription(e.target.value)} />
+              <TextArea defaultValue={description} style={{ resize: 'none'}} rows={2} onChange={(e) => setDescription(e.target.value)} />
             </Flex>
             <Flex vertical gap={8}>
               <Typography.Title level={5}>アイコン画像</Typography.Title>
@@ -73,7 +80,7 @@ export const EditIssueForm = (
             </Flex>
             <Flex vertical gap={8}>
               <Typography.Title level={5}>訂正理由</Typography.Title>
-              <TextArea placeholder="理由を入力してください" onChange={(e) => setIssueReason(e.target.value)} />
+              <TextArea placeholder="理由を入力してください" style={{ resize: 'none'}} onChange={(e) => setIssueReason(e.target.value)} />
             </Flex>
             <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
           </Flex>
