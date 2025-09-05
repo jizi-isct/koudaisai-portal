@@ -3,7 +3,7 @@ import {Noto_Sans_JP} from "next/font/google";
 import "../globals.css";
 import "../members.css"
 import { ConfigProvider } from "antd";
-import type { ThemeConfig } from "antd";
+import { antdTheme } from "@/lib/lib";
 import {Footer, Header, MobileNavigator} from "@/components/generic";
 
 const notoSans = Noto_Sans_JP({
@@ -16,19 +16,6 @@ export const metadata: Metadata = {
   description: 'このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。このサイトを通じて工大祭への参加に関する各種手続きを行うことができます。一緒に工大祭を創りあげましょう！',
 }
 
-const theme: ThemeConfig = {
-  token: {
-    colorPrimary: "#0048FF",
-    "borderRadius": 8,
-  },
-  components: {
-    Button: {
-      contentFontSize: 12,
-      paddingInline: 17,
-    },
-  },
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +26,7 @@ export default function RootLayout({
       <body className={notoSans.className} id={"app"}>
         <Header header_type="members"  />
         <main className="content">
-          <ConfigProvider theme={theme}>
+          <ConfigProvider theme={antdTheme}>
             {children}
           </ConfigProvider>
         </main>
