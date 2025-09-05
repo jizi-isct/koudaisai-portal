@@ -1,12 +1,6 @@
 import { Input } from "antd";
-import type { InputProps } from "antd";
-import styles from "./TextInput.module.css";
 
 const { TextArea } = Input;
-
-type TextInputProps = InputProps & {
-  // 独自拡張したいProps
-};
 
 /**
  * テキスト入力

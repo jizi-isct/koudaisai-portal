@@ -2,7 +2,6 @@ import {useCallback, useState} from "react";
 import type {apiQueryClientType} from "@/lib";
 import { Flex, Upload, Button, message, Spin } from "antd";
 import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
-import styles from "./FileUploader.module.css";
 
 type FileUploaderProps = {
   callback: (fileKey: string, fileName: string) => (void | Promise<void>),
