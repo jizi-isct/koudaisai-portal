@@ -3,8 +3,8 @@
 import styles from "./MobileNavigator.module.css";
 import Link from "next/link";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
+import { Button } from "antd";
 import {usePathname, useRouter} from "next/navigation";
-import {ButtonCompact} from "@/components/generic/ButtonCompact";
 import {logout, useIsLoggedInMembers} from "@/lib";
 
 
@@ -26,10 +26,10 @@ export function MobileNavigator({header_type}: Props) {
         isLoggedIn === undefined ? <></> :
           isLoggedIn === true
             ? <div className={styles.logout}>
-              <ButtonCompact text={"ログアウト"} onClick={handleLogout}/>
+              <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleLogout}>ログアウト</Button>
             </div>
             : <div className={styles.login}>
-              <ButtonCompact text={"ログイン"} onClick={() => router.push("/login")}/>
+              <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={() => router.push("/login")}>ログイン</Button>
             </div>
       }
       <nav className={`${styles.nav} ${header_type === "admin" ? styles.admin : styles.members}`}>

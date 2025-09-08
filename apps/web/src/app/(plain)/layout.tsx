@@ -1,4 +1,6 @@
 import {Metadata} from "next";
+import { ConfigProvider } from "antd";
+import { antdTheme } from "@/lib/lib";
 
 export const metadata: Metadata = {
   title: '工大祭ポータル',
@@ -12,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-    <body id={"app"}>{children}</body>
+    <body id={"app"}>
+      <ConfigProvider theme={antdTheme}>
+        {children}
+      </ConfigProvider>
+    </body>
     </html>
   )
 }

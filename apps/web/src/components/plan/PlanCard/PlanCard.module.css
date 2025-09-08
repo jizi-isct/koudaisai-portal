@@ -24,12 +24,7 @@
 .edit_button {
     position: absolute;
     top: 20px;
-    right: 10px;
-    background-color: var(--darkblue);
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
+    right: 25px;
 }
 
 /* モバイル向けのスタイル */

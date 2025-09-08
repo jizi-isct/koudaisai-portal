@@ -1,7 +1,7 @@
 import {useCallback, useState} from "react";
 import type {apiQueryClientType} from "@/lib";
-import {Loader} from "@/components/generic/Loader";
-import styles from "./FileUploader.module.css";
+import { Flex, Upload, Button, message, Spin } from "antd";
+import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 
 type FileUploaderProps = {
   callback: (fileKey: string, fileName: string) => (void | Promise<void>),
@@ -11,15 +11,14 @@ type FileUploaderProps = {
 
 export function FileUploader({callback, fileType, client}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [messageApi, contextHolder] = message.useMessage();
   const {mutateAsync: mutateUploadFile} = client.useMutation("post", "/files/upload")
   const handleFileUpload = useCallback(async (file: File | undefined) => {
     setIsUploading(true)
     if (!file) {
-      setError("ファイルを指定してください")
+      messageApi.error(`ファイルを指定してください`);
       return
     }
-
     try {
       const response = await mutateUploadFile({
         body: {
@@ -37,22 +36,27 @@ export function FileUploader({callback, fileType, client}: FileUploaderProps) {
 
       await callback(response.key, file.name)
     } catch (e) {
-      setError(`エラー：${e}`)
+      messageApi.error(`エラー：${e}`);
     } finally {
       setIsUploading(false)
     }
     setIsUploading(false)
-  }, [callback, mutateUploadFile])
+    messageApi.success(`ファイルがアップロードされました`);
+  }, [messageApi, callback, mutateUploadFile])
 
   return (
-    <div className={styles.root}>
-      <input
-        type="file"
-        accept={fileType}
-        onChange={e => handleFileUpload(e.target.files?.[0])}
-      />
-      {isUploading && <><Loader/><span>アップロード中</span></>}
-      {error && <span style={{color: "red"}}>{error}</span>}
-    </div>
+    <>
+      {contextHolder}
+      <Upload beforeUpload={(file) => {
+        handleFileUpload(file); // ファイル選択後に自分の関数を呼ぶ
+        return false; // アップロードは自動で行わない
+      }} accept={fileType} maxCount={1}>
+        <Button icon={<UploadOutlined />}>アップロードする</Button>
+      </Upload>
+      {isUploading && <Flex>
+        <Spin indicator={<LoadingOutlined spin />} size="small" />
+        <span>アップロード中</span>
+      </Flex>}
+    </>
   )
 }

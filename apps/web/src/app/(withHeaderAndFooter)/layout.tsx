@@ -2,6 +2,8 @@ import type {Metadata} from "next";
 import {Noto_Sans_JP} from "next/font/google";
 import "../globals.css";
 import "../members.css"
+import { ConfigProvider } from "antd";
+import { antdTheme } from "@/lib/lib";
 import {Footer, Header, MobileNavigator} from "@/components/generic";
 
 const notoSans = Noto_Sans_JP({
@@ -24,7 +26,9 @@ export default function RootLayout({
       <body className={notoSans.className} id={"app"}>
         <Header header_type="members"  />
         <main className="content">
-          {children}
+          <ConfigProvider theme={antdTheme}>
+            {children}
+          </ConfigProvider>
         </main>
         <MobileNavigator header_type="members"/>
         <Footer />

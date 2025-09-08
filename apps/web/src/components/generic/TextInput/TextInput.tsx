@@ -1,12 +1,6 @@
-import styles from "./TextInput.module.css";
+import { Input } from "antd";
 
-type TextInputProps = {
-  width?: string;
-  placeholder?: string;
-  value?: string;
-  setValue: (newValue: string) => void;
-  paragraph: boolean;
-};
+const { TextArea } = Input;
 
 /**
  * テキスト入力
@@ -18,27 +12,6 @@ type TextInputProps = {
  * @param paragraph trueの場合，textareaを表示する
  * @constructor
  */
-export const TextInput = ({width, placeholder = "テキストを入力", value, setValue, paragraph}: TextInputProps) => {
-  if (paragraph) {
-    return (
-      <textarea
-        className={styles.Paragraph}
-        value={value ?? placeholder}
-        placeholder={placeholder}
-        style={{fontSize: 12, width: width ? width : "100%"}}
-        onChange={(e) => (setValue(e.target.value))}
-      />
-    )
-  } else {
-    return (
-      <input
-        type="text"
-        className={styles.textBox}
-        value={value ?? "データなし"}
-        placeholder={placeholder}
-        style={{fontSize: 16, width: width ? width : "100%"}}
-        onChange={(e) => (setValue(e.target.value))}
-      />
-    );
-  }
+export const TextInput = ({ ...props }) => {
+  return <TextArea {...props} />;
 };

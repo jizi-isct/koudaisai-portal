@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ThemeConfig } from "antd";
 
 export const topPageData = {
   booth: [
@@ -588,3 +589,16 @@ export const questionDataPlanStage: Record<string, Array<Question>> = {
     }
   ]
 }
+
+export const antdTheme: ThemeConfig = {
+  token: {
+    colorPrimary: "#0048FF",
+    "borderRadius": 8,
+  },
+  components: {
+    Button: {
+      contentFontSize: 12,
+      paddingInline: 17,
+    },
+  },
+};

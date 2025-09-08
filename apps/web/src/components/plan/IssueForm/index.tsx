@@ -2,11 +2,11 @@
 
 import React from "react";
 import {$apiMembers} from "@/lib";
-import {TextInput} from "@/components/generic/TextInput/TextInput";
+import { Flex, Typography, Button, Input } from "antd";
 import {FileUploader} from "@/components/common/FileUploader";
-import {ButtonCompact} from "@/components/generic/ButtonCompact";
 import {Heading1} from "@/components/generic";
 
+const { TextArea } = Input;
 
 type EditModalProps = {
   refetch: () => Promise<void>;
@@ -20,10 +20,12 @@ export const EditIssueForm = (
   }: EditModalProps) => {
   const [description, setDescription] = React.useState<string>(initDescription);
   const [iconKey, setIconKey] = React.useState<string | undefined>();
-  const [issueReason, setIssueReason] = React.useState<string>("")
-  const {mutateAsync: createApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests")
+  const [issueReason, setIssueReason] = React.useState<string>("");
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  const {mutateAsync: createApprovalRequest} = $apiMembers.useMutation("post", "/users/{user_id}/approval_requests");
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     let reqDescription: string | undefined = description;
 
     if (description === initDescription) {
@@ -54,27 +56,21 @@ export const EditIssueForm = (
   return (
     <div>
       <Heading1 emoji={"📝"}>企画情報の訂正</Heading1>
-      <label>
-        企画概要
-        <TextInput
-          value={description}
-          setValue={setDescription}
-          paragraph={true}
-        />
-      </label>
-      <label>
-        アイコン画像
-        <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
-      </label>
-      <label>
-        訂正理由
-        <TextInput
-          value={issueReason}
-          setValue={setIssueReason}
-          paragraph={true}
-        />
-      </label>
-      <ButtonCompact text={"企画情報の訂正を申請する"} onClick={handleSubmit}/>
+      <Flex vertical gap={20}>
+        <Flex vertical gap={4}>
+          <Typography.Title level={5}>企画概要</Typography.Title>
+          <TextArea defaultValue={description} style={{ resize: 'none'}} rows={2} onChange={(e) => setDescription(e.target.value)} />
+        </Flex>
+        <Flex vertical gap={8}>
+          <Typography.Title level={5}>アイコン画像</Typography.Title>
+          <FileUploader fileType={"image/*"} callback={(key, _) => setIconKey(key)} client={$apiMembers}/>
+        </Flex>
+        <Flex vertical gap={8}>
+          <Typography.Title level={5}>訂正理由</Typography.Title>
+          <TextArea placeholder="理由を入力してください" style={{ resize: 'none'}} onChange={(e) => setIssueReason(e.target.value)} />
+        </Flex>
+        <Button type="primary" style={{ alignSelf: "flex-start" }} loading={isSubmitting} onClick={handleSubmit}>企画情報の訂正を申請する</Button>
+      </Flex>
     </div>
   );
 };
