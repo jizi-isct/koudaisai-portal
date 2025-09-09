@@ -1,24 +1,51 @@
+'use client'
 import styles from "./ContentList.module.css";
-import React, {ReactNode} from "react";
+import React, {ReactNode, useState} from "react";
+import {Pagination} from "antd";
 
 type Props = {
-  contents: Array<ReactNode>
+  contents: Array<ReactNode>;
+  pagination?: boolean;
+  pageSize?: number;
 }
 
-export function ContentList({contents}: Props) {
+export function ContentList({contents, pagination = false, pageSize = 10}: Props) {
+  const [page, setPage] = useState(1);
+
   if (contents.length === 0) {
     return <></>;
   }
+
+
+  let currentContent = contents;
+
+  if (pagination) {
+    // ページ管理
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    currentContent = contents.slice(start, end);
+  }
+
   return (
     <div className={styles.root}>
       {
-        contents.map((content, i) => (
+        currentContent.map((item, i) => (
           <React.Fragment key={`fragment-${i}`}>
             { i > 0 && <div className={styles.separator}/>}
-            {content}
+            {item}
           </React.Fragment>
         ))
       }
+      {pagination && (
+        <Pagination
+          current={page}
+          pageSize={pageSize}
+          total={contents.length}
+          onChange={(p) => setPage(p)}
+          showSizeChanger={false}
+          align="center"
+        />
+      )}
     </div>
   )
 }
