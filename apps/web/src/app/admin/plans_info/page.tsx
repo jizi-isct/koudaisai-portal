@@ -359,7 +359,7 @@ function Inner() {
 
           // location
           let location = undefined
-          if (data.location && data.building !== "") {
+          if (data.location && data.building) {
             location = [{
               type: "indoor",
               building: data.building,
