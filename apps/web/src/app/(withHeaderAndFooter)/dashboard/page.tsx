@@ -112,6 +112,7 @@ function Inner3({group}: { user: UserRead, group: GroupRead }) {
           <PlanCard
             plan={plan as BasePlanRead}
             openModal={() => setIsModalOpen(true)}
+            disableEdit={true}
           />
           :
           <LoadingScreen/>

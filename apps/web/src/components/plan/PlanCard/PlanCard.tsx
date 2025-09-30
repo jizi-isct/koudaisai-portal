@@ -6,6 +6,7 @@ import {BasePlanRead} from "@/lib/plansInfoTypes";
 type ExhibitorCardProps = {
   plan: BasePlanRead;
   openModal: () => void;
+  disableEdit: boolean;
 };
 
 // typeのラベル変換マップ
@@ -16,7 +17,7 @@ const typeLabels: Record<string, string> = {
   labo: "研究室企画",
 };
 
-export const PlanCard = ({plan, openModal}: ExhibitorCardProps) => {
+export const PlanCard = ({plan, openModal, disableEdit}: ExhibitorCardProps) => {
   return (
     <div className={styles.card}>
       <PlanIcon planId={plan.id}/>
@@ -36,6 +37,7 @@ export const PlanCard = ({plan, openModal}: ExhibitorCardProps) => {
         style={{ alignSelf: "flex-start" }}
         onClick={() => openModal()}
         className={styles.edit_button}
+        disabled={disableEdit}
       >訂正する</Button>
     </div>
   );
