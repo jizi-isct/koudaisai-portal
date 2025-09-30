@@ -1,6 +1,6 @@
 'use client'
 import styles from "./ContentList.module.css";
-import React, {ReactNode, useState} from "react";
+import React, {ReactNode, useMemo, useState} from "react";
 import {Pagination} from "antd";
 
 type Props = {
@@ -12,18 +12,18 @@ type Props = {
 export function ContentList({contents, pagination = false, pageSize = 10}: Props) {
   const [page, setPage] = useState(1);
 
-  if (contents.length === 0) {
-    return <></>;
-  }
-
-
-  let currentContents = contents;
-
-  if (pagination) {
+  const currentContents = useMemo(() => {
+    if(!pagination) {
+      return contents;
+    }
     // ページ管理
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    currentContents = contents.slice(start, end);
+    return contents.slice(start, end);
+  }, [contents, page, pageSize, pagination]);
+
+  if (contents.length === 0) {
+    return <></>;
   }
 
   return (
