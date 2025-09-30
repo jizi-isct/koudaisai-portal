@@ -17,19 +17,19 @@ export function ContentList({contents, pagination = false, pageSize = 10}: Props
   }
 
 
-  let currentContent = contents;
+  let currentContents = contents;
 
   if (pagination) {
     // ページ管理
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    currentContent = contents.slice(start, end);
+    currentContents = contents.slice(start, end);
   }
 
   return (
     <div className={styles.root}>
       {
-        currentContent.map((item, i) => (
+        currentContents.map((item, i) => (
           <React.Fragment key={`fragment-${i}`}>
             { i > 0 && <div className={styles.separator}/>}
             {item}

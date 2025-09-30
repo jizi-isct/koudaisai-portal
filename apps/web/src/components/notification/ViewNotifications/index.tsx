@@ -22,11 +22,15 @@ export function ViewNotifications({client}: ViewNotificationsProps) {
     }
   );
 
+  const notifications_sorted = notifications?.sort((a, b) => {
+    return new Date(b.notification.created_at).getTime() - new Date(a.notification.created_at).getTime();
+  });
+
   if (!userId || isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!notifications || notifications.length === 0) {
+  if (!notifications_sorted || notifications_sorted.length === 0) {
     return (
       <div style={{textAlign: "center"}}>
         <p>実行委員会からの通知はありません</p>
@@ -36,9 +40,9 @@ export function ViewNotifications({client}: ViewNotificationsProps) {
   return (
     <div>
       <ContentList
-      pagination={true} pageSize={10}
-        contents={notifications.map((value, index) =>
-          <ContentRowNotification key={index} notification={value.notification} />
+      pagination={true} pageSize={5}
+        contents={notifications_sorted.map((value, index) =>
+          <ContentRowNotification key={value.notification.id} notification={value.notification} />
         )}
       />
     </div>
