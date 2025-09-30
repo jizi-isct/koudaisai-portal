@@ -1,5 +1,5 @@
 import styles from "./PlanCard.module.css";
-import {Button} from "antd";
+import {Button, Tag, Tooltip} from "antd";
 import {PlanIcon} from "@/components/plan/PlanIcon";
 import {BasePlanRead} from "@/lib/plansInfoTypes";
 
@@ -21,7 +21,15 @@ export const PlanCard = ({plan, openModal, disableEdit}: ExhibitorCardProps) => 
   return (
     <div className={styles.card}>
       <PlanIcon planId={plan.id}/>
-      <h1>{plan.plan_name}</h1>
+      <h1>
+        {plan.plan_name}
+        {
+          plan.is_recommended && <Tooltip title={"おすすめ企画"}><Tag color={"gold"}>⭐️</Tag></Tooltip>
+        }
+        {
+          plan.is_child_friendly && <Tooltip title={"子供向け企画"}><Tag color={"cyan"}>👦</Tag></Tooltip>
+        }
+      </h1>
       <h4>{typeLabels[plan.type] || plan.type}</h4>
       <p>{plan.description}</p>
       <Button
