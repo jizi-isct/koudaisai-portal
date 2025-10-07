@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::str::FromStr;
 use uuid::Uuid;
 
 /// フォームの回答
@@ -45,29 +44,4 @@ pub enum Answers {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AnswerText {
     pub value: String,
-}
-
-impl FormResponse {
-    pub fn from_model(
-        model: &crate::sea_orm_entities::form_type_builtin_response::Model,
-    ) -> anyhow::Result<Self> {
-        let response_id = model.response_id;
-        let created_at = model.created_at.unwrap().into();
-        let updated_at = model.updated_at.unwrap().into();
-        let form_id = model.form_id;
-        let respondent_id = model.respondent_id.to_string();
-        let answers1 = serde_json::from_value::<HashMap<String, Answer>>(model.answers.clone())?;
-        let mut answers = HashMap::new();
-        for (item_id, answer) in answers1 {
-            answers.insert(Uuid::from_str(item_id.as_str())?, answer);
-        }
-        Ok(Self {
-            response_id,
-            created_at,
-            updated_at,
-            form_id,
-            respondent_id,
-            answers,
-        })
-    }
 }

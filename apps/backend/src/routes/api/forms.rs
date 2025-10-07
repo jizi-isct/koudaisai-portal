@@ -10,7 +10,6 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
-use sea_orm::{ActiveModelTrait, EntityTrait};
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;

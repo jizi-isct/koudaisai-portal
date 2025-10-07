@@ -58,14 +58,14 @@ pub struct FormUpdate {
     pub form_type: Option<FormType>,
 }
 
-enum ActiveModelFormCreate {
+pub enum ActiveModelFormCreate {
     External(
         sea_orm_entities::form::ActiveModel,
         sea_orm_entities::form_type_external::ActiveModel,
     ),
 }
 
-enum ActiveModelFormUpdate {
+pub enum ActiveModelFormUpdate {
     External(
         sea_orm_entities::form::ActiveModel,
         sea_orm_entities::form_type_external::ActiveModel,
@@ -73,7 +73,7 @@ enum ActiveModelFormUpdate {
     Generic(sea_orm_entities::form::ActiveModel),
 }
 
-enum ModelFormRead {
+pub enum ModelFormRead {
     External(
         sea_orm_entities::form::Model,
         sea_orm_entities::form_type_external::Model,

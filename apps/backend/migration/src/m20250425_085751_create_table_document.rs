@@ -1,5 +1,5 @@
 use crate::sea_orm::Statement;
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -19,7 +19,7 @@ impl MigrationTrait for Migration {
                 title TEXT NOT NULL
             );
             "#
-                    .trim(),
+                .trim(),
             ))
             .await?;
 
@@ -93,7 +93,7 @@ impl MigrationTrait for Migration {
                 r#"
             DROP TABLE document_format_markdown;
             "#
-                    .trim(),
+                .trim(),
             ))
             .await?;
 
@@ -137,7 +137,7 @@ impl MigrationTrait for Migration {
                 r#"
             DROP TABLE document_category;
             "#
-                    .trim(),
+                .trim(),
             ))
             .await?;
 

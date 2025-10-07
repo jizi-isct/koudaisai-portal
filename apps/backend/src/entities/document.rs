@@ -261,16 +261,14 @@ impl DocumentUpdate {
         db_conn: &DbConn,
     ) -> Result<DocumentRead> {
         Ok(match self.into_active_model(id, updated_by) {
-            DocumentUpdateActiveModel::Markdown(mut generic, mut markdown) => {
-                DocumentRead::from_markdown(
-                    generic.update(db_conn).await?,
-                    markdown.update(db_conn).await?,
-                )
-            }
-            DocumentUpdateActiveModel::Pdf(mut generic, mut pdf) => {
+            DocumentUpdateActiveModel::Markdown(generic, markdown) => DocumentRead::from_markdown(
+                generic.update(db_conn).await?,
+                markdown.update(db_conn).await?,
+            ),
+            DocumentUpdateActiveModel::Pdf(generic, pdf) => {
                 DocumentRead::from_pdf(generic.update(db_conn).await?, pdf.update(db_conn).await?)
             }
-            DocumentUpdateActiveModel::Misc(mut generic, mut misc) => {
+            DocumentUpdateActiveModel::Misc(generic, misc) => {
                 DocumentRead::from_misc(generic.update(db_conn).await?, misc.update(db_conn).await?)
             }
             DocumentUpdateActiveModel::Generic(generic) => {
