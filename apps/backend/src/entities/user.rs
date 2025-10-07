@@ -21,6 +21,37 @@ use serde::{Deserialize, Serialize};
 use tracing::log::trace;
 use uuid::Uuid;
 
+const PASSWORD_RESET_EMAIL_SUBJECT: &str = r#"工大祭ポータル - パスワードリセット"#;
+const PASSWORD_RESET_EMAIL_BODY: &str = r#"{{username}} 様
+
+いつも工大祭ポータルをご利用いただきありがとうございます。
+
+パスワードリセットのご依頼を受け付けました。
+以下のリンクより新しいパスワードを設定してください。
+
+パスワードリセットリンク:
+https://portal.koudaisai.jp/reset-password?token={{reset_token}}
+
+※ このリンクの有効期限は{{expires_at}}です。期限を過ぎると無効になりますのでご注意ください。
+
+※ 本メールは送信専用です。本メールへのご返信には対応しておりません。
+
+ご不明な点がございましたら、工大祭実行委員会までお問い合わせください。
+
+もしこのメールに心当たりがない場合は、このメールを破棄してください。
+
+今後とも工大祭実行委員会をよろしくお願いいたします。
+
+--------------------------------
+東京科学大学　工大祭実行委員会
+工大祭ポータル
+https://portal.koudaisai.jp/
+
+お問い合わせ先
+　模擬店企画/一般企画 sanka@koudaisai.jp
+　ステージ企画 stage@koudaisai.jp
+　研究室公開企画 laboratory@koudaisai.jp"#;
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserCreate {
     pub name: String,
@@ -198,15 +229,13 @@ impl UserRead {
         sender: &Sender,
         from: Email,
         reset_token: String,
-        template_subject: &str,
-        template_content: &str,
         expire_time: i64,
     ) -> SendgridResult<Response> {
         self.send_email_plain_text(
             sender,
             from,
-            template_subject,
-            &template_content
+            PASSWORD_RESET_EMAIL_SUBJECT,
+            &PASSWORD_RESET_EMAIL_BODY
                 .replace("{{reset_token}}", &reset_token)
                 .replace("{{username}}", format!("{}", self.name).as_str())
                 .replace("{{expires_at}}", &*format_secs_ja_full(expire_time)),

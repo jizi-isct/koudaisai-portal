@@ -1,6 +1,6 @@
 mod api;
 mod auth;
-use crate::config::{Sendgrid, SendgridTemplate, Web};
+use crate::config::{Sendgrid, Web};
 use crate::middlewares;
 use crate::service::discord::Discord;
 use crate::util::jwt::JWTManager;
@@ -39,7 +39,6 @@ pub fn init_routes(
         web: web.clone(),
         sendgrid_sender_email: Email::new(sendgrid.sender_address.clone()),
         sendgrid_sender: Sender::new(sendgrid.api_key, None),
-        sendgrid_template: sendgrid.template,
         db_conn: db_conn.clone(),
         oidc_client,
         auth_sessions: Default::default(),
@@ -82,7 +81,6 @@ pub struct AppState {
     pub web: Web,
     pub sendgrid_sender_email: Email,
     pub sendgrid_sender: Sender,
-    pub sendgrid_template: SendgridTemplate,
     pub db_conn: DatabaseConnection,
     pub oidc_client: OIDCClient,
     pub auth_sessions: Mutex<HashMap<String, AuthSession>>,

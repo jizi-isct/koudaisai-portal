@@ -189,8 +189,6 @@ async fn post_reset(
             &state.sendgrid_sender,
             state.sendgrid_sender_email.clone(),
             reset_token,
-            &state.sendgrid_template.password_reset_email_subject.clone(),
-            &state.sendgrid_template.password_reset_email_body.clone(),
             state.jwt_manager.password_reset_token_expire_time.clone(),
         )
         .await;
