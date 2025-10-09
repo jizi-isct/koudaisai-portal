@@ -1,16 +1,14 @@
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
-use axum::extract::{ConnectInfo, Query, State};
+use axum::extract::{ConnectInfo, Query};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
 use scraper::{Html, Selector};
-use sea_orm::ActiveModelTrait;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use std::str::FromStr;
 use std::sync::Arc;
 use tracing::instrument;
 
@@ -30,10 +28,9 @@ struct MetaInfo {
     description: Option<String>,
 }
 
-#[instrument(name = "GET /api/v2/util/meta", skip(state))]
+#[instrument(name = "GET /api/v2/util/meta")]
 async fn get_meta(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
-    State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
     Query(params): Query<Params>,
 ) -> AppResponse {

@@ -6,7 +6,7 @@ use crate::sea_orm_entities::{
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbConn, EntityTrait, IntoActiveModel};
+use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

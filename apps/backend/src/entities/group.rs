@@ -83,10 +83,10 @@ impl GroupCreate {
         let transaction = db_conn.begin().await?;
         let mut generated_users_m_addresses = vec![];
 
-        let mut group_type;
+        let group_type;
         match self.r#type {
             GroupTypeCreate::TypePlan(plan) => {
-                let mut plan_type;
+                let plan_type;
                 match plan.r#type {
                     PlanTypeCreate::TypeBooth(booth) => {
                         generated_users_m_addresses.push(booth.representative1.m_address.clone());

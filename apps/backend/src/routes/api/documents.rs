@@ -1,29 +1,24 @@
 use crate::entities::document;
-use crate::entities::document::{
-    DocumentCreate, DocumentRead, DocumentUpdate, DocumentWriteActiveModel,
-};
+use crate::entities::document::{DocumentCreate, DocumentRead, DocumentUpdate};
 use crate::entities::document_category::DocumentCategoryRead;
 use crate::entities::target_specifier::TargetSpecifier;
 use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
-use crate::sea_orm_entities;
 use crate::util::AppResponse;
-use anyhow::{anyhow, Error};
+use anyhow::anyhow;
 use axum::extract::{ConnectInfo, Path, Query, State};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
 use http::StatusCode;
 use linked_hash_map::LinkedHashMap;
-use sea_orm::{ActiveModelTrait, DbErr, IntoActiveModel};
+use sea_orm::DbErr;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::iter::Map;
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
-use tracing::{error, instrument, warn};
+use tracing::{instrument, warn};
 use uuid::Uuid;
 
 #[instrument(name = "init /api/v2/documents")]
@@ -131,7 +126,7 @@ async fn get_documents_by_category(
 
     let mut categories_document_map =
         LinkedHashMap::<Option<Uuid>, Vec<DocumentRead>>::from_iter([(None, vec![])]);
-    if (include_empty_categories) {
+    if include_empty_categories {
         for category in DocumentCategoryRead::get_all(&state.db_conn).await? {
             categories_document_map.insert(Some(category.id), vec![]);
         }

@@ -10,7 +10,7 @@ mod users;
 mod util;
 
 use crate::routes::AppState;
-use axum::{Router, ServiceExt};
+use axum::Router;
 use std::sync::Arc;
 use tracing::instrument;
 

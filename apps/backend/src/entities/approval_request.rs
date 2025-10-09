@@ -248,7 +248,7 @@ impl ReadApprovalRequest {
                         format!("https://api2025.jizi.jp/v1/plans/{}", issuer.group_id),
                     )
                     .json(&body)
-                    .bearer_auth(token.clone())
+                    .bearer_auth(token)
                     .send()
                     .await?;
                 if !response.status().is_success() {

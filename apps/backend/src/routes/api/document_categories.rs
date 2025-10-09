@@ -8,7 +8,6 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
 use http::StatusCode;
-use sea_orm::ActiveModelTrait;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::instrument;

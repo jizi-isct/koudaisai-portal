@@ -2,7 +2,7 @@ pub mod question;
 pub mod responses;
 
 use question::Question;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// フォーム
@@ -66,19 +66,3 @@ pub struct ItemPageBreak {}
 /// テキスト
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ItemText {}
-
-impl Form {
-    pub fn from_model(
-        model: &crate::sea_orm_entities::form_type_builtin::Model,
-    ) -> Result<Self, serde_json::error::Error> {
-        let form_id = model.form_id;
-        let info = serde_json::from_value(model.info.clone())?;
-        let items = serde_json::from_value(model.items.clone())?;
-
-        Ok(Form {
-            form_id,
-            info,
-            items,
-        })
-    }
-}
