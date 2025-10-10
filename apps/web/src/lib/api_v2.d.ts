@@ -2825,8 +2825,8 @@ export interface components {
         };
         /** @description マークダウンタイプの通知 */
         NotificationUpdateTypeMarkdown: {
-          /** @description 通知のタイトル */
-          title?: string;
+            /** @description 通知のタイトル */
+            title?: string;
             content?: string;
         };
         /** @description 承認申請の通知タイプ */
