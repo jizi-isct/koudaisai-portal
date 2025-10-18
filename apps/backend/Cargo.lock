@@ -2761,6 +2761,7 @@ dependencies = [
  "chrono",
  "confy",
  "http 1.2.0",
+ "hyper 1.6.0",
  "jsonwebtoken",
  "linked-hash-map",
  "migration",

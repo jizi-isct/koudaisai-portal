@@ -62,6 +62,7 @@ async fn main() {
         s3_client,
         config.s3.bucket.clone(),
         discord,
+        config.secrets,
     );
 
     let listener = tokio::net::TcpListener::bind(format!(

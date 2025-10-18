@@ -13,9 +13,10 @@ use crate::routes::AppState;
 use axum::Router;
 use std::sync::Arc;
 use tracing::instrument;
+use crate::config::Secrets;
 
 #[instrument(name = "init /api")]
-pub fn init_router() -> Router<Arc<AppState>> {
+pub fn init_router(secrets: Secrets) -> Router<Arc<AppState>> {
     Router::new()
         .nest("/v2/forms", forms::init_router())
         .nest("/v2/documents", documents::init_router())
@@ -29,5 +30,5 @@ pub fn init_router() -> Router<Arc<AppState>> {
         .nest("/v2/util", util::init_router())
         .nest("/v2/approval-requests", approval_requests::init_router())
         .nest("/v2/groups", groups::init_router())
-        .nest_service("/plans_info", plans_info::init_service())
+        .nest_service("/plans_info", plans_info::init_service(secrets))
 }

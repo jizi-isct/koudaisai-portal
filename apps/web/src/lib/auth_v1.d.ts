@@ -261,7 +261,6 @@ export interface paths {
          * パスワードリセットリクエスト
          * @description ユーザーがパスワードを忘れた場合に、パスワードリセットのためのメールを送信します。
          *     メールアドレスを指定してリクエストを行います。
-         *
          */
         post: {
             parameters: {
@@ -317,7 +316,6 @@ export interface paths {
         /**
          * パスワードのリセット承認
          * @description パスワードリセットトークンが有効であることを確認し、パスワードリセットを承認します。
-         *
          */
         post: {
             parameters: {

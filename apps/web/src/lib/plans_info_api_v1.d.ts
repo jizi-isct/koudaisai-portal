@@ -934,42 +934,75 @@ export interface components {
                 longitude: number;
             } | null;
         };
-        CreatePlanDetails: {
-            /** @description 当日販売される商品の一覧 */
-            products: {
+        /** @description 当日販売される商品情報（作成用） */
+        ProductsCreate: {
+            /** @description 商品の一覧 */
+            items: {
                 /** @description 商品名 */
                 name: string;
-                /** @description 価格 */
-                price: number;
-                /** @description 商品説明 */
-                description: string;
+                /** @description 値段 */
+                price: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options: {
+                    /** @description 商品名 */
+                    name: string;
+                    /** @description 値段 */
+                    price: number | null;
+                }[];
             }[];
+            /** @description 商品全体の説明文 */
+            description: string;
+        };
+        /** @description 当日販売される商品情報（読み取り用） */
+        ProductsRead: {
+            /** @description 商品の一覧 */
+            items: {
+                /** @description 商品名 */
+                name: string;
+                /** @description 値段 */
+                price: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options: {
+                    /** @description 商品名 */
+                    name: string;
+                    /** @description 値段 */
+                    price: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description: string;
+        };
+        /** @description 当日販売される商品情報（更新用） */
+        ProductsUpdate: {
+            /** @description 商品の一覧 */
+            items?: {
+                /** @description 商品名 */
+                name?: string;
+                /** @description 値段 */
+                price?: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options?: {
+                    /** @description 商品名 */
+                    name?: string;
+                    /** @description 値段 */
+                    price?: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description?: string;
+        };
+        CreatePlanDetails: {
+            products: components["schemas"]["ProductsCreate"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
         ReadPlanDetails: {
-            /** @description 当日販売される商品の一覧 */
-            products: {
-                /** @description 商品名 */
-                name: string;
-                /** @description 価格 */
-                price: number;
-                /** @description 商品説明 */
-                description: string;
-            }[];
+            products: components["schemas"]["ProductsRead"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
         UpdatePlanDetails: {
-            /** @description 当日販売される商品の一覧 */
-            products?: {
-                /** @description 商品名 */
-                name?: string;
-                /** @description 価格 */
-                price?: number;
-                /** @description 商品説明 */
-                description?: string;
-            }[];
+            products?: components["schemas"]["ProductsUpdate"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
@@ -988,7 +1021,8 @@ export interface components {
         BoothPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
             categories?: components["schemas"]["BoothPlanCategory"][];
         };
-        /** @example {
+        /**
+         * @example {
          *       "id": "I-001",
          *       "type": "general",
          *       "categories": [
@@ -1012,7 +1046,8 @@ export interface components {
          *           "room": "2F 201教室"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         GeneralPlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description 一般企画ID（I-000形式） */
             id?: string;
@@ -1028,7 +1063,8 @@ export interface components {
         GeneralPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
             categories?: components["schemas"]["GeneralPlanCategory"][];
         };
-        /** @example {
+        /**
+         * @example {
          *       "id": "S-001",
          *       "type": "stage",
          *       "organization_name": "軽音楽部",
@@ -1048,7 +1084,8 @@ export interface components {
          *           "name": "中央ステージ"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         StagePlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description ステージ企画ID（S-000形式） */
             id?: string;
@@ -1060,7 +1097,8 @@ export interface components {
             type: "stage";
         };
         StagePlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-        /** @example {
+        /**
+         * @example {
          *       "id": "L-001",
          *       "type": "labo",
          *       "organization_name": "ロボット工学研究室",
@@ -1082,7 +1120,8 @@ export interface components {
          *           "room": "3F 305研究室"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         LaboPlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description 研究室企画ID（L-000形式） */
             id?: string;

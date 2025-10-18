@@ -536,9 +536,10 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description 空のカテゴリも含めるかどうか。デフォルトは`false`。
+                    /**
+                     * @description 空のカテゴリも含めるかどうか。デフォルトは`false`。
                      *     `true`の場合、資料が存在しないカテゴリも含まれる。
-                     *      */
+                     */
                     include_empty_categories?: boolean;
                 };
                 header?: never;
@@ -1232,9 +1233,10 @@ export interface paths {
                     content: {
                         "application/json": {
                             notification: components["schemas"]["NotificationRead"];
-                            /** @description その通知が既読かどうかを示すフラグ
+                            /**
+                             * @description その通知が既読かどうかを示すフラグ
                              *     trueの場合、通知は既読であることを示す
-                             *      */
+                             */
                             is_read: boolean;
                         }[];
                     };
