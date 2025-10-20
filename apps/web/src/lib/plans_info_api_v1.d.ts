@@ -18,8 +18,8 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description 企画タイプでフィルタリング */
-                    type?: "booth" | "general" | "stage" | "labo";
+                    /** @description 企画タイプでフィルタリング（カンマ区切りで複数指定可） */
+                    type?: ("booth" | "general" | "stage" | "labo")[];
                     /** @description おすすめ企画でフィルタリング */
                     recommended?: boolean;
                     /** @description 子供向け企画でフィルタリング */
@@ -97,6 +97,22 @@ export interface paths {
                 };
             };
         };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/plans/{planId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         /**
          * 新しい企画を作成
          * @description 指定されたIDで新しい企画を作成します。すでに同じIDの企画が存在する場合はconflictエラーを返します。
@@ -230,7 +246,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/plans:bulk": {
+    "/admin/plans:bulk": {
         parameters: {
             query?: never;
             header?: never;
@@ -303,7 +319,58 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * 企画の一括更新
+         * @description 指定されたIDの企画を複数まとめて更新します。存在しない企画IDは無視されます。
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        [key: string]: components["schemas"]["BoothPlanUpdate"] | components["schemas"]["GeneralPlanUpdate"] | components["schemas"]["StagePlanUpdate"] | components["schemas"]["LaboPlanUpdate"];
+                    };
+                };
+            };
+            responses: {
+                /** @description 企画が正常に一括更新されました */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 一部の企画更新に失敗しました */
+                207: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 失敗したエントリーのエラー情報 */
+                            errors?: (components["schemas"]["Error"] & {
+                                /** @description 失敗した企画のID */
+                                plan_id: string;
+                            })[];
+                        };
+                    };
+                };
+                /** @description リクエストが無効です */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/plans/{planId}/details": {
@@ -335,7 +402,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PlanDetails"];
+                        "application/json": components["schemas"]["ReadPlanDetails"];
                     };
                 };
                 /** @description 企画が見つかりません */
@@ -349,6 +416,22 @@ export interface paths {
                 };
             };
         };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/plans/{planId}/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         /**
          * 企画の詳細情報を作成・更新
          * @description 指定されたIDの企画の詳細情報を作成または完全に更新します。
@@ -365,7 +448,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["PlanDetails"];
+                    "application/json": components["schemas"]["CreatePlanDetails"];
                 };
             };
             responses: {
@@ -416,7 +499,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["PlanDetails"];
+                    "application/json": components["schemas"]["UpdatePlanDetails"];
                 };
             };
             responses: {
@@ -495,6 +578,22 @@ export interface paths {
                 };
             };
         };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/plans/{planId}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         /**
          * 企画のアイコンをアップロード
          * @description 指定されたIDの企画のアイコン画像をアップロードします．アップロード時にアイコン画像が最適化されます．
@@ -543,7 +642,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/plans/{planId}/icon:import": {
+    "/admin/plans/{planId}/icon:import": {
         parameters: {
             query?: never;
             header?: never;
@@ -636,6 +735,37 @@ export interface components {
             /** @description 企画実施場所の名称 */
             name: string;
         };
+        /**
+         * Format: enum
+         * @description 模擬店企画のカテゴリ
+         *     - `main_rice` - ごはん系
+         *     - `main_noodle_flour` - 麺・粉もの系
+         *     - `main_skewer_grill` - 串・焼き物系
+         *     - `main_hot_snack` - ホットフード・軽食系
+         *     - `main_soup` - スープ系
+         *     - `main_world_street` - 世界の屋台フード
+         *     - `sweet_japanese` - 和スイーツ
+         *     - `sweet_western` - 洋スイーツ
+         *     - `sweet_cold` - 冷たいスイーツ
+         *     - `sweet_snack` - スナックスイーツ
+         *     - `sweet_drink` - 飲むスイーツ（デザートドリンク）
+         *     - `sweet_world` - 世界のスイーツ・甘味系屋台フード
+         *     - `drink` - ドリンク系
+         * @enum {string}
+         */
+        BoothPlanCategory: "main_rice" | "main_noodle_flour" | "main_skewer_grill" | "main_hot_snack" | "main_soup" | "main_world_street" | "sweet_japanese" | "sweet_western" | "sweet_cold" | "sweet_snack" | "sweet_drink" | "sweet_world" | "drink";
+        /**
+         * Format: enum
+         * @description 一般企画のカテゴリ
+         *     - `play` - 遊び・体験
+         *     - `display` - 展示
+         *     - `performance` - パフォーマンス
+         *     - `cafe` - カフェ
+         *     - `rest` - 一休み
+         *     - `presentation`
+         * @enum {string}
+         */
+        GeneralPlanCategory: "play" | "display" | "performance" | "cafe" | "rest" | "presentation";
         BasePlanRead: {
             /** @description 企画の一意識別子 */
             id: string;
@@ -680,6 +810,19 @@ export interface components {
             };
             /** @description 企画実施場所一覧 */
             location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+            /** @description 企画の緯度経度座標 */
+            coordinates?: {
+                /**
+                 * Format: float
+                 * @description 緯度
+                 */
+                latitude: number;
+                /**
+                 * Format: float
+                 * @description 経度
+                 */
+                longitude: number;
+            } | null;
         };
         BasePlanCreate: {
             /** @description 企画のタイプ */
@@ -723,6 +866,19 @@ export interface components {
             };
             /** @description 企画実施場所一覧 */
             location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+            /** @description 企画の緯度経度座標 */
+            coordinates?: {
+                /**
+                 * Format: float
+                 * @description 緯度
+                 */
+                latitude: number;
+                /**
+                 * Format: float
+                 * @description 経度
+                 */
+                longitude: number;
+            } | null;
         };
         BasePlanUpdate: {
             /** @description 団体名（参加申請時のものを掲載、変更原則なし） */
@@ -764,39 +920,114 @@ export interface components {
             };
             /** @description 企画実施場所一覧 */
             location?: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
+            /** @description 企画の緯度経度座標 */
+            coordinates?: {
+                /**
+                 * Format: float
+                 * @description 緯度
+                 */
+                latitude: number;
+                /**
+                 * Format: float
+                 * @description 経度
+                 */
+                longitude: number;
+            } | null;
         };
-        PlanDetails: {
-            /** @description 当日販売される商品の一覧 */
-            products?: {
+        /** @description 当日販売される商品情報（作成用） */
+        ProductsCreate: {
+            /** @description 商品の一覧 */
+            items: {
+                /** @description 商品名 */
+                name: string;
+                /** @description 値段 */
+                price: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options: {
+                    /** @description 商品名 */
+                    name: string;
+                    /** @description 値段 */
+                    price: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description: string;
+        };
+        /** @description 当日販売される商品情報（読み取り用） */
+        ProductsRead: {
+            /** @description 商品の一覧 */
+            items: {
+                /** @description 商品名 */
+                name: string;
+                /** @description 値段 */
+                price: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options: {
+                    /** @description 商品名 */
+                    name: string;
+                    /** @description 値段 */
+                    price: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description: string;
+        };
+        /** @description 当日販売される商品情報（更新用） */
+        ProductsUpdate: {
+            /** @description 商品の一覧 */
+            items?: {
                 /** @description 商品名 */
                 name?: string;
-                /** @description 価格 */
-                price?: number;
-                /** @description 商品説明 */
-                description?: string;
-                /**
-                 * @description 販売状況
-                 * @enum {string}
-                 */
-                availability?: "available" | "limited" | "sold_out";
+                /** @description 値段 */
+                price?: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options?: {
+                    /** @description 商品名 */
+                    name?: string;
+                    /** @description 値段 */
+                    price?: number | null;
+                }[];
             }[];
+            /** @description 商品全体の説明文 */
+            description?: string;
+        };
+        CreatePlanDetails: {
+            products: components["schemas"]["ProductsCreate"];
             /** @description 追加情報（マークダウン形式） */
-            additional_info?: string;
+            additional_info?: string | null;
+        };
+        ReadPlanDetails: {
+            products: components["schemas"]["ProductsRead"];
+            /** @description 追加情報（マークダウン形式） */
+            additional_info?: string | null;
+        };
+        UpdatePlanDetails: {
+            products?: components["schemas"]["ProductsUpdate"];
+            /** @description 追加情報（マークダウン形式） */
+            additional_info?: string | null;
         };
         BoothPlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description 模擬店企画ID（M-000形式） */
             id?: string;
             /** @enum {string} */
             type: "booth";
+            categories: components["schemas"]["BoothPlanCategory"][];
         };
         BoothPlanCreate: components["schemas"]["BasePlanCreate"] & {
             /** @enum {string} */
             type: "booth";
+            categories: components["schemas"]["BoothPlanCategory"][];
         };
-        BoothPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-        /** @example {
+        BoothPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
+            categories?: components["schemas"]["BoothPlanCategory"][];
+        };
+        /**
+         * @example {
          *       "id": "I-001",
          *       "type": "general",
+         *       "categories": [
+         *         "play"
+         *       ],
          *       "organization_name": "ゲーム制作サークル",
          *       "plan_name": "オリジナルゲーム体験会",
          *       "description": "サークルメンバーが制作したオリジナルゲームを体験できます。",
@@ -815,19 +1046,25 @@ export interface components {
          *           "room": "2F 201教室"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         GeneralPlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description 一般企画ID（I-000形式） */
             id?: string;
             /** @enum {string} */
             type: "general";
+            categories: components["schemas"]["GeneralPlanCategory"][];
         };
         GeneralPlanCreate: components["schemas"]["BasePlanCreate"] & {
             /** @enum {string} */
             type: "general";
+            categories: components["schemas"]["GeneralPlanCategory"][];
         };
-        GeneralPlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-        /** @example {
+        GeneralPlanUpdate: components["schemas"]["BasePlanUpdate"] & {
+            categories?: components["schemas"]["GeneralPlanCategory"][];
+        };
+        /**
+         * @example {
          *       "id": "S-001",
          *       "type": "stage",
          *       "organization_name": "軽音楽部",
@@ -847,7 +1084,8 @@ export interface components {
          *           "name": "中央ステージ"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         StagePlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description ステージ企画ID（S-000形式） */
             id?: string;
@@ -859,7 +1097,8 @@ export interface components {
             type: "stage";
         };
         StagePlanUpdate: components["schemas"]["BasePlanUpdate"] & Record<string, never>;
-        /** @example {
+        /**
+         * @example {
          *       "id": "L-001",
          *       "type": "labo",
          *       "organization_name": "ロボット工学研究室",
@@ -881,7 +1120,8 @@ export interface components {
          *           "room": "3F 305研究室"
          *         }
          *       ]
-         *     } */
+         *     }
+         */
         LaboPlanRead: components["schemas"]["BasePlanRead"] & {
             /** @description 研究室企画ID（L-000形式） */
             id?: string;

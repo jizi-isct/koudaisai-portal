@@ -4,6 +4,7 @@ use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use tracing_core::LevelFilter;
+use crate::util::secrets::Secret;
 
 pub fn init_config() -> Result<Config, ConfyError> {
     confy::load("koudaisai-portal", None)
@@ -17,6 +18,7 @@ pub struct Config {
     pub s3: S3,
     pub sendgrid: Sendgrid,
     pub discord: Discord,
+    pub secrets: Secrets
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -160,4 +162,10 @@ pub struct Sendgrid {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Discord {
     pub approval_request_url: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Secrets {
+    pub plans_info_api_client_id: Secret,
+    pub plans_info_api_client_secret: Secret,
 }

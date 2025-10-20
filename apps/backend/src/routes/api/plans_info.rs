@@ -1,26 +1,38 @@
-use axum::body::Body;
-use axum::extract::Request;
-use axum_proxy::client::{HttpConnector, HttpsConnector};
-use axum_proxy::{AppendPrefix, ReusedService};
-use tower::util::MapRequest;
-use tower::ServiceExt;
+use crate::config::Secrets;
+use axum::routing::{any_service, MethodRouter};
+use axum_proxy::AppendPrefix;
+use http::header::HOST;
+use http::{HeaderName, HeaderValue};
+use std::str::FromStr;
+use tower::ServiceBuilder;
+use tower_http::set_header::SetRequestHeaderLayer;
 use tracing::instrument;
 
 #[instrument(name = "init /api/v2/users")]
-pub fn init_service<'a>() -> MapRequest<
-    ReusedService<AppendPrefix<'a>, HttpsConnector<HttpConnector>, Body>,
-    fn(Request) -> Request<Body>,
-> {
+pub fn init_service<S: Clone + 'static, E: From<std::convert::Infallible> + 'static>(
+    secrets: Secrets,
+) -> MethodRouter<S, E> {
     // 上流ホスト（:authority）を指定。
     let upstream = axum_proxy::builder_https("api2025.jizi.jp").expect("build proxy client");
 
     // /api/plans_info/{*path} の先頭1回だけ /v1 に置換
     // 例: /api/plans_info/plans?x=1 → /v1/plans?x=1
-    upstream
-        .build(AppendPrefix("/v1"))
-        .map_request(|mut req: Request<Body>| {
-            req.headers_mut()
-                .insert("host", "api2025.jizi.jp".parse().unwrap());
-            req
-        })
+    let host = HeaderValue::from_static("api2025.jizi.jp");
+    let cf_id =
+        HeaderValue::from_str(secrets.plans_info_api_client_id.as_ref()).expect("valid header");
+    let cf_secret =
+        HeaderValue::from_str(secrets.plans_info_api_client_secret.as_ref()).expect("valid header");
+
+    any_service(upstream.build(AppendPrefix("/v1"))).layer(
+        ServiceBuilder::new()
+            .layer(SetRequestHeaderLayer::overriding(HOST, host.clone()))
+            .layer(SetRequestHeaderLayer::overriding(
+                HeaderName::from_str("CF-Access-Client-Id").unwrap(),
+                cf_id,
+            ))
+            .layer(SetRequestHeaderLayer::overriding(
+                HeaderName::from_str("CF-Access-Client-Secret").unwrap(),
+                cf_secret,
+            )),
+    )
 }

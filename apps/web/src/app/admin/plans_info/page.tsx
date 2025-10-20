@@ -66,10 +66,10 @@ function Inner() {
   const download = useDownload()
   const [messageApi, contextHolder] = message.useMessage();
   const {data, isLoading, refetch} = $plansInfoApiAdmin.useQuery("get", "/plans")
-  const {mutateAsync: mutatePlanBulkCreate} = $plansInfoApiAdmin.useMutation("post", "/plans:bulk")
-  const {mutateAsync: mutatePlanIconImport} = $plansInfoApiAdmin.useMutation("post", "/plans/{planId}/icon:import")
-  const {mutateAsync: mutatePlanUpdate} = $plansInfoApiAdmin.useMutation("patch", "/plans/{planId}")
-  const {mutateAsync: mutatePlanDelete} = $plansInfoApiAdmin.useMutation("delete", "/plans/{planId}")
+  const {mutateAsync: mutatePlanBulkCreate} = $plansInfoApiAdmin.useMutation("post", "/admin/plans:bulk")
+  const {mutateAsync: mutatePlanIconImport} = $plansInfoApiAdmin.useMutation("post", "/admin/plans/{planId}/icon:import")
+  const {mutateAsync: mutatePlanUpdate} = $plansInfoApiAdmin.useMutation("patch", "/admin/plans/{planId}")
+  const {mutateAsync: mutatePlanDelete} = $plansInfoApiAdmin.useMutation("delete", "/admin/plans/{planId}")
 
   const handleDelete = (id: string) => async () => {
     await mutatePlanDelete({

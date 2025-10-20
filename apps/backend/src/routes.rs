@@ -1,6 +1,7 @@
 mod api;
 mod auth;
-use crate::config::{Sendgrid, Web};
+use std::string::String;
+use crate::config::{Secrets, Sendgrid, Web};
 use crate::middlewares;
 use crate::service::discord::Discord;
 use crate::util::jwt::JWTManager;
@@ -33,6 +34,7 @@ pub fn init_routes(
     s3_client: aws_sdk_s3::Client,
     s3_bucket: String,
     discord: Discord,
+    secrets: Secrets
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
@@ -68,7 +70,7 @@ pub fn init_routes(
 
     Router::new()
         .nest("/auth", auth::init_router())
-        .nest("/api", api::init_router())
+        .nest("/api", api::init_router(secrets))
         .fallback_service(get_service(serve_dir))
         // .nest_service("/admin", get_service(admin_serve_dir))
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
