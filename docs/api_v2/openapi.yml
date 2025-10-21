@@ -27,62 +27,62 @@ tags:
 paths:
   # groups
   /groups:
-    $ref: paths/groups/groups.yml
+    $ref: paths/groups.yml
   /groups/{id}:
-    $ref: paths/groups/groups_{id}.yml
+    $ref: paths/groups/_id.yml
   # forms
   /forms:
     $ref: paths/forms.yml
   /forms/{form_id}:
-    $ref: paths/forms_{form_id}.yml
+    $ref: paths/forms/_form_id.yml
   # documents
   /documents:
     $ref: paths/documents.yml
   /documents/by-category:
-    $ref: paths/documents_by-category.yml
+    $ref: paths/documents/by-category.yml
   /documents/{document_id}:
-    $ref: paths/documents_{document_id}.yml
+    $ref: paths/documents/_document_id.yml
   /document-categories:
     $ref: paths/document-categories.yml
   /document-categories/{category_id}:
-    $ref: paths/document-categories_{category_id}.yml
+    $ref: paths/document-categories/_category_id.yml
   # files
   /files/upload:
-    $ref: paths/files_upload.yml
+    $ref: paths/files/upload.yml
   /files/download:
-    $ref: paths/files_download.yml
+    $ref: paths/files/download.yml
   # users
   /users:
     $ref: paths/users.yml
   /users/{user_id}:
-    $ref: paths/users_{user_id}.yml
+    $ref: paths/users/_user_id.yml
   /users/{user_id}/notifications:
-    $ref: paths/users_{user_id}_notifications.yml
+    $ref: paths/users/_user_id/notifications.yml
   /users/{user_id}/approval_requests:
-    $ref: paths/users_{user_id}_approval_requests.yml
+    $ref: paths/users/_user_id/approval_requests.yml
   /users/{user_id}/approval_requests/{request_id}:
-    $ref: "paths/users_{user_id}_approval_requests_{request_id}.yml"
+    $ref: paths/users/_user_id/approval_requests/_request_id.yml
   /users/{user_id}/approval_requests/{request_id}/close:
-    $ref: paths/users_{user_id}_approval_requests_{request_id}_close.yml
+    $ref: paths/users/_user_id/approval_requests/_request_id/close.yml
   /users/{user_id}/m_address:
-    $ref: paths/users_{user_id}_m_address.yml
+    $ref: paths/users/_user_id/m_address.yml
   # notifications
   /notifications:
     $ref: paths/notifications.yml
   /notifications/{notification_id}:
-    $ref: paths/notifications_{notification_id}.yml
+    $ref: paths/notifications/_notification_id.yml
   # util
   /util/meta:
-    $ref: paths/util_meta.yml
+    $ref: paths/util/meta.yml
   # approval requests
   /approval-requests:
     $ref: paths/approval_requests.yml
   /approval-requests/{id}:
-    $ref: paths/approval_requests_{id}.yml
+    $ref: paths/approval_requests/_id.yml
   /approval-requests/{id}/approve:
-    $ref: paths/approval_requests_{id}_approve.yml
+    $ref: paths/approval_requests/_id/approve.yml
   /approval-requests/{id}/reject:
-    $ref: paths/approval_requests_{id}_reject.yml
+    $ref: paths/approval_requests/_id/reject.yml
 
 components:
   securitySchemes:
