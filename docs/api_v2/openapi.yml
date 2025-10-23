@@ -30,6 +30,8 @@ paths:
     $ref: paths/groups.yml
   /groups/{id}:
     $ref: paths/groups/_id.yml
+  /groups/{id}/plan-details:
+    $ref: paths/groups/_id/plan-details.yml
   # forms
   /forms:
     $ref: paths/forms.yml

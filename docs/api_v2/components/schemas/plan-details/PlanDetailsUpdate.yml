@@ -1,0 +1,8 @@
+type: object
+properties:
+  products:
+    $ref: 'products/ProductsUpdate.yml'
+  additional_info:
+    type: string
+    nullable: true
+    description: 追加情報（マークダウン形式）
