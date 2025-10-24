@@ -298,9 +298,9 @@ mod tests {
         let deserialized: TargetSpecifier = serde_json::from_str("\"user/nologin\"").unwrap();
         assert!(matches!(deserialized, TargetSpecifier::UserNologin));
 
-        // Test invalid format
-        let result = serde_json::from_str::<TargetSpecifier>("\"invalid/format\"");
-        assert!(result.is_err());
+        // Test unknown
+        let deserialized = serde_json::from_str::<TargetSpecifier>("\"invalid/format\"").unwrap();
+        assert!(matches!(deserialized, TargetSpecifier::Unknown(_)));
 
         // Test GroupId
         let group_id = "T-000";
