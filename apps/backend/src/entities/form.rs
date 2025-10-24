@@ -11,8 +11,6 @@ use sea_orm::{DbConn, EntityTrait, NotSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-mod builtin;
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum FormType {

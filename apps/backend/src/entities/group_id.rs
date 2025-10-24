@@ -1,6 +1,5 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
-use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub enum GroupId {
