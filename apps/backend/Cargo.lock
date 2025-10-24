@@ -2760,6 +2760,7 @@ dependencies = [
  "base64url",
  "chrono",
  "confy",
+ "futures-util",
  "http 1.2.0",
  "hyper 1.6.0",
  "jsonwebtoken",
