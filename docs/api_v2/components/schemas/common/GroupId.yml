@@ -1,0 +1,5 @@
+oneOf:
+  - type: string
+    example: M-001
+  - type: string
+    enum: [ us ]

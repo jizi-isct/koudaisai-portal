@@ -6,11 +6,10 @@ get:
   parameters:
     - name: id
       in: path
-      description: 団体ID
+      description: 団体のID
       required: true
       schema:
-        type: string
-        example: M-001
+        $ref: "../../../components/schemas/common/GroupId.yml"
   responses:
     '200':
       description: OK
@@ -32,11 +31,10 @@ patch:
   parameters:
     - name: id
       in: path
-      description: 団体ID
+      description: 団体のID
       required: true
       schema:
-        type: string
-        example: M-001
+        $ref: "../../../components/schemas/common/GroupId.yml"
   requestBody:
     required: true
     content:
