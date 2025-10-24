@@ -6,16 +6,16 @@ use crate::sea_orm_entities;
 use crate::sea_orm_entities::read_notifications;
 use crate::util::format_secs_ja_full;
 use crate::util::jwt::Claims;
-use crate::util::sha::{stretch_with_salt, SHAManager};
-use anyhow::{anyhow, Result};
+use crate::util::sha::{SHAManager, stretch_with_salt};
+use anyhow::{Result, anyhow};
 use chrono::{DateTime, Utc};
 use reqwest::Response;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, ConnectionTrait, DbConn, DbErr, EntityTrait, NotSet, QueryFilter,
 };
-use sendgrid::v3::{Content, Email, Message, Personalization, Sender};
 use sendgrid::SendgridResult;
+use sendgrid::v3::{Content, Email, Message, Personalization, Sender};
 use serde::{Deserialize, Serialize};
 use tracing::log::trace;
 use uuid::Uuid;

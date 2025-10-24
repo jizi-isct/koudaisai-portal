@@ -1,5 +1,5 @@
-use crate::entities::group::plan::PlanTypeRead;
 use crate::entities::group::GroupTypeRead;
+use crate::entities::group::plan::PlanTypeRead;
 use crate::entities::user::UserRead;
 use sea_orm::DbConn;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};

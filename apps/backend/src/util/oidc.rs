@@ -1,5 +1,5 @@
-use oauth2::basic::{BasicErrorResponseType, BasicRevocationErrorResponse};
 use oauth2::StandardRevocableToken;
+use oauth2::basic::{BasicErrorResponseType, BasicRevocationErrorResponse};
 use openidconnect::core::{
     CoreAuthDisplay, CoreAuthPrompt, CoreGenderClaim, CoreJsonWebKey,
     CoreJweContentEncryptionAlgorithm, CoreTokenIntrospectionResponse, CoreTokenResponse,

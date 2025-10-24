@@ -1,5 +1,5 @@
 use crate::config::Secrets;
-use axum::routing::{any_service, MethodRouter};
+use axum::routing::{MethodRouter, any_service};
 use axum_proxy::AppendPrefix;
 use http::header::HOST;
 use http::{HeaderName, HeaderValue};

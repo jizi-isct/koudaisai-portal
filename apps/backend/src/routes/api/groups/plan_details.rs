@@ -1,3 +1,5 @@
+use crate::entities::group_id::GroupId;
+use crate::entities::plan_details::{PlanDetailsRead, PlanDetailsUpdate};
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -9,8 +11,6 @@ use http::{HeaderMap, Method, StatusCode};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::instrument;
-use crate::entities::group_id::GroupId;
-use crate::entities::plan_details::{PlanDetailsRead, PlanDetailsUpdate};
 
 #[instrument(name = "init /api/v2/groups/{id}/plan-details")]
 pub fn init_router() -> Router<Arc<AppState>> {
@@ -49,11 +49,7 @@ async fn get_plan_details(
 
     // 上流の plans API に委譲（存在しない場合は 404）
     let url = format!("https://api2025.jizi.jp/v1/plans/{}/details", group_id);
-    let resp = state
-        .http_client
-        .request(Method::GET, url)
-        .send()
-        .await;
+    let resp = state.http_client.request(Method::GET, url).send().await;
 
     let resp = match resp {
         Ok(r) => r,
@@ -117,8 +113,18 @@ async fn patch_plan_details(
     let url = format!("https://api2025.jizi.jp/v1/plans/{}/plan-details", group_id);
     let mut req = state.http_client.request(Method::PATCH, url).json(&payload);
     let mut headers = HeaderMap::new();
-    headers.insert("CF-Access-Client-Id", state.secrets.plans_info_api_client_id.as_ref().parse()?);
-    headers.insert("CF-Access-Client-Secret", state.secrets.plans_info_api_client_secret.as_ref().parse()?);
+    headers.insert(
+        "CF-Access-Client-Id",
+        state.secrets.plans_info_api_client_id.as_ref().parse()?,
+    );
+    headers.insert(
+        "CF-Access-Client-Secret",
+        state
+            .secrets
+            .plans_info_api_client_secret
+            .as_ref()
+            .parse()?,
+    );
     req = req.headers(headers);
     let resp = req.send().await;
 

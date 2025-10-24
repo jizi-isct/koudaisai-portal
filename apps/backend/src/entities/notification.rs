@@ -3,7 +3,7 @@ use crate::sea_orm_entities::{
     notification, notification_type_approval_request, notification_type_markdown,
     sea_orm_active_enums,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};

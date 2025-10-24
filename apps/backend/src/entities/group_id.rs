@@ -72,8 +72,7 @@ mod tests {
     fn test_deserialize() {
         // Test String variant
         let id = "M-001";
-        let deserialized: GroupId =
-            serde_json::from_str("\"M-001\"").unwrap();
+        let deserialized: GroupId = serde_json::from_str("\"M-001\"").unwrap();
         match deserialized {
             GroupId::String(string) => assert_eq!(id, string),
             _ => panic!("Expected String variant"),

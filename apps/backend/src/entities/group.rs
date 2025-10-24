@@ -7,8 +7,8 @@ use crate::entities::group::plan::{
 };
 use crate::entities::group::press::{PressCreate, PressRead, PressUpdate};
 use crate::sea_orm_entities;
-use crate::util::sha::stretch_with_salt;
 use crate::util::IntoActiveValue;
+use crate::util::sha::stretch_with_salt;
 use chrono::{DateTime, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityTrait, TransactionTrait};

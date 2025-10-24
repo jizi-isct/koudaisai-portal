@@ -1,16 +1,15 @@
 mod api;
 mod auth;
-use std::string::String;
 use crate::config::{Secrets, Sendgrid, Web};
 use crate::middlewares;
 use crate::service::discord::Discord;
 use crate::util::jwt::JWTManager;
 use crate::util::oidc::OIDCClient;
 use crate::util::sha::SHAManager;
+use axum::Router;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::middleware::from_fn_with_state;
 use axum::routing::get_service;
-use axum::Router;
 use jsonwebtoken::Algorithm;
 use oauth2::PkceCodeVerifier;
 use openidconnect::Nonce;
@@ -19,6 +18,7 @@ use sea_orm::DatabaseConnection;
 use sendgrid::v3::{Email, Sender};
 use std::collections::HashMap;
 use std::net::SocketAddr;
+use std::string::String;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tower_http::cors::CorsLayer;
@@ -34,7 +34,7 @@ pub fn init_routes(
     s3_client: aws_sdk_s3::Client,
     s3_bucket: String,
     discord: Discord,
-    secrets: Secrets
+    secrets: Secrets,
 ) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
     debug!("Initializing routes");
     let state = Arc::new(AppState {

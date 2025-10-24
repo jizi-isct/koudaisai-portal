@@ -1,4 +1,4 @@
-use crate::config::{init_config, Db, Logging};
+use crate::config::{Db, Logging, init_config};
 use crate::routes::init_routes;
 use crate::service::discord::Discord;
 use crate::util::oidc::OIDCClient;
