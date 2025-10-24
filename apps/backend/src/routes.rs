@@ -61,6 +61,7 @@ pub fn init_routes(
         s3_client,
         s3_bucket,
         discord,
+        secrets: secrets.clone(),
     });
 
     let serve_dir =
@@ -92,6 +93,7 @@ pub struct AppState {
     pub s3_client: aws_sdk_s3::Client,
     pub s3_bucket: String,
     pub discord: Discord,
+    pub secrets: Secrets,
 }
 
 pub struct AuthSession {
