@@ -26,6 +26,8 @@ export interface paths {
                     child_friendly?: boolean;
                     /** @description 研究室ツアー参加企画でフィルタリング */
                     lab_tour?: boolean;
+                    /** @description スケジュールの表現方法。省略時はtrue。trueの場合：null→null、配列→全要素の最小start_timeと最大end_timeに結合した単一オブジェクト、文字列→文字列、オブジェクト→オブジェクト。falseの場合：null→[]、配列→そのまま、文字列→[文字列]、オブジェクト→[オブジェクト]。 */
+                    combine_schedule?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -67,7 +69,10 @@ export interface paths {
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description スケジュールの表現方法。省略時はtrue。trueの場合：null→null、配列→全要素の最小start_timeと最大end_timeに結合した単一オブジェクト、文字列→文字列、オブジェクト→オブジェクト。falseの場合：null→[]、配列→そのまま、文字列→[文字列]、オブジェクト→[オブジェクト]。 */
+                    combine_schedule?: boolean;
+                };
                 header?: never;
                 path: {
                     /** @description 企画ID */
@@ -766,6 +771,33 @@ export interface components {
          * @enum {string}
          */
         GeneralPlanCategory: "play" | "display" | "performance" | "cafe" | "rest" | "presentation";
+        DaySchedule: {
+            /**
+             * @description 企画開始時間（HH:mm形式）
+             * @example 10:00
+             */
+            start_time: string;
+            /**
+             * @description 企画終了時間（HH:mm形式）
+             * @example 17:00
+             */
+            end_time: string;
+        };
+        /** @description 企画のスケジュール（作成用） */
+        ScheduleCreate: {
+            day1?: components["schemas"]["DaySchedule"] | null;
+            day2?: components["schemas"]["DaySchedule"] | null;
+        };
+        /** @description 企画のスケジュール（読み取り用） */
+        ScheduleRead: {
+            day1?: components["schemas"]["DaySchedule"] | null;
+            day2?: components["schemas"]["DaySchedule"] | null;
+        };
+        /** @description 企画のスケジュール（更新用） */
+        ScheduleUpdate: {
+            day1?: components["schemas"]["DaySchedule"] | null;
+            day2?: components["schemas"]["DaySchedule"] | null;
+        };
         BasePlanRead: {
             /** @description 企画の一意識別子 */
             id: string;
@@ -781,33 +813,7 @@ export interface components {
             is_child_friendly: boolean;
             /** @description おすすめ企画か否か */
             is_recommended: boolean;
-            /** @description 企画のスケジュール */
-            schedule: {
-                day1?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 10:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 17:00
-                     */
-                    end_time: string;
-                } | null;
-                day2?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 11:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 16:00
-                     */
-                    end_time: string;
-                } | null;
-            };
+            schedule: components["schemas"]["ScheduleRead"];
             /** @description 企画実施場所一覧 */
             location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
             /** @description 企画の緯度経度座標 */
@@ -837,33 +843,7 @@ export interface components {
             is_child_friendly: boolean;
             /** @description おすすめ企画か否か */
             is_recommended: boolean;
-            /** @description 企画のスケジュール */
-            schedule: {
-                day1?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 10:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 17:00
-                     */
-                    end_time: string;
-                } | null;
-                day2?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 11:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 16:00
-                     */
-                    end_time: string;
-                } | null;
-            };
+            schedule: components["schemas"]["ScheduleCreate"];
             /** @description 企画実施場所一覧 */
             location: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
             /** @description 企画の緯度経度座標 */
@@ -891,33 +871,7 @@ export interface components {
             is_child_friendly?: boolean;
             /** @description おすすめ企画か否か */
             is_recommended?: boolean;
-            /** @description 企画のスケジュール */
-            schedule?: {
-                day1?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 10:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 17:00
-                     */
-                    end_time: string;
-                } | null;
-                day2?: {
-                    /**
-                     * @description 企画開始時間（HH:mm形式）
-                     * @example 11:00
-                     */
-                    start_time: string;
-                    /**
-                     * @description 企画終了時間（HH:mm形式）
-                     * @example 16:00
-                     */
-                    end_time: string;
-                } | null;
-            };
+            schedule?: components["schemas"]["ScheduleUpdate"];
             /** @description 企画実施場所一覧 */
             location?: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"])[];
             /** @description 企画の緯度経度座標 */
