@@ -23,14 +23,24 @@ import {
   quotePlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin
+  toolbarPlugin,
+  directivesPlugin,
+  AdmonitionDirectiveDescriptor, imagePlugin
 } from "@mdxeditor/editor";
+import { Kiwi_Maru } from 'next/font/google';
+
+const kiwiMaru = Kiwi_Maru({
+  weight: ['300','400','500'],
+  subsets: ['latin'],
+  display: 'swap'
+});
 
 export function EditAdditionalInfo() {
   return (
     <div className={styles.editorWrapper}>
       <MDXEditor
         markdown="Hello world"
+        contentEditableClassName={`${styles.mdxContent} ${kiwiMaru.className}`}
         plugins={[
           toolbarPlugin({
             toolbarContents: () => (
@@ -50,14 +60,16 @@ export function EditAdditionalInfo() {
               </DiffSourceToggleWrapper>
             )
           }),
+          imagePlugin(),
           diffSourcePlugin({ viewMode: 'rich-text' }),
-          headingsPlugin(),
+          headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5, 6] }),
           listsPlugin(),
           tablePlugin(),
           quotePlugin(),
           thematicBreakPlugin(),
           linkPlugin(),
           linkDialogPlugin(),
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
           markdownShortcutPlugin(),
         ]}
       />
