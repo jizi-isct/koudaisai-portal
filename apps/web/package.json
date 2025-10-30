@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
+    "@mdxeditor/editor": "^3.48.0",
     "antd": "^5.26.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

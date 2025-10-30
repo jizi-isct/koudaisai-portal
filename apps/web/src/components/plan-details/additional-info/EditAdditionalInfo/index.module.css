@@ -1,0 +1,27 @@
+.editorWrapper {
+  /* Ensure text inside the editor area is left-aligned by default */
+  text-align: left;
+}
+
+/* Reset global <p> centering within the editor area */
+.editorWrapper p {
+  margin-left: 0;
+  margin-right: 0;
+  width: auto;
+  text-align: left;
+}
+
+.editorWrapper h1,
+.editorWrapper h2,
+.editorWrapper h3,
+.editorWrapper h4,
+.editorWrapper h5,
+.editorWrapper h6 {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.editorWrapper ul,
+.editorWrapper ol {
+  margin-left: 1.25em;
+}
