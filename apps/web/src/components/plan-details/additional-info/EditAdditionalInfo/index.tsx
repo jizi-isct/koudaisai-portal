@@ -25,12 +25,12 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
   directivesPlugin,
-  AdmonitionDirectiveDescriptor, imagePlugin
+  AdmonitionDirectiveDescriptor, imagePlugin, BlockTypeSelect
 } from "@mdxeditor/editor";
-import { Kiwi_Maru } from 'next/font/google';
+import {Kiwi_Maru} from 'next/font/google';
 
 const kiwiMaru = Kiwi_Maru({
-  weight: ['300','400','500'],
+  weight: ['300', '400', '500'],
   subsets: ['latin'],
   display: 'swap'
 });
@@ -45,31 +45,32 @@ export function EditAdditionalInfo() {
           toolbarPlugin({
             toolbarContents: () => (
               <DiffSourceToggleWrapper>
-                <UndoRedo />
-                <Separator />
-                <BoldItalicUnderlineToggles />
-                <StrikeThroughSupSubToggles />
-                <Separator />
-                <ListsToggle />
-                <Separator />
-                <CreateLink />
-                <CodeToggle />
-                <Separator />
-                <InsertTable />
-                <InsertThematicBreak />
+                <UndoRedo/>
+                <BlockTypeSelect/>
+                <Separator/>
+                <BoldItalicUnderlineToggles/>
+                <StrikeThroughSupSubToggles/>
+                <Separator/>
+                <ListsToggle/>
+                <Separator/>
+                <CreateLink/>
+                <CodeToggle/>
+                <Separator/>
+                <InsertTable/>
+                <InsertThematicBreak/>
               </DiffSourceToggleWrapper>
             )
           }),
           imagePlugin(),
-          diffSourcePlugin({ viewMode: 'rich-text' }),
-          headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5, 6] }),
+          diffSourcePlugin({viewMode: 'rich-text'}),
+          headingsPlugin({allowedHeadingLevels: [1, 2, 3, 4, 5, 6]}),
           listsPlugin(),
           tablePlugin(),
           quotePlugin(),
           thematicBreakPlugin(),
           linkPlugin(),
           linkDialogPlugin(),
-          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+          directivesPlugin({directiveDescriptors: [AdmonitionDirectiveDescriptor]}),
           markdownShortcutPlugin(),
         ]}
       />
