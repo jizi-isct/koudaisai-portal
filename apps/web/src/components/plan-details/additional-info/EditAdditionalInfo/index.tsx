@@ -28,8 +28,8 @@ import {
   directivesPlugin,
   AdmonitionDirectiveDescriptor, imagePlugin, SingleChoiceToggleGroup
 } from "@mdxeditor/editor";
-import { Kiwi_Maru } from 'next/font/google';
-import {ReactNode, useState} from "react";
+import {Kiwi_Maru} from 'next/font/google';
+import {JSX, useState} from "react";
 import {AppstoreOutlined, CompassOutlined} from "@ant-design/icons";
 
 const kiwiMaru = Kiwi_Maru({
@@ -49,11 +49,7 @@ const styleChoiceItems = [
     value: "web",
     contents: <CompassOutlined/>
   }
-] satisfies [{
-  title: string
-  value: "app" | "web"
-  contents: ReactNode
-}]
+]
 
 export function EditAdditionalInfo() {
   const [style, setStyle] = useState<"app" | "web">("app")
@@ -67,22 +63,23 @@ export function EditAdditionalInfo() {
           toolbarPlugin({
             toolbarContents: () => (
               <DiffSourceToggleWrapper>
-                <UndoRedo />
-                <Separator />
-                <SingleChoiceToggleGroup items={styleChoiceItems} onChange={setStyle} value={style}/>
-                <Separator />
-                <BlockTypeSelect />
+                <UndoRedo/>
                 <Separator/>
-                <BoldItalicUnderlineToggles />
-                <StrikeThroughSupSubToggles />
-                <Separator />
-                <ListsToggle />
-                <Separator />
-                <CreateLink />
-                <CodeToggle />
-                <Separator />
-                <InsertTable />
-                <InsertThematicBreak />
+                <SingleChoiceToggleGroup items={styleChoiceItems} onChange={(v) => setStyle(v as "app" | "web")}
+                                         value={style}/>
+                <Separator/>
+                <BlockTypeSelect/>
+                <Separator/>
+                <BoldItalicUnderlineToggles/>
+                <StrikeThroughSupSubToggles/>
+                <Separator/>
+                <ListsToggle/>
+                <Separator/>
+                <CreateLink/>
+                <CodeToggle/>
+                <Separator/>
+                <InsertTable/>
+                <InsertThematicBreak/>
               </DiffSourceToggleWrapper>
             )
           }),
