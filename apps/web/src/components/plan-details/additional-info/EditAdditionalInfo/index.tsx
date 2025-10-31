@@ -3,6 +3,7 @@
 import '@mdxeditor/editor/style.css'
 import styles from './index.module.css'
 import {
+  BlockTypeSelect,
   BoldItalicUnderlineToggles,
   CodeToggle,
   CreateLink,
@@ -25,9 +26,11 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
   directivesPlugin,
-  AdmonitionDirectiveDescriptor, imagePlugin, BlockTypeSelect
+  AdmonitionDirectiveDescriptor, imagePlugin, SingleChoiceToggleGroup
 } from "@mdxeditor/editor";
-import {Kiwi_Maru} from 'next/font/google';
+import { Kiwi_Maru } from 'next/font/google';
+import {ReactNode, useState} from "react";
+import {AppstoreOutlined, CompassOutlined} from "@ant-design/icons";
 
 const kiwiMaru = Kiwi_Maru({
   weight: ['300', '400', '500'],
@@ -35,29 +38,51 @@ const kiwiMaru = Kiwi_Maru({
   display: 'swap'
 });
 
+const styleChoiceItems = [
+  {
+    title: "アプリ表示",
+    value: "app",
+    contents: <AppstoreOutlined/>
+  },
+  {
+    title: "公式サイト表示",
+    value: "web",
+    contents: <CompassOutlined/>
+  }
+] satisfies [{
+  title: string
+  value: "app" | "web"
+  contents: ReactNode
+}]
+
 export function EditAdditionalInfo() {
+  const [style, setStyle] = useState<"app" | "web">("app")
+
   return (
     <div className={styles.editorWrapper}>
       <MDXEditor
         markdown="Hello world"
-        contentEditableClassName={`${styles.mdxContent} ${kiwiMaru.className}`}
+        contentEditableClassName={style === "app" ? `${styles.app} ${kiwiMaru.className}` : styles.web}
         plugins={[
           toolbarPlugin({
             toolbarContents: () => (
               <DiffSourceToggleWrapper>
-                <UndoRedo/>
-                <BlockTypeSelect/>
+                <UndoRedo />
+                <Separator />
+                <SingleChoiceToggleGroup items={styleChoiceItems} onChange={setStyle} value={style}/>
+                <Separator />
+                <BlockTypeSelect />
                 <Separator/>
-                <BoldItalicUnderlineToggles/>
-                <StrikeThroughSupSubToggles/>
-                <Separator/>
-                <ListsToggle/>
-                <Separator/>
-                <CreateLink/>
-                <CodeToggle/>
-                <Separator/>
-                <InsertTable/>
-                <InsertThematicBreak/>
+                <BoldItalicUnderlineToggles />
+                <StrikeThroughSupSubToggles />
+                <Separator />
+                <ListsToggle />
+                <Separator />
+                <CreateLink />
+                <CodeToggle />
+                <Separator />
+                <InsertTable />
+                <InsertThematicBreak />
               </DiffSourceToggleWrapper>
             )
           }),

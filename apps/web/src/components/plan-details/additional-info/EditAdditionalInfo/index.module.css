@@ -12,23 +12,23 @@
 }
 
 /* Scope styles to the editable content */
-.mdxContent {
+.app {
   line-height: 1.7;
   color: #1a1a1a;
 }
 
 /* Headings: sizes approximating the RN component */
-.mdxContent h1 { font-size: clamp(24px, 4.2vw, 36px); font-weight: 700; margin: 0.6em 0 0.3em; }
-.mdxContent h2 { font-size: clamp(22px, 3.6vw, 30px); font-weight: 700; margin: 0.6em 0 0.3em; }
-.mdxContent h3 { font-size: clamp(20px, 3.0vw, 26px); font-weight: 700; margin: 0.6em 0 0.3em; }
-.mdxContent h4 { font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; margin: 0.6em 0 0.3em; }
-.mdxContent h5 { font-size: clamp(16px, 2.2vw, 20px); font-weight: 600; margin: 0.6em 0 0.3em; }
-.mdxContent h6 { font-size: clamp(14px, 2.0vw, 18px); font-weight: 600; margin: 0.6em 0 0.3em; }
+.app h1 { font-size: clamp(24px, 4.2vw, 36px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h2 { font-size: clamp(22px, 3.6vw, 30px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h3 { font-size: clamp(20px, 3.0vw, 26px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h4 { font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; margin: 0.6em 0 0.3em; }
+.app h5 { font-size: clamp(16px, 2.2vw, 20px); font-weight: 600; margin: 0.6em 0 0.3em; }
+.app h6 { font-size: clamp(14px, 2.0vw, 18px); font-weight: 600; margin: 0.6em 0 0.3em; }
 
 /* Decorative underline for H1–H3 (approximation of the Skia underline) */
-.mdxContent h1,
-.mdxContent h2,
-.mdxContent h3 {
+.app h1,
+.app h2,
+.app h3 {
   position: relative;
   display: inline-block;
   padding-right: 0.8em; /* space for green accent */
@@ -36,13 +36,13 @@
 }
 
 /* Per-level tuning variables (approximate RN Skia drawing) */
-.mdxContent h1 { --u-h: 3px;   --u-off: -0.28em; --leaf: 1; --leaf-size: 0.62em; --leaf-right: -0.12em; --leaf-bottom: -0.30em; --leaf-rotate: 5.73deg; }
-.mdxContent h2 { --u-h: 2.6px; --u-off: -0.26em; --leaf: 1; --leaf-size: 0.56em; --leaf-right: -0.10em; --leaf-bottom: -0.28em; --leaf-rotate: 5.73deg; }
-.mdxContent h3 { --u-h: 2.2px; --u-off: -0.22em; --leaf: 0; }
+.app h1 { --u-h: 3px;   --u-off: -0.28em; --leaf: 1; --leaf-size: 0.62em; --leaf-right: -0.12em; --leaf-bottom: -0.30em; --leaf-rotate: 5.73deg; }
+.app h2 { --u-h: 2.6px; --u-off: -0.26em; --leaf: 1; --leaf-size: 0.56em; --leaf-right: -0.10em; --leaf-bottom: -0.28em; --leaf-rotate: 5.73deg; }
+.app h3 { --u-h: 2.2px; --u-off: -0.22em; --leaf: 0; }
 
-.mdxContent h1::after,
-.mdxContent h2::after,
-.mdxContent h3::after {
+.app h1::after,
+.app h2::after,
+.app h3::after {
   content: "";
   position: absolute;
   left: 0;
@@ -56,8 +56,8 @@
 }
 
 /* green rounded square ("leaf") — shown on h1/h2 only */
-.mdxContent h1::before,
-.mdxContent h2::before {
+.app h1::before,
+.app h2::before {
   content: "";
   position: absolute;
   width: var(--leaf-size, 0.6em);
@@ -72,46 +72,46 @@
 }
 
 /* ensure h3 has no leaf */
-.mdxContent h3::before { content: none; }
+.app h3::before { content: none; }
 
 /* Paragraph: left indent similar to wp(2) */
-.mdxContent p {
+.app p {
   padding-left: clamp(8px, 2vw, 24px);
   margin: 0.6em 0;
 }
 
 /* Lists */
-.mdxContent ul,
-.mdxContent ol {
+.app ul,
+.app ol {
   margin-left: 1.25em;
 }
 
 /* Table styling to match RN */
-.mdxContent table {
+.app table {
   width: 100%;
   border-collapse: collapse;
   border: 2px solid #9443ff;
   margin: 10px 0;
 }
-.mdxContent thead {
+.app thead {
   border-bottom: 1px solid #9443ff;
 }
-.mdxContent th {
+.app th {
   background-color: #e2cdff;
   border: 1px solid #c2b1e3;
   padding: 5px;
 }
-.mdxContent tr {
+.app tr {
   background-color: #f2e9fb;
   border-bottom: 0.5px solid #c2b1e3;
 }
-.mdxContent td {
+.app td {
   border: 0.5px solid #c2b1e3;
   padding: 5px;
 }
 
 /* Link pill style */
-.mdxContent a {
+.app a {
   position: relative;
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -120,7 +120,7 @@
   background: #eedcfb;
   text-decoration: none;
 }
-.mdxContent a::after {
+.app a::after {
   content: "";
   position: absolute;
   top: -2px;
@@ -133,9 +133,9 @@
 }
 
 /* Admonitions (directives) — try multiple selector shapes for compatibility */
-.mdxContent .admonition,
-.mdxContent [data-kind],
-.mdxContent [data-admonition-type] {
+.app .admonition,
+.app [data-kind],
+.app [data-admonition-type] {
   border-radius: 6px;
   border-width: 2px;
   border-style: solid;
@@ -143,40 +143,40 @@
   margin: 0.8em 0;
 }
 /* info */
-.mdxContent .admonition.info,
-.mdxContent [data-kind="info"],
-.mdxContent [data-admonition-type="info"] {
+.app .admonition.info,
+.app [data-kind="info"],
+.app [data-admonition-type="info"] {
   background: #D9EDF7;
   border-color: #61848f;
 }
 /* danger */
-.mdxContent .admonition.danger,
-.mdxContent [data-kind="danger"],
-.mdxContent [data-admonition-type="danger"] {
+.app .admonition.danger,
+.app [data-kind="danger"],
+.app [data-admonition-type="danger"] {
   background: #F2DEDE;
   border-color: #A94442;
 }
 /* caution/warning */
-.mdxContent .admonition.caution,
-.mdxContent .admonition.warning,
-.mdxContent [data-kind="caution"],
-.mdxContent [data-admonition-type="caution"],
-.mdxContent [data-admonition-type="warning"] {
+.app .admonition.caution,
+.app .admonition.warning,
+.app [data-kind="caution"],
+.app [data-admonition-type="caution"],
+.app [data-admonition-type="warning"] {
   background: #FCF8E3;
   border-color: #8a6d3b;
 }
 /* tip/success */
-.mdxContent .admonition.tip,
-.mdxContent .admonition.success,
-.mdxContent [data-kind="tip"],
-.mdxContent [data-admonition-type="tip"],
-.mdxContent [data-admonition-type="success"] {
+.app .admonition.tip,
+.app .admonition.success,
+.app [data-kind="tip"],
+.app [data-admonition-type="tip"],
+.app [data-admonition-type="success"] {
   background: #DFF0D8;
   border-color: #3C763D;
 }
 /* spoiler (non-standard) */
-.mdxContent .admonition.spoiler,
-.mdxContent [data-admonition-type="spoiler"] {
+.app .admonition.spoiler,
+.app [data-admonition-type="spoiler"] {
   background: #f3eff8;
   border-color: #9389b1;
 }
