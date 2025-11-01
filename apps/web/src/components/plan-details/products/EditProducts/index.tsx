@@ -1,21 +1,21 @@
 import {Form, Input, Button, Divider, Space} from "antd";
 import {LoadingOutlined, PlusOutlined, UploadOutlined} from "@ant-design/icons";
 import {EditProduct} from "@/components/plan-details/products/EditProduct";
-import {ProductsRead, ProductsUpdate} from "@/lib";
+import {ProductsCreate, ProductsRead} from "@/lib";
 
 type Props = {
-  products: ProductsRead,
-  updateProducts: (products: ProductsUpdate) => Promise<void>,
+  product: ProductsRead | undefined,
+  updateProducts: (products: ProductsCreate) => Promise<void>,
   isLoading: boolean,
 }
 
-export function EditProducts({products, updateProducts, isLoading}: Props) {
+export function EditProducts({product, updateProducts, isLoading}: Props) {
   return (
     <Form
       layout="vertical"
       onFinish={async (values) => await updateProducts(values)}
-      initialValues={products}
       size="small"
+      initialValues={product}
     >
       <Form.Item
         label={"商品全体の説明"}

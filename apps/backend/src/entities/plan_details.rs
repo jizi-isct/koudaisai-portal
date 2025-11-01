@@ -22,25 +22,23 @@ pub struct ProductsRead {
     pub description: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ProductsUpdate {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub items: Option<Vec<ProductItem>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ProductsCreate {
+    pub items: Vec<ProductItem>,
+    pub description: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlanDetailsRead {
-    pub products: ProductsRead,
+    pub product: ProductsRead,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub additional_info: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PlanDetailsUpdate {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub products: Option<ProductsUpdate>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlanDetailsCreate {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub product: Option<ProductsCreate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_info: Option<String>,
 }

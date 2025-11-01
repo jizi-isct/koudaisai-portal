@@ -1,5 +1,5 @@
 use crate::entities::group_id::GroupId;
-use crate::entities::plan_details::{PlanDetailsRead, PlanDetailsUpdate};
+use crate::entities::plan_details::{PlanDetailsCreate, PlanDetailsRead};
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -14,7 +14,7 @@ use tracing::instrument;
 
 #[instrument(name = "init /api/v2/groups/{id}/plan-details")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", get(get_plan_details).patch(patch_plan_details))
+    Router::new().route("/", get(get_plan_details).put(put_plan_details))
 }
 
 #[axum::debug_handler]
@@ -49,7 +49,7 @@ async fn get_plan_details(
 
     // 上流の plans API に委譲（存在しない場合は 404）
     let url = format!("https://api2025.jizi.jp/v1/plans/{}/details", group_id);
-    let resp = state.http_client.request(Method::GET, url).send().await;
+    let resp = state.http_client.request(Method::GET, url).header("Cache-Control", "no-cache").send().await;
 
     let resp = match resp {
         Ok(r) => r,
@@ -81,15 +81,15 @@ async fn get_plan_details(
 }
 
 #[instrument(
-    name = "PATCH /api/v2/groups/{id}/plan-details",
+    name = "PUT /api/v2/groups/{id}/plan-details",
     skip(state, current_user)
 )]
-async fn patch_plan_details(
+async fn put_plan_details(
     ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
     Path(id): Path<GroupId>,
-    Json(payload): Json<PlanDetailsUpdate>,
+    Json(payload): Json<PlanDetailsCreate>,
 ) -> AppResponse {
     // 権限チェック: ユーザーのみ
     let user = match current_user {
@@ -110,8 +110,8 @@ async fn patch_plan_details(
         return Ok((StatusCode::FORBIDDEN, ().into_response()));
     }
 
-    let url = format!("https://api2025.jizi.jp/v1/plans/{}/plan-details", group_id);
-    let mut req = state.http_client.request(Method::PATCH, url).json(&payload);
+    let url = format!("https://api2025.jizi.jp/v1/admin/plans/{}/details", group_id);
+    let mut req = state.http_client.request(Method::PUT, url).json(&payload);
     let mut headers = HeaderMap::new();
     headers.insert(
         "CF-Access-Client-Id",

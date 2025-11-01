@@ -2,7 +2,7 @@ type: object
 required:
   - products
 properties:
-  products:
+  product:
     $ref: 'products/ProductsRead.yml'
   additional_info:
     type: string

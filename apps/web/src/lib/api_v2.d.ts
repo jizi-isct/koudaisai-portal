@@ -252,16 +252,11 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
         /**
-         * 企画詳細情報を編集
-         * @description 自分が属する団体のみ編集可能
+         * 企画詳細情報を上書き
+         * @description 自分が属する団体のみ上書き可能
          */
-        patch: {
+        put: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -273,7 +268,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["PlanDetailsUpdate"];
+                    "application/json": components["schemas"]["PlanDetailsCreate"];
                 };
             };
             responses: {
@@ -300,6 +295,11 @@ export interface paths {
                 };
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/forms": {
@@ -2478,12 +2478,12 @@ export interface components {
             description: string;
         };
         PlanDetailsRead: {
-            products: components["schemas"]["ProductsRead"];
+            product?: components["schemas"]["ProductsRead"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
         /** @description 当日販売される商品情報（更新用） */
-        ProductsUpdate: {
+        ProductsCreate: {
             /** @description 商品の一覧 */
             items?: {
                 /** @description 商品名 */
@@ -2501,8 +2501,8 @@ export interface components {
             /** @description 商品全体の説明文 */
             description?: string;
         };
-        PlanDetailsUpdate: {
-            products?: components["schemas"]["ProductsUpdate"];
+        PlanDetailsCreate: {
+            product?: components["schemas"]["ProductsCreate"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
