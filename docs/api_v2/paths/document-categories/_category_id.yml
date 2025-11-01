@@ -16,7 +16,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
+            $ref: "../../components/schemas/document_category/ReadDocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -42,7 +42,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/document_category/UpdateDocumentCategory.yml"
+          $ref: "../../components/schemas/document_category/UpdateDocumentCategory.yml"
   responses:
     '201':
       description: Changed
@@ -51,7 +51,7 @@ patch:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
+              $ref: "../../components/schemas/document_category/ReadDocumentCategory.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':

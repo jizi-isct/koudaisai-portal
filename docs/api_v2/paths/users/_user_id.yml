@@ -12,14 +12,14 @@ get:
       description: ユーザーID
       required: true
       schema:
-        $ref: "../components/schemas/common/UserId.yml"
+        $ref: "../../components/schemas/common/UserId.yml"
   responses:
     '200':
       description: OK
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/user/UserRead.yml
+            $ref: ../../components/schemas/user/UserRead.yml
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -38,13 +38,13 @@ patch:
       description: ユーザーID
       required: true
       schema:
-        $ref: "../components/schemas/common/UserId.yml"
+        $ref: "../../components/schemas/common/UserId.yml"
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/user/UserUpdate.yml
+          $ref: ../../components/schemas/user/UserUpdate.yml
   responses:
     '204':
       description: 更新成功

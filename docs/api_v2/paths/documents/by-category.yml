@@ -27,12 +27,12 @@ get:
               properties:
                 category:
                   allOf:
-                    - $ref: "../components/schemas/document_category/ReadDocumentCategory.yml"
+                    - $ref: "../../components/schemas/document_category/ReadDocumentCategory.yml"
                   nullable: true
                 documents:
                   type: array
                   items:
-                    $ref: "../components/schemas/document/ReadDocument.yml"
+                    $ref: "../../components/schemas/document/ReadDocument.yml"
               required:
                 - category
                 - documents

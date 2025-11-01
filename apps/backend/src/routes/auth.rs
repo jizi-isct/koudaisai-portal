@@ -1,6 +1,5 @@
 mod password;
 
-use crate::entities::user::UserRead;
 use crate::routes::{AppState, AuthSession};
 use crate::sea_orm_entities::prelude::Users;
 use crate::sea_orm_entities::{revoked_refresh_tokens, users};
@@ -12,21 +11,21 @@ use axum::extract::{ConnectInfo, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use axum_gcra::RateLimitLayer;
 use axum_gcra::gcra::Quota;
 use axum_gcra::real_ip::RealIp;
-use axum_gcra::RateLimitLayer;
 use http::HeaderValue;
 use oauth2::{
     AccessToken, AuthorizationCode, CsrfToken, PkceCodeChallenge, RefreshToken, Scope,
     TokenResponse,
 };
-use openidconnect::core::CoreAuthenticationFlow;
 use openidconnect::Nonce;
+use openidconnect::core::CoreAuthenticationFlow;
 use reqwest::Client;
 use sea_orm::ActiveValue::Set;
+use sea_orm::ColumnTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, EntityTrait};
-use sea_orm::{ColumnTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
@@ -59,6 +58,7 @@ pub fn init_router() -> Router<Arc<AppState>> {
             ),
         )
         .route("/v1/refresh", post(refresh))
+        .route("/v1/revoke", post(revoke))
         .route("/v1/admin/login", get(admin_login))
         .route("/v1/admin/redirect", post(admin_redirect))
         .nest("/v1/password", password::init_router())
@@ -233,90 +233,6 @@ async fn refresh(
         }
     } else {
         Err(StatusCode::UNAUTHORIZED)
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-struct ResetPayload {
-    access_token: String,
-    old_password: String,
-    new_password: String,
-}
-#[instrument(name = "/auth/v1/reset", skip(state, payload))]
-async fn reset(
-    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
-    State(state): State<Arc<AppState>>,
-    Json(payload): Json<ResetPayload>,
-) -> StatusCode {
-    let access_token = match state.jwt_manager.decode(payload.access_token.as_str()) {
-        Ok(access_token) => access_token,
-        Err(_) => {
-            return StatusCode::UNAUTHORIZED;
-        }
-    };
-
-    let user = match UserRead::find_from_id(access_token.claims.sub, &state.db_conn).await {
-        Ok(Some(user)) => user,
-        Ok(None) => {
-            warn!("jwt token with invalid user was provided.");
-            return StatusCode::INTERNAL_SERVER_ERROR;
-        }
-        Err(err) => {
-            warn!("internal error occurred while executing sql: {:?}", err);
-            return StatusCode::INTERNAL_SERVER_ERROR;
-        }
-    };
-
-    if state
-        .jwt_manager
-        .is_access_token_valid(&access_token.claims, &user)
-    {
-        let sub = access_token.claims.sub;
-        let user = match users::Entity::find_by_id(sub).one(&state.db_conn).await {
-            Ok(Some(user)) => user,
-            Ok(None) => {
-                warn!("jwt token with invalid user was provided.");
-                return StatusCode::INTERNAL_SERVER_ERROR;
-            }
-            Err(err) => {
-                warn!("internal error occurred while executing sql: {:?}", err);
-                return StatusCode::INTERNAL_SERVER_ERROR;
-            }
-        };
-        //有効化されていない
-        if user.password_hash == None {
-            debug!("The account wasn't activated");
-            return StatusCode::UNAUTHORIZED;
-        }
-        let current_pwd_hash = user.password_hash.clone().unwrap();
-        let old_pwd_hash = state.sha_manager.stretch_with_salt(
-            payload.old_password.to_string().as_str(),
-            user.password_salt.as_str(),
-        );
-        let new_pwd_hash = state.sha_manager.stretch_with_salt(
-            payload.new_password.to_string().as_str(),
-            user.password_salt.as_str(),
-        );
-
-        if digest(old_pwd_hash.as_str()) == digest(current_pwd_hash.as_str()) {
-            let mut user = user.into_active_model();
-            user.password_hash = Set(Some(new_pwd_hash));
-            match user.update(&state.db_conn).await {
-                Ok(_) => StatusCode::OK,
-                Err(err) => {
-                    warn!(
-                        "Internal server error occurred while updating user password: {:?}",
-                        err
-                    );
-                    StatusCode::INTERNAL_SERVER_ERROR
-                }
-            }
-        } else {
-            debug!("password incorrect");
-            StatusCode::UNAUTHORIZED
-        }
-    } else {
-        StatusCode::UNAUTHORIZED
     }
 }
 

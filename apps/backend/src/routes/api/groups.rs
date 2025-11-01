@@ -1,3 +1,5 @@
+mod plan_details;
+
 use crate::entities::group;
 use crate::entities::group::{GroupCreate, GroupRead, GroupUpdate};
 use crate::middlewares::CurrentUser;
@@ -16,13 +18,16 @@ use tracing::instrument;
 
 #[instrument(name = "init /api/v2/groups")]
 pub fn init_router() -> Router<Arc<AppState>> {
-    Router::new().route("/", get(get_groups)).route(
-        "/{id}",
-        get(get_group)
-            .put(put_group)
-            .patch(patch_group)
-            .delete(delete_group),
-    )
+    Router::new()
+        .route("/", get(get_groups))
+        .route(
+            "/{id}",
+            get(get_group)
+                .put(put_group)
+                .patch(patch_group)
+                .delete(delete_group),
+        )
+        .nest("/{id}/plan-details", plan_details::init_router())
 }
 
 #[instrument(name = "GET /api/v2/groups", skip(state, current_user))]

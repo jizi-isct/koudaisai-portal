@@ -63,6 +63,12 @@ small {
     line-height: 1.25;
 }
 
+/* Ensure MDXEditor popups (dropdowns, dialogs) render above our Modal (z-index: 1002) */
+.mdxeditor-popup-container {
+    position: relative;
+    z-index: 1105 !important;
+}
+
 @media screen and ( max-width : 768px ) {
     .content {
         margin-top: 100px;

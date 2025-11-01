@@ -1,10 +1,10 @@
+use crate::util::secrets::Secret;
 use confy::ConfyError;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use tracing_core::LevelFilter;
-use crate::util::secrets::Secret;
 
 pub fn init_config() -> Result<Config, ConfyError> {
     confy::load("koudaisai-portal", None)
@@ -18,7 +18,7 @@ pub struct Config {
     pub s3: S3,
     pub sendgrid: Sendgrid,
     pub discord: Discord,
-    pub secrets: Secrets
+    pub secrets: Secrets,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

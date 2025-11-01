@@ -56,7 +56,7 @@ async fn get_meta(
                         description: None,
                     })
                     .into_response(),
-                ))
+                ));
             }
         },
         Err(_) => {
@@ -67,7 +67,7 @@ async fn get_meta(
                     description: None,
                 })
                 .into_response(),
-            ))
+            ));
         }
     };
 

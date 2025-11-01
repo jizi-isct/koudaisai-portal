@@ -33,11 +33,10 @@ put:
   parameters:
     - name: id
       in: path
-      description: 団体ID
+      description: 団体のID
       required: true
       schema:
-        type: string
-        example: T-001
+        $ref: "../../components/schemas/common/GroupId.yml"
   requestBody:
     required: true
     content:

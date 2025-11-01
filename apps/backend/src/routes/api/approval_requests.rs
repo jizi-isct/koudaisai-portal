@@ -1,4 +1,4 @@
-use crate::entities::approval_request::{delete_by_id, ReadApprovalRequest};
+use crate::entities::approval_request::{ReadApprovalRequest, delete_by_id};
 use crate::entities::notification::{NotificationCreate, NotificationType};
 use crate::entities::target_specifier::TargetSpecifier;
 use crate::entities::user::UserRead;

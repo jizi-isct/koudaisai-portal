@@ -2,10 +2,10 @@ use crate::entities::approval_request::{
     ApprovalRequestStatus, ApprovalRequestType, CreateApprovalRequest, ReadApprovalRequest,
 };
 use crate::entities::user::UserRead;
+use aws_sdk_s3::Client as S3Client;
 use aws_sdk_s3::config::http::HttpResponse;
 use aws_sdk_s3::error::SdkError;
 use aws_sdk_s3::operation::get_object::GetObjectError;
-use aws_sdk_s3::Client as S3Client;
 use openidconnect::core::CoreUserInfoClaims;
 use reqwest::Url;
 use serenity::all::CreateAttachment;

@@ -436,7 +436,42 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 企画の詳細情報を取得（管理）
+         * @description 指定されたIDの企画の詳細情報を取得します（管理用）。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 企画ID */
+                    planId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 企画詳細情報 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReadPlanDetails"];
+                    };
+                };
+                /** @description 企画が見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
         /**
          * 企画の詳細情報を作成・更新
          * @description 指定されたIDの企画の詳細情報を作成または完全に更新します。
@@ -488,53 +523,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /**
-         * 企画の詳細情報を部分更新
-         * @description 指定されたIDの企画の詳細情報を部分的に更新します。
-         */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 企画ID */
-                    planId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdatePlanDetails"];
-                };
-            };
-            responses: {
-                /** @description 詳細情報が正常に更新されました */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description リクエストが無効です */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description 企画が見つかりません */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/plans/{planId}/icon": {
@@ -782,6 +771,7 @@ export interface components {
              * @example 17:00
              */
             end_time: string;
+            location?: (components["schemas"]["IndoorLocation"] | components["schemas"]["OutdoorLocation"]) | null;
         };
         /** @description 企画のスケジュール（作成用） */
         ScheduleCreate: {
@@ -946,17 +936,17 @@ export interface components {
             description?: string;
         };
         CreatePlanDetails: {
-            products: components["schemas"]["ProductsCreate"];
+            product?: components["schemas"]["ProductsCreate"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
         ReadPlanDetails: {
-            products: components["schemas"]["ProductsRead"];
+            product?: components["schemas"]["ProductsRead"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };
         UpdatePlanDetails: {
-            products?: components["schemas"]["ProductsUpdate"];
+            product?: components["schemas"]["ProductsUpdate"];
             /** @description 追加情報（マークダウン形式） */
             additional_info?: string | null;
         };

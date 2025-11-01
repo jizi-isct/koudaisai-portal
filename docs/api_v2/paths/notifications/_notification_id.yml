@@ -1,15 +1,15 @@
 get:
-  summary: 資料を取得
+  summary: 通知を取得
   description: |-
     ### authの違いによる挙動の違い
-    - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
-    - **admin_oidcの場合**: 存在する資料を全て取得可能
+    - **exhibitor_bearerの場合**: 自分が通知対象である場合通知を取得可能
+    - **admin_oidcの場合**: 存在する通知を全て取得可能
   tags:
-    - documents
+    - notifications
   parameters:
-    - name: document_id
+    - name: notification_id
       in: path
-      description: 資料のID
+      description: 通知id
       required: true
       schema:
         type: string
@@ -20,7 +20,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/document/ReadDocument.yml"
+            $ref: "../../components/schemas/notification/NotificationRead.yml"
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -30,13 +30,13 @@ get:
     - admin_oidc:
         - k-portal:admin:all
 patch:
-  summary: 資料を更新
+  summary: 通知を更新
   tags:
-    - documents
+    - notifications
   parameters:
-    - name: document_id
+    - name: notification_id
       in: path
-      description: 資料のID
+      description: 通知ID
       required: true
       schema:
         type: string
@@ -46,16 +46,10 @@ patch:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/document/UpdateDocument.yml"
+          $ref: "../../components/schemas/notification/NotificationUpdate.yml"
   responses:
-    '201':
-      description: Changed
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: "../components/schemas/document/ReadDocument.yml"
+    '204':
+      description: No Content
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -64,20 +58,20 @@ patch:
     - admin_oidc:
         - k-portal:admin:all
 delete:
-  summary: 資料を削除
+  summary: 通知を削除
   tags:
-    - documents
+    - notifications
   parameters:
-    - name: document_id
+    - name: notification_id
       in: path
-      description: フォームID
+      description: 通知ID
       required: true
       schema:
         type: string
         format: uuid
   responses:
     '204':
-      description: 削除成功
+      description: No Content
     '401':
       description: 資格情報が無効だった場合
     '404':

@@ -89,8 +89,8 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description 団体ID */
-                    id: string;
+                    /** @description 団体のID */
+                    id: components["schemas"]["GroupId"];
                 };
                 cookie?: never;
             };
@@ -202,6 +202,104 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/groups/{id}/plan-details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 企画の詳細情報を取得
+         * @description 自分が属する団体の企画のみ取得可能。取材団体等の企画と紐付けされていない団体は404が返されます。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 団体のID */
+                    id: components["schemas"]["GroupId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlanDetailsRead"];
+                    };
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 企画が存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        /**
+         * 企画詳細情報を上書き
+         * @description 自分が属する団体のみ上書き可能
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 団体のID */
+                    id: components["schemas"]["GroupId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlanDetailsCreate"];
+                };
+            };
+            responses: {
+                /** @description 企画情報が正常に編集された */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 不正なrequest bodyの形式 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 企画が存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/forms": {
@@ -2227,6 +2325,7 @@ export interface components {
             type_plan?: components["schemas"]["PlanRead"];
             type_press?: components["schemas"]["PressRead"];
         };
+        GroupId: string | "us";
         UserCreate: {
             /**
              * @description 名前
@@ -2358,6 +2457,54 @@ export interface components {
             name?: string;
             type_plan?: components["schemas"]["PlanUpdate"];
             type_press?: components["schemas"]["PressUpdate"];
+        };
+        /** @description 当日販売される商品情報（読み取り用） */
+        ProductsRead: {
+            /** @description 商品の一覧 */
+            items: {
+                /** @description 商品名 */
+                name: string;
+                /** @description 値段 */
+                price: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options: {
+                    /** @description 商品名 */
+                    name: string;
+                    /** @description 値段 */
+                    price: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description: string;
+        };
+        PlanDetailsRead: {
+            product?: components["schemas"]["ProductsRead"];
+            /** @description 追加情報（マークダウン形式） */
+            additional_info?: string | null;
+        };
+        /** @description 当日販売される商品情報（更新用） */
+        ProductsCreate: {
+            /** @description 商品の一覧 */
+            items?: {
+                /** @description 商品名 */
+                name?: string;
+                /** @description 値段 */
+                price?: number | null;
+                /** @description トッピングやフレーバーなどのオプション */
+                options?: {
+                    /** @description 商品名 */
+                    name?: string;
+                    /** @description 値段 */
+                    price?: number | null;
+                }[];
+            }[];
+            /** @description 商品全体の説明文 */
+            description?: string;
+        };
+        PlanDetailsCreate: {
+            product?: components["schemas"]["ProductsCreate"];
+            /** @description 追加情報（マークダウン形式） */
+            additional_info?: string | null;
         };
         /** @description Target specifier for forms */
         TargetSpecifier: string & (("group/type/plan_general" | "group/type/plan_booth" | "group/type/plan_stage" | "group/type/plan_labo" | "group/type/press" | "user/nologin") | unknown | unknown);
