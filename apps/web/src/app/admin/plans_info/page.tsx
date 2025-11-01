@@ -135,16 +135,16 @@ function Inner() {
             let day1 = null
             let day2 = null
             if (data.day1_start_time !== "" && data.day1_end_time !== "") {
-              day1 = {
+              day1 = [{
                 start_time: data.day1_start_time,
                 end_time: data.day1_end_time
-              }
+              }]
             }
             if (data.day2_start_time !== "" && data.day2_end_time !== "") {
-              day2 = {
+              day2 = [{
                 start_time: data.day2_start_time,
                 end_time: data.day2_end_time
-              }
+              }]
             }
 
             // location
@@ -335,20 +335,20 @@ function Inner() {
           let day1 = undefined;
           let day2 = undefined;
           if (data.day1_start_time === "null") {
-            day1 = null
+            day1 = []
           } else if (data.day1_start_time && data.day1_start_time !== "" && data.day1_end_time !== "") {
-            day1 = {
+            day1 = [{
               start_time: data.day1_start_time,
               end_time: data.day1_end_time
-            }
+            }]
           }
           if (data.day2_start_time === "null") {
-            day2 = null
+            day2 = []
           } else if (data.day2_start_time && data.day2_start_time !== "" && data.day2_end_time !== "") {
-            day2 = {
+            day2 = [{
               start_time: data.day2_start_time,
               end_time: data.day2_end_time
-            }
+            }]
           }
 
           if (day1 || day2) {
