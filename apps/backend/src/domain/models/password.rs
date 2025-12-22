@@ -1,5 +1,5 @@
 use regex::Regex;
-use crate::domain::error::FactoryError;
+use crate::domain::models::error::FactoryError;
 
 // 小文字・大文字・数字・記号８文字以上
 const PASSWORD_REGEX: &str = r#"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()_+-={}[|;:'",<.>/?])(?=.{8,})"#;
