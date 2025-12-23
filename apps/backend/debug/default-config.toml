@@ -1,0 +1,48 @@
+[logging]
+log_level = "Trace"
+json = false
+
+[web.server]
+host = "0.0.0.0"
+port = 8080
+base_url = "http://localhost:8080/admin"
+
+[web.auth]
+password_salt = "P3Z9Pya4ixZg73HH"
+activation_salt = "FNi7RleyOlsjWTLi"
+stretch_cost = 13
+jwt_secret_key_path = "./debug/private-key.pem"
+jwt_public_key_path = "./debug/public-key.pem"
+
+[web.auth.keycloak]
+id = "koudaisai-portal"
+secret = "CNX8FeUfQ6YR6O4bstU3Nhi7xlEUumRA"
+issuer = "http://localhost:8000/realms/jizi-portal"
+
+[web.static_files]
+web_path = "/var/www/html/web"
+admin_path = "/var/www/html/admin"
+
+[db]
+address = "postgres://root:root@localhost:5432/koudaisai-portal"
+
+[s3]
+# S3連携が必要な場合は別途設定の必要あり
+access_key_id = ""
+secret_access_key = ""
+endpoint = ""
+bucket = ""
+
+[sendgrid]
+# sendgrid連携が必要な場合は別途設定の必要あり
+sender_address = ""
+api_key = ""
+
+[discord]
+# Discord連携が必要な場合は別途設定の必要あり
+approval_request_url = ""
+
+[secrets]
+# 企画情報API連携が必要な場合は別途設定の必要あり
+plans_info_api_client_id = ""
+plans_info_api_client_secret = ""
