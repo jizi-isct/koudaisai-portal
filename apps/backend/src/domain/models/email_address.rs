@@ -2,11 +2,11 @@ use regex::Regex;
 use crate::domain::models::error::FactoryError;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Email {
+pub struct EmailAddress {
     pub address: String,
 }
 
-impl Email {
+impl EmailAddress {
     pub fn new(address: String) -> Result<Self, FactoryError> {
         let r = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
         let regex = Regex::new(r).unwrap();
@@ -25,13 +25,13 @@ mod tests {
 
     #[test]
     fn test_valid_email() {
-        let email = Email::new("test@example.com".to_string());
+        let email = EmailAddress::new("test@example.com".to_string());
         assert!(email.is_ok());
     }
 
     #[test]
     fn test_invalid_email() {
-        let email = Email::new("invalid_email".to_string());
+        let email = EmailAddress::new("invalid_email".to_string());
         assert!(email.is_err());
     }
 }
