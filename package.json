@@ -62,7 +62,7 @@
     "jsonc-eslint-parser": "^2.1.0",
     "nx": "20.8.0",
     "rollup-plugin-preserve-directives": "^0.4.0",
-    "storybook": "^8.4.6",
+    "storybook": "^8.6.15",
     "svgr": "^1.10.0",
     "tslib": "^2.3.0",
     "typed-css-modules": "^0.9.1",
