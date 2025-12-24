@@ -9,6 +9,7 @@ services:
       - "8000:8000"
     volumes:
       - keycloak-data:/opt/keycloak/data
+      - ./a:/var/lib/keycloak
   db:
     image: postgres:14
     platform: linux/amd64

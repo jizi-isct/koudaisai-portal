@@ -38,4 +38,7 @@ ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin \
     KC_HTTP_PORT=8000
 
 HEALTHCHECK --interval=5s --retries=30 CMD curl -f -s http://localhost:8000/health/ready || exit 1
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--legacy-observability-interface=true"]
+
+COPY --chmod=777 kc-entrypoint.sh /usr/local/bin/
+COPY --chmod=777 kc-init-realms/ /opt/keycloak/data/import/
+ENTRYPOINT ["/usr/local/bin/kc-entrypoint.sh"]
