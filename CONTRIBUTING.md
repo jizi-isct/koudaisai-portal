@@ -33,7 +33,7 @@ We welcome contributions to this repository!
     
 5. **開発環境用データベース・Keycloakを起動**
     ```shell
-    npx nx backend:docker-up
+    npx nx docker-up backend
     ```
 6. **開発環境を起動**
     ```shell
