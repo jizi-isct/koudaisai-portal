@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use crate::application::ports::clock::Clock;
 
+#[derive(Clone)]
 pub struct MemoryClock {
     now: DateTime<Utc>,
 }
