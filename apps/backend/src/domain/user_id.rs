@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Hash)]
 pub struct UserId {
     pub id: Uuid
 }

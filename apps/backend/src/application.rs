@@ -11,7 +11,7 @@ pub mod error;
 mod group;
 pub mod ports;
 pub mod user;
-mod transaction;
+pub mod transaction;
 
 pub struct Application<Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock, E: Email> {
     _phantom: std::marker::PhantomData<Tx>,
