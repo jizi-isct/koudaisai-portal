@@ -10,5 +10,4 @@ pub enum TransactionError {
 pub trait Transaction {
     async fn begin(&mut self) -> Result<(), TransactionError>;
     async fn commit(&mut self) -> Result<(), TransactionError>;
-    async fn rollback(&mut self) -> Result<(), TransactionError>;
 }
