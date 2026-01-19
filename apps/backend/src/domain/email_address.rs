@@ -1,5 +1,5 @@
 use regex::Regex;
-use crate::domain::models::error::FactoryError;
+use crate::domain::error::FactoryError;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EmailAddress {

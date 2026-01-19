@@ -21,6 +21,8 @@ pub mod sea_orm_entities;
 mod service;
 pub mod util;
 mod domain;
+mod application;
+mod dtos;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();
 const MINOR_VERSION: u32 = pkg_version_minor!();
