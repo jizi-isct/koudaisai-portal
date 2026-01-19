@@ -117,3 +117,174 @@ impl<'a, Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRep
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::domain::actor_ctx::ActorContext;
+    use crate::domain::group::{Group, GroupType};
+    use crate::domain::group_id::GroupId;
+    use crate::domain::user_id::UserId;
+    use crate::infra::memory::MemoryApplication;
+    use crate::infra::memory::transaction_impl::MemoryTransaction;
+    use chrono::Utc;
+    use uuid::Uuid;
+
+    fn setup_app() -> MemoryApplication {
+        MemoryApplication::new_memory_app(Utc::now())
+    }
+
+    fn admin_ctx() -> ActorContext {
+        ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            claims: vec!["koudaisai-portal:admin:group:read".to_string(), "koudaisai-portal:admin:group:create".to_string()],
+        }
+    }
+
+    fn user_ctx(user_id: UserId, memberships: Vec<Membership>) -> ActorContext {
+        ActorContext::User {
+            user_id,
+            memberships,
+            group_type: GroupType::Press { representative: user_id },
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_all_success() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let group_app = app.group();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        app.group_repo.insert(group).await.unwrap();
+
+        let result = group_app.get_all(&ctx).await;
+        assert!(result.is_ok());
+        let groups = result.unwrap();
+        assert_eq!(groups.len(), 1);
+        assert_eq!(groups[0].id(), group_id);
+    }
+
+    #[tokio::test]
+    async fn test_get_all_unauthorized() {
+        let app = setup_app();
+        let ctx = ActorContext::NoLogin;
+        let group_app = app.group();
+
+        let result = group_app.get_all(&ctx).await;
+        assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+    }
+
+    #[tokio::test]
+    async fn test_get_by_id_success_admin() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let group_app = app.group();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        app.group_repo.insert(group).await.unwrap();
+
+        let result = group_app.get_by_id(&ctx, group_id).await;
+        assert!(result.is_ok());
+        let group_opt = result.unwrap();
+        assert!(group_opt.is_some());
+        assert_eq!(group_opt.unwrap().id(), group_id);
+    }
+
+    #[tokio::test]
+    async fn test_get_by_id_success_user() {
+        let app = setup_app();
+        let user_id = UserId::new(Uuid::new_v4());
+        let group_id = GroupId::new('G', 1).unwrap();
+        let membership = Membership::new(group_id, user_id, &app.clock);
+        let ctx = user_ctx(user_id, vec![membership.clone()]);
+        let group_app = app.group();
+
+        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: user_id }, &app.clock).unwrap();
+        app.group_repo.insert(group).await.unwrap();
+        app.membership_repo.insert(membership).await.unwrap();
+
+        let result = group_app.get_by_id(&ctx, group_id).await;
+        assert!(result.is_ok());
+        let group_opt = result.unwrap();
+        assert!(group_opt.is_some());
+        assert_eq!(group_opt.unwrap().id(), group_id);
+    }
+
+    #[tokio::test]
+    async fn test_get_by_id_not_found() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let group_app = app.group();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let result = group_app.get_by_id(&ctx, group_id).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn test_get_by_id_unauthorized_user() {
+        let app = setup_app();
+        let user_id = UserId::new(Uuid::new_v4());
+        let ctx = user_ctx(user_id, vec![]); // No memberships
+        let group_app = app.group();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        app.group_repo.insert(group).await.unwrap();
+
+        let result = group_app.get_by_id(&ctx, group_id).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_none()); // authz returns NotFound for users not in group
+    }
+
+    #[tokio::test]
+    async fn test_create_group_success() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let group_app = app.group();
+        let tx = MemoryTransaction::new();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let rep_id = UserId::new(Uuid::new_v4());
+        let group_type = GroupType::Press { representative: rep_id };
+
+        let result = group_app.create_group(&ctx, tx, group_id, "New Group".to_string(), group_type).await;
+        assert!(result.is_ok());
+
+        let saved_group = app.group_repo.find_by_id(group_id).await.unwrap();
+        assert!(saved_group.is_some());
+        assert_eq!(saved_group.unwrap().name(), "New Group");
+
+        let memberships = app.membership_repo.find_by_group_id(group_id).await.unwrap();
+        assert_eq!(memberships.len(), 1);
+        assert_eq!(memberships[0].user_id(), rep_id);
+    }
+
+    #[tokio::test]
+    async fn test_create_group_unauthorized() {
+        let app = setup_app();
+        let ctx = ActorContext::NoLogin;
+        let group_app = app.group();
+        let tx = MemoryTransaction::new();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let result = group_app.create_group(&ctx, tx, group_id, "New Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }).await;
+        assert!(matches!(result, Err(ApplicationSequentialOperationError::Unauthorized)));
+    }
+
+    #[tokio::test]
+    async fn test_create_group_invalid_input() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let group_app = app.group();
+        let tx = MemoryTransaction::new();
+
+        let group_id = GroupId::new('G', 1).unwrap();
+        let result = group_app.create_group(&ctx, tx, group_id, "".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }).await;
+        assert!(matches!(result, Err(ApplicationSequentialOperationError::InvalidInput(_))));
+    }
+}
