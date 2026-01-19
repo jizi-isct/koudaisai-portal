@@ -63,14 +63,14 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> Us
         &self,
         actor_ctx: &ActorContext,
         user: &User,
-    ) -> Result<(), ApplicationOperationError<InsertError>> {
+    ) -> Result<(), ApplicationOperationError<UpdateError>> {
         // authz
         if !authz::can_update_user(actor_ctx, user) {
             return Err(ApplicationOperationError::Unauthorized);
         }
 
         // update user
-        Ok(self.user_repo.insert(user).await?)
+        Ok(self.user_repo.update(user).await?)
     }
 
     pub async fn change_m_address(
