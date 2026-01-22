@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::FromStr;
 use crate::domain::error::FactoryError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
@@ -26,6 +27,20 @@ impl GroupId {
 
     pub fn index_str(&self) -> String {
         format!("{:03}", self.index)
+    }
+}
+
+impl FromStr for GroupId {
+    type Err = FactoryError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split('-').collect();
+        if parts.len() != 2 {
+            return Err(FactoryError::InvalidInput("Invalid format".to_string()));
+        }
+        let prefix = parts[0].chars().next().ok_or(FactoryError::InvalidInput("Invalid format".to_string()))?;
+        let index_str = parts[1];
+        let index = u16::from_str_radix(index_str, 10).map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))?;
+        GroupId::new(prefix, index).map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))
     }
 }
 
