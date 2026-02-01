@@ -3,8 +3,6 @@
 import {Heading1, LoadingScreen} from "@/components/generic"
 import {$apiMembers, $apiNoAuth, useIsLoggedInMembers} from "@/lib";
 
-import '@react-pdf-viewer/core/lib/styles/index.css';
-import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {ViewDocuments} from "@/components/document/view/ViewDocuments";
 import {ReadDocumentProvider} from "@/contexts/ReadDocumentContext";
