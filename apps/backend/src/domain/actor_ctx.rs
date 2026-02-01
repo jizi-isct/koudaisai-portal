@@ -97,10 +97,10 @@ impl ActorContext {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::group_id::GroupId;
-    use crate::domain::user_id::UserId;
-    use crate::domain::membership::Membership;
     use crate::application::ports::clock::Clock;
+    use crate::domain::group_id::GroupId;
+    use crate::domain::membership::Membership;
+    use crate::domain::user_id::UserId;
     use chrono::{DateTime, Utc};
     use uuid::Uuid;
 
@@ -135,7 +135,9 @@ mod tests {
         let ctx = ActorContext::User {
             user_id,
             memberships,
-            group_type: GroupType::Press { representative: user_id },
+            group_type: GroupType::Press {
+                representative: user_id,
+            },
         };
         assert!(ctx.is_group_id(&group_id));
         assert!(!ctx.is_group_id(&GroupId::new('G', 2).unwrap()));
@@ -147,7 +149,9 @@ mod tests {
         let ctx_user = ActorContext::User {
             user_id,
             memberships: vec![],
-            group_type: GroupType::Press { representative: user_id },
+            group_type: GroupType::Press {
+                representative: user_id,
+            },
         };
         let ctx_admin = ActorContext::Admin {
             user_id,
@@ -164,6 +168,12 @@ mod tests {
     #[test]
     fn test_is_user_nologin() {
         assert!(ActorContext::NoLogin.is_user_nologin());
-        assert!(!ActorContext::Admin { user_id: UserId::new(Uuid::new_v4()), claims: vec![] }.is_user_nologin());
+        assert!(
+            !ActorContext::Admin {
+                user_id: UserId::new(Uuid::new_v4()),
+                claims: vec![]
+            }
+            .is_user_nologin()
+        );
     }
 }

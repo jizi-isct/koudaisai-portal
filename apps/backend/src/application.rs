@@ -10,10 +10,17 @@ pub mod authz;
 pub mod error;
 mod group;
 pub mod ports;
-pub mod user;
 pub mod transaction;
+pub mod user;
 
-pub struct Application<Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock, E: Email> {
+pub struct Application<
+    Tx: Transaction,
+    GR: GroupRepo<Tx>,
+    MR: MembershipRepo<Tx>,
+    UR: UserRepo<Tx>,
+    C: Clock,
+    E: Email,
+> {
     _phantom: std::marker::PhantomData<Tx>,
     group_repo: GR,
     membership_repo: MR,
@@ -22,8 +29,14 @@ pub struct Application<Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx
     email: E,
 }
 
-impl<Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock, E: Email>
-    Application<Tx, GR, MR, UR, C, E>
+impl<
+    Tx: Transaction,
+    GR: GroupRepo<Tx>,
+    MR: MembershipRepo<Tx>,
+    UR: UserRepo<Tx>,
+    C: Clock,
+    E: Email,
+> Application<Tx, GR, MR, UR, C, E>
 {
     pub fn new(group_repo: GR, membership_repo: MR, user_repo: UR, clock: C, email: E) -> Self {
         Self {

@@ -155,8 +155,8 @@ impl Group {
 mod tests {
     use super::*;
     use crate::domain::group_id::GroupId;
-    use crate::domain::user_id::UserId;
     use crate::domain::membership::Membership;
+    use crate::domain::user_id::UserId;
     use uuid::Uuid;
 
     struct MockClock {
@@ -173,7 +173,9 @@ mod tests {
         let group_id = GroupId::new('A', 1).unwrap();
         let name = "Test Group".to_string();
         let user_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press { representative: user_id };
+        let group_type = GroupType::Press {
+            representative: user_id,
+        };
         Group::register(group_id, name, group_type, clock).unwrap()
     }
 
@@ -183,7 +185,9 @@ mod tests {
         let group_id = GroupId::new('A', 1).unwrap();
         let name = "Test Group".to_string();
         let user_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press { representative: user_id };
+        let group_type = GroupType::Press {
+            representative: user_id,
+        };
 
         let group = Group::register(group_id, name.clone(), group_type.clone(), &clock).unwrap();
 
@@ -200,7 +204,9 @@ mod tests {
         let group_id = GroupId::new('A', 1).unwrap();
         let name = "  ".to_string();
         let user_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press { representative: user_id };
+        let group_type = GroupType::Press {
+            representative: user_id,
+        };
 
         let result = Group::register(group_id, name, group_type, &clock);
         assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
@@ -213,9 +219,18 @@ mod tests {
         let updated_at = Utc::now();
         let name = "Restored Group".to_string();
         let user_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press { representative: user_id };
+        let group_type = GroupType::Press {
+            representative: user_id,
+        };
 
-        let group = Group::restore(group_id, created_at, updated_at, name.clone(), group_type.clone()).unwrap();
+        let group = Group::restore(
+            group_id,
+            created_at,
+            updated_at,
+            name.clone(),
+            group_type.clone(),
+        )
+        .unwrap();
 
         assert_eq!(group.id(), group_id);
         assert_eq!(group.name(), name);
@@ -257,7 +272,9 @@ mod tests {
         let mut group = setup_group(&clock);
 
         let new_representative = UserId::new(Uuid::new_v4());
-        let new_type = GroupType::Press { representative: new_representative };
+        let new_type = GroupType::Press {
+            representative: new_representative,
+        };
         let membership = Membership::new(group.id(), UserId::new(Uuid::new_v4()), &clock);
 
         let update_time = initial_time + chrono::Duration::seconds(20);
@@ -298,4 +315,3 @@ mod tests {
         assert!(matches!(result, Err(UpdateRolesError::InvalidInput(_))));
     }
 }
-

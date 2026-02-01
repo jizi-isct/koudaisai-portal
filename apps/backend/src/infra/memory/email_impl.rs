@@ -1,10 +1,10 @@
-use std::sync::{Arc, RwLock};
-use anyhow::anyhow;
-use async_trait::async_trait;
 use crate::application::error::ApplicationError;
 use crate::application::ports::email::Email;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::error::DomainError;
+use anyhow::anyhow;
+use async_trait::async_trait;
+use std::sync::{Arc, RwLock};
 
 pub struct MemoryEmail {
     sent_emails: Arc<RwLock<Vec<(EmailAddress, String)>>>,
@@ -25,7 +25,10 @@ impl MemoryEmail {
 #[async_trait]
 impl Email for MemoryEmail {
     async fn send(&self, address: &EmailAddress, body: &str) -> Result<(), ApplicationError> {
-        let mut sent_emails = self.sent_emails.write().map_err(|e| ApplicationError::InternalError(anyhow!(e.to_string())))?;
+        let mut sent_emails = self
+            .sent_emails
+            .write()
+            .map_err(|e| ApplicationError::InternalError(anyhow!(e.to_string())))?;
         sent_emails.push((address.clone(), body.to_string()));
         Ok(())
     }

@@ -1,9 +1,9 @@
-use std::str::FromStr;
-use uuid::Uuid;
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::error::FactoryError;
 use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
+use std::str::FromStr;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TargetSpecifier {
@@ -31,14 +31,21 @@ impl FromStr for TargetSpecifier {
                 let user_id_str = &s[8..];
                 match Uuid::parse_str(user_id_str) {
                     Ok(uuid) => TargetSpecifier::UserId(UserId::new(uuid)),
-                    Err(_) => return Err(FactoryError::InvalidInput(format!("Invalid uuid: {}", s))),
+                    Err(_) => {
+                        return Err(FactoryError::InvalidInput(format!("Invalid uuid: {}", s)));
+                    }
                 }
             }
             s if s.starts_with("group/id/") => {
                 let group_id = GroupId::from_str(&s[9..])?;
                 TargetSpecifier::GroupId(group_id)
             }
-            _ => return Err(FactoryError::InvalidInput(format!("Invalid target specifier: {}", s)))
+            _ => {
+                return Err(FactoryError::InvalidInput(format!(
+                    "Invalid target specifier: {}",
+                    s
+                )));
+            }
         };
         Ok(target_specifier)
     }
@@ -77,11 +84,11 @@ impl TargetSpecifier {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::group_id::GroupId;
-    use crate::domain::user_id::UserId;
-    use crate::domain::membership::Membership;
-    use crate::domain::group::GroupType;
     use crate::application::ports::clock::Clock;
+    use crate::domain::group::GroupType;
+    use crate::domain::group_id::GroupId;
+    use crate::domain::membership::Membership;
+    use crate::domain::user_id::UserId;
     use chrono::{DateTime, Utc};
     use uuid::Uuid;
 
@@ -94,19 +101,43 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        assert_eq!(TargetSpecifier::from_str("group/type/project_general").unwrap(), TargetSpecifier::GroupTypeProjectGeneral);
-        assert_eq!(TargetSpecifier::from_str("group/type/project_booth").unwrap(), TargetSpecifier::GroupTypeProjectBooth);
-        assert_eq!(TargetSpecifier::from_str("group/type/project_stage").unwrap(), TargetSpecifier::GroupTypeProjectStage);
-        assert_eq!(TargetSpecifier::from_str("group/type/project_labo").unwrap(), TargetSpecifier::GroupTypeProjectLabo);
-        assert_eq!(TargetSpecifier::from_str("group/type/press").unwrap(), TargetSpecifier::GroupTypePress);
-        assert_eq!(TargetSpecifier::from_str("user/nologin").unwrap(), TargetSpecifier::UserNologin);
+        assert_eq!(
+            TargetSpecifier::from_str("group/type/project_general").unwrap(),
+            TargetSpecifier::GroupTypeProjectGeneral
+        );
+        assert_eq!(
+            TargetSpecifier::from_str("group/type/project_booth").unwrap(),
+            TargetSpecifier::GroupTypeProjectBooth
+        );
+        assert_eq!(
+            TargetSpecifier::from_str("group/type/project_stage").unwrap(),
+            TargetSpecifier::GroupTypeProjectStage
+        );
+        assert_eq!(
+            TargetSpecifier::from_str("group/type/project_labo").unwrap(),
+            TargetSpecifier::GroupTypeProjectLabo
+        );
+        assert_eq!(
+            TargetSpecifier::from_str("group/type/press").unwrap(),
+            TargetSpecifier::GroupTypePress
+        );
+        assert_eq!(
+            TargetSpecifier::from_str("user/nologin").unwrap(),
+            TargetSpecifier::UserNologin
+        );
 
         let user_uuid = Uuid::new_v4();
         let user_id_str = format!("user/id/{}", user_uuid);
-        assert_eq!(TargetSpecifier::from_str(&user_id_str).unwrap(), TargetSpecifier::UserId(UserId::new(user_uuid)));
+        assert_eq!(
+            TargetSpecifier::from_str(&user_id_str).unwrap(),
+            TargetSpecifier::UserId(UserId::new(user_uuid))
+        );
 
         let group_id_str = "group/id/M-001";
-        assert_eq!(TargetSpecifier::from_str(group_id_str).unwrap(), TargetSpecifier::GroupId(GroupId::from_str("M-001").unwrap()));
+        assert_eq!(
+            TargetSpecifier::from_str(group_id_str).unwrap(),
+            TargetSpecifier::GroupId(GroupId::from_str("M-001").unwrap())
+        );
 
         assert!(TargetSpecifier::from_str("invalid").is_err());
         assert!(TargetSpecifier::from_str("user/id/invalid-uuid").is_err());
@@ -132,7 +163,7 @@ mod tests {
         let user_id = UserId::new(Uuid::new_v4());
         let group_id = GroupId::from_str("M-001").unwrap();
         let memberships = vec![Membership::new(group_id, user_id, &MockClock)];
-        
+
         let ctx_general = ActorContext::User {
             user_id,
             memberships: memberships.clone(),
@@ -151,11 +182,16 @@ mod tests {
 
         // GroupId
         assert!(TargetSpecifier::GroupId(group_id).does_actor_match(&ctx_general));
-        assert!(!TargetSpecifier::GroupId(GroupId::from_str("M-002").unwrap()).does_actor_match(&ctx_general));
+        assert!(
+            !TargetSpecifier::GroupId(GroupId::from_str("M-002").unwrap())
+                .does_actor_match(&ctx_general)
+        );
 
         // UserId
         assert!(TargetSpecifier::UserId(user_id).does_actor_match(&ctx_general));
-        assert!(!TargetSpecifier::UserId(UserId::new(Uuid::new_v4())).does_actor_match(&ctx_general));
+        assert!(
+            !TargetSpecifier::UserId(UserId::new(Uuid::new_v4())).does_actor_match(&ctx_general)
+        );
 
         // UserNologin
         assert!(TargetSpecifier::UserNologin.does_actor_match(&ctx_nologin));

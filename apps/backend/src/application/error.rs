@@ -1,6 +1,6 @@
+use crate::application::transaction::TransactionError;
 use anyhow::anyhow;
 use thiserror::Error;
-use crate::application::transaction::TransactionError;
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
@@ -9,7 +9,7 @@ pub enum ApplicationError {
     #[error("Unauthorized")]
     Unauthorized,
     #[error("Internal error")]
-    InternalError(#[from] anyhow::Error)
+    InternalError(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Error)]
@@ -21,7 +21,7 @@ pub enum ApplicationOperationError<Op: OperationError> {
     #[error("Unauthorized")]
     Unauthorized,
     #[error("Internal error")]
-    InternalError(anyhow::Error)
+    InternalError(anyhow::Error),
 }
 
 #[derive(Debug, Error)]
@@ -35,7 +35,7 @@ pub enum ApplicationSequentialOperationError<Op: OperationError> {
     #[error("Unauthorized")]
     Unauthorized,
     #[error("Internal error")]
-    InternalError(anyhow::Error)
+    InternalError(anyhow::Error),
 }
 
 trait OperationError {}
@@ -49,13 +49,13 @@ pub enum InsertError {
     #[error("Conflict")]
     Conflict,
     #[error("Internal error: {0}")]
-    InternalError(#[from] anyhow::Error)
+    InternalError(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Error)]
 pub enum FindError {
     #[error("Internal error: {0}")]
-    InternalError(#[from] anyhow::Error)
+    InternalError(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Error)]
@@ -63,7 +63,7 @@ pub enum UpdateError {
     #[error("Not found")]
     NotFound,
     #[error("Internal error: {0}")]
-    InternalError(#[from] anyhow::Error)
+    InternalError(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Error)]
@@ -71,5 +71,5 @@ pub enum DeleteError {
     #[error("Not found")]
     NotFound,
     #[error("Internal error: {0}")]
-    InternalError(#[from] anyhow::Error)
+    InternalError(#[from] anyhow::Error),
 }

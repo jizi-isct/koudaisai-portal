@@ -1,17 +1,19 @@
+use crate::domain::error::FactoryError;
 use std::fmt::Display;
 use std::str::FromStr;
-use crate::domain::error::FactoryError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct GroupId {
     prefix: char,
-    index: u16
+    index: u16,
 }
 
 impl GroupId {
     pub fn new(prefix: char, index: u16) -> Result<Self, FactoryError> {
         if index >= 1000 {
-            return Err(FactoryError::InvalidInput("Index must be less than 1000".to_string()));
+            return Err(FactoryError::InvalidInput(
+                "Index must be less than 1000".to_string(),
+            ));
         }
 
         Ok(Self { prefix, index })
@@ -37,10 +39,15 @@ impl FromStr for GroupId {
         if parts.len() != 2 {
             return Err(FactoryError::InvalidInput("Invalid format".to_string()));
         }
-        let prefix = parts[0].chars().next().ok_or(FactoryError::InvalidInput("Invalid format".to_string()))?;
+        let prefix = parts[0]
+            .chars()
+            .next()
+            .ok_or(FactoryError::InvalidInput("Invalid format".to_string()))?;
         let index_str = parts[1];
-        let index = u16::from_str_radix(index_str, 10).map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))?;
-        GroupId::new(prefix, index).map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))
+        let index = u16::from_str_radix(index_str, 10)
+            .map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))?;
+        GroupId::new(prefix, index)
+            .map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))
     }
 }
 

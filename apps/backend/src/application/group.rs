@@ -137,7 +137,10 @@ mod tests {
     fn admin_ctx() -> ActorContext {
         ActorContext::Admin {
             user_id: UserId::new(Uuid::new_v4()),
-            claims: vec!["koudaisai-portal:admin:group:read".to_string(), "koudaisai-portal:admin:group:create".to_string()],
+            claims: vec![
+                "koudaisai-portal:admin:group:read".to_string(),
+                "koudaisai-portal:admin:group:create".to_string(),
+            ],
         }
     }
 
@@ -145,7 +148,9 @@ mod tests {
         ActorContext::User {
             user_id,
             memberships,
-            group_type: GroupType::Press { representative: user_id },
+            group_type: GroupType::Press {
+                representative: user_id,
+            },
         }
     }
 
@@ -156,7 +161,15 @@ mod tests {
         let group_app = app.group();
 
         let group_id = GroupId::new('G', 1).unwrap();
-        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        let group = Group::register(
+            group_id,
+            "Test Group".to_string(),
+            GroupType::Press {
+                representative: UserId::new(Uuid::new_v4()),
+            },
+            &app.clock,
+        )
+        .unwrap();
         app.group_repo.insert(group).await.unwrap();
 
         let result = group_app.get_all(&ctx).await;
@@ -173,7 +186,10 @@ mod tests {
         let group_app = app.group();
 
         let result = group_app.get_all(&ctx).await;
-        assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
     }
 
     #[tokio::test]
@@ -183,7 +199,15 @@ mod tests {
         let group_app = app.group();
 
         let group_id = GroupId::new('G', 1).unwrap();
-        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        let group = Group::register(
+            group_id,
+            "Test Group".to_string(),
+            GroupType::Press {
+                representative: UserId::new(Uuid::new_v4()),
+            },
+            &app.clock,
+        )
+        .unwrap();
         app.group_repo.insert(group).await.unwrap();
 
         let result = group_app.get_by_id(&ctx, group_id).await;
@@ -202,7 +226,15 @@ mod tests {
         let ctx = user_ctx(user_id, vec![membership.clone()]);
         let group_app = app.group();
 
-        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: user_id }, &app.clock).unwrap();
+        let group = Group::register(
+            group_id,
+            "Test Group".to_string(),
+            GroupType::Press {
+                representative: user_id,
+            },
+            &app.clock,
+        )
+        .unwrap();
         app.group_repo.insert(group).await.unwrap();
         app.membership_repo.insert(membership).await.unwrap();
 
@@ -233,7 +265,15 @@ mod tests {
         let group_app = app.group();
 
         let group_id = GroupId::new('G', 1).unwrap();
-        let group = Group::register(group_id, "Test Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }, &app.clock).unwrap();
+        let group = Group::register(
+            group_id,
+            "Test Group".to_string(),
+            GroupType::Press {
+                representative: UserId::new(Uuid::new_v4()),
+            },
+            &app.clock,
+        )
+        .unwrap();
         app.group_repo.insert(group).await.unwrap();
 
         let result = group_app.get_by_id(&ctx, group_id).await;
@@ -250,16 +290,24 @@ mod tests {
 
         let group_id = GroupId::new('G', 1).unwrap();
         let rep_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press { representative: rep_id };
+        let group_type = GroupType::Press {
+            representative: rep_id,
+        };
 
-        let result = group_app.create_group(&ctx, tx, group_id, "New Group".to_string(), group_type).await;
+        let result = group_app
+            .create_group(&ctx, tx, group_id, "New Group".to_string(), group_type)
+            .await;
         assert!(result.is_ok());
 
         let saved_group = app.group_repo.find_by_id(group_id).await.unwrap();
         assert!(saved_group.is_some());
         assert_eq!(saved_group.unwrap().name(), "New Group");
 
-        let memberships = app.membership_repo.find_by_group_id(group_id).await.unwrap();
+        let memberships = app
+            .membership_repo
+            .find_by_group_id(group_id)
+            .await
+            .unwrap();
         assert_eq!(memberships.len(), 1);
         assert_eq!(memberships[0].user_id(), rep_id);
     }
@@ -272,8 +320,21 @@ mod tests {
         let tx = MemoryTransaction::new();
 
         let group_id = GroupId::new('G', 1).unwrap();
-        let result = group_app.create_group(&ctx, tx, group_id, "New Group".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }).await;
-        assert!(matches!(result, Err(ApplicationSequentialOperationError::Unauthorized)));
+        let result = group_app
+            .create_group(
+                &ctx,
+                tx,
+                group_id,
+                "New Group".to_string(),
+                GroupType::Press {
+                    representative: UserId::new(Uuid::new_v4()),
+                },
+            )
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationSequentialOperationError::Unauthorized)
+        ));
     }
 
     #[tokio::test]
@@ -284,7 +345,20 @@ mod tests {
         let tx = MemoryTransaction::new();
 
         let group_id = GroupId::new('G', 1).unwrap();
-        let result = group_app.create_group(&ctx, tx, group_id, "".to_string(), GroupType::Press { representative: UserId::new(Uuid::new_v4()) }).await;
-        assert!(matches!(result, Err(ApplicationSequentialOperationError::InvalidInput(_))));
+        let result = group_app
+            .create_group(
+                &ctx,
+                tx,
+                group_id,
+                "".to_string(),
+                GroupType::Press {
+                    representative: UserId::new(Uuid::new_v4()),
+                },
+            )
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationSequentialOperationError::InvalidInput(_))
+        ));
     }
 }

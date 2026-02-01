@@ -49,7 +49,12 @@ async fn get_plan_details(
 
     // 上流の plans API に委譲（存在しない場合は 404）
     let url = format!("https://api2025.jizi.jp/v1/plans/{}/details", group_id);
-    let resp = state.http_client.request(Method::GET, url).header("Cache-Control", "no-cache").send().await;
+    let resp = state
+        .http_client
+        .request(Method::GET, url)
+        .header("Cache-Control", "no-cache")
+        .send()
+        .await;
 
     let resp = match resp {
         Ok(r) => r,
@@ -110,7 +115,10 @@ async fn put_plan_details(
         return Ok((StatusCode::FORBIDDEN, ().into_response()));
     }
 
-    let url = format!("https://api2025.jizi.jp/v1/admin/plans/{}/details", group_id);
+    let url = format!(
+        "https://api2025.jizi.jp/v1/admin/plans/{}/details",
+        group_id
+    );
     let mut req = state.http_client.request(Method::PUT, url).json(&payload);
     let mut headers = HeaderMap::new();
     headers.insert(

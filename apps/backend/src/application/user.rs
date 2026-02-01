@@ -1,4 +1,3 @@
-use std::marker::PhantomData;
 use crate::application::authz;
 use crate::application::authz::CanGetByIdError;
 use crate::application::error::{ApplicationOperationError, FindError, InsertError, UpdateError};
@@ -10,6 +9,7 @@ use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
+use std::marker::PhantomData;
 
 pub struct UserApp<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> {
     _phantom: PhantomData<&'a Tx>,
@@ -18,7 +18,9 @@ pub struct UserApp<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>
     clock: &'a C,
 }
 
-impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> UserApp<'a, Tx, MR, UR, C> {
+impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
+    UserApp<'a, Tx, MR, UR, C>
+{
     pub fn new(membership_repo: &'a MR, user_repo: &'a UR, clock: &'a C) -> Self {
         Self {
             _phantom: PhantomData::default(),
@@ -28,7 +30,10 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> Us
         }
     }
 
-    pub async fn get_all(&self, actor_ctx: &ActorContext) -> Result<Vec<User>, ApplicationOperationError<FindError>> {
+    pub async fn get_all(
+        &self,
+        actor_ctx: &ActorContext,
+    ) -> Result<Vec<User>, ApplicationOperationError<FindError>> {
         // auth
         if !authz::can_get_all_users(actor_ctx) {
             return Err(ApplicationOperationError::Unauthorized);
@@ -85,14 +90,17 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> Us
         }
 
         // get user
-        let user = self
-            .user_repo
-            .find_by_id(user_id)
-            .await;
+        let user = self.user_repo.find_by_id(user_id).await;
         let mut user = match user {
             Ok(Some(user)) => user,
-            Ok(None) => return Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)),
-            Err(FindError::InternalError(e)) => return Err(ApplicationOperationError::InternalError(e)),
+            Ok(None) => {
+                return Err(ApplicationOperationError::OperationFailed(
+                    UpdateError::NotFound,
+                ));
+            }
+            Err(FindError::InternalError(e)) => {
+                return Err(ApplicationOperationError::InternalError(e));
+            }
         };
 
         // update user
@@ -120,7 +128,8 @@ mod tests {
         let app = MemoryApplication::new_memory_app(now);
         let user_id = UserId::new(Uuid::new_v4());
         let email = EmailAddress::new("test@example.com".to_string()).unwrap();
-        let user = User::register(user_id, "Test User".to_string(), email, app.clock.clone()).unwrap();
+        let user =
+            User::register(user_id, "Test User".to_string(), email, app.clock.clone()).unwrap();
         app.user_repo.insert(&user).await.unwrap();
         (app, user_id)
     }
@@ -148,7 +157,10 @@ mod tests {
         let user_app = app.user();
         let result = user_app.get_all(&actor_ctx).await;
 
-        assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
     }
 
     #[tokio::test]
@@ -174,11 +186,14 @@ mod tests {
         // Mock group_id
         use crate::domain::group_id::GroupId;
         let group_id = GroupId::new('G', 1).unwrap();
-        
+
         // Register a membership for the target user
         use crate::domain::membership::Membership;
         let membership = Membership::new(group_id, user_id, &app.clock);
-        app.membership_repo.insert(membership.clone()).await.unwrap();
+        app.membership_repo
+            .insert(membership.clone())
+            .await
+            .unwrap();
 
         // Actor is in the same group
         let actor_id = UserId::new(Uuid::new_v4());
@@ -186,7 +201,9 @@ mod tests {
         let actor_ctx = ActorContext::User {
             user_id: actor_id,
             memberships: vec![actor_membership],
-            group_type: crate::domain::group::GroupType::Press { representative: actor_id },
+            group_type: crate::domain::group::GroupType::Press {
+                representative: actor_id,
+            },
         };
 
         let user_app = app.user();
@@ -205,7 +222,9 @@ mod tests {
         };
 
         let user_app = app.user();
-        let result = user_app.get_by_id(&actor_ctx, UserId::new(Uuid::new_v4())).await;
+        let result = user_app
+            .get_by_id(&actor_ctx, UserId::new(Uuid::new_v4()))
+            .await;
 
         assert!(result.is_ok());
         assert!(result.unwrap().is_none());
@@ -218,7 +237,9 @@ mod tests {
         let actor_ctx = ActorContext::User {
             user_id: UserId::new(Uuid::new_v4()),
             memberships: vec![],
-            group_type: crate::domain::group::GroupType::Press { representative: UserId::new(Uuid::new_v4()) },
+            group_type: crate::domain::group::GroupType::Press {
+                representative: UserId::new(Uuid::new_v4()),
+            },
         };
 
         let user_app = app.user();
@@ -238,13 +259,14 @@ mod tests {
         };
 
         let mut user = app.user_repo.find_by_id(user_id).await.unwrap().unwrap();
-        user.rename("Updated Name".to_string(), app.clock.clone()).unwrap();
+        user.rename("Updated Name".to_string(), app.clock.clone())
+            .unwrap();
 
         let user_app = app.user();
         let result = user_app.update_user(&actor_ctx, &user).await;
 
         assert!(result.is_ok());
-        
+
         let updated_user = app.user_repo.find_by_id(user_id).await.unwrap().unwrap();
         assert_eq!(updated_user.name(), "Updated Name");
     }
@@ -259,7 +281,10 @@ mod tests {
         let user_app = app.user();
         let result = user_app.update_user(&actor_ctx, &user).await;
 
-        assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
     }
 
     #[tokio::test]
@@ -272,10 +297,12 @@ mod tests {
         let new_email = EmailAddress::new("new@example.com".to_string()).unwrap();
 
         let user_app = app.user();
-        let result = user_app.change_m_address(&actor_ctx, user_id, new_email.clone()).await;
+        let result = user_app
+            .change_m_address(&actor_ctx, user_id, new_email.clone())
+            .await;
 
         assert!(result.is_ok());
-        
+
         let updated_user = app.user_repo.find_by_id(user_id).await.unwrap().unwrap();
         assert_eq!(updated_user.m_address(), &new_email);
     }
@@ -287,9 +314,14 @@ mod tests {
         let new_email = EmailAddress::new("new@example.com".to_string()).unwrap();
 
         let user_app = app.user();
-        let result = user_app.change_m_address(&actor_ctx, user_id, new_email).await;
+        let result = user_app
+            .change_m_address(&actor_ctx, user_id, new_email)
+            .await;
 
-        assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
     }
 
     #[tokio::test]
@@ -302,8 +334,15 @@ mod tests {
         let new_email = EmailAddress::new("new@example.com".to_string()).unwrap();
 
         let user_app = app.user();
-        let result = user_app.change_m_address(&actor_ctx, UserId::new(Uuid::new_v4()), new_email).await;
+        let result = user_app
+            .change_m_address(&actor_ctx, UserId::new(Uuid::new_v4()), new_email)
+            .await;
 
-        assert!(matches!(result, Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound))));
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound
+            ))
+        ));
     }
 }

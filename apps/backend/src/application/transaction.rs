@@ -3,7 +3,7 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum TransactionError {
     #[error("Failed to commit transaction: {0}")]
-    Failed(String)
+    Failed(String),
 }
 
 #[async_trait::async_trait]

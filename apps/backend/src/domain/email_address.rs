@@ -1,5 +1,5 @@
-use regex::Regex;
 use crate::domain::error::FactoryError;
+use regex::Regex;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EmailAddress {
@@ -11,8 +11,9 @@ impl EmailAddress {
         let r = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
         let regex = Regex::new(r).unwrap();
         if !regex.is_match(&*address) {
-
-            return Err(FactoryError::InvalidInput("Invalid email address".to_string()));
+            return Err(FactoryError::InvalidInput(
+                "Invalid email address".to_string(),
+            ));
         }
 
         Ok(Self { address })

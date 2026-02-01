@@ -1,9 +1,9 @@
-use crate::domain::password_credentials::{PasswordCredentials};
+use crate::application::ports::clock::Clock;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
+use crate::domain::password_credentials::PasswordCredentials;
 use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
-use crate::application::ports::clock::Clock;
 
 /// ユーザーのステータス
 /// * `Registered` - ユーザーが登録されたが、まだアクティベートされていない状態を示す
@@ -39,7 +39,7 @@ impl User {
         id: UserId,
         name: String,
         m_address: EmailAddress,
-        clock: C
+        clock: C,
     ) -> Result<Self, FactoryError> {
         if (name.trim().is_empty()) {
             return Err(FactoryError::InvalidInput("Name is empty".to_string()));
@@ -116,7 +116,11 @@ impl User {
     /// ユーザーをアクティベートするメソッド
     /// `Registered` または `Deactivated` 状態のユーザーのみアクティベート可能
     /// それ以外の状態の場合、`InvalidTransitionError` を返す
-    pub fn activate<C: Clock>(&mut self, password_credentials: PasswordCredentials, clock: &C) -> Result<(), InvalidTransitionError> {
+    pub fn activate<C: Clock>(
+        &mut self,
+        password_credentials: PasswordCredentials,
+        clock: &C,
+    ) -> Result<(), InvalidTransitionError> {
         match &self.status {
             UserStatus::Registered => {
                 self.status = UserStatus::Active {
@@ -124,8 +128,11 @@ impl User {
                 };
                 self.updated_at = clock.now();
                 Ok(())
-            },
-            UserStatus::Deactivated { password_credentials, .. } => {
+            }
+            UserStatus::Deactivated {
+                password_credentials,
+                ..
+            } => {
                 self.status = UserStatus::Active {
                     password_credentials: password_credentials.clone(),
                 };
@@ -139,9 +146,15 @@ impl User {
     /// ユーザーを無効化するメソッド
     /// `Active` 状態のユーザーのみ無効化可能
     /// それ以外の状態の場合、`InvalidTransitionError` を返す
-    pub fn deactivate<C: Clock>(&mut self, reason: String, clock: &C) -> Result<(), InvalidTransitionError> {
+    pub fn deactivate<C: Clock>(
+        &mut self,
+        reason: String,
+        clock: &C,
+    ) -> Result<(), InvalidTransitionError> {
         match &self.status {
-            UserStatus::Active { password_credentials } => {
+            UserStatus::Active {
+                password_credentials,
+            } => {
                 self.status = UserStatus::Deactivated {
                     password_credentials: password_credentials.clone(),
                     deactivated_at: clock.now(),
@@ -158,11 +171,11 @@ impl User {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::user_id::UserId;
     use crate::domain::email_address::EmailAddress;
     use crate::domain::password_credentials::PasswordCredentials;
+    use crate::domain::user_id::UserId;
+    use chrono::{Duration, TimeZone};
     use uuid::Uuid;
-    use chrono::{TimeZone, Duration};
 
     struct MockClock {
         now: DateTime<Utc>,
@@ -225,7 +238,14 @@ mod tests {
         let m_address = EmailAddress::new("restored@example.com".to_string()).unwrap();
         let status = UserStatus::Registered;
 
-        let user = User::restore(id, created_at, updated_at, name.clone(), m_address.clone(), status.clone());
+        let user = User::restore(
+            id,
+            created_at,
+            updated_at,
+            name.clone(),
+            m_address.clone(),
+            status.clone(),
+        );
 
         assert_eq!(user.id(), id);
         assert_eq!(user.created_at(), &created_at);
@@ -291,7 +311,10 @@ mod tests {
         let result = user.activate(creds.clone(), &clock2);
 
         assert!(result.is_ok());
-        if let UserStatus::Active { password_credentials } = user.status() {
+        if let UserStatus::Active {
+            password_credentials,
+        } = user.status()
+        {
             assert_eq!(password_credentials, &creds);
         } else {
             panic!("Status should be Active");
@@ -311,7 +334,7 @@ mod tests {
 
         let activate_time = initial_time + Duration::seconds(60);
         let clock2 = MockClock { now: activate_time };
-        
+
         let result = user.activate(creds.clone(), &clock2);
 
         assert!(result.is_ok());
@@ -340,13 +363,20 @@ mod tests {
         user.activate(creds.clone(), &clock).unwrap();
 
         let deactivate_time = initial_time + Duration::seconds(40);
-        let clock2 = MockClock { now: deactivate_time };
+        let clock2 = MockClock {
+            now: deactivate_time,
+        };
         let reason = "test reason".to_string();
 
         let result = user.deactivate(reason.clone(), &clock2);
 
         assert!(result.is_ok());
-        if let UserStatus::Deactivated { password_credentials, deactivated_at, reason: r } = user.status() {
+        if let UserStatus::Deactivated {
+            password_credentials,
+            deactivated_at,
+            reason: r,
+        } = user.status()
+        {
             assert_eq!(password_credentials, &creds);
             assert_eq!(deactivated_at, &deactivate_time);
             assert_eq!(r, &reason);

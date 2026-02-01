@@ -49,8 +49,8 @@ pub fn can_update_user(actor_ctx: &ActorContext, user: &User) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:update".to_string())
-        },
-        _ => false
+        }
+        _ => false,
     }
 }
 
@@ -58,8 +58,8 @@ pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, user_id: UserI
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:change-email".to_string())
-        },
-        _ => false
+        }
+        _ => false,
     }
 }
 
@@ -67,12 +67,15 @@ pub fn can_get_all_groups(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:group:read".to_string())
-        },
-        _ => false
+        }
+        _ => false,
     }
 }
 
-pub fn can_get_group_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) -> Result<(), CanGetByIdError> {
+pub fn can_get_group_by_id(
+    actor_ctx: &ActorContext,
+    members: &Vec<Membership>,
+) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             if claims.contains(&"koudaisai-portal:admin:group:read".to_string()) {
@@ -80,7 +83,7 @@ pub fn can_get_group_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) 
             } else {
                 Err(CanGetByIdError::Unauthorized)
             }
-        },
+        }
         ActorContext::User { user_id, .. } => {
             // ユーザーがグループに所属しているかどうかを確認
             if members.iter().any(|m| m.user_id() == *user_id) {
@@ -88,8 +91,8 @@ pub fn can_get_group_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) 
             } else {
                 Err(CanGetByIdError::NotFound)
             }
-        },
-        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized)
+        }
+        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized),
     }
 }
 
@@ -97,22 +100,22 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:group:create".to_string())
-        },
-        _ => false
+        }
+        _ => false,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::application::ports::clock::Clock;
     use crate::domain::actor_ctx::ActorContext;
+    use crate::domain::group::GroupType;
     use crate::domain::group_id::GroupId;
     use crate::domain::membership::Membership;
     use crate::domain::user_id::UserId;
-    use crate::domain::group::GroupType;
-    use crate::application::ports::clock::Clock;
-    use uuid::Uuid;
     use chrono::{DateTime, Utc};
+    use uuid::Uuid;
 
     struct MockClock;
     impl Clock for MockClock {
@@ -150,7 +153,9 @@ mod tests {
         let user_ctx = ActorContext::User {
             user_id: create_user_id(),
             memberships: vec![],
-            group_type: GroupType::Press { representative: create_user_id() },
+            group_type: GroupType::Press {
+                representative: create_user_id(),
+            },
         };
         assert!(!can_get_all_users(&user_ctx));
 
@@ -176,14 +181,19 @@ mod tests {
             user_id: create_user_id(),
             claims: vec![],
         };
-        assert!(matches!(can_get_user_by_id(&unauthorized_admin_ctx, memberships_of_the_user.clone()), Err(CanGetByIdError::Unauthorized)));
+        assert!(matches!(
+            can_get_user_by_id(&unauthorized_admin_ctx, memberships_of_the_user.clone()),
+            Err(CanGetByIdError::Unauthorized)
+        ));
 
         // User in the same group
         let other_user_id = create_user_id();
         let same_group_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![create_membership(group_id, other_user_id)],
-            group_type: GroupType::Press { representative: other_user_id },
+            group_type: GroupType::Press {
+                representative: other_user_id,
+            },
         };
         assert!(can_get_user_by_id(&same_group_user_ctx, memberships_of_the_user.clone()).is_ok());
 
@@ -192,12 +202,20 @@ mod tests {
         let diff_group_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![create_membership(diff_group_id, other_user_id)],
-            group_type: GroupType::Press { representative: other_user_id },
+            group_type: GroupType::Press {
+                representative: other_user_id,
+            },
         };
-        assert!(matches!(can_get_user_by_id(&diff_group_user_ctx, memberships_of_the_user.clone()), Err(CanGetByIdError::NotFound)));
+        assert!(matches!(
+            can_get_user_by_id(&diff_group_user_ctx, memberships_of_the_user.clone()),
+            Err(CanGetByIdError::NotFound)
+        ));
 
         // NoLogin
-        assert!(matches!(can_get_user_by_id(&ActorContext::NoLogin, memberships_of_the_user.clone()), Err(CanGetByIdError::Unauthorized)));
+        assert!(matches!(
+            can_get_user_by_id(&ActorContext::NoLogin, memberships_of_the_user.clone()),
+            Err(CanGetByIdError::Unauthorized)
+        ));
     }
 
     #[test]
@@ -206,7 +224,13 @@ mod tests {
         use crate::domain::email_address::EmailAddress;
         use crate::domain::user::User;
         let clock = MockClock;
-        let user = User::register(create_user_id(), "test".to_string(), EmailAddress::new("test@example.com".to_string()).unwrap(), clock).unwrap();
+        let user = User::register(
+            create_user_id(),
+            "test".to_string(),
+            EmailAddress::new("test@example.com".to_string()).unwrap(),
+            clock,
+        )
+        .unwrap();
 
         let admin_ctx = ActorContext::Admin {
             user_id: create_user_id(),
@@ -237,9 +261,15 @@ mod tests {
             user_id: create_user_id(),
             claims: vec![],
         };
-        assert!(!can_change_m_address_of_the_user(&unauthorized_admin_ctx, user_id));
+        assert!(!can_change_m_address_of_the_user(
+            &unauthorized_admin_ctx,
+            user_id
+        ));
 
-        assert!(!can_change_m_address_of_the_user(&ActorContext::NoLogin, user_id));
+        assert!(!can_change_m_address_of_the_user(
+            &ActorContext::NoLogin,
+            user_id
+        ));
     }
 
     #[test]
@@ -277,13 +307,18 @@ mod tests {
             user_id: create_user_id(),
             claims: vec![],
         };
-        assert!(matches!(can_get_group_by_id(&unauthorized_admin_ctx, &members), Err(CanGetByIdError::Unauthorized)));
+        assert!(matches!(
+            can_get_group_by_id(&unauthorized_admin_ctx, &members),
+            Err(CanGetByIdError::Unauthorized)
+        ));
 
         // User who is a member
         let member_user_ctx = ActorContext::User {
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
-            group_type: GroupType::Press { representative: user_id },
+            group_type: GroupType::Press {
+                representative: user_id,
+            },
         };
         assert!(can_get_group_by_id(&member_user_ctx, &members).is_ok());
 
@@ -292,12 +327,20 @@ mod tests {
         let non_member_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![],
-            group_type: GroupType::Press { representative: other_user_id },
+            group_type: GroupType::Press {
+                representative: other_user_id,
+            },
         };
-        assert!(matches!(can_get_group_by_id(&non_member_user_ctx, &members), Err(CanGetByIdError::NotFound)));
+        assert!(matches!(
+            can_get_group_by_id(&non_member_user_ctx, &members),
+            Err(CanGetByIdError::NotFound)
+        ));
 
         // NoLogin
-        assert!(matches!(can_get_group_by_id(&ActorContext::NoLogin, &members), Err(CanGetByIdError::Unauthorized)));
+        assert!(matches!(
+            can_get_group_by_id(&ActorContext::NoLogin, &members),
+            Err(CanGetByIdError::Unauthorized)
+        ));
     }
 
     #[test]

@@ -1,15 +1,15 @@
 use crate::config::Secrets;
+use crate::middlewares::CurrentUser;
+use crate::util::layers::RequireUserLayer;
+use axum::extract::Request;
 use axum::routing::{MethodRouter, any_service};
 use axum_proxy::AppendPrefix;
 use http::header::HOST;
 use http::{HeaderName, HeaderValue};
 use std::str::FromStr;
-use axum::extract::Request;
 use tower::ServiceBuilder;
 use tower_http::set_header::SetRequestHeaderLayer;
 use tracing::instrument;
-use crate::middlewares::CurrentUser;
-use crate::util::layers::RequireUserLayer;
 
 #[instrument(name = "init /api/v2/users")]
 pub fn init_service<S: Clone + 'static, E: From<std::convert::Infallible> + 'static>(

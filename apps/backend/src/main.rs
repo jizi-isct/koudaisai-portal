@@ -13,16 +13,16 @@ use tracing::{debug, info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
+mod application;
 pub mod config;
+mod domain;
 pub mod entities;
+mod infra;
 pub mod middlewares;
 mod routes;
 pub mod sea_orm_entities;
 mod service;
 pub mod util;
-mod domain;
-mod application;
-mod infra;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();
 const MINOR_VERSION: u32 = pkg_version_minor!();

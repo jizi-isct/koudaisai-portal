@@ -1,6 +1,6 @@
+use crate::application::ports::clock::Clock;
 use crate::domain::error::{DomainError, FactoryError};
 use chrono::{DateTime, Utc};
-use crate::application::ports::clock::Clock;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PasswordCredentials {

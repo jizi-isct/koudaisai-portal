@@ -1,9 +1,9 @@
-pub mod transaction_impl;
-pub mod user_repo_impl;
-pub mod group_repo_impl;
-pub mod membership_repo_impl;
 pub mod clock_impl;
 pub mod email_impl;
+pub mod group_repo_impl;
+pub mod membership_repo_impl;
+pub mod transaction_impl;
+pub mod user_repo_impl;
 
 use crate::application::Application;
 use crate::infra::memory::clock_impl::MemoryClock;
@@ -19,7 +19,7 @@ pub type MemoryApplication = Application<
     MemoryMembershipRepo,
     MemoryUserRepo,
     MemoryClock,
-    MemoryEmail
+    MemoryEmail,
 >;
 
 impl MemoryApplication {
