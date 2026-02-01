@@ -31,7 +31,6 @@
     "@nx/js": "20.8.1",
     "@nx/next": "22.2.3",
     "@nx/react": "22.2.3",
-    "@nx/storybook": "20.8.0",
     "@nx/vite": "20.8.0",
     "@nx/web": "20.8.0",
     "@nx/workspace": "20.8.0",
