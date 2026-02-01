@@ -7,7 +7,6 @@ import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import {$apiAdmin} from "@/lib";
 import {LoadingScreen} from "@/components/generic";
-import {Separator} from "@react-pdf-viewer/core";
 import {ViewPendingEditExhibitionInfoRequest} from "@/components/plan/ViewPendingEditExhibitionInfoRequest";
 import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
 
@@ -193,7 +192,6 @@ function Inner({approvalRequestId}: { approvalRequestId: string }) {
                           approvalRequest={approvalRequest}
                           plan={basePlan}
                   />
-                  <Separator/>
                 </Card>
         }
         <Card
