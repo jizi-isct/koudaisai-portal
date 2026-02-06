@@ -228,25 +228,56 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     }
 }
 
-// ここらへんわかりません！！今はgroupのコードをコピーしてあります
 pub fn can_get_document_category_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            if claims.contains(&"koudaisai-portal:admin:group:read".to_string()) {
+            if claims.contains(&"k-portal:admin:all".to_string()) {
                 Ok(())
             } else {
                 Err(CanGetByIdError::Unauthorized)
             }
         },
         ActorContext::User { user_id, .. } => {
-            // ユーザーがグループに所属しているかどうかを確認
-            if members.iter().any(|m| m.user_id() == *user_id) {
-                Ok(())
-            } else {
-                Err(CanGetByIdError::NotFound)
-            }
+            Ok(()) // 何か弾く条件あるかな…
         },
         ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized)
+    }
+}
+
+pub fn can_get_all_document_categories(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"k-portal:admin:all".to_string())
+        },
+        ActorContext::User { user_id, .. } => true,
+        ActorContext::NoLogin => false
+    }
+}
+
+pub fn can_create_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"k-portal:admin:all".to_string())
+        },
+        _ => false
+    }
+}
+
+pub fn can_update_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"k-portal:admin:all".to_string())
+        },
+        _ => false
+    }
+}
+
+pub fn can_delete_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"k-portal:admin:all".to_string())
+        },
+        _ => false
     }
 }
 
