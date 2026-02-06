@@ -11,6 +11,7 @@ pub enum FormType {
     TypeExternal { form_url: String },
 }
 
+#[derive(Clone)]
 pub struct Form {
     id: FormId,
     created_at: DateTime<Utc>,
