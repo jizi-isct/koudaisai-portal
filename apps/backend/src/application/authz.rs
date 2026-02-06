@@ -228,6 +228,28 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+// ここらへんわかりません！！今はgroupのコードをコピーしてあります
+pub fn can_get_document_category_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) -> Result<(), CanGetByIdError> {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            if claims.contains(&"koudaisai-portal:admin:group:read".to_string()) {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::Unauthorized)
+            }
+        },
+        ActorContext::User { user_id, .. } => {
+            // ユーザーがグループに所属しているかどうかを確認
+            if members.iter().any(|m| m.user_id() == *user_id) {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::NotFound)
+            }
+        },
+        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
