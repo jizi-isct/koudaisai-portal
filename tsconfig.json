@@ -4,34 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/web-admin"
-    },
-    {
-      "path": "./apps/web-members"
-    },
-    {
-      "path": "./libs/ui-generic"
-    },
-    {
-      "path": "./libs/ui-edit_form"
-    },
-    {
-      "path": "./libs/ui-edit_response"
-    },
-    {
-      "path": "./libs/util"
-    },
-    {
-      "path": "./libs/ui-edit_document"
-    },
-    {
-      "path": "./libs/ui-show_document"
-    },
-    {
       "path": "./libs/shared-types"
     },
     {
       "path": "./apps/web"
+    },
+    {
+      "path": "./libs/shared-ui"
     },
     {
       "path": "./libs/shared-auth-members"
