@@ -4,7 +4,6 @@ import styles from "./Header.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import {usePathname, useRouter} from "next/navigation";
-import {isLoggedInAdmin, isLoggedInMembers, logout} from "@/lib";
 import {useEffect, useState} from "react";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 
@@ -16,9 +15,12 @@ const arrowIcon = "/components/generic/Header/arrow.svg"
 type HeaderProps = {
     header_type: "admin" | "members" ;
     titleColor?: "white" | "black";
+    isLoggedInAdmin: () => Promise<boolean>;
+    isLoggedInMembers: () => Promise<boolean>;
+    logout: () => Promise<void>;
 };
 
-export const Header = ({header_type, titleColor = "black"}: HeaderProps) => {
+export const Header = ({header_type, titleColor = "black", isLoggedInMembers, isLoggedInAdmin, logout}: HeaderProps) => {
     const router = useRouter();
     // ヘッダーのユーザアイコンのドロップダウンの状態を管理
     const [isOpen, setIsOpen] = useState(false);

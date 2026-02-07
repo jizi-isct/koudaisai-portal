@@ -3,11 +3,8 @@
 import styles from "./Footer.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import {useIsLoggedInMembers} from "@/lib";
 
-export const Footer = () => {
-  const isLoggedIn = useIsLoggedInMembers()
-
+export const Footer = (isLoggedIn: boolean) => {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoWrapper}>
