@@ -5,14 +5,15 @@ import Link from "next/link";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 import { Button } from "antd";
 import {usePathname, useRouter} from "next/navigation";
-import {logout, useIsLoggedInMembers} from "@/lib";
 
 
 type Props = {
   header_type: "admin" | "members";
+  logout: () => Promise<void>;
+  useIsLoggedInMembers: () => Promise<boolean | undefined>;
 }
 
-export function MobileNavigator({header_type}: Props) {
+export function MobileNavigator({header_type, logout, useIsLoggedInMembers}: Props) {
   const router = useRouter();
   const isLoggedIn = useIsLoggedInMembers(); // 仮のログイン状態
   const currentPath = usePathname();

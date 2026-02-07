@@ -1,5 +1,5 @@
 import styles from "./LoadingScreen.module.css"
-import {Loader} from "@/components/generic/Loader";
+import {Loader} from "../Loader";
 
 export function LoadingScreen() {
   return (
