@@ -22,6 +22,8 @@
     "customConditions": [
       "development"
     ],
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "@koudaisai/shared-utils": ["libs/shared-utils/src/index.ts"]
+
   }
 }
