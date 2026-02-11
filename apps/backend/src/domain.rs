@@ -1,4 +1,5 @@
 pub mod actor_ctx;
+pub mod approval_request;
 pub mod email_address;
 pub mod error;
 pub mod group;
