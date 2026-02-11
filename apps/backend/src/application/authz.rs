@@ -105,6 +105,77 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+// ============================================================
+// 承認申請（ApprovalRequest）の認可ルール
+// ============================================================
+
+use crate::domain::approval_request::ApprovalRequest;
+
+/// 全ての承認申請を取得できるか（管理者用）
+pub fn can_get_all_approval_requests(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:approval-request:read".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// 特定の承認申請を取得できるか
+pub fn can_get_approval_request(
+    actor_ctx: &ActorContext,
+    request: &ApprovalRequest,
+    memberships_of_issuer: &[Membership],
+) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:approval-request:read".to_string())
+        }
+        ActorContext::User { memberships, .. } => {
+            // 同じグループに所属しているユーザーの申請は閲覧可能
+            memberships.iter().any(|m| {
+                memberships_of_issuer
+                    .iter()
+                    .any(|m2| m.group_id() == m2.group_id())
+            })
+        }
+        ActorContext::NoLogin => false,
+    }
+}
+
+/// 承認申請を作成できるか
+pub fn can_create_approval_request(actor_ctx: &ActorContext) -> bool {
+    matches!(actor_ctx, ActorContext::User { .. })
+}
+
+/// 承認申請を承認/却下できるか（管理者用）
+pub fn can_approve_or_reject_approval_request(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:approval-request:approve".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// 承認申請をクローズできるか（申請者本人のみ）
+pub fn can_close_approval_request(actor_ctx: &ActorContext, request: &ApprovalRequest) -> bool {
+    match actor_ctx {
+        ActorContext::User { user_id, .. } => *user_id == request.issued_by(),
+        _ => false,
+    }
+}
+
+/// 承認申請を削除できるか（管理者用）
+pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:approval-request:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
