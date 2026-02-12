@@ -23,5 +23,8 @@
       "development"
     ],
     "jsx": "react-jsx"
-  }
+  },
+  "@koudaisai/shared-types": [
+    "libs/shared-types/src/index.ts"
+  ]
 }
