@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/ui-show_document"
+    },
+    {
+      "path": "./libs/shared-types"
     }
   ],
   "ts-node": {
