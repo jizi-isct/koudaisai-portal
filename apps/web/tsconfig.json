@@ -53,9 +53,5 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "references": [
-    {
-      "path": "../../libs/ui-edit_document"
-    }
-  ]
+  "references": []
 }
