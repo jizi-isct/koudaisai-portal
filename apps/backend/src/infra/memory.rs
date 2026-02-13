@@ -1,3 +1,4 @@
+pub mod approval_request_repo_impl;
 pub mod clock_impl;
 pub mod email_impl;
 pub mod group_repo_impl;
@@ -6,6 +7,7 @@ pub mod transaction_impl;
 pub mod user_repo_impl;
 
 use crate::application::Application;
+use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
 use crate::infra::memory::clock_impl::MemoryClock;
 use crate::infra::memory::email_impl::MemoryEmail;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;
@@ -15,6 +17,7 @@ use crate::infra::memory::user_repo_impl::MemoryUserRepo;
 
 pub type MemoryApplication = Application<
     MemoryTransaction,
+    MemoryApprovalRequestRepo,
     MemoryGroupRepo,
     MemoryMembershipRepo,
     MemoryUserRepo,
@@ -28,6 +31,7 @@ impl MemoryApplication {
     /// `now` には初期時刻を指定してください。
     pub fn new_memory_app(now: chrono::DateTime<chrono::Utc>) -> Self {
         Application::new(
+            MemoryApprovalRequestRepo::new(),
             MemoryGroupRepo::new(),
             MemoryMembershipRepo::new(),
             MemoryUserRepo::new(),
