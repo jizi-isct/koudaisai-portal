@@ -9,13 +9,13 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
 pub struct MemoryApprovalRequestRepo {
-    requests: Arc<RwLock<HashMap<ApprovalRequestId, ApprovalRequest>>>,
+    approval_requests: Arc<RwLock<HashMap<ApprovalRequestId, ApprovalRequest>>>,
 }
 
 impl MemoryApprovalRequestRepo {
     pub fn new() -> Self {
         Self {
-            requests: Arc::new(RwLock::new(HashMap::new())),
+            approval_requests: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }
@@ -23,42 +23,42 @@ impl MemoryApprovalRequestRepo {
 #[async_trait]
 impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
     async fn find_by_id(&self, id: ApprovalRequestId) -> Result<Option<ApprovalRequest>, FindError> {
-        let requests = self
-            .requests
+        let approval_requests = self
+            .approval_requests
             .read()
             .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-        Ok(requests.get(&id).cloned())
+        Ok(approval_requests.get(&id).cloned())
     }
 
     async fn find_all(&self) -> Result<Vec<ApprovalRequest>, FindError> {
-        let requests = self
-            .requests
+        let approval_requests = self
+            .approval_requests
             .read()
             .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-        Ok(requests.values().cloned().collect())
+        Ok(approval_requests.values().cloned().collect())
     }
 
-    async fn find_by_issued_by(&self, user_id: UserId) -> Result<Vec<ApprovalRequest>, FindError> {
-        let requests = self
-            .requests
+    async fn find_by_user_ids(&self, user_ids: &[UserId]) -> Result<Vec<ApprovalRequest>, FindError> {
+        let approval_requests = self
+            .approval_requests
             .read()
             .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-        Ok(requests
+        Ok(approval_requests
             .values()
-            .filter(|r| r.issued_by() == user_id)
+            .filter(|r| user_ids.contains(&r.issued_by()))
             .cloned()
             .collect())
     }
 
     async fn insert(&self, request: &ApprovalRequest) -> Result<(), InsertError> {
-        let mut requests = self
-            .requests
+        let mut approval_requests = self
+            .approval_requests
             .write()
             .map_err(|e| InsertError::InternalError(anyhow!(e.to_string())))?;
-        if requests.contains_key(&request.id()) {
+        if approval_requests.contains_key(&request.id()) {
             return Err(InsertError::Conflict);
         }
-        requests.insert(request.id(), request.clone());
+        approval_requests.insert(request.id(), request.clone());
         Ok(())
     }
 
@@ -71,14 +71,14 @@ impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
     }
 
     async fn update(&self, request: &ApprovalRequest) -> Result<(), UpdateError> {
-        let mut requests = self
-            .requests
+        let mut approval_requests = self
+            .approval_requests
             .write()
             .map_err(|e| UpdateError::InternalError(anyhow!(e.to_string())))?;
-        if !requests.contains_key(&request.id()) {
+        if !approval_requests.contains_key(&request.id()) {
             return Err(UpdateError::NotFound);
         }
-        requests.insert(request.id(), request.clone());
+        approval_requests.insert(request.id(), request.clone());
         Ok(())
     }
 
@@ -91,11 +91,11 @@ impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
     }
 
     async fn delete(&self, id: ApprovalRequestId) -> Result<(), DeleteError> {
-        let mut requests = self
-            .requests
+        let mut approval_requests = self
+            .approval_requests
             .write()
             .map_err(|e| DeleteError::InternalError(anyhow!(e.to_string())))?;
-        if requests.remove(&id).is_none() {
+        if approval_requests.remove(&id).is_none() {
             return Err(DeleteError::NotFound);
         }
         Ok(())

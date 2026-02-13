@@ -70,42 +70,32 @@ impl<'a, Tx: Transaction, AR: ApprovalRequestRepo<Tx>, MR: MembershipRepo<Tx>, C
         Ok(Some(request))
     }
 
-    /// ユーザーが発行した承認申請を取得
-    pub async fn get_by_issued_by(
+    /// ユーザーが所属するグループのメンバーが発行した承認申請を取得
+    pub async fn get_by_group_members(
         &self,
         actor_ctx: &ActorContext,
         user_id: UserId,
     ) -> Result<Vec<ApprovalRequest>, ApplicationOperationError<FindError>> {
-        let memberships_of_issuer = self.membership_repo.find_by_user_id(user_id).await?;
-
-        // 同じグループに所属していることを確認するためのダミーリクエストチェック
-        // actor_ctxがユーザーの場合、同じグループに属しているかを確認
-        match actor_ctx {
-            ActorContext::Admin { claims, .. } => {
-                if !claims
-                    .contains(&"koudaisai-portal:admin:approval-request:read".to_string())
-                {
-                    return Err(ApplicationOperationError::Unauthorized);
-                }
-            }
-            ActorContext::User { memberships, .. } => {
-                let is_same_group = memberships.iter().any(|m| {
-                    memberships_of_issuer
-                        .iter()
-                        .any(|m2| m.group_id() == m2.group_id())
-                });
-                if !is_same_group {
-                    return Err(ApplicationOperationError::Unauthorized);
-                }
-            }
-            ActorContext::NoLogin => {
-                return Err(ApplicationOperationError::Unauthorized);
-            }
+        // 対象ユーザーのメンバーシップを取得
+        let memberships_of_target = self.membership_repo.find_by_user_id(user_id).await?;
+        if memberships_of_target.is_empty() {
+            return Ok(vec![]);
         }
+
+        // 対象ユーザーが所属するグループIDを取得（最初のグループを使用）
+        let group_id = memberships_of_target[0].group_id();
+
+        if !authz::can_get_group_approval_requests(actor_ctx, group_id) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        // グループの全メンバーのユーザーIDを取得
+        let group_memberships = self.membership_repo.find_by_group_id(group_id).await?;
+        let user_ids: Vec<UserId> = group_memberships.iter().map(|m| m.user_id()).collect();
 
         Ok(self
             .approval_request_repo
-            .find_by_issued_by(user_id)
+            .find_by_user_ids(&user_ids)
             .await?)
     }
 

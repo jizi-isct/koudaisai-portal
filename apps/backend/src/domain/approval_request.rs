@@ -1,26 +1,8 @@
 use crate::application::ports::clock::Clock;
+use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
 use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
-
-/// 承認申請ID
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ApprovalRequestId(Uuid);
-
-impl ApprovalRequestId {
-    pub fn new(id: Uuid) -> Self {
-        Self(id)
-    }
-
-    pub fn generate() -> Self {
-        Self(Uuid::new_v4())
-    }
-
-    pub fn as_uuid(&self) -> Uuid {
-        self.0
-    }
-}
 
 /// 承認申請のタイプ
 #[derive(Debug, Clone, PartialEq)]
@@ -194,7 +176,9 @@ impl ApprovalRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::approval_request_id::ApprovalRequestId;
     use chrono::TimeZone;
+    use uuid::Uuid;
 
     struct MockClock {
         now: DateTime<Utc>,

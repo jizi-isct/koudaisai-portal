@@ -110,6 +110,7 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
 // ============================================================
 
 use crate::domain::approval_request::ApprovalRequest;
+use crate::domain::group_id::GroupId;
 
 /// 全ての承認申請を取得できるか（管理者用）
 pub fn can_get_all_approval_requests(actor_ctx: &ActorContext) -> bool {
@@ -118,6 +119,20 @@ pub fn can_get_all_approval_requests(actor_ctx: &ActorContext) -> bool {
             claims.contains(&"koudaisai-portal:admin:approval-request:read".to_string())
         }
         _ => false,
+    }
+}
+
+/// グループメンバーの承認申請を取得できるか
+pub fn can_get_group_approval_requests(actor_ctx: &ActorContext, group_id: GroupId) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:approval-request:read".to_string())
+        }
+        ActorContext::User { memberships, .. } => {
+            // 同じグループに所属している場合のみ取得可能
+            memberships.iter().any(|m| m.group_id() == group_id)
+        }
+        ActorContext::NoLogin => false,
     }
 }
 
