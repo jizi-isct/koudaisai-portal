@@ -228,7 +228,7 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     }
 }
 
-pub fn can_get_document_category_by_id(actor_ctx: &ActorContext, members: &Vec<Membership>) -> Result<(), CanGetByIdError> {
+pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             if claims.contains(&"k-portal:admin:all".to_string()) {

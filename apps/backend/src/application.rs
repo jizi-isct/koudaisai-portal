@@ -12,9 +12,10 @@ pub mod approval_request;
 pub mod authz;
 pub mod error;
 pub mod form;
-mod group;
+pub mod group;
 pub mod ports;
 pub mod transaction;
+pub mod document_category;
 pub mod user;
 
 pub struct Application<

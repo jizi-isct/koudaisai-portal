@@ -9,10 +9,10 @@ pub trait DocumentCategoryRepo<Tx: Transaction> {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<DocumentCategory>, FindError>;
     async fn find_all(&self) -> Result<Vec<DocumentCategory>, FindError>;
 
-    async fn insert(&self, id: Uuid) -> Result<DocumentCategory, InsertError>;
+    async fn insert(&self, id: Uuid) -> Result<(), InsertError>;
     async fn insert_in(&self, tx: &mut Tx, id: &Uuid) -> Result<(), anyhow::Error>;
     
-    async fn update(&self, id: Uuid) -> Result<Option<DocumentCategory>, UpdateError>;
+    async fn update(&self, document_category: &DocumentCategory) -> Result<(), UpdateError>;
     async fn update_in(&self, tx: &mut Tx, id: &Uuid) -> Result<(), anyhow::Error>;
 
     async fn delete(&self, id: Uuid) -> Result<u64, DeleteError>;
