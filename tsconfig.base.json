@@ -5,10 +5,7 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": [
-      "es2023",
-      "dom"
-    ],
+    "lib": ["es2023", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -24,6 +21,7 @@
     ],
     "jsx": "react-jsx",
     "@koudaisai/shared-utils": ["libs/shared-utils/src/index.ts"],
-    "@koudaisai/shared-types": ["libs/shared-types/src/index.ts"]
+    "@koudaisai/shared-types": ["libs/shared-types/src/index.ts"],
+    "@koudaisai/shared-api": ["libs/shared-api/src/index.ts"],
   }
 }
