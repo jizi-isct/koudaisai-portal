@@ -1,1 +1,2 @@
-export * from './lib/shared-auth-admin.js';
+export * from './auth.js';
+export * from './hook.js';
