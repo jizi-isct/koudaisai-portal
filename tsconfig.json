@@ -35,6 +35,9 @@
     },
     {
       "path": "./libs/shared-auth-members"
+    },
+    {
+      "path": "./libs/shared-auth-admin"
     }
   ],
   "ts-node": {
