@@ -29,6 +29,12 @@
     },
     {
       "path": "./libs/shared-types"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./libs/shared-auth-members"
     }
   ],
   "ts-node": {
