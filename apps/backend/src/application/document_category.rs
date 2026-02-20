@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::application::Application;
 use crate::application::authz::{self, CanGetByIdError};
-use crate::application::error::{ApplicationOperationError, FindError, InsertError, UpdateError};
+use crate::application::error::{ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::transaction::Transaction;
 
@@ -61,6 +61,17 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock> DocumentCateg
         }
 
         Ok(self.document_category_repo.update(document_category).await?)
+    }
+
+    pub async fn delete_document_category(&self, actor_ctx: &ActorContext, id: Uuid,) -> Result<(), ApplicationOperationError<DeleteError>> {
+        // authz
+        if !authz::can_delete_document_category(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        // delete document_category
+        self.document_category_repo.delete(id).await?;
+        Ok(())
     }
 
 
