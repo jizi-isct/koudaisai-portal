@@ -1,4 +1,5 @@
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::form::Form;
 use crate::domain::membership::Membership;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
@@ -100,6 +101,42 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:group:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_get_form(actor_ctx: &ActorContext, form: &Form) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:read".to_string())
+        }
+        _ => form.targets().iter().any(|t| t.does_actor_match(actor_ctx)),
+    }
+}
+
+pub fn can_create_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:delete".to_string())
         }
         _ => false,
     }

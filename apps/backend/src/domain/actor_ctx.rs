@@ -92,6 +92,14 @@ impl ActorContext {
     pub fn is_user_nologin(&self) -> bool {
         matches!(self, ActorContext::NoLogin)
     }
+
+    pub fn user_id(&self) -> Option<UserId> {
+        match self {
+            ActorContext::User { user_id, .. } => Some(*user_id),
+            ActorContext::Admin { user_id, .. } => Some(*user_id),
+            ActorContext::NoLogin => None,
+        }
+    }
 }
 
 #[cfg(test)]
