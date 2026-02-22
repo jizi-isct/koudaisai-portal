@@ -22,7 +22,10 @@ impl MemoryApprovalRequestRepo {
 
 #[async_trait]
 impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
-    async fn find_by_id(&self, id: ApprovalRequestId) -> Result<Option<ApprovalRequest>, FindError> {
+    async fn find_by_id(
+        &self,
+        id: ApprovalRequestId,
+    ) -> Result<Option<ApprovalRequest>, FindError> {
         let approval_requests = self
             .approval_requests
             .read()
@@ -38,7 +41,10 @@ impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
         Ok(approval_requests.values().cloned().collect())
     }
 
-    async fn find_by_user_ids(&self, user_ids: &[UserId]) -> Result<Vec<ApprovalRequest>, FindError> {
+    async fn find_by_user_ids(
+        &self,
+        user_ids: &[UserId],
+    ) -> Result<Vec<ApprovalRequest>, FindError> {
         let approval_requests = self
             .approval_requests
             .read()

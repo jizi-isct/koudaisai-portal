@@ -5,6 +5,7 @@ use crate::domain::user_id::UserId;
 use std::str::FromStr;
 use uuid::Uuid;
 
+/// ユーザーの認可に使われる表示対象を指定するための列挙型
 #[derive(Debug, Clone, PartialEq)]
 pub enum TargetSpecifier {
     GroupTypeProjectGeneral,

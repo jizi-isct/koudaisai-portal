@@ -9,7 +9,8 @@ use crate::application::ports::repositories::approval_request_repo::ApprovalRequ
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
-use crate::domain::approval_request::{ApprovalRequest, ApprovalRequestId, ApprovalRequestType};
+use crate::domain::approval_request::{ApprovalRequest, ApprovalRequestType};
+use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::user_id::UserId;
 
 pub struct ApprovalRequestApp<
@@ -116,9 +117,8 @@ impl<'a, Tx: Transaction, AR: ApprovalRequestRepo<Tx>, MR: MembershipRepo<Tx>, C
         };
 
         let id = ApprovalRequestId::generate();
-        let request =
-            ApprovalRequest::create(id, user_id, request_type, issue_reason, self.clock)
-                .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
+        let request = ApprovalRequest::create(id, user_id, request_type, issue_reason, self.clock)
+            .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
 
         self.approval_request_repo.insert(&request).await?;
         Ok(id)

@@ -11,6 +11,7 @@ pub enum FormType {
     TypeExternal { form_url: String },
 }
 
+#[derive(Clone)]
 pub struct Form {
     id: FormId,
     created_at: DateTime<Utc>,
@@ -23,7 +24,6 @@ pub struct Form {
     due_date: DateTime<Utc>,
     r#type: FormType,
 }
-
 
 impl Form {
     pub fn register<C: Clock>(
@@ -109,7 +109,12 @@ impl Form {
         &self.targets
     }
 
-    pub fn set_targets<C: Clock>(&mut self, targets: Vec<TargetSpecifier>, updated_by: Option<Uuid>, clock: &C) -> () {
+    pub fn set_targets<C: Clock>(
+        &mut self,
+        targets: Vec<TargetSpecifier>,
+        updated_by: Option<Uuid>,
+        clock: &C,
+    ) -> () {
         self.targets = targets;
 
         if let Some(user_id) = updated_by {
@@ -125,7 +130,12 @@ impl Form {
         &self.name
     }
 
-    pub fn rename<C: Clock>(&mut self, name: String, updated_by: Uuid, clock: &C) -> Result<(), FactoryError> {
+    pub fn rename<C: Clock>(
+        &mut self,
+        name: String,
+        updated_by: Uuid,
+        clock: &C,
+    ) -> Result<(), FactoryError> {
         if name.trim().is_empty() {
             return Err(FactoryError::InvalidInput("Form name is empty".to_string()));
         }
@@ -141,7 +151,12 @@ impl Form {
         &self.summary
     }
 
-    pub fn change_summary<C: Clock>(&mut self, summary: String, updated_by: Uuid, clock: &C) -> Result<(), FactoryError> {
+    pub fn change_summary<C: Clock>(
+        &mut self,
+        summary: String,
+        updated_by: Uuid,
+        clock: &C,
+    ) -> Result<(), FactoryError> {
         if summary.trim().is_empty() {
             return Err(FactoryError::InvalidInput("Summary is empty".to_string()));
         }
@@ -157,7 +172,12 @@ impl Form {
         self.due_date
     }
 
-    pub fn change_due_date<C: Clock>(&mut self, due_date: DateTime<Utc>, updated_by: Uuid, clock: &C) -> Result<(), FactoryError> {
+    pub fn change_due_date<C: Clock>(
+        &mut self,
+        due_date: DateTime<Utc>,
+        updated_by: Uuid,
+        clock: &C,
+    ) -> Result<(), FactoryError> {
         self.due_date = due_date;
         self.updated_by = updated_by;
         self.updated_at = clock.now();
@@ -169,7 +189,12 @@ impl Form {
         &self.r#type
     }
 
-    pub fn change_type<C: Clock>(&mut self, r#type: FormType, updated_by: Uuid, clock: &C) -> Result<(), InvalidTransitionError> {
+    pub fn change_type<C: Clock>(
+        &mut self,
+        r#type: FormType,
+        updated_by: Uuid,
+        clock: &C,
+    ) -> Result<(), InvalidTransitionError> {
         if discriminant(&r#type) != discriminant(&self.r#type) {
             return Err(InvalidTransitionError {});
         }
@@ -208,7 +233,10 @@ mod tests {
         let form_type = FormType::TypeExternal {
             form_url: "https://example.com/form".to_string(),
         };
-        Form::register(created_by, targets, name, summary, due_date, form_type, clock).unwrap()
+        Form::register(
+            created_by, targets, name, summary, due_date, form_type, clock,
+        )
+        .unwrap()
     }
 
     #[test]
@@ -257,7 +285,9 @@ mod tests {
             form_url: "https://example.com/form".to_string(),
         };
 
-        let result = Form::register(created_by, targets, name, summary, due_date, form_type, &clock);
+        let result = Form::register(
+            created_by, targets, name, summary, due_date, form_type, &clock,
+        );
         assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
     }
 
@@ -273,7 +303,9 @@ mod tests {
             form_url: "https://example.com/form".to_string(),
         };
 
-        let result = Form::register(created_by, targets, name, summary, due_date, form_type, &clock);
+        let result = Form::register(
+            created_by, targets, name, summary, due_date, form_type, &clock,
+        );
         assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
     }
 
@@ -289,7 +321,9 @@ mod tests {
             form_url: "https://example.com/form".to_string(),
         };
 
-        let result = Form::register(created_by, targets, name, summary, due_date, form_type, &clock);
+        let result = Form::register(
+            created_by, targets, name, summary, due_date, form_type, &clock,
+        );
         assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
     }
 
@@ -305,7 +339,9 @@ mod tests {
             form_url: "https://example.com/form".to_string(),
         };
 
-        let result = Form::register(created_by, targets, name, summary, due_date, form_type, &clock);
+        let result = Form::register(
+            created_by, targets, name, summary, due_date, form_type, &clock,
+        );
         assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
     }
 

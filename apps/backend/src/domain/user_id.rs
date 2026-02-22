@@ -15,3 +15,9 @@ impl Display for UserId {
         write!(f, "{}", self.0)
     }
 }
+
+impl From<UserId> for Uuid {
+    fn from(user_id: UserId) -> Self {
+        user_id.0
+    }
+}
