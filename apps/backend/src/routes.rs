@@ -25,7 +25,16 @@ use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
 
-#[instrument(skip(web, sendgrid, db_conn, oidc_client, s3_client, s3_bucket, discord, secrets))]
+#[instrument(skip(
+    web,
+    sendgrid,
+    db_conn,
+    oidc_client,
+    s3_client,
+    s3_bucket,
+    discord,
+    secrets
+))]
 pub fn init_routes(
     web: &Web,
     sendgrid: Sendgrid,

@@ -13,8 +13,11 @@ use tracing::{debug, info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
+mod application;
 pub mod config;
+pub mod domain;
 pub mod entities;
+mod infra;
 pub mod middlewares;
 mod routes;
 pub mod sea_orm_entities;

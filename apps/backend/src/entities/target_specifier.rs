@@ -7,6 +7,7 @@ use std::fmt;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq)]
+#[deprecated]
 pub enum TargetSpecifier {
     GroupTypePlanGeneral,
     GroupTypePlanBooth,
