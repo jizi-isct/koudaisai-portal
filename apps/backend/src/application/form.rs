@@ -192,6 +192,7 @@ mod tests {
         ActorContext::Admin {
             user_id: UserId::new(Uuid::new_v4()),
             claims: vec![
+                "koudaisai-portal:admin:form:read".to_string(),
                 "koudaisai-portal:admin:form:create".to_string(),
                 "koudaisai-portal:admin:form:update".to_string(),
                 "koudaisai-portal:admin:form:delete".to_string(),
