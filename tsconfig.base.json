@@ -5,10 +5,7 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": [
-      "es2023",
-      "dom"
-    ],
+    "lib": ["es2023", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -22,6 +19,13 @@
     "customConditions": [
       "development"
     ],
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "@koudaisai/shared-api": ["libs/shared-api/src/index.ts"],
+      "@koudaisai/shared-types": ["libs/shared-types/src/index.ts"],
+      "@koudaisai/shared-ui": ["libs/shared-ui/src/index.ts"],
+      "@koudaisai/shared-utils": ["libs/shared-utils/src/index.ts"],
+      "@koudaisai/shared-auth-members": ["libs/shared-auth-members/src/index.ts"]
+    }
   }
 }

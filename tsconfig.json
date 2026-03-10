@@ -4,7 +4,19 @@
   "files": [],
   "references": [
     {
+      "path": "./libs/shared-types"
+    },
+    {
       "path": "./apps/web"
+    },
+    {
+      "path": "./libs/shared-ui"
+    },
+    {
+      "path": "./libs/shared-auth-members"
+    },
+    {
+      "path": "./libs/shared-auth-admin"
     }
   ],
   "ts-node": {
