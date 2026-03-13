@@ -9,3 +9,6 @@ export {
 export {
   type paths as authPaths
 } from "./auth_v1";
+export {
+  type paths as plansInfoPaths
+} from "./plans_info_api_v1";

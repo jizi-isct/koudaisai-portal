@@ -6,13 +6,11 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
-    "@tanstack/react-query": "^5.90.20",
     "@wojtekmaj/react-hooks": "^2.0.4",
     "antd": "^6.2.2",
     "antd-style": "^4.1.0",
     "next": "^16.1.6",
     "next-base64": "^1.1.0",
-    "openapi-react-query": "^0.5.1",
     "react": "19.2.4",
     "react-datepicker": "^9.1.0",
     "react-dom": "19.2.4",
