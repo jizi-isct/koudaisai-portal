@@ -1,6 +1,5 @@
 {
   "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
   "files": [],
   "references": [
     {
@@ -17,12 +16,12 @@
     },
     {
       "path": "./libs/shared-auth-admin"
+    },
+    {
+      "path": "./libs/shared-api"
+    },
+    {
+      "path": "./libs/shared-utils"
     }
-  ],
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs",
-      "customConditions": null
-    }
-  }
+  ]
 }
