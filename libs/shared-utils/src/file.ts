@@ -1,9 +1,9 @@
 // apps/web/src/lib/util.ts から以下の関数をコピー
-import {fetchClientNoAuth} from "@/lib/api";
+import type {ApiFetchClient} from "@koudaisai/shared-api";
 import {useCallback, useEffect, useState} from "react";
 
-export async function getDownloadUrl(fileKey: string, fileName: string) {
-  return await fetchClientNoAuth.GET(
+export async function getDownloadUrl(fetchClient: ApiFetchClient, fileKey: string, fileName: string) {
+  return await fetchClient.GET(
     "/files/download",
     {
       params: {
