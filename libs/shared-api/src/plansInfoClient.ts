@@ -2,8 +2,8 @@ import createClient, {OpenapiQueryClient} from "openapi-react-query";
 import {type plansInfoPaths} from "@koudaisai/shared-types";
 import createFetchClient, {Client, type Middleware} from "openapi-fetch";
 
-type PlansInfoFetchClient = Client<plansInfoPaths, `${string}/${string}`>
-type PlansInfoQueryClient = OpenapiQueryClient<plansInfoPaths, `${string}/${string}`>
+export type PlansInfoFetchClient = Client<plansInfoPaths, `${string}/${string}`>
+export type PlansInfoQueryClient = OpenapiQueryClient<plansInfoPaths, `${string}/${string}`>
 
 /**
  * fetch clientを生成する関数。必要に応じてミドルウェアを適用できます。
