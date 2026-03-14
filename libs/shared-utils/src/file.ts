@@ -16,13 +16,13 @@ export async function getDownloadUrl(fetchClient: ApiFetchClient, fileKey: strin
   )
 }
 
-export function useDownloadUrl(fileKey: string, fileName: string) {
+export function useDownloadUrl(fetchClient: ApiFetchClient, fileKey: string, fileName: string) {
   const [downloadUrl, setDownloadUrl] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
-      const {data, error: error_} = await getDownloadUrl(fileKey, fileName)
+      const {data, error: error_} = await getDownloadUrl(fetchClient, fileKey, fileName)
       if (data) {
         setDownloadUrl(data.presigned_url);
       } else {
