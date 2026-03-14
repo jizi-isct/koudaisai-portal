@@ -10,7 +10,6 @@
     "antd": "^6.2.2",
     "antd-style": "^4.1.0",
     "next": "^16.1.6",
-    "next-base64": "^1.1.0",
     "react": "19.2.4",
     "react-datepicker": "^9.1.0",
     "react-dom": "19.2.4",
