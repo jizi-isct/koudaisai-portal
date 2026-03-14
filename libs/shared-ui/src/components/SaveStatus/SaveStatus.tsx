@@ -1,6 +1,6 @@
 import styles from "./SaveStatus.module.css";
 import {saved, saving, unsaved} from "../icons/save_status";
-import {SaveStatus as SaveStatus_} from "@/lib";
+import {SaveStatus as SaveStatus_} from "@koudaisai/shared-types";
 import Element = React.JSX.Element;
 
 type SaveStatusProps = {

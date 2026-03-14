@@ -1,6 +1,6 @@
 import {Step} from "../Step";
 import styles from "./Steps.module.css";
-import {chunk} from "@/lib";
+import {chunk} from "@koudaisai/shared-utils";
 import {JSX} from "react";
 
 type Props = {
