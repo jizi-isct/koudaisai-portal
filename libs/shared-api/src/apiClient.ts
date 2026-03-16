@@ -1,9 +1,9 @@
 import createClient, {OpenapiQueryClient} from "openapi-react-query";
-import {type plansInfoPaths} from "@koudaisai/shared-types";
+import {type apiPaths} from "@koudaisai/shared-types";
 import createFetchClient, {Client, type Middleware} from "openapi-fetch";
 
-export type PlansInfoFetchClient = Client<plansInfoPaths, `${string}/${string}`>
-export type PlansInfoQueryClient = OpenapiQueryClient<plansInfoPaths, `${string}/${string}`>
+export type ApiFetchClient = Client<apiPaths, `${string}/${string}`>
+export type ApiQueryClient = OpenapiQueryClient<apiPaths, `${string}/${string}`>
 
 /**
  * fetch clientを生成する関数。必要に応じてミドルウェアを適用できます。
@@ -11,8 +11,8 @@ export type PlansInfoQueryClient = OpenapiQueryClient<plansInfoPaths, `${string}
  * @param baseUrl APIのbase url
  * @param middleware ミドルウェア。認証などに使用できます。
  */
-export function getPlansInfoFetchClient(baseUrl: string, middleware?: Middleware): PlansInfoFetchClient {
-  const fetchClient = createFetchClient<plansInfoPaths>({baseUrl})
+export function getApiFetchClient(baseUrl: string, middleware?: Middleware): ApiFetchClient {
+  const fetchClient = createFetchClient<apiPaths>({baseUrl})
   if (middleware) {
     fetchClient.use(middleware)
   }
@@ -23,6 +23,6 @@ export function getPlansInfoFetchClient(baseUrl: string, middleware?: Middleware
  * fetch clientからReact QueryのClientを生成します。
  * @param fetchClient fetch client
  */
-export function getPlansInfoQueryClient(fetchClient: PlansInfoFetchClient): PlansInfoQueryClient {
+export function getApiQueryClient(fetchClient: ApiFetchClient): ApiQueryClient {
   return createClient(fetchClient)
 }

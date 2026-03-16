@@ -1,13 +1,32 @@
-// 団体向け認証機能のみ抽出
+import {AuthFetchClient, decodeAccessToken} from "@koudaisai/shared-auth";
+import type {Middleware} from "openapi-fetch";
+import nextBase64 from "next-base64";
 
-//localStorageに保存されているトークンのキー名
 const ACCESS_TOKEN_KEY = 'exhibitor_access_token';
 const REFRESH_TOKEN_KEY = 'exhibitor_refresh_token';
 
+export function getAuthMiddleware(fetchClient: AuthFetchClient): Middleware {
+  return {
+    async onRequest({request}) {
+      const tokens = await getTokensMembers(fetchClient);
+
+      //ログインされてない->ログイン画面へ
+      if (!tokens) {
+        window.location.assign("/login")
+        return;
+      }
+
+      request.headers.set("Authorization", `Bearer ${tokens.access_token}`);
+      return request;
+    }
+  }
+
+}
+
 //団体向けトークンの取得
-export const getTokensMembers = async () => {
-  const refresh_token = localStorage.getItem("exhibitor_refresh_token")
-  const access_token = localStorage.getItem("exhibitor_access_token")
+export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
+  const refresh_token = localStorage.getItem(REFRESH_TOKEN_KEY)
+  const access_token = localStorage.getItem(ACCESS_TOKEN_KEY)
 
   //nullだったらundefinedに
   if (refresh_token === null || access_token === null) {
@@ -35,7 +54,7 @@ export const getTokensMembers = async () => {
   }
 
   //トークンのリフレッシュを試みる
-  const {data} = await fetchClientAuth.POST(
+  const {data} = await fetchClient.POST(
     "/refresh",
     {
       body: {
@@ -55,20 +74,20 @@ export const getTokensMembers = async () => {
 };
 
 //団体向けログイン
-export const login = async (email: string, password: string) => {
-  const {data, response} = await fetchClientAuth.POST(
+export const login = async (fetchClient: AuthFetchClient, email: string, password: string) => {
+  const {data, response} = await fetchClient.POST(
     "/login",
     {
       body: {
-        m_address: m_address,
+        m_address: email,
         password: password
       }
     }
   )
 
   if (data) {
-    localStorage.setItem("exhibitor_refresh_token", data.refresh_token)
-    localStorage.setItem("exhibitor_access_token", data.access_token)
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token)
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token)
     return data
   } else {
     switch (response.status) {
