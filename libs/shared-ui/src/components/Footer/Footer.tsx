@@ -4,12 +4,14 @@ import styles from "./Footer.module.css";
 import Link from "next/link";
 import Image from "next/image";
 
+import membersLogo from "./assets/members_logo.svg"
+
 export const Footer = (isLoggedIn: boolean) => {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoWrapper}>
         <Image
-          src="/components/generic/Header/members_logo.png"
+          src={membersLogo}
           alt="Koudaisai Portal Admin Site Logo"
           width={40}
           height={40}

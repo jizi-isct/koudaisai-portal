@@ -1,4 +1,4 @@
-// apps/web/src/lib/util.ts から以下の関数をコピー
+'use client'
 import type {ApiFetchClient} from "@koudaisai/shared-api";
 import {useCallback, useEffect, useState} from "react";
 

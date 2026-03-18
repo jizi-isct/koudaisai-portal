@@ -1,5 +1,5 @@
 // ユーティリティ関数をエクスポート
-export * from './array.js';
-export * from './file.js';
-export * from './validation.js';
-export * from './representative.js';
+export * from './array';
+export * from './file';
+export * from './validation';
+export * from './representative';

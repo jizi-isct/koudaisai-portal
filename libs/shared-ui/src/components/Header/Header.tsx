@@ -7,10 +7,10 @@ import {usePathname, useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {headerItemsAdmin, headerItemsMembers} from "../lib/magicNumbers";
 
-const adminLogo = "/components/generic/Header/admin_logo.jpg"
-const membersLogo = "/components/generic/Header/members_logo.png"
-const accountIcon = "/components/generic/Header/icon_account.svg"
-const arrowIcon = "/components/generic/Header/arrow.svg"
+import adminLogo from "./assets/admin_logo.jpg";
+import membersLogo from "./assets/members_logo.png";
+import accountIcon from "./assets/icon_account.svg";
+import arrowIcon from "./assets/arrow.svg";
 
 type HeaderProps = {
     header_type: "admin" | "members" ;

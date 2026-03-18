@@ -32,6 +32,7 @@
     "@nx/web": "22.4.4",
     "@nx/workspace": "22.4.4",
     "@swc-node/register": "^1.11.1",
+    "@swc/cli": "~0.6.0",
     "@swc/core": "^1.15.11",
     "@swc/helpers": "^0.5.18",
     "@types/node": "^25.2.0",
@@ -67,6 +68,6 @@
     "libs/*"
   ],
   "overrides": {
-  "@microsoft/api-extractor": "7.47.0"
+    "@microsoft/api-extractor": "7.47.0"
   }
 }

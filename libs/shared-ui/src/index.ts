@@ -10,3 +10,6 @@ export * from './components/SaveStatus';
 export * from './components/Selector';
 export * from './components/lib/types';
 export * from './components/lib/magicNumbers'
+export * from './components/Header/Header'
+export * from './components/Footer/Footer'
+export * from './components/MobileNavigator/MobileNavigator'
