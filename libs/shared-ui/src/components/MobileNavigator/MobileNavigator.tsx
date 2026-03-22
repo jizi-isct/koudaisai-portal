@@ -10,12 +10,11 @@ import {usePathname, useRouter} from "next/navigation";
 type Props = {
   header_type: "admin" | "members";
   logout: () => Promise<void>;
-  useIsLoggedInMembers: () => Promise<boolean | undefined>;
+  isLoggedIn?: boolean;
 }
 
-export function MobileNavigator({header_type, logout, useIsLoggedInMembers}: Props) {
+export function MobileNavigator({header_type, logout, isLoggedIn}: Props) {
   const router = useRouter();
-  const isLoggedIn = useIsLoggedInMembers(); // 仮のログイン状態
   const currentPath = usePathname();
   const handleLogout = async () => {
     await logout();
@@ -25,7 +24,7 @@ export function MobileNavigator({header_type, logout, useIsLoggedInMembers}: Pro
     <div className={styles.root}>
       {
         isLoggedIn === undefined ? <></> :
-          isLoggedIn === true
+          isLoggedIn
             ? <div className={styles.logout}>
               <Button type="primary" style={{ alignSelf: "flex-start" }} onClick={handleLogout}>ログアウト</Button>
             </div>

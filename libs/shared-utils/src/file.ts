@@ -1,9 +1,9 @@
 // apps/web/src/lib/util.ts から以下の関数をコピー
-import {fetchClientNoAuth} from "@/lib/api";
+import type {ApiFetchClient} from "@koudaisai/shared-api";
 import {useCallback, useEffect, useState} from "react";
 
-export async function getDownloadUrl(fileKey: string, fileName: string) {
-  return await fetchClientNoAuth.GET(
+export async function getDownloadUrl(fetchClient: ApiFetchClient, fileKey: string, fileName: string) {
+  return await fetchClient.GET(
     "/files/download",
     {
       params: {
@@ -16,13 +16,13 @@ export async function getDownloadUrl(fileKey: string, fileName: string) {
   )
 }
 
-export function useDownloadUrl(fileKey: string, fileName: string) {
+export function useDownloadUrl(fetchClient: ApiFetchClient, fileKey: string, fileName: string) {
   const [downloadUrl, setDownloadUrl] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
-      const {data, error: error_} = await getDownloadUrl(fileKey, fileName)
+      const {data, error: error_} = await getDownloadUrl(fetchClient, fileKey, fileName)
       if (data) {
         setDownloadUrl(data.presigned_url);
       } else {

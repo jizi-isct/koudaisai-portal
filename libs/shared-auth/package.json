@@ -1,5 +1,5 @@
 {
-  "name": "@koudaisai/shared-auth-members",
+  "name": "@koudaisai/shared-auth",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -16,7 +16,8 @@
     }
   },
   "dependencies": {
+    "tslib": "^2.3.0",
     "openapi-fetch": "^0.17.0",
-    "next-base64": "^1.1.0"
+    "openapi-react-query": "^0.5.4"
   }
 }

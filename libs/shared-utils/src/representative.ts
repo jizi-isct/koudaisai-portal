@@ -1,7 +1,7 @@
 /**
  * ユーザーIDから代表者のインデックスを取得
  */
-import {GroupRead, UserRead} from "@/lib/types";
+import {GroupRead, UserRead} from "@koudaisai/shared-types";
 
 export function getRepresentativeIndex(user: UserRead, group: GroupRead): string | undefined {
   if (group.type_press) {

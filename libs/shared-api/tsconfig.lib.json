@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
+  "references": [
+    {
+      "path": "../shared-types/tsconfig.lib.json"
+    }
+  ],
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
-    "declaration": true,
-    "types": ["node", "vite/client"]
-  },
-  "include": ["src/**/*.ts"]
+    "outDir": "./dist",
+  }
 }
