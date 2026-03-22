@@ -11,6 +11,25 @@ pub struct DocumentCategory {
 }
 
 impl DocumentCategory {
+    pub fn register<C: Clock>(
+        id: Uuid,
+        title: String,
+        emoji: Option<String>,
+        clock: &C,
+    ) -> Result<Self, FactoryError> {
+        if title.trim().is_empty() {
+            return Err(FactoryError::InvalidInput("Title is empty".to_string()));
+        }
+
+        Ok(Self {
+            id,
+            created_at: clock.now(),
+            updated_at: clock.now(),
+            title,
+            emoji,
+        })
+    }
+
     pub fn id(&self) -> Uuid {
         self.id
     }
