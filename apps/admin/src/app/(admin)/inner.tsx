@@ -35,7 +35,7 @@ export function Inner({children}: Props) {
       if (t) {
         setTokens(t);
       } else {
-        router.push("/login");
+        window.location.assign(process.env.NEXT_PUBLIC_AUTH_BASE_URL + "/admin/login");
       }
     })();
   }, [router]);
