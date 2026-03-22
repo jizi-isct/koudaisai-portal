@@ -8,6 +8,7 @@ export * from './components/Modal';
 export * from './components/ContentList';
 export * from './components/SaveStatus';
 export * from './components/Selector';
+export * from './components/LoadingScreen';
 export * from './components/lib/types';
 export * from './components/lib/magicNumbers'
 export * from './components/Header/Header'
