@@ -30,6 +30,9 @@
       "path": "./libs/shared-auth"
     },
     {
+      "path": "./apps/admin"
+    },
+    {
       "path": "./apps/join"
     }
   ]
