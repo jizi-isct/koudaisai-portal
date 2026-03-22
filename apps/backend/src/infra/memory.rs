@@ -1,5 +1,6 @@
 pub mod approval_request_repo_impl;
 pub mod clock_impl;
+pub mod document_category_repo_impl;
 pub mod email_impl;
 pub mod group_repo_impl;
 pub mod membership_repo_impl;
@@ -21,6 +22,7 @@ pub type MemoryApplication = Application<
     MemoryGroupRepo,
     MemoryMembershipRepo,
     MemoryUserRepo,
+    MemoryDocumentCategoryRepo,
     MemoryClock,
     MemoryEmail,
 >;
@@ -35,6 +37,7 @@ impl MemoryApplication {
             MemoryGroupRepo::new(),
             MemoryMembershipRepo::new(),
             MemoryUserRepo::new(),
+            MemoryDocumentCategoryRepo::new(),
             MemoryClock::new(now),
             MemoryEmail::new(),
         )

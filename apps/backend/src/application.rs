@@ -1,6 +1,7 @@
 use crate::application::ports::clock::Clock;
 use crate::application::ports::email::Email;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
+use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
@@ -10,12 +11,12 @@ use crate::application::user::UserApp;
 
 pub mod approval_request;
 pub mod authz;
+pub mod document_category;
 pub mod error;
 pub mod form;
 pub mod group;
 pub mod ports;
 pub mod transaction;
-pub mod document_category;
 pub mod user;
 
 pub struct Application<
@@ -24,6 +25,7 @@ pub struct Application<
     GR: GroupRepo<Tx>,
     MR: MembershipRepo<Tx>,
     UR: UserRepo<Tx>,
+    DCR: DocumentCategoryRepo<Tx>,
     FR: FormRepo,
     C: Clock,
     E: Email,
@@ -33,6 +35,7 @@ pub struct Application<
     group_repo: GR,
     membership_repo: MR,
     user_repo: UR,
+    document_category_repo: DCR,
     clock: C,
     form_repo: FR,
     email: E,
@@ -44,16 +47,18 @@ impl<
     GR: GroupRepo<Tx>,
     MR: MembershipRepo<Tx>,
     UR: UserRepo<Tx>,
+    DCR: DocumentCategoryRepo<Tx>,
     FR: FormRepo,
     C: Clock,
     E: Email,
-> Application<Tx, AR, GR, MR, UR, FR, C, E>
+> Application<Tx, AR, GR, MR, UR, DCR, FR, C, E>
 {
     pub fn new(
         approval_request_repo: AR,
         group_repo: GR,
         membership_repo: MR,
         user_repo: UR,
+        document_category_repo: DCR,
         form_repo: FR,
         clock: C,
         email: E,
@@ -64,6 +69,7 @@ impl<
             group_repo,
             membership_repo,
             user_repo,
+            document_category_repo,
             form_repo,
             clock,
             email,
@@ -89,6 +95,10 @@ impl<
 
     pub fn user(&'_ self) -> UserApp<'_, Tx, MR, UR, C> {
         UserApp::new(&self.membership_repo, &self.user_repo, &self.clock)
+    }
+
+    pub fn document_category(&'_ self) -> document_category::DocumentCategoryApp<'_, Tx, DCR, C> {
+        document_category::DocumentCategoryApp::new(&self.document_category_repo, &self.clock)
     }
 
     pub fn form(&'_ self) -> form::FormApp<'_, FR, C> {

@@ -2,6 +2,7 @@ use crate::{application::ports::clock::Clock, domain::error::FactoryError};
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+#[derive(Debug, Clone)]
 pub struct DocumentCategory {
     pub id: Uuid,
     pub created_at: DateTime<Utc>,
@@ -30,6 +31,26 @@ impl DocumentCategory {
         })
     }
 
+    pub fn restore(
+        id: Uuid,
+        created_at: DateTime<Utc>,
+        updated_at: DateTime<Utc>,
+        title: String,
+        emoji: Option<String>,
+    ) -> Result<Self, FactoryError> {
+        if title.trim().is_empty() {
+            return Err(FactoryError::InvalidInput("Title is empty".to_string()));
+        }
+
+        Ok(Self {
+            id,
+            created_at,
+            updated_at,
+            title,
+            emoji,
+        })
+    }
+
     pub fn id(&self) -> Uuid {
         self.id
     }
@@ -46,24 +67,33 @@ impl DocumentCategory {
         &self.title
     }
 
-    pub fn change_title<C: Clock>(&mut self, new_title: String, clock: C) -> Result<(), FactoryError> {
+    pub fn change_title<C: Clock>(
+        &mut self,
+        new_title: String,
+        clock: C,
+    ) -> Result<(), FactoryError> {
         if new_title.trim().is_empty() {
-            return Err(FactoryError::InvalidInput("title is empty".to_string()));
+            return Err(FactoryError::InvalidInput("Title is empty".to_string()));
         }
         self.title = new_title;
         self.updated_at = clock.now();
         Ok(())
     }
 
-    pub fn emoji(&self) -> Option<&str> { // Some(&str)またはNone
+    pub fn emoji(&self) -> Option<&str> {
+        // Some(&str)またはNone
         self.emoji.as_deref()
     }
 
-    pub fn change_emoji<C: Clock>(&mut self, new_emoji: Option<String>, clock: C) -> Result<(), FactoryError> {
-
-        if let Some(new_emoji) = new_emoji { // emojiがNoneじゃなければ
+    pub fn change_emoji<C: Clock>(
+        &mut self,
+        new_emoji: Option<String>,
+        clock: C,
+    ) -> Result<(), FactoryError> {
+        if let Some(new_emoji) = new_emoji {
+            // emojiがNoneじゃなければ
             if new_emoji.trim().is_empty() {
-                return Err(FactoryError::InvalidInput("emoji is empty".to_string())) // わざわざOption型なので、もし空文字列ならエラー返す
+                return Err(FactoryError::InvalidInput("Emoji is empty".to_string())); // わざわざOption型なので、もし空文字列ならエラー返す
             }
 
             self.emoji = Some(new_emoji);
@@ -75,6 +105,4 @@ impl DocumentCategory {
 
         Ok(())
     }
-
-
 }

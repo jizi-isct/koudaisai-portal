@@ -198,6 +198,7 @@ mod tests {
         ));
     }
 
+    #[tokio::test]
     async fn test_get_by_id_success_admin() {
         let app = setup_app();
         let ctx = admin_ctx();
@@ -300,6 +301,7 @@ mod tests {
         assert_eq!(stored.id(), document_category.id);
     }
 
+    #[tokio::test]
     async fn test_update_document_category_unauthorized() {
         let app = setup_app();
         let ctx = ActorContext::NoLogin;
