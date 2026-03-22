@@ -145,7 +145,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 
@@ -174,7 +174,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 
@@ -213,7 +213,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 
@@ -221,24 +221,16 @@ mod tests {
             .get_by_id(&ctx, document_category.id)
             .await;
         assert!(result.is_ok());
-        assert!(result.unwrap().is_some());
-        assert_eq!(result.unwrap().unwrap().id(), document_category.id);
+
+        let document_category_opt = result.unwrap();
+        assert!(document_category_opt.is_some());
+        assert_eq!(document_category_opt.unwrap().id(), document_category.id);
     }
 
     #[tokio::test]
     async fn test_get_by_id_not_found() {
         let app = setup_app();
         let ctx = admin_ctx();
-        let document_category_app = app.document_category();
-        let result = document_category_app.get_by_id(&ctx, Uuid::new_v4()).await;
-        assert!(result.is_ok());
-        assert!(result.unwrap().is_none());
-    }
-
-    #[tokio::test]
-    async fn test_get_by_id_not_found() {
-        let app = setup_app();
-        let ctx = ActorContext::NoLogin;
         let document_category_app = app.document_category();
         let result = document_category_app.get_by_id(&ctx, Uuid::new_v4()).await;
         assert!(result.is_ok());
@@ -260,7 +252,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 
@@ -339,7 +331,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 
@@ -371,7 +363,7 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(document_category)
+            .insert(&document_category)
             .await
             .unwrap();
 

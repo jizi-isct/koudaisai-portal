@@ -21,7 +21,7 @@ pub trait DocumentCategoryRepo<Tx: Transaction> {
         &self,
         tx: &mut Tx,
         document_category: &DocumentCategory,
-    ) -> Result<(), InsertError>;
+    ) -> Result<(), UpdateError>;
 
     async fn delete(&self, id: Uuid) -> Result<(), DeleteError>;
     async fn delete_in(&self, tx: &mut Tx, id: Uuid) -> Result<(), DeleteError>;

@@ -36,8 +36,8 @@ pub struct Application<
     membership_repo: MR,
     user_repo: UR,
     document_category_repo: DCR,
-    clock: C,
     form_repo: FR,
+    clock: C,
     email: E,
 }
 

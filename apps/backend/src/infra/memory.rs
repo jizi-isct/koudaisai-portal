@@ -11,6 +11,7 @@ pub mod user_repo_impl;
 use crate::application::Application;
 use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
 use crate::infra::memory::clock_impl::MemoryClock;
+use crate::infra::memory::document_category_repo_impl::MemoryDocumentCategoryRepo;
 use crate::infra::memory::email_impl::MemoryEmail;
 use crate::infra::memory::form_repo_impl::MemoryFormRepo;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;

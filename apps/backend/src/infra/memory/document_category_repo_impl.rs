@@ -30,8 +30,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
         Ok(categories.get(&id).map(|c| {
             DocumentCategory::restore(
                 c.id(),
-                c.created_at(),
-                c.updated_at(),
+                c.created_at().clone(),
+                c.updated_at().clone(),
                 c.title.clone(),
                 c.emoji.clone(),
             )
@@ -49,8 +49,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
             .map(|c| {
                 DocumentCategory::restore(
                     c.id(),
-                    c.created_at(),
-                    c.updated_at(),
+                    c.created_at().clone(),
+                    c.updated_at().clone(),
                     c.title.clone(),
                     c.emoji.clone(),
                 )
@@ -95,10 +95,10 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
         &self,
         _tx: &mut MemoryTransaction,
         document_category: &DocumentCategory,
-    ) -> Result<(), InsertError> {
+    ) -> Result<(), UpdateError> {
         self.update(document_category).await.map_err(|e| match e {
-            UpdateError::InternalError(err) => InsertError::InternalError(err),
-            UpdateError::NotFound => InsertError::Conflict,
+            UpdateError::InternalError(err) => UpdateError::InternalError(err),
+            UpdateError::NotFound => UpdateError::Conflict,
         })
     }
 
