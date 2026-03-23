@@ -11,6 +11,12 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   trailingSlash: true,
+  transpilePackages: [
+    '@koudaisai/shared-api',
+    '@koudaisai/shared-auth',
+    '@koudaisai/shared-auth-admin',
+    '@koudaisai/shared-ui',
+  ],
 };
 
 const plugins = [
