@@ -21,10 +21,10 @@ function Inner() {
   const {data: users} = $apiAdmin.useQuery("get", "/users")
   const userNameMap = useMemo(() => {
     if (!users) return {};
-    return users.reduce((acc, user) => {
+    return users.reduce<Record<string, string>>((acc, user) => {
       acc[user.id] = user.group_id + "の" + user.name;
       return acc;
-    }, {} as Record<string, string>);
+    }, {});
   }, [users])
 
   const columns: TableProps<ApprovalRequestRead>['columns'] = [

@@ -13,7 +13,7 @@ if (!apiBaseUrl) throw new Error("NEXT_PUBLIC_API_BASE_URL が設定されてい
 export const authFetchClient = getAuthFetchClient(authBaseUrl);
 export const $auth = getAuthQueryClient(authFetchClient);
 
-export const adminMiddleware = getAuthMiddleware(authFetchClient, "/login");
+export const adminMiddleware = getAuthMiddleware(authFetchClient, `${authBaseUrl}/admin/login`);
 
 export const fetchClientAdmin = getApiFetchClient(apiBaseUrl, adminMiddleware);
 export const $apiAdmin = getApiQueryClient(fetchClientAdmin);

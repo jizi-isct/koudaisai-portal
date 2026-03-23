@@ -3,7 +3,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
 import {Button, Flex, Form, Input, message, Radio, Result, Space} from 'antd';
 import {TargetSpecifier} from "@/components/TargetSpecifier";
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import {$apiAdmin} from "@/lib/api";
@@ -55,13 +55,6 @@ function Inner({notificationId}: { notificationId: string }) {
     "/notifications/{notification_id}"
   )
   const [submitting, setSubmitting] = useState(false)
-
-  const notificationType = useMemo(() => {
-    if ("type_markdown" in (data ?? {})) {
-      return "markdown"
-    }
-    return "markdown"
-  }, [data])
 
   if (isLoading) {
     return <LoadingScreen/>
@@ -169,7 +162,7 @@ function Inner({notificationId}: { notificationId: string }) {
           </Form.List>
         </Form.Item>
         <Form.Item label="通知の種類">
-          <Radio.Group defaultValue={notificationType}>
+          <Radio.Group defaultValue="markdown">
             <Radio.Button value="markdown">MD</Radio.Button>
           </Radio.Group>
         </Form.Item>

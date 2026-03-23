@@ -21,11 +21,22 @@ function Inner() {
   const {mutateAsync: mutateFormCreate} = $apiAdmin.useMutation("post", "/forms")
   const [submitting, setSubmitting] = useState(false)
   const router = useRouter()
-  const [formName, setFormName] = useState("");
-  const [summary, setSummary] = useState("");
-  const [url, setUrl] = useState("");
+  const [form] = Form.useForm<{
+    formName: string,
+    summary: string,
+    url: string,
+    targets: string[][],
+    dueDate: string | undefined,
+  }>()
+  const urlValue = Form.useWatch("url", form) ?? ""
 
-  const handleSubmit = async ({targets, dueDate}: { targets: string[][], dueDate: number | undefined }) => {
+  const handleSubmit = async ({formName, summary, url, targets, dueDate}: {
+    formName: string,
+    summary: string,
+    url: string,
+    targets: string[][],
+    dueDate: string | undefined,
+  }) => {
     setSubmitting(true)
     try {
       await mutateFormCreate({
@@ -53,7 +64,7 @@ function Inner() {
     messageApi.loading('外部フォームのメタデータを取得中...')
     try {
       const result = await fetchClientAdmin.GET("/util/meta", {
-        params: {query: {url}}
+        params: {query: {url: urlValue}}
       })
       if (!result.data) {
         messageApi.destroy()
@@ -67,8 +78,12 @@ function Inner() {
         messageApi.destroy()
         messageApi.success('外部フォームのメタデータを取得しました')
       }
-      result.data?.title && setFormName(result.data?.title)
-      result.data?.description && setSummary(result.data?.description)
+      if (result.data.title) {
+        form.setFieldsValue({formName: result.data.title})
+      }
+      if (result.data.description) {
+        form.setFieldsValue({summary: result.data.description})
+      }
     } catch (e) {
       messageApi.destroy()
       messageApi.error("外部フォームのメタデータのfetchに失敗しました: " + e)
@@ -78,24 +93,17 @@ function Inner() {
   return (
     <>
       <Form
+        form={form}
         onFinish={handleSubmit}
         initialValues={{targets: [], formType: "external"}}
       >
         <h1>新規フォームを作成</h1>
-        <Form.Item label={"フォーム名"} rules={[{required: true}]}>
-          <Input
-            placeholder={"フォーム名を入力してください"}
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
-          />
+        <Form.Item name="formName" label={"フォーム名"} rules={[{required: true}]}>
+          <Input placeholder={"フォーム名を入力してください"}/>
         </Form.Item>
 
-        <Form.Item label={"要約"} rules={[{required: true}]}>
-          <TextArea
-            placeholder={"フォームの要約を入力してください"}
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-          />
+        <Form.Item name="summary" label={"要約"} rules={[{required: true}]}>
+          <TextArea placeholder={"フォームの要約を入力してください"}/>
         </Form.Item>
 
         <Form.Item label={"対象"} rules={[{required: true}]}>
@@ -122,8 +130,10 @@ function Inner() {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item label="外部フォームurl" rules={[{required: true}]}>
-          <Input type="textarea" value={url} onChange={(e) => setUrl(e.target.value)}/>
+        <Form.Item name="url" label="外部フォームurl" rules={[{required: true}]}>
+          <Input/>
+        </Form.Item>
+        <Form.Item>
           <Button type="default" onClick={syncFormNameAndSummary}>フォーム名と要約を自動取得</Button>
         </Form.Item>
 

@@ -28,13 +28,8 @@ function Inner() {
   });
 
   if (!code || !state) {
-    return (
-      <div className={styles.root}>
-        <p style={{color: "red"}}>
-          認証コードまたは状態パラメータを取得できませんでした。もう一度ログインをやり直してください。
-        </p>
-      </div>
-    );
+    window.location.assign(`${process.env.NEXT_PUBLIC_AUTH_BASE_URL}/admin/login`);
+    return <div className={styles.root}><LoadingScreen /></div>;
   }
 
   if (data) {

@@ -62,7 +62,7 @@ function Inner({approvalRequestId}: { approvalRequestId: string }) {
       enabled: !!approvalRequest?.issued_by,
       params: {
         path: {
-          user_id: approvalRequest?.issued_by!
+          user_id: approvalRequest?.issued_by ?? ""
         }
       }
     }
@@ -70,7 +70,7 @@ function Inner({approvalRequestId}: { approvalRequestId: string }) {
   const {data: basePlan, isLoading} = $plansInfoApiNoLogin.useQuery("get", "/plans/{planId}", {
     params: {
       path: {
-        planId: issuer?.group_id!
+        planId: issuer?.group_id ?? ""
       }
     },
     enabled: !!issuer?.group_id,

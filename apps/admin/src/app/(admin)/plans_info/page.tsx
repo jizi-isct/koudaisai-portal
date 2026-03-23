@@ -578,7 +578,7 @@ function Inner() {
           maxCount={1}
           accept=".csv"
           beforeUpload={async (file) => {
-            handleBulkUpdate(await file.text());
+            await handleBulkUpdate(await file.text());
             return false
           }}
         >
