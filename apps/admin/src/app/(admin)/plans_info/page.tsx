@@ -8,12 +8,17 @@ import {
   BasePlanRead,
   BoothPlanCreate,
   BoothPlanUpdate,
+  DaySchedule,
   GeneralPlanCreate,
   GeneralPlanUpdate,
+  IndoorLocation,
   LaboPlanCreate,
   LaboPlanUpdate,
+  OutdoorLocation,
+  ScheduleCreate,
+  ScheduleUpdate,
   StagePlanCreate,
-  StagePlanUpdate
+  StagePlanUpdate,
 } from "@koudaisai/shared-types";
 import Papa from "papaparse";
 import objectHash from "object-hash";
@@ -54,6 +59,99 @@ type BulkUpdateRow = {
   icon_url?: string;
 }
 
+function buildDaySchedule(startTime: string, endTime: string): DaySchedule {
+  return {start_time: startTime, end_time: endTime}
+}
+
+function buildLocation(building: string, locationName: string): (IndoorLocation | OutdoorLocation)[] {
+  if (building !== "") {
+    return [{type: "indoor", building, room: locationName}]
+  }
+  return [{type: "outdoor", name: locationName}]
+}
+
+function buildCreateSchedule(row: BulkCreateRow): ScheduleCreate {
+  return {
+    day1: row.day1_start_time !== "" && row.day1_end_time !== ""
+      ? buildDaySchedule(row.day1_start_time, row.day1_end_time)
+      : null,
+    day2: row.day2_start_time !== "" && row.day2_end_time !== ""
+      ? buildDaySchedule(row.day2_start_time, row.day2_end_time)
+      : null,
+  }
+}
+
+function buildPlanCreate(row: BulkCreateRow): BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate {
+  const base = {
+    organization_name: row.organization_name,
+    plan_name: row.plan_name,
+    description: row.description,
+    is_child_friendly: row.is_child_friendly === "true",
+    is_recommended: row.is_recommended === "true",
+    schedule: buildCreateSchedule(row),
+    location: buildLocation(row.building, row.location),
+  }
+  switch (row.id.charAt(0)) {
+    case "M": return {...base, type: "booth", categories: []}
+    case "I": return {...base, type: "general", categories: []}
+    case "S": return {...base, type: "stage"}
+    case "L": return {...base, type: "labo", is_lab_tour: row.is_lab_tour.toLowerCase() === "true"}
+    default: throw new Error("企画番号の頭文字はM, I, S, Lのいずれかである必要があります。")
+  }
+}
+
+function buildUpdateSchedule(row: BulkUpdateRow): ScheduleUpdate | undefined {
+  let day1: DaySchedule | null | undefined
+  let day2: DaySchedule | null | undefined
+
+  if (row.day1_start_time === "null") {
+    day1 = null
+  } else if (row.day1_start_time && row.day1_start_time !== "" && row.day1_end_time && row.day1_end_time !== "") {
+    day1 = buildDaySchedule(row.day1_start_time, row.day1_end_time)
+  }
+
+  if (row.day2_start_time === "null") {
+    day2 = null
+  } else if (row.day2_start_time && row.day2_start_time !== "" && row.day2_end_time && row.day2_end_time !== "") {
+    day2 = buildDaySchedule(row.day2_start_time, row.day2_end_time)
+  }
+
+  if (day1 !== undefined || day2 !== undefined) {
+    return {day1, day2}
+  }
+  return undefined
+}
+
+function buildUpdateLocation(row: BulkUpdateRow): (IndoorLocation | OutdoorLocation)[] | undefined {
+  if (row.location && row.building) {
+    return [{type: "indoor", building: row.building, room: row.location}]
+  }
+  if (row.location) {
+    return [{type: "outdoor", name: row.location}]
+  }
+  return undefined
+}
+
+function buildPlanUpdate(row: BulkUpdateRow): BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate {
+  const base = {
+    organization_name: row.organization_name,
+    plan_name: row.plan_name,
+    description: row.description,
+    is_child_friendly: row.is_child_friendly ? row.is_child_friendly === "true" : undefined,
+    is_recommended: row.is_recommended ? row.is_recommended === "true" : undefined,
+    schedule: buildUpdateSchedule(row),
+    location: buildUpdateLocation(row),
+  }
+
+  if (row.id.charAt(0) === "L") {
+    return {
+      ...base,
+      is_lab_tour: row.is_lab_tour ? row.is_lab_tour.toLowerCase() === "true" : undefined,
+    }
+  }
+  return base
+}
+
 export default function Page() {
   return (
     <QueryClientProvider client={new QueryClient()}>
@@ -91,101 +189,14 @@ function Inner() {
     Papa.parse<BulkCreateRow>(csv, {
         header: true,
         skipEmptyLines: true,
-        worker: true,           // Web Workerでパース（UIをブロックしない）
-        encoding: "UTF-8",      // Shift_JISなら "Shift_JIS" に変更（不明なら自前検知→二度読みが安全）
+        worker: true,
+        encoding: "UTF-8",
         step: (result, parser) => {
           try {
-            const data = result.data;
-
-            // type
-            let type;
-            switch (data.id.charAt(0)) {
-              case "M":
-                type = "booth";
-                break;
-              case "I":
-                type = "general";
-                break;
-              case "S":
-                type = "stage";
-                break;
-              case "L":
-                type = "labo";
-                break;
-              default:
-                throw "企画番号の頭文字はM, I, S, Lのいずれかである必要があります。"
-            }
-
-            // organization_name
-            const organization_name = data.organization_name;
-
-            // plan_name
-            const plan_name = data.plan_name;
-
-            // description
-            const description = data.description;
-
-            // is_child_friendly
-            const is_child_friendly = data.is_child_friendly === "true";
-
-            // is_recommended
-            const is_recommended = data.is_recommended === "true";
-
-            // schedule
-            let day1 = null
-            let day2 = null
-            if (data.day1_start_time !== "" && data.day1_end_time !== "") {
-              day1 = [{
-                start_time: data.day1_start_time,
-                end_time: data.day1_end_time
-              }]
-            }
-            if (data.day2_start_time !== "" && data.day2_end_time !== "") {
-              day2 = [{
-                start_time: data.day2_start_time,
-                end_time: data.day2_end_time
-              }]
-            }
-
-            // location
-            let location
-            if (data.building !== "") {
-              location = [{
-                type: "indoor",
-                building: data.building,
-                room: data.location
-              }]
-            } else {
-              location = [{
-                type: "outdoor",
-                name: data.location
-              }]
-            }
-
-            // is_lab_tour
-            let is_lab_tour = undefined;
-            if (type === "labo") {
-              is_lab_tour = data.is_lab_tour.toLowerCase() === "true";
-            }
-
-            plans.set(data.id, {
-              type,
-              organization_name,
-              plan_name,
-              description,
-              is_child_friendly,
-              is_recommended,
-              schedule: {
-                day1,
-                day2
-              },
-              location,
-              is_lab_tour
-            })
-
-            //アイコン
-            if (data.icon_url !== "") {
-              iconUrls.set(data.id, data.icon_url)
+            const row = result.data;
+            plans.set(row.id, buildPlanCreate(row))
+            if (row.icon_url !== "") {
+              iconUrls.set(row.id, row.icon_url)
             }
           } catch (error) {
             console.error('Error in step processing:', error);
@@ -198,7 +209,6 @@ function Inner() {
           }
         },
         complete: async () => {
-          // If parsing was aborted due to an error, don't proceed with complete callback
           if (isAborted) {
             return;
           }
@@ -235,14 +245,8 @@ function Inner() {
           const n = iconUrls.size
           await Promise.all(iconUrls.entries().map(([id, iconUrl]) => {
             return mutatePlanIconImport({
-              params: {
-                path: {
-                  planId: id
-                }
-              },
-              body: {
-                url: iconUrl
-              }
+              params: {path: {planId: id}},
+              body: {url: iconUrl}
             }).then(() => {
               i++
               messageApi.destroy(hash)
@@ -290,112 +294,14 @@ function Inner() {
     Papa.parse<BulkUpdateRow>(csv, {
       header: true,
       skipEmptyLines: true,
-      worker: true,           // Web Workerでパース（UIをブロックしない）
-      encoding: "UTF-8",      // Shift_JISなら "Shift_JIS" に変更（不明なら自前検知→二度読みが安全）
+      worker: true,
+      encoding: "UTF-8",
       step: (result, parser) => {
         try {
-          const data = result.data;
-
-          // type
-          let type;
-          switch (data.id.charAt(0)) {
-            case "M":
-              type = "booth";
-              break;
-            case "I":
-              type = "general";
-              break;
-            case "S":
-              type = "stage";
-              break;
-            case "L":
-              type = "labo";
-              break;
-            default:
-              type = undefined;
-          }
-
-          // organization_name
-          const organization_name = data.organization_name;
-
-          // plan_name
-          const plan_name = data.plan_name;
-
-          // description
-          const description = data.description;
-
-          // is_child_friendly
-          const is_child_friendly = data.is_child_friendly ? data.is_child_friendly === "true" : undefined;
-
-          // is_recommended
-          const is_recommended = data.is_recommended ? data.is_recommended === "true" : undefined;
-
-          // schedule
-          let schedule = undefined
-          let day1 = undefined;
-          let day2 = undefined;
-          if (data.day1_start_time === "null") {
-            day1 = []
-          } else if (data.day1_start_time && data.day1_start_time !== "" && data.day1_end_time !== "") {
-            day1 = [{
-              start_time: data.day1_start_time,
-              end_time: data.day1_end_time
-            }]
-          }
-          if (data.day2_start_time === "null") {
-            day2 = []
-          } else if (data.day2_start_time && data.day2_start_time !== "" && data.day2_end_time !== "") {
-            day2 = [{
-              start_time: data.day2_start_time,
-              end_time: data.day2_end_time
-            }]
-          }
-
-          if (day1 || day2) {
-            schedule = {
-              day1, day2
-            }
-          }
-
-          // location
-          let location = undefined
-          if (data.location && data.building) {
-            location = [{
-              type: "indoor",
-              building: data.building,
-              room: data.location
-            }]
-          } else if (data.location) {
-            location = [{
-              type: "outdoor",
-              name: data.location
-            }]
-          }
-
-          // is_lab_tour
-          let is_lab_tour = undefined;
-          if (type === "labo") {
-            const lab_tour = data.is_lab_tour
-            is_lab_tour = lab_tour ? lab_tour.toLowerCase() === "true" : undefined;
-          } else {
-            type = undefined;
-          }
-
-          plans.set(data.id, {
-            type,
-            organization_name,
-            plan_name,
-            description,
-            is_child_friendly,
-            is_recommended,
-            schedule,
-            location,
-            is_lab_tour
-          })
-
-          //アイコン
-          if (data.icon_url && data.icon_url !== "") {
-            iconUrls.set(data.id, data.icon_url)
+          const row = result.data;
+          plans.set(row.id, buildPlanUpdate(row))
+          if (row.icon_url && row.icon_url !== "") {
+            iconUrls.set(row.id, row.icon_url)
           }
         } catch (error) {
           console.error('Error in step processing:', error);
@@ -408,7 +314,6 @@ function Inner() {
         }
       },
       complete: async () => {
-        // If parsing was aborted due to an error, don't proceed with complete callback
         if (isAborted) {
           return;
         }
@@ -428,11 +333,7 @@ function Inner() {
 
             try {
               await mutatePlanUpdate({
-                params: {
-                  path: {
-                    planId: id
-                  }
-                },
+                params: {path: {planId: id}},
                 body: plan
               })
             } catch (err) {
@@ -445,7 +346,6 @@ function Inner() {
               break;
             }
             isCreated.push(id)
-
             i++
           }
         } catch (e) {
@@ -466,14 +366,8 @@ function Inner() {
         const n2 = iconUrls.size
         await Promise.all(iconUrls.entries().map(([id, iconUrl]) => {
           return mutatePlanIconImport({
-            params: {
-              path: {
-                planId: id
-              }
-            },
-            body: {
-              url: iconUrl
-            }
+            params: {path: {planId: id}},
+            body: {url: iconUrl}
           }).then(() => {
             i2++
             messageApi.destroy(hash)
@@ -537,10 +431,10 @@ function Inner() {
         description: plan.description,
         is_child_friendly: plan.is_child_friendly ? "true" : "false",
         is_recommended: plan.is_recommended ? "true" : "false",
-        day1_start_time: plan.schedule?.day1?.start_time ?? "なし",
-        day1_end_time: plan.schedule?.day1?.end_time ?? "なし",
-        day2_start_time: plan.schedule?.day2?.start_time ?? "なし",
-        day2_end_time: plan.schedule?.day2?.end_time ?? "なし",
+        day1_start_time: plan.schedule.day1?.start_time ?? "なし",
+        day1_end_time: plan.schedule.day1?.end_time ?? "なし",
+        day2_start_time: plan.schedule.day2?.start_time ?? "なし",
+        day2_end_time: plan.schedule.day2?.end_time ?? "なし",
         building,
         location,
         is_lab_tour: "is_lab_tour" in plan ? (plan.is_lab_tour ? "true" : "false") : "false",
@@ -548,16 +442,10 @@ function Inner() {
       }
     }) ?? []
 
-    const csv = Papa.unparse(rows, {
-      newline: "\r\n"
-    })
+    const csv = Papa.unparse(rows, {newline: "\r\n"})
     const bom = "\uFEFF"
     const blob = new Blob([bom + csv], {type: "text/csv;charset=utf-8;"});
-    const url = URL.createObjectURL(blob);
-
-    download(url, "plans.csv")
-
-    return
+    download(URL.createObjectURL(blob), "plans.csv")
   }
 
   const columns: TableProps<BasePlanRead>['columns'] = [
@@ -572,22 +460,10 @@ function Inner() {
       title: <Tooltip title={"type"}>種類</Tooltip>,
       dataIndex: "type",
       filters: [
-        {
-          text: "模擬店企画",
-          value: "booth"
-        },
-        {
-          text: "一般企画",
-          value: "general"
-        },
-        {
-          text: "ステージ企画",
-          value: "stage"
-        },
-        {
-          text: "研究室公開企画",
-          value: "labo"
-        }
+        {text: "模擬店企画", value: "booth"},
+        {text: "一般企画", value: "general"},
+        {text: "ステージ企画", value: "stage"},
+        {text: "研究室公開企画", value: "labo"}
       ],
       onFilter: (value, record) => record.type === value,
       render: value => {
@@ -610,14 +486,14 @@ function Inner() {
       title: <Tooltip title={"icon"}>アイコン</Tooltip>,
       dataIndex: "id",
       rowScope: "row",
-      render: (value, record) => {
-        return <Image
+      render: (_value, record) => (
+        <Image
           src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${record.id}/icon`}
           alt={"企画のアイコン"}
           width={128}
           height={128}
         />
-      }
+      )
     },
     {
       key: "organization_name",
@@ -642,26 +518,22 @@ function Inner() {
       title: <Tooltip title={"is_child_friendly"}>子供向け企画?</Tooltip>,
       dataIndex: "is_child_friendly",
       rowScope: "row",
-      render: (_value, record, _index) => {
-        if (record.is_child_friendly) {
-          return <Tooltip title={"true"}><Checkbox checked={true} disabled={true}/></Tooltip>
-        } else {
-          return <Tooltip title={"false"}><Checkbox checked={false} disabled={true}/></Tooltip>
-        }
-      }
+      render: (_value, record) => (
+        <Tooltip title={record.is_child_friendly ? "true" : "false"}>
+          <Checkbox checked={record.is_child_friendly} disabled/>
+        </Tooltip>
+      )
     },
     {
       key: "is_recommended",
       title: <Tooltip title={"is_recommended"}>おすすめ企画?</Tooltip>,
       dataIndex: "is_recommended",
       rowScope: "row",
-      render: (_value, record, _index) => {
-        if (record.is_recommended) {
-          return <Tooltip title={"true"}><Checkbox checked={true} disabled={true}/></Tooltip>
-        } else {
-          return <Tooltip title={"false"}><Checkbox checked={false} disabled={true}/></Tooltip>
-        }
-      }
+      render: (_value, record) => (
+        <Tooltip title={record.is_recommended ? "true" : "false"}>
+          <Checkbox checked={record.is_recommended} disabled/>
+        </Tooltip>
+      )
     },
     {
       key: "actions",
@@ -673,9 +545,7 @@ function Inner() {
           title={"企画情報を削除"}
           description="あなたは本当にこの企画情報を削除する気ですか！？"
           onConfirm={handleDelete(value)}
-          onCancel={() => {
-            return
-          }}
+          onCancel={() => {return}}
           okText="はい"
           cancelText="いいえ"
         >
@@ -718,11 +588,12 @@ function Inner() {
       </Flex>
 
       <Flex gap={8} vertical>
-        <Table<BasePlanRead> size={"small"}
-                             dataSource={data.plans.map(item => ({...item, key: item.id}))}
-                             columns={columns}
-                             bordered
-                             scroll={{x: 'max-content'}}
+        <Table<BasePlanRead>
+          size={"small"}
+          dataSource={data.plans.map(item => ({...item, key: item.id}))}
+          columns={columns}
+          bordered
+          scroll={{x: 'max-content'}}
         />
       </Flex>
     </>

@@ -14,6 +14,12 @@ export {
   type components as plansInfoComponents,
 } from "./plans_info_api_v1";
 
+export type IndoorLocation = import("./plans_info_api_v1").components["schemas"]["IndoorLocation"];
+export type OutdoorLocation = import("./plans_info_api_v1").components["schemas"]["OutdoorLocation"];
+export type DaySchedule = import("./plans_info_api_v1").components["schemas"]["DaySchedule"];
+export type ScheduleCreate = import("./plans_info_api_v1").components["schemas"]["ScheduleCreate"];
+export type ScheduleUpdate = import("./plans_info_api_v1").components["schemas"]["ScheduleUpdate"];
+
 export type BasePlanCreate = import("./plans_info_api_v1").components["schemas"]["BasePlanCreate"];
 export type BasePlanRead = import("./plans_info_api_v1").components["schemas"]["BasePlanRead"];
 export type BasePlanUpdate = import("./plans_info_api_v1").components["schemas"]["BasePlanUpdate"];
