@@ -88,8 +88,12 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
     },
   ];
 
-  const handleChange = (value: string[]) => {
-    onChange(value.join("/"))
+  const handleChange = (value: (string | number | null)[]) => {
+    if (value.length === 0) {
+      onChange("")
+      return
+    }
+    onChange(value.map(String).join("/"))
   }
 
   return (

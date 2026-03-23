@@ -309,12 +309,15 @@ function Inner({documentId}: { documentId: string }) {
 
         {
           documentFormat == "markdown" &&
-                <Form.Item label="markdown" rules={[{required: true}]}>
+                <Form.Item
+                        label="markdown"
+                        name="markdownContent"
+                        rules={[{required: true}]}
+                        initialValue={documentRead.format_markdown?.content ?? ""}
+                >
                   <TextArea
                           rows={10}
                           placeholder={"Markdown形式で資料の内容を入力してください"}
-                          name="markdownContent"
-                          disabled={documentFormat !== "markdown"}
                   />
                 </Form.Item>
         }

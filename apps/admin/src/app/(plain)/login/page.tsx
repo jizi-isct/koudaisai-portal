@@ -20,11 +20,22 @@ export default function Login() {
 
 function Inner() {
   const search = useSearchParams();
-  const code = search.get("code")!;
-  const state = search.get("state")!;
+  const code = search.get("code");
+  const state = search.get("state");
   const {data, error} = $auth.useQuery("post", "/admin/redirect", {
-    body: {code, state},
+    body: {code: code ?? "", state: state ?? ""},
+    enabled: code !== null && state !== null,
   });
+
+  if (!code || !state) {
+    return (
+      <div className={styles.root}>
+        <p style={{color: "red"}}>
+          認証コードまたは状態パラメータを取得できませんでした。もう一度ログインをやり直してください。
+        </p>
+      </div>
+    );
+  }
 
   if (data) {
     setAdminTokens(data);

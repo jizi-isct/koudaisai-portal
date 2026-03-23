@@ -86,23 +86,28 @@ function Inner({notificationId}: { notificationId: string }) {
 
   const handleSubmit = async ({title, target, markdown}: { title: string | undefined, target: string[][] | undefined, markdown: string | undefined }) => {
     setSubmitting(true)
-    await mutateNotificationUpdate({
-        params: {
-          path: {
-            notification_id: notificationId
-          }
-        },
-        body: {
-          target: target?.map((t) => t.join("/")),
-          type_markdown: {
-            title: title,
-            content: markdown
+    try {
+      await mutateNotificationUpdate({
+          params: {
+            path: {
+              notification_id: notificationId
+            }
+          },
+          body: {
+            target: target?.map((t) => t.join("/")),
+            type_markdown: {
+              title: title,
+              content: markdown
+            }
           }
         }
-      }
-    )
-    setSubmitting(false)
-    messageApi.success('保存しました')
+      )
+      messageApi.success('保存しました')
+    } catch (e) {
+      messageApi.error("保存に失敗しました: " + e)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!("type_markdown" in data)) {

@@ -413,8 +413,8 @@ function Inner() {
 
   const handleDownload = async () => {
     const rows = data?.plans?.map(plan => {
-      let building = "なし"
-      let location = "なし"
+      let building = ""
+      let location = ""
       switch (plan.location[0].type) {
         case "indoor":
           building = plan.location[0].building
@@ -431,10 +431,10 @@ function Inner() {
         description: plan.description,
         is_child_friendly: plan.is_child_friendly ? "true" : "false",
         is_recommended: plan.is_recommended ? "true" : "false",
-        day1_start_time: plan.schedule.day1?.start_time ?? "なし",
-        day1_end_time: plan.schedule.day1?.end_time ?? "なし",
-        day2_start_time: plan.schedule.day2?.start_time ?? "なし",
-        day2_end_time: plan.schedule.day2?.end_time ?? "なし",
+        day1_start_time: plan.schedule.day1?.start_time ?? "",
+        day1_end_time: plan.schedule.day1?.end_time ?? "",
+        day2_start_time: plan.schedule.day2?.start_time ?? "",
+        day2_end_time: plan.schedule.day2?.end_time ?? "",
         building,
         location,
         is_lab_tour: "is_lab_tour" in plan ? (plan.is_lab_tour ? "true" : "false") : "false",

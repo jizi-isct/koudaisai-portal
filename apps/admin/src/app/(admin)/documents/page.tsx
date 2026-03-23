@@ -85,7 +85,7 @@ function Inner() {
       key: "updated_at",
       title: "更新日時",
       rowScope: "row",
-      render: record => record.category ? new Date(record.category.created_at).toLocaleString("ja-JP", {
+      render: record => record.category ? new Date(record.category.updated_at).toLocaleString("ja-JP", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -98,27 +98,31 @@ function Inner() {
       title: '操作',
       fixed: 'right',
       render: record => <Flex gap={5}>
-        <Popconfirm
-          title={"フォームを削除"}
-          description="あなたは本当にこの資料カテゴリを削除する気ですか！？"
-          onConfirm={async () => {
-            await mutateDocumentCategoryDelete({
-              params: {
-                path: {
-                  category_id: record.category.id,
+        {record.category ? (
+          <Popconfirm
+            title={"資料カテゴリを削除"}
+            description="あなたは本当にこの資料カテゴリを削除する気ですか！？"
+            onConfirm={async () => {
+              await mutateDocumentCategoryDelete({
+                params: {
+                  path: {
+                    category_id: record.category.id,
+                  }
                 }
-              }
-            })
-            await refetch()
-          }}
-          onCancel={() => {
-            return
-          }}
-          okText="はい"
-          cancelText="いいえ"
-        >
-          <Button danger><DeleteOutlined/></Button>
-        </Popconfirm>
+              })
+              await refetch()
+            }}
+            onCancel={() => {
+              return
+            }}
+            okText="はい"
+            cancelText="いいえ"
+          >
+            <Button danger><DeleteOutlined/></Button>
+          </Popconfirm>
+        ) : (
+          <Button danger disabled><DeleteOutlined/></Button>
+        )}
       </Flex>,
     },
   ]
@@ -214,7 +218,7 @@ function Inner() {
       fixed: 'right',
       render: (value) => <Flex gap={5}>
         <Popconfirm
-          title={"フォームを削除"}
+          title={"資料を削除"}
           description="あなたは本当にこの資料を削除する気ですか！？"
           onConfirm={async () => {
             await mutateDocumentDelete({
@@ -224,6 +228,7 @@ function Inner() {
                 }
               }
             })
+            await refetch()
           }}
           onCancel={() => {
             return
