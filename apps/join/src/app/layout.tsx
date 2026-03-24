@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="ja">
     <body id={"app"}>
       <ConfigProvider theme={antdTheme}>
         {children}

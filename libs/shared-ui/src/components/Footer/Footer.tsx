@@ -6,13 +6,13 @@ import Image from "next/image";
 
 import membersLogo from "./assets/members_logo.svg"
 
-export const Footer = (isLoggedIn: boolean) => {
+export const Footer = ({isLoggedIn}: {isLoggedIn ?: boolean}) => {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoWrapper}>
         <Image
           src={membersLogo}
-          alt="Koudaisai Portal Admin Site Logo"
+          alt="Koudaisai Portal Members Site Logo"
           width={40}
           height={40}
         />

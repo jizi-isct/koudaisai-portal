@@ -19,6 +19,10 @@ export default function Page() {
     }
 
     window.addEventListener("scroll", handleScroll)
+    handleScroll()
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
   return (
@@ -85,7 +89,7 @@ export default function Page() {
           logout = {async () => Promise.resolve()}
         />
     </main>
-    {Footer(true)}
+    <Footer isLoggedIn={false} />
     </>
   );
 }
