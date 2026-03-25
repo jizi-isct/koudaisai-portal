@@ -23,20 +23,11 @@ impl MemoryDocumentCategoryRepo {
 #[async_trait]
 impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<DocumentCategory>, FindError> {
-        let categories = self
+        let document_categories = self
             .document_categories
             .read()
             .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-        Ok(categories.get(&id).map(|c| {
-            DocumentCategory::restore(
-                c.id(),
-                c.created_at().clone(),
-                c.updated_at().clone(),
-                c.title().to_string(),
-                c.emoji().map(|s| s.to_string()),
-            )
-            .unwrap()
-        }))
+        Ok(document_categories.get(&id).cloned())
     }
 
     async fn find_all(&self) -> Result<Vec<DocumentCategory>, FindError> {
@@ -44,19 +35,7 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
             .document_categories
             .read()
             .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-        Ok(categories
-            .values()
-            .map(|c| {
-                DocumentCategory::restore(
-                    c.id(),
-                    c.created_at().clone(),
-                    c.updated_at().clone(),
-                    c.title().to_string(),
-                    c.emoji().map(|s| s.to_string()),
-                )
-                .unwrap()
-            })
-            .collect())
+        Ok(categories.values().cloned().collect())
     }
 
     async fn insert(&self, document_category: &DocumentCategory) -> Result<(), InsertError> {
