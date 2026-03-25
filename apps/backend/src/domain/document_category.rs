@@ -184,7 +184,7 @@ mod tests {
     }
 
     #[test]
-    fn test_register_empty_name() {
+    fn test_register_empty_title() {
         let clock = MockClock { now: Utc::now() };
         let id = Uuid::new_v4();
         let title = "  ";
