@@ -1,19 +1,14 @@
 use std::marker::PhantomData;
-
-use aws_smithy_types::Document;
 use uuid::Uuid;
 
-use crate::application::Application;
 use crate::application::authz::{self, CanGetByIdError};
-use crate::application::error::{
-    ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
-};
+use crate::application::error::{ApplicationOperationError, DeleteError, FindError, UpdateError};
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::transaction::Transaction;
 
 use crate::application::ports::clock::Clock;
 
-use crate::domain::actor_ctx::{self, ActorContext};
+use crate::domain::actor_ctx::ActorContext;
 
 use crate::domain::document_category::DocumentCategory;
 
@@ -52,7 +47,7 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
         actor_ctx: &ActorContext,
         id: Uuid,
     ) -> Result<Option<DocumentCategory>, ApplicationOperationError<FindError>> {
-        // find user
+        // find document category by id
         let Some(document_category) = self.document_category_repo.find_by_id(id).await? else {
             return Ok(None);
         };
@@ -100,12 +95,11 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
 mod tests {
     use super::*;
     use crate::domain::actor_ctx::ActorContext;
-    use crate::domain::group::{Group, GroupType};
+    use crate::domain::group::GroupType;
     use crate::domain::group_id::GroupId;
     use crate::domain::membership::Membership;
     use crate::domain::user_id::UserId;
     use crate::infra::memory::MemoryApplication;
-    use crate::infra::memory::transaction_impl::MemoryTransaction;
     use chrono::Utc;
     use uuid::Uuid;
 

@@ -110,11 +110,6 @@ impl DocumentCategory {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::group_id::GroupId;
-    use crate::domain::membership::Membership;
-    use crate::domain::user_id::UserId;
-    use crate::sea_orm_entities::document;
-    use aws_smithy_types::Document;
     use uuid::Uuid;
 
     struct MockClock {
