@@ -110,7 +110,11 @@ mod tests {
     fn admin_ctx() -> ActorContext {
         ActorContext::Admin {
             user_id: UserId::new(Uuid::new_v4()),
-            claims: vec!["k-portal:admin:all".to_string()],
+            claims: vec![
+                "koudaisai-portal:admin:document-category:read".to_string(),
+                "koudaisai-portal:admin:document-category:update".to_string(),
+                "koudaisai-portal:admin:document-category:delete".to_string(),
+            ],
         }
     }
 
