@@ -271,7 +271,7 @@ mod tests {
         let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
-        let document_category = DocumentCategory::register(
+        let document_category_before = DocumentCategory::register(
             Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
@@ -279,8 +279,21 @@ mod tests {
         )
         .unwrap();
 
+        app.document_category_repo
+            .insert(&document_category_before)
+            .await
+            .unwrap();
+
+        let document_category_after = DocumentCategory::register(
+            document_category_before.id(),
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
         let result = document_category_app
-            .update_document_category(&ctx, &document_category)
+            .update_document_category(&ctx, &document_category_after)
             .await;
         assert!(result.is_ok());
 
