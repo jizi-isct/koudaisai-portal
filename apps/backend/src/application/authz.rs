@@ -231,53 +231,51 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
 pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            if claims.contains(&"k-portal:admin:all".to_string()) {
+            if claims.contains(&"koudaisai-portal:admin:document-category:read".to_string()) {
                 Ok(())
             } else {
                 Err(CanGetByIdError::Unauthorized)
             }
-        },
-        ActorContext::User { user_id, .. } => {
-            Ok(())
-        },
-        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized)
+        }
+        ActorContext::User { user_id, .. } => Ok(()),
+        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized),
     }
 }
 
 pub fn can_get_all_document_categories(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            claims.contains(&"k-portal:admin:all".to_string())
-        },
+            claims.contains(&"koudaisai-portal:admin:document-category:read".to_string())
+        }
         ActorContext::User { user_id, .. } => true,
-        ActorContext::NoLogin => false
+        ActorContext::NoLogin => false,
     }
 }
 
 pub fn can_create_document_category(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            claims.contains(&"k-portal:admin:all".to_string())
-        },
-        _ => false
+            claims.contains(&"koudaisai-portal:admin:document-category:create".to_string())
+        }
+        _ => false,
     }
 }
 
 pub fn can_update_document_category(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            claims.contains(&"k-portal:admin:all".to_string())
-        },
-        _ => false
+            claims.contains(&"koudaisai-portal:admin:document-category:update".to_string())
+        }
+        _ => false,
     }
 }
 
 pub fn can_delete_document_category(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
-            claims.contains(&"k-portal:admin:all".to_string())
-        },
-        _ => false
+            claims.contains(&"koudaisai-portal:admin:document-category:delete".to_string())
+        }
+        _ => false,
     }
 }
 
