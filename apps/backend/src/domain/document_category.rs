@@ -4,11 +4,11 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct DocumentCategory {
-    pub id: Uuid,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub title: String,
-    pub emoji: Option<String>,
+    id: Uuid,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+    title: String,
+    emoji: Option<String>,
 }
 
 impl DocumentCategory {

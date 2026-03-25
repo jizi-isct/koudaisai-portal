@@ -153,7 +153,7 @@ mod tests {
         assert!(result.is_ok());
         let document_categories = result.unwrap();
         assert_eq!(document_categories.len(), 1);
-        assert_eq!(document_categories[0].id(), document_category.id);
+        assert_eq!(document_categories[0].id(), document_category.id());
     }
 
     #[tokio::test]
@@ -182,7 +182,7 @@ mod tests {
         assert!(result.is_ok());
         let document_categories = result.unwrap();
         assert_eq!(document_categories.len(), 1);
-        assert_eq!(document_categories[0].id(), document_category.id);
+        assert_eq!(document_categories[0].id(), document_category.id());
     }
 
     #[tokio::test]
@@ -218,13 +218,13 @@ mod tests {
             .unwrap();
 
         let result = document_category_app
-            .get_by_id(&ctx, document_category.id)
+            .get_by_id(&ctx, document_category.id())
             .await;
         assert!(result.is_ok());
 
         let document_category_opt = result.unwrap();
         assert!(document_category_opt.is_some());
-        assert_eq!(document_category_opt.unwrap().id(), document_category.id);
+        assert_eq!(document_category_opt.unwrap().id(), document_category.id());
     }
 
     #[tokio::test]
@@ -257,7 +257,7 @@ mod tests {
             .unwrap();
 
         let result = document_category_app
-            .get_by_id(&ctx, document_category.id)
+            .get_by_id(&ctx, document_category.id())
             .await;
         assert!(matches!(
             result,
@@ -286,11 +286,11 @@ mod tests {
 
         let stored = app
             .document_category_repo
-            .find_by_id(document_category.id)
+            .find_by_id(document_category_after.id())
             .await
             .unwrap()
             .unwrap();
-        assert_eq!(stored.id(), document_category.id);
+        assert_eq!(stored.id(), document_category_after.id());
     }
 
     #[tokio::test]
@@ -336,13 +336,13 @@ mod tests {
             .unwrap();
 
         let result = document_category_app
-            .delete_document_category(&ctx, document_category.id)
+            .delete_document_category(&ctx, document_category.id())
             .await;
         assert!(result.is_ok());
 
         let stored = app
             .document_category_repo
-            .find_by_id(document_category.id)
+            .find_by_id(document_category.id())
             .await
             .unwrap();
         assert!(stored.is_none());
@@ -368,7 +368,7 @@ mod tests {
             .unwrap();
 
         let result = document_category_app
-            .delete_document_category(&ctx, document_category.id)
+            .delete_document_category(&ctx, document_category.id())
             .await;
         assert!(matches!(
             result,
