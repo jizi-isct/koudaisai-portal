@@ -22,10 +22,19 @@ impl DocumentCategory {
             return Err(FactoryError::InvalidInput("Title is empty".to_string()));
         }
 
+        if let Some(emoji) = emoji.clone() {
+            // emojiがNoneじゃなければ
+            if emoji.trim().is_empty() {
+                return Err(FactoryError::InvalidInput("Emoji is empty".to_string())); // わざわざOption型なので、もし空文字列ならエラー返す
+            }
+        }
+
+        let now = clock.now();
+
         Ok(Self {
             id,
-            created_at: clock.now(),
-            updated_at: clock.now(),
+            created_at: now,
+            updated_at: now,
             title,
             emoji,
         })
@@ -40,6 +49,13 @@ impl DocumentCategory {
     ) -> Result<Self, FactoryError> {
         if title.trim().is_empty() {
             return Err(FactoryError::InvalidInput("Title is empty".to_string()));
+        }
+
+        if let Some(emoji) = emoji.clone() {
+            // emojiがNoneじゃなければ
+            if emoji.trim().is_empty() {
+                return Err(FactoryError::InvalidInput("Emoji is empty".to_string())); // わざわざOption型なので、もし空文字列ならエラー返す
+            }
         }
 
         Ok(Self {
@@ -63,8 +79,8 @@ impl DocumentCategory {
         self.updated_at
     }
 
-    pub fn title(&self) -> String {
-        self.title.clone()
+    pub fn title(&self) -> &str {
+        &self.title
     }
 
     pub fn change_title<C: Clock>(
@@ -80,9 +96,9 @@ impl DocumentCategory {
         Ok(())
     }
 
-    pub fn emoji(&self) -> Option<String> {
-        // Some(String)またはNone
-        self.emoji.clone()
+    pub fn emoji(&self) -> Option<&str> {
+        // Some(&str)またはNoneを返す
+        self.emoji.as_deref()
     }
 
     pub fn change_emoji<C: Clock>(
@@ -136,15 +152,16 @@ mod tests {
     fn test_register_success() {
         let clock = MockClock { now: Utc::now() };
         let id = Uuid::new_v4();
-        let title = "Test Category".to_string();
-        let emoji = Some("📃".to_string());
+        let title = "Test Category";
+        let emoji = "📃";
 
         let document_category =
-            DocumentCategory::register(id, title.clone(), emoji.clone(), &clock).unwrap();
+            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock)
+                .unwrap();
 
         assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
-        assert_eq!(document_category.emoji(), emoji);
+        assert_eq!(document_category.emoji(), Some(emoji));
         assert_eq!(document_category.created_at(), clock.now);
         assert_eq!(document_category.updated_at(), clock.now);
     }
@@ -153,15 +170,15 @@ mod tests {
     fn test_register_none_success() {
         let clock = MockClock { now: Utc::now() };
         let id = Uuid::new_v4();
-        let title = "Test Category".to_string();
-        let emoji = None;
+        let title = "Test Category";
+        let emoji: Option<String> = None;
 
         let document_category =
-            DocumentCategory::register(id, title.clone(), emoji.clone(), &clock).unwrap();
+            DocumentCategory::register(id, title.to_string(), emoji, &clock).unwrap();
 
         assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
-        assert_eq!(document_category.emoji(), emoji);
+        assert_eq!(document_category.emoji(), None);
         assert_eq!(document_category.created_at(), clock.now);
         assert_eq!(document_category.updated_at(), clock.now);
     }
@@ -170,11 +187,11 @@ mod tests {
     fn test_register_empty_name() {
         let clock = MockClock { now: Utc::now() };
         let id = Uuid::new_v4();
-        let title = "  ".to_string();
-        let emoji = Some("📃".to_string());
+        let title = "  ";
+        let emoji = "📃";
 
         let document_category =
-            DocumentCategory::register(id, title.clone(), emoji.clone(), &clock);
+            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock);
 
         assert!(matches!(
             document_category,
@@ -186,11 +203,11 @@ mod tests {
     fn test_register_empty_emoji() {
         let clock = MockClock { now: Utc::now() };
         let id = Uuid::new_v4();
-        let title = "Test Category".to_string();
-        let emoji = Some("  ".to_string());
+        let title = "Test Category";
+        let emoji = "  ";
 
         let document_category =
-            DocumentCategory::register(id, title.clone(), emoji.clone(), &clock);
+            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock);
 
         assert!(matches!(
             document_category,
@@ -203,16 +220,21 @@ mod tests {
         let id = Uuid::new_v4();
         let created_at = Utc::now();
         let updated_at = Utc::now();
-        let title = "Restored Category".to_string();
-        let emoji = Some("📃".to_string());
+        let title = "Restored Category";
+        let emoji = "📃";
 
-        let document_category =
-            DocumentCategory::restore(id, created_at, updated_at, title.clone(), emoji.clone())
-                .unwrap();
+        let document_category = DocumentCategory::restore(
+            id,
+            created_at,
+            updated_at,
+            title.to_string(),
+            Some(emoji.to_string()),
+        )
+        .unwrap();
 
         assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
-        assert_eq!(document_category.emoji(), emoji);
+        assert_eq!(document_category.emoji(), Some(emoji));
         assert_eq!(document_category.created_at(), created_at);
         assert_eq!(document_category.updated_at(), updated_at);
     }
@@ -223,11 +245,11 @@ mod tests {
         let clock = MockClock { now: initial_time };
         let mut document_category = setup_document_category(&clock);
 
-        let new_title = "New Category Title".to_string();
+        let new_title = "New Category Title";
         let update_time = initial_time + chrono::Duration::seconds(10);
         let clock_updated = MockClock { now: update_time };
 
-        let result = document_category.change_title(new_title.clone(), &clock_updated);
+        let result = document_category.change_title(new_title.to_string(), &clock_updated);
         assert!(result.is_ok());
         assert_eq!(document_category.title(), new_title);
         assert_eq!(document_category.updated_at(), update_time);
@@ -249,13 +271,13 @@ mod tests {
         let clock = MockClock { now: initial_time };
         let mut document_category = setup_document_category(&clock);
 
-        let new_emoji = Some("✅️".to_string());
+        let new_emoji = "✅️";
         let update_time = initial_time + chrono::Duration::seconds(10);
         let clock_updated = MockClock { now: update_time };
 
-        let result = document_category.change_emoji(new_emoji.clone(), &clock_updated);
+        let result = document_category.change_emoji(Some(new_emoji.to_string()), &clock_updated);
         assert!(result.is_ok());
-        assert_eq!(document_category.emoji(), new_emoji);
+        assert_eq!(document_category.emoji(), Some(new_emoji));
         assert_eq!(document_category.updated_at(), update_time);
         assert_eq!(document_category.created_at(), initial_time);
     }
@@ -266,13 +288,13 @@ mod tests {
         let clock = MockClock { now: initial_time };
         let mut document_category = setup_document_category(&clock);
 
-        let new_emoji = None;
+        let new_emoji: Option<String> = None;
         let update_time = initial_time + chrono::Duration::seconds(10);
         let clock_updated = MockClock { now: update_time };
 
         let result = document_category.change_emoji(new_emoji.clone(), &clock_updated);
         assert!(result.is_ok());
-        assert_eq!(document_category.emoji(), new_emoji);
+        assert_eq!(document_category.emoji(), None);
         assert_eq!(document_category.updated_at(), update_time);
         assert_eq!(document_category.created_at(), initial_time);
     }

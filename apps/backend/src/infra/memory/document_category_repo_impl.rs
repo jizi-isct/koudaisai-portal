@@ -32,8 +32,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
                 c.id(),
                 c.created_at().clone(),
                 c.updated_at().clone(),
-                c.title().clone(),
-                c.emoji().clone(),
+                c.title().to_string(),
+                c.emoji().map(|s| s.to_string()),
             )
             .unwrap()
         }))
@@ -51,8 +51,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
                     c.id(),
                     c.created_at().clone(),
                     c.updated_at().clone(),
-                    c.title().clone(),
-                    c.emoji().clone(),
+                    c.title().to_string(),
+                    c.emoji().map(|s| s.to_string()),
                 )
                 .unwrap()
             })
