@@ -32,8 +32,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
                 c.id(),
                 c.created_at().clone(),
                 c.updated_at().clone(),
-                c.title.clone(),
-                c.emoji.clone(),
+                c.title().clone(),
+                c.emoji().clone(),
             )
             .unwrap()
         }))
@@ -51,8 +51,8 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
                     c.id(),
                     c.created_at().clone(),
                     c.updated_at().clone(),
-                    c.title.clone(),
-                    c.emoji.clone(),
+                    c.title().clone(),
+                    c.emoji().clone(),
                 )
                 .unwrap()
             })
@@ -96,10 +96,7 @@ impl DocumentCategoryRepo<MemoryTransaction> for MemoryDocumentCategoryRepo {
         _tx: &mut MemoryTransaction,
         document_category: &DocumentCategory,
     ) -> Result<(), UpdateError> {
-        self.update(document_category).await.map_err(|e| match e {
-            UpdateError::InternalError(err) => UpdateError::InternalError(err),
-            UpdateError::NotFound => UpdateError::Conflict,
-        })
+        self.update(document_category).await
     }
 
     async fn delete(&self, id: Uuid) -> Result<(), DeleteError> {
