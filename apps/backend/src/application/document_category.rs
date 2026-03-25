@@ -62,16 +62,37 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
     pub async fn update_document_category(
         &self,
         actor_ctx: &ActorContext,
-        document_category: &DocumentCategory,
+        id: Uuid,
+        title: Option<String>,
+        emoji: Option<Option<String>>,
     ) -> Result<(), ApplicationOperationError<UpdateError>> {
         // authz
         if !authz::can_update_document_category(actor_ctx) {
             return Err(ApplicationOperationError::Unauthorized);
         }
 
+        let Some(mut document_category) = self
+            .document_category_repo
+            .find_by_id(id)
+            .await
+            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
+        else {
+            return Err(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound,
+            ));
+        };
+
+        if let Some(title) = title {
+            document_category.change_title(title, self.clock);
+        }
+
+        if let Some(emoji) = emoji {
+            document_category.change_emoji(emoji, self.clock);
+        }
+
         Ok(self
             .document_category_repo
-            .update(document_category)
+            .update(&document_category)
             .await?)
     }
 
@@ -269,7 +290,7 @@ mod tests {
         let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
-        let document_category_before = DocumentCategory::register(
+        let document_category = DocumentCategory::register(
             Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
@@ -278,30 +299,97 @@ mod tests {
         .unwrap();
 
         app.document_category_repo
-            .insert(&document_category_before)
+            .insert(&document_category)
             .await
             .unwrap();
 
-        let document_category_after = DocumentCategory::register(
-            document_category_before.id(),
+        // Load the stored category, mutate it, and verify timestamp semantics on update.
+        let mut stored = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+        let created_at_before = stored.created_at();
+        let updated_at_before = stored.updated_at();
+        stored
+            .change_title("New Category".to_string(), &app.clock)
+            .unwrap();
+        stored
+            .change_emoji(Some("✅️".to_string()), &app.clock)
+            .unwrap();
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some(stored.title().to_string()),
+                Some(stored.emoji().map(|s| s.to_string())),
+            )
+            .await;
+        assert!(result.is_ok());
+        let stored_after = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(stored_after.id(), document_category.id());
+        assert_eq!(stored_after.created_at(), created_at_before);
+        assert!(stored_after.updated_at() > updated_at_before);
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_success_admin() {
+        let app = setup_app();
+        let ctx = admin_ctx();
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
         )
         .unwrap();
 
-        let result = document_category_app
-            .update_document_category(&ctx, &document_category_after)
-            .await;
-        assert!(result.is_ok());
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
 
-        let stored = app
+        // Load the stored category, mutate it, and verify timestamp semantics on update.
+        let mut stored = app
             .document_category_repo
-            .find_by_id(document_category_after.id())
+            .find_by_id(document_category.id())
             .await
             .unwrap()
             .unwrap();
-        assert_eq!(stored.id(), document_category_after.id());
+        let created_at_before = stored.created_at();
+        let updated_at_before = stored.updated_at();
+        stored
+            .change_title("New Category".to_string(), &app.clock)
+            .unwrap();
+        stored
+            .change_emoji(Some("✅️".to_string()), &app.clock)
+            .unwrap();
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some(stored.title().to_string()),
+                Some(stored.emoji().map(|s| s.to_string())),
+            )
+            .await;
+        assert!(result.is_ok());
+        let stored_after = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(stored_after.id(), document_category.id());
+        assert_eq!(stored_after.created_at(), created_at_before);
+        assert!(stored_after.updated_at() > updated_at_before);
     }
 
     #[tokio::test]
@@ -319,7 +407,12 @@ mod tests {
         .unwrap();
 
         let result = document_category_app
-            .update_document_category(&ctx, &document_category)
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some("New Title".to_string()),
+                None,
+            )
             .await;
         assert!(matches!(
             result,
