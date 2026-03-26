@@ -8,6 +8,12 @@
   "types": "./dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
+    "./client": {
+      "development": "./src/ClientFile.ts",
+      "types": "./dist/ClientFile.d.ts",
+      "import": "./dist/ClientFile.js",
+      "default": "./dist/ClientFile.js"
+    },
     ".": {
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
