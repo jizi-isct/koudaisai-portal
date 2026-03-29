@@ -1,7 +1,7 @@
-import Form from "antd/es/form";
-import {$apiAdmin} from "@/lib/api";
 import {LoadingScreen} from "@koudaisai/shared-ui";
 import {Cascader} from "antd";
+import Form from "antd/es/form";
+import {$apiAdmin} from "@/lib/api";
 
 interface Option {
   value: string;

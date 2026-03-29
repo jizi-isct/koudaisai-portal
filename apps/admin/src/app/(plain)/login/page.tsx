@@ -1,12 +1,12 @@
 "use client";
 
-import {useSearchParams} from "next/navigation";
-import {$auth} from "@/lib/api";
 import {setAdminTokens} from "@koudaisai/shared-auth-admin";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Suspense} from "react";
 import {LoadingScreen} from "@koudaisai/shared-ui";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {useSearchParams} from "next/navigation";
+import {Suspense} from "react";
 import styles from "./page.module.css";
+import {$auth} from "@/lib/api";
 
 export default function Login() {
   return (

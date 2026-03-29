@@ -1,8 +1,8 @@
 import './global.css';
-import {Noto_Sans_JP} from "next/font/google";
 import {ConfigProvider} from "antd";
-import type {Metadata} from "next";
 import type {ThemeConfig} from "antd";
+import type {Metadata} from "next";
+import {Noto_Sans_JP} from "next/font/google";
 
 const notoSans = Noto_Sans_JP({
   subsets: ["latin"],

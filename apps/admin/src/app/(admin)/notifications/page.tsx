@@ -1,10 +1,10 @@
 "use client";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
-import {$apiAdmin} from "@/lib/api";
-import {NotificationRead} from "@koudaisai/shared-types";
-import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
 import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
+import {NotificationRead} from "@koudaisai/shared-types";
+import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {Button, Flex, Popconfirm, Table, TableProps, Tag} from "antd";
+import {$apiAdmin} from "@/lib/api";
 
 export default function Page() {
   return (

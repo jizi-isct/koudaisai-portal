@@ -1,7 +1,7 @@
 "use client";
 
-import {getAuthFetchClient, getAuthQueryClient} from "@koudaisai/shared-auth";
 import {getApiFetchClient, getApiQueryClient} from "@koudaisai/shared-api";
+import {getAuthFetchClient, getAuthQueryClient} from "@koudaisai/shared-auth";
 import {getAuthMiddleware} from "@koudaisai/shared-auth-admin";
 
 const authBaseUrl = process.env.NEXT_PUBLIC_AUTH_BASE_URL;

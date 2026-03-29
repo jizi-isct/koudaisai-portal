@@ -1,10 +1,10 @@
 "use client";
+import {LoadingScreen} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {useSearchParams} from "next/navigation";
 import {Button, Flex, Form, Input, message, Result} from 'antd';
+import {useSearchParams} from "next/navigation";
 import {useState} from "react";
 import {$apiAdmin} from "@/lib/api";
-import {LoadingScreen} from "@koudaisai/shared-ui";
 
 type FormValues = {
   title: string;

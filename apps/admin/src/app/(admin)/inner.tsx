@@ -1,10 +1,5 @@
 "use client";
 
-import {getTokensAdmin} from "@koudaisai/shared-auth-admin";
-import type {Tokens} from "@koudaisai/shared-auth";
-import {authFetchClient} from "@/lib/api";
-import {ReactNode, useEffect, useState} from "react";
-import {Button, Flex, Layout, Menu, theme} from "antd";
 import {
   BellOutlined,
   BookOutlined,
@@ -14,13 +9,18 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import {Header} from "antd/lib/layout/layout";
-import Sider from "antd/es/layout/Sider";
-import {Content} from "antd/es/layout/layout";
-import Image from "next/image";
+import type {Tokens} from "@koudaisai/shared-auth";
+import {getTokensAdmin} from "@koudaisai/shared-auth-admin";
 import {LoadingScreen} from "@koudaisai/shared-ui";
-import {usePathname, useRouter} from "next/navigation";
 import {useWindowWidth} from "@wojtekmaj/react-hooks";
+import {Button, Flex, Layout, Menu, theme} from "antd";
+import {Content} from "antd/es/layout/layout";
+import Sider from "antd/es/layout/Sider";
+import {Header} from "antd/lib/layout/layout";
+import Image from "next/image";
+import {usePathname, useRouter} from "next/navigation";
+import {ReactNode, useEffect, useState} from "react";
+import {authFetchClient} from "@/lib/api";
 
 type Props = {
   children: ReactNode;

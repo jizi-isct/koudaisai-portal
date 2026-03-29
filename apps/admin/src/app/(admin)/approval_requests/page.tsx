@@ -1,11 +1,11 @@
 "use client";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
-import {$apiAdmin} from "@/lib/api";
-import {ApprovalRequestRead} from "@koudaisai/shared-types";
-import {Button, Flex, Table, TableProps, Tag, Tooltip} from "antd";
 import {MoreOutlined} from "@ant-design/icons";
+import {ApprovalRequestRead} from "@koudaisai/shared-types";
+import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {Button, Flex, Table, TableProps, Tag, Tooltip} from "antd";
 import {useMemo} from "react";
+import {$apiAdmin} from "@/lib/api";
 
 
 export default function Page() {
@@ -33,7 +33,7 @@ function Inner() {
       title: "申請者",
       dataIndex: "issued_by",
       rowScope: "row",
-      render: (value, record, _index) => <span>
+      render: (value, _record, _index) => <span>
         {userNameMap[value] || value}
       </span>
     },

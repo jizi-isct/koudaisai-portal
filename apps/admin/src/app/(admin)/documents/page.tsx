@@ -1,12 +1,12 @@
 "use client";
 
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Heading1} from "@koudaisai/shared-ui";
-import {$apiAdmin} from "@/lib/api";
-import {DocumentCategoryRead, DocumentRead} from "@koudaisai/shared-types";
-import {Button, Flex, message, Popconfirm, Table, TableProps} from "antd";
 import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
+import {DocumentCategoryRead, DocumentRead} from "@koudaisai/shared-types";
+import {Heading1} from "@koudaisai/shared-ui";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {Button, Flex, message, Popconfirm, Table, TableProps} from "antd";
 import {useMemo} from "react";
+import {$apiAdmin} from "@/lib/api";
 
 type RowType = {
   category: DocumentCategoryRead | null,
