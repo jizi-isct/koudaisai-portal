@@ -168,7 +168,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -197,7 +196,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -236,7 +234,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -275,7 +272,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -303,7 +299,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -344,7 +339,37 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some("New Title".to_string()),
+                None,
+            )
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_user_unauthorized() {
+        let app = setup_app();
+        let user_id = UserId::new(Uuid::new_v4());
+        let group_id = GroupId::new('G', 1).unwrap();
+        let membership = Membership::new(group_id, user_id, &app.clock);
+        let ctx = user_ctx(user_id, vec![membership.clone()]);
+
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -372,7 +397,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,
@@ -404,7 +428,6 @@ mod tests {
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
-            Uuid::new_v4(),
             "Test Category".to_string(),
             Some("📃".to_string()),
             &app.clock,

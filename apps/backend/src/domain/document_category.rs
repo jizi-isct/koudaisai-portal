@@ -13,7 +13,6 @@ pub struct DocumentCategory {
 
 impl DocumentCategory {
     pub fn register<C: Clock>(
-        id: Uuid,
         title: String,
         emoji: Option<String>,
         clock: &C,
@@ -32,11 +31,11 @@ impl DocumentCategory {
         let now = clock.now();
 
         Ok(Self {
-            id,
+            id: Uuid::new_v4(),
             created_at: now,
             updated_at: now,
-            title,
-            emoji,
+            title: title,
+            emoji: emoji,
         })
     }
 
@@ -139,27 +138,19 @@ mod tests {
     }
 
     fn setup_document_category(clock: &MockClock) -> DocumentCategory {
-        DocumentCategory::register(
-            Uuid::new_v4(),
-            "Test Category".to_string(),
-            Some("📃".to_string()),
-            clock,
-        )
-        .unwrap()
+        DocumentCategory::register("Test Category".to_string(), Some("📃".to_string()), clock)
+            .unwrap()
     }
 
     #[test]
     fn test_register_success() {
         let clock = MockClock { now: Utc::now() };
-        let id = Uuid::new_v4();
         let title = "Test Category";
         let emoji = "📃";
 
         let document_category =
-            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock)
-                .unwrap();
+            DocumentCategory::register(title.to_string(), Some(emoji.to_string()), &clock).unwrap();
 
-        assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
         assert_eq!(document_category.emoji(), Some(emoji));
         assert_eq!(document_category.created_at(), clock.now);
@@ -169,14 +160,12 @@ mod tests {
     #[test]
     fn test_register_none_success() {
         let clock = MockClock { now: Utc::now() };
-        let id = Uuid::new_v4();
         let title = "Test Category";
         let emoji: Option<String> = None;
 
         let document_category =
-            DocumentCategory::register(id, title.to_string(), emoji, &clock).unwrap();
+            DocumentCategory::register(title.to_string(), emoji, &clock).unwrap();
 
-        assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
         assert_eq!(document_category.emoji(), None);
         assert_eq!(document_category.created_at(), clock.now);
@@ -186,12 +175,11 @@ mod tests {
     #[test]
     fn test_register_empty_title() {
         let clock = MockClock { now: Utc::now() };
-        let id = Uuid::new_v4();
         let title = "  ";
         let emoji = "📃";
 
         let document_category =
-            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock);
+            DocumentCategory::register(title.to_string(), Some(emoji.to_string()), &clock);
 
         assert!(matches!(
             document_category,
@@ -202,12 +190,11 @@ mod tests {
     #[test]
     fn test_register_empty_emoji() {
         let clock = MockClock { now: Utc::now() };
-        let id = Uuid::new_v4();
         let title = "Test Category";
         let emoji = "  ";
 
         let document_category =
-            DocumentCategory::register(id, title.to_string(), Some(emoji.to_string()), &clock);
+            DocumentCategory::register(title.to_string(), Some(emoji.to_string()), &clock);
 
         assert!(matches!(
             document_category,
