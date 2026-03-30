@@ -12,6 +12,8 @@ pub struct DocumentCategory {
 }
 
 impl DocumentCategory {
+    /// 新規登録用コンストラクタ
+    /// タイトルと絵文字を受け取り、現在の日時を作成日時と更新日時に設定。
     pub fn register<C: Clock>(
         title: String,
         emoji: Option<String>,
@@ -39,6 +41,8 @@ impl DocumentCategory {
         })
     }
 
+    /// 復元用コンストラクタ
+    /// ID、作成日時、更新日時、タイトル、絵文字を受け取り、それらをそのままフィールドに設定。
     pub fn restore(
         id: Uuid,
         created_at: DateTime<Utc>,
