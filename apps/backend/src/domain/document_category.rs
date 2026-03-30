@@ -49,25 +49,14 @@ impl DocumentCategory {
         updated_at: DateTime<Utc>,
         title: String,
         emoji: Option<String>,
-    ) -> Result<Self, FactoryError> {
-        if title.trim().is_empty() {
-            return Err(FactoryError::InvalidInput("Title is empty".to_string()));
-        }
-
-        if let Some(emoji) = emoji.clone() {
-            // emojiがNoneじゃなければ
-            if emoji.trim().is_empty() {
-                return Err(FactoryError::InvalidInput("Emoji is empty".to_string())); // わざわざOption型なので、もし空文字列ならエラー返す
-            }
-        }
-
-        Ok(Self {
+    ) -> Self {
+        Self {
             id,
             created_at,
             updated_at,
             title,
             emoji,
-        })
+        }
     }
 
     pub fn id(&self) -> Uuid {
@@ -220,8 +209,7 @@ mod tests {
             updated_at,
             title.to_string(),
             Some(emoji.to_string()),
-        )
-        .unwrap();
+        );
 
         assert_eq!(document_category.id(), id);
         assert_eq!(document_category.title(), title);
