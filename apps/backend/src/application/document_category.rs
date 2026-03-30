@@ -75,7 +75,9 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
             .document_category_repo
             .find_by_id(id)
             .await
-            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
+            .map_err(|e| {
+                ApplicationOperationError::OperationFailed(UpdateError::InternalError(e.into()))
+            })?
         else {
             return Err(ApplicationOperationError::OperationFailed(
                 UpdateError::NotFound,
