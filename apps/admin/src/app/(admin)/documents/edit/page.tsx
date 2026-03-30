@@ -257,9 +257,9 @@ function Inner({documentId}: { documentId: string }) {
               <Flex gap={16} vertical>
                 {fields.map((field) => (
                   <Space key={field.key}>
-                    <TargetSpecifier name={field.name.toString()} onChange={() => {
-                      return
-                    }}/>
+                    <Form.Item name={field.name} noStyle rules={[{required: true}]}>
+                      <TargetSpecifier/>
+                    </Form.Item>
                     <MinusCircleOutlined
                       onClick={() => {
                         remove(field.name);

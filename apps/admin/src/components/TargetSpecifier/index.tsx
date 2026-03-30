@@ -1,6 +1,5 @@
 import {LoadingScreen} from "@koudaisai/shared-ui";
 import {Cascader} from "antd";
-import Form from "antd/es/form";
 import {$apiAdmin} from "@/lib/api";
 
 interface Option {
@@ -10,12 +9,11 @@ interface Option {
 }
 
 type TargetSpecifierProps = {
-  name: string,
-  onChange: (value: string) => void;
+  value?: string[];
+  onChange?: (value: string[]) => void;
 }
 
-
-export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
+export function TargetSpecifier({value, onChange}: TargetSpecifierProps) {
   const {data: users} = $apiAdmin.useQuery("get", "/users")
   const {data: groups} = $apiAdmin.useQuery("get", "/groups")
 
@@ -32,37 +30,20 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
           value: 'type',
           label: '種類',
           children: [
-            {
-              value: 'plan_general',
-              label: '一般企画',
-            },
-            {
-              value: 'plan_booth',
-              label: '模擬店企画'
-            },
-            {
-              value: 'plan_stage',
-              label: 'ステージ企画',
-            },
-            {
-              value: 'plan_labo',
-              label: '研究室企画',
-            },
-            {
-              value: 'press',
-              label: '学内取材団体',
-            }
+            {value: 'plan_general', label: '一般企画'},
+            {value: 'plan_booth', label: '模擬店企画'},
+            {value: 'plan_stage', label: 'ステージ企画'},
+            {value: 'plan_labo', label: '研究室企画'},
+            {value: 'press', label: '学内取材団体'},
           ],
         },
         {
           value: 'id',
           label: '指定',
-          children: groups.map((group) => (
-            {
-              value: group.id,
-              label: `${group.id} - ${group.name}`
-            }
-          ))
+          children: groups.map((group) => ({
+            value: group.id,
+            label: `${group.id} - ${group.name}`
+          }))
         }
       ],
     },
@@ -70,39 +51,31 @@ export function TargetSpecifier({name, onChange}: TargetSpecifierProps) {
       value: 'user',
       label: 'ユーザー',
       children: [
-        {
-          value: 'nologin',
-          label: '非ログイン',
-        },
+        {value: 'nologin', label: '非ログイン'},
         {
           value: 'id',
           label: '個人',
-          children: users.map((user) => (
-            {
-              value: user.id,
-              label: `${user.group_id}の${user.name}`
-            }
-          ))
+          children: users.map((user) => ({
+            value: user.id,
+            label: `${user.group_id}の${user.name}`
+          }))
         }
       ],
     },
   ];
 
-  const handleChange = (value: (string | number | null)[]) => {
-    if (value.length === 0) {
-      onChange("")
-      return
+  const handleChange = (val: string[] | string[][]) => {
+    if (onChange && val.every((v): v is string => typeof v === 'string')) {
+      onChange(val)
     }
-    onChange(value.map(String).join("/"))
   }
 
   return (
-    <Form.Item name={name} noStyle rules={[{required: true}]}>
-      <Cascader
-        options={options}
-        onChange={handleChange}
-        showSearch
-      />
-    </Form.Item>
+    <Cascader
+      value={value}
+      options={options}
+      onChange={handleChange}
+      showSearch
+    />
   )
 }
