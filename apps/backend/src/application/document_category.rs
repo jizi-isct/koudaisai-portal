@@ -164,7 +164,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_all_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx();
+        let ctx = admin_ctx(true);
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -230,7 +230,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_by_id_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx();
+        let ctx = admin_ctx(true);
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -258,7 +258,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_by_id_not_found() {
         let app = setup_app();
-        let ctx = admin_ctx();
+        let ctx = admin_ctx(true);
         let document_category_app = app.document_category();
         let result = document_category_app.get_by_id(&ctx, Uuid::new_v4()).await;
         assert!(result.is_ok());
@@ -295,7 +295,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx();
+        let ctx = admin_ctx(true);
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -393,7 +393,7 @@ mod tests {
     #[tokio::test]
     async fn test_delete_document_category_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx();
+        let ctx = admin_ctx(true);
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
