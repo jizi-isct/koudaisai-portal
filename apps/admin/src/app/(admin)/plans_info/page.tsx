@@ -19,7 +19,7 @@ import {
 import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
 import {useDownload} from "@koudaisai/shared-utils";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tooltip, Upload} from "antd";
+import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tag, Tooltip, Upload} from "antd";
 import Image from "next/image";
 import objectHash from "object-hash";
 import Papa from "papaparse";
@@ -469,15 +469,15 @@ function Inner() {
       render: value => {
         switch (value) {
           case "booth":
-            return <Tooltip title={"booth"}><span style={{color: "red"}}>模擬店企画</span></Tooltip>
+            return <Tooltip title={"booth"}><Tag color="red">模擬店企画</Tag></Tooltip>
           case "general":
-            return <Tooltip title={"general"}><span style={{color: "blue"}}>一般企画</span></Tooltip>
+            return <Tooltip title={"general"}><Tag color="blue">一般企画</Tag></Tooltip>
           case "stage":
-            return <Tooltip title={"stage"}><span style={{color: "green"}}>ステージ企画</span></Tooltip>
+            return <Tooltip title={"stage"}><Tag color="green">ステージ企画</Tag></Tooltip>
           case "labo":
-            return <Tooltip title={"labo"}><span style={{color: "orange"}}>研究室公開企画</span></Tooltip>
+            return <Tooltip title={"labo"}><Tag color="orange">研究室公開企画</Tag></Tooltip>
           default:
-            return <span>不明</span>
+            return <Tag color="warning">不明</Tag>
         }
       }
     },
