@@ -4,7 +4,7 @@ import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
 import {DocumentCategoryRead, DocumentRead} from "@koudaisai/shared-types";
 import {Heading1} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Flex, message, Popconfirm, Table, TableProps} from "antd";
+import {Button, Flex, message, Popconfirm, Table, TableProps, Tag} from "antd";
 import {useMemo} from "react";
 import {$apiAdmin} from "@/lib/api";
 
@@ -145,13 +145,13 @@ function Inner() {
       title: "種類",
       render: (_value, record, _index) => {
         if ('format_pdf' in record) {
-          return <span style={{color: "orange"}}>PDF</span>;
+          return <Tag color="orange">PDF</Tag>;
         } else if ('format_markdown' in record) {
-          return <span style={{color: "green"}}>Markdown</span>
+          return <Tag color="green">Markdown</Tag>;
         } else if ('format_misc' in record) {
-          return <span style={{color: "blue"}}>その他</span>;
+          return <Tag color="blue">その他</Tag>;
         } else {
-          return <span style={{color: "red"}}>不明</span>;
+          return <Tag color="red">不明</Tag>;
         }
       }
     },
@@ -160,15 +160,9 @@ function Inner() {
       title: "対象",
       dataIndex: "targets",
       render: (value) => {
-        return <div
-          style={{
-            display: "flex",
-            maxWidth: "200px",
-            overflow: "scroll",
-          }}
-        >
-          {value.map((target: string) => <span key={target} style={{marginRight: 4}}>{target}</span>)}
-        </div>
+        return <Flex wrap gap={4} style={{maxWidth: "200px"}}>
+          {value.map((target: string) => <Tag key={target}>{target}</Tag>)}
+        </Flex>
       }
     },
     {
