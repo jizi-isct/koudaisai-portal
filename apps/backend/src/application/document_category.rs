@@ -256,6 +256,31 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_get_by_id_token_invalid_admin() {
+        let app = setup_app();
+        let ctx = admin_ctx(false);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app.get_all(&ctx).await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
     async fn test_get_by_id_not_found() {
         let app = setup_app();
         let ctx = admin_ctx(true);
@@ -333,7 +358,166 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_update_document_category_unauthorized() {
+    async fn test_update_document_category_title_only() {
+        let app = setup_app();
+        let ctx = admin_ctx(true);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some("New Title".to_string()),
+                None,
+            )
+            .await;
+        assert!(result.is_ok());
+
+        let stored_after = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(stored_after.id(), document_category.id());
+        assert_eq!(stored_after.title(), "New Title");
+        assert_eq!(stored_after.emoji(), Some("📃"));
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_emoji_only() {
+        let app = setup_app();
+        let ctx = admin_ctx(true);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                None,
+                Some(Some("✅️".to_string())),
+            )
+            .await;
+        assert!(result.is_ok());
+
+        let stored_after = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(stored_after.id(), document_category.id());
+        assert_eq!(stored_after.title(), "Test Category");
+        assert_eq!(stored_after.emoji(), Some("✅️"));
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_emoji_to_none() {
+        let app = setup_app();
+        let ctx = admin_ctx(true);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app
+            .update_document_category(&ctx, document_category.id(), None, Some(None))
+            .await;
+        assert!(result.is_ok());
+
+        let stored_after = app
+            .document_category_repo
+            .find_by_id(document_category.id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(stored_after.id(), document_category.id());
+        assert_eq!(stored_after.title(), "Test Category");
+        assert_eq!(stored_after.emoji(), None);
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_not_found() {
+        let app = setup_app();
+        let ctx = admin_ctx(true);
+        let document_category_app = app.document_category();
+
+        let result = document_category_app
+            .update_document_category(&ctx, Uuid::new_v4(), Some("Title".to_string()), None)
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound
+            ))
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_admin_without_permission() {
+        let app = setup_app();
+        let ctx = admin_ctx(false);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        let result = document_category_app
+            .update_document_category(
+                &ctx,
+                document_category.id(),
+                Some("New Title".to_string()),
+                None,
+            )
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_update_document_category_nologin() {
         let app = setup_app();
         let ctx = ActorContext::NoLogin;
         let document_category_app = app.document_category();
@@ -445,6 +629,81 @@ mod tests {
         assert!(matches!(
             result,
             Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_delete_document_category_user_unauthorized() {
+        let app = setup_app();
+        let user_id = UserId::new(Uuid::new_v4());
+        let group_id = GroupId::new('G', 1).unwrap();
+        let membership = Membership::new(group_id, user_id, &app.clock);
+        let ctx = user_ctx(user_id, vec![membership.clone()]);
+
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app
+            .delete_document_category(&ctx, document_category.id())
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_delete_document_category_admin_without_permission() {
+        let app = setup_app();
+        let ctx = admin_ctx(false);
+        let document_category_app = app.document_category();
+
+        let document_category = DocumentCategory::register(
+            "Test Category".to_string(),
+            Some("📃".to_string()),
+            &app.clock,
+        )
+        .unwrap();
+
+        app.document_category_repo
+            .insert(&document_category)
+            .await
+            .unwrap();
+
+        let result = document_category_app
+            .delete_document_category(&ctx, document_category.id())
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_delete_document_category_not_found() {
+        let app = setup_app();
+        let ctx = admin_ctx(true);
+        let document_category_app = app.document_category();
+
+        let result = document_category_app
+            .delete_document_category(&ctx, Uuid::new_v4())
+            .await;
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::OperationFailed(
+                DeleteError::NotFound
+            ))
         ));
     }
 }
