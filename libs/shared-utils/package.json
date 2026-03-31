@@ -21,7 +21,7 @@
       "default": "./dist/index.js"
     }
   },
-  "dependencies": {
+  "devDependencies": {
     "vite-plugin-dts": "^4.5.4"
   }
 }
