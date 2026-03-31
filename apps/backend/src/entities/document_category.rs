@@ -9,14 +9,14 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCategoryWrite {
-    #[serde(default)]
+    #[serde(default)] // 逆シリアライズ時にフィールドが存在しない場合、デフォルト値(None)を使用
     pub title: Option<String>,
     #[serde(default)]
     pub emoji: Option<Option<String>>,
 }
 
 impl DocumentCategoryWrite {
-    pub fn into_active_model(self, id: Uuid) -> sea_orm_entities::document_category::ActiveModel {
+    pub fn into_active_model(self, id: Uuid) -> sea_orm_entities::document_category::ActiveModel { // ActiveModelはDBへの書き込み操作用のデータ構造
         let title = match self.title {
             Some(title) => Set(title),
             None => NotSet,
@@ -58,7 +58,7 @@ pub struct DocumentCategoryRead {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub title: String,
-    pub emoji: Option<String>,
+    pub emoji: Option<String>, // Noneならフロント側で絵文字を割当
 }
 
 impl From<Model> for DocumentCategoryRead {
@@ -78,7 +78,7 @@ impl DocumentCategoryRead {
         let models = Entity.select().all(db_conn).await?;
         let mut result = Vec::new();
         for model in models {
-            result.push(model.into());
+            result.push(model.into()); // fromを使って変換したものをpush
         }
         Ok(result)
     }
@@ -88,7 +88,7 @@ impl DocumentCategoryRead {
         db_conn: &DbConn,
     ) -> Result<Option<DocumentCategoryRead>, DbErr> {
         let result = Entity::find_by_id(id).one(db_conn).await?;
-        Ok(result.map(|model| model.into()))
+        Ok(result.map(|model| model.into())) // Some(model)が存在するなら変換して返し、存在しないならNoneのまま返す
     }
 }
 

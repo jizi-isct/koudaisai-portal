@@ -1,0 +1,7 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "apps/backend/Cargo.toml",
+    "apps/backend/migration/Cargo.toml"
+  ],
+  "rust-analyzer.cargo.targetDir": "apps/backend/target"
+}
