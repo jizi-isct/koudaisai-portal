@@ -13,8 +13,6 @@
     "react-markdown": "^10.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/preset-react": "^7.28.5",
     "@eslint/compat": "^2.0.2",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
@@ -34,7 +32,6 @@
     "@types/node": "^25.2.0",
     "@types/react": "19.2.10",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "^5.1.2",
     "@vitest/ui": "^3.0.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
