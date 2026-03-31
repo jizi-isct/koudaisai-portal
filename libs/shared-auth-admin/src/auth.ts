@@ -3,14 +3,14 @@ import nextBase64 from 'next-base64';
 import type {Middleware} from "openapi-fetch";
 import type {AuthFetchClient, Tokens} from "@koudaisai/shared-auth";
 
-export function getAuthMiddleware(fetchClient: AuthFetchClient): Middleware {
+export function getAuthMiddleware(fetchClient: AuthFetchClient, loginPath = "/admin/login"): Middleware {
   return {
     async onRequest({request}) {
       const tokens = await getTokensAdmin(fetchClient);
 
       //ログインされてない->ログイン画面へ
       if (!tokens) {
-        window.location.assign("/admin/login")
+        window.location.assign(loginPath)
         return;
       }
 
