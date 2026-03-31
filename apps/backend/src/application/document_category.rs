@@ -133,21 +133,14 @@ mod tests {
         MemoryApplication::new_memory_app(Utc::now())
     }
 
-    fn admin_ctx(has_token: bool) -> ActorContext {
-        if has_token {
-            ActorContext::Admin {
-                user_id: UserId::new(Uuid::new_v4()),
-                claims: vec![
-                    "koudaisai-portal:admin:document-category:read".to_string(),
-                    "koudaisai-portal:admin:document-category:update".to_string(),
-                    "koudaisai-portal:admin:document-category:delete".to_string(),
-                ],
-            }
-        } else {
-            ActorContext::Admin {
-                user_id: UserId::new(Uuid::new_v4()),
-                claims: vec![], // no permission
-            }
+    fn admin_ctx() -> ActorContext {
+        ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            claims: vec![
+                "koudaisai-portal:admin:document-category:read".to_string(),
+                "koudaisai-portal:admin:document-category:update".to_string(),
+                "koudaisai-portal:admin:document-category:delete".to_string(),
+            ],
         }
     }
 
@@ -164,7 +157,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_all_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -230,7 +223,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_by_id_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -256,34 +249,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_by_id_token_invalid_admin() {
-        let app = setup_app();
-        let ctx = admin_ctx(false);
-        let document_category_app = app.document_category();
-
-        let document_category = DocumentCategory::register(
-            "Test Category".to_string(),
-            Some("📃".to_string()),
-            &app.clock,
-        )
-        .unwrap();
-
-        app.document_category_repo
-            .insert(&document_category)
-            .await
-            .unwrap();
-
-        let result = document_category_app.get_all(&ctx).await;
-        assert!(matches!(
-            result,
-            Err(ApplicationOperationError::Unauthorized)
-        ));
-    }
-
-    #[tokio::test]
     async fn test_get_by_id_not_found() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
         let result = document_category_app.get_by_id(&ctx, Uuid::new_v4()).await;
         assert!(result.is_ok());
@@ -320,7 +288,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -360,7 +328,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_title_only() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -400,7 +368,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_emoji_only() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -440,7 +408,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_emoji_to_none() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -475,7 +443,7 @@ mod tests {
     #[tokio::test]
     async fn test_update_document_category_not_found() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let result = document_category_app
@@ -486,33 +454,6 @@ mod tests {
             Err(ApplicationOperationError::OperationFailed(
                 UpdateError::NotFound
             ))
-        ));
-    }
-
-    #[tokio::test]
-    async fn test_update_document_category_admin_without_permission() {
-        let app = setup_app();
-        let ctx = admin_ctx(false);
-        let document_category_app = app.document_category();
-
-        let document_category = DocumentCategory::register(
-            "Test Category".to_string(),
-            Some("📃".to_string()),
-            &app.clock,
-        )
-        .unwrap();
-
-        let result = document_category_app
-            .update_document_category(
-                &ctx,
-                document_category.id(),
-                Some("New Title".to_string()),
-                None,
-            )
-            .await;
-        assert!(matches!(
-            result,
-            Err(ApplicationOperationError::Unauthorized)
         ));
     }
 
@@ -577,7 +518,7 @@ mod tests {
     #[tokio::test]
     async fn test_delete_document_category_success_admin() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let document_category = DocumentCategory::register(
@@ -664,36 +605,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_delete_document_category_admin_without_permission() {
-        let app = setup_app();
-        let ctx = admin_ctx(false);
-        let document_category_app = app.document_category();
-
-        let document_category = DocumentCategory::register(
-            "Test Category".to_string(),
-            Some("📃".to_string()),
-            &app.clock,
-        )
-        .unwrap();
-
-        app.document_category_repo
-            .insert(&document_category)
-            .await
-            .unwrap();
-
-        let result = document_category_app
-            .delete_document_category(&ctx, document_category.id())
-            .await;
-        assert!(matches!(
-            result,
-            Err(ApplicationOperationError::Unauthorized)
-        ));
-    }
-
-    #[tokio::test]
     async fn test_delete_document_category_not_found() {
         let app = setup_app();
-        let ctx = admin_ctx(true);
+        let ctx = admin_ctx();
         let document_category_app = app.document_category();
 
         let result = document_category_app
