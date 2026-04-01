@@ -14,3 +14,5 @@ export * from './components/lib/magicNumbers'
 export * from './components/Header/Header'
 export * from './components/Footer/Footer'
 export * from './components/MobileNavigator/MobileNavigator'
+export * from './components/ContentRow';
+export * from './components/Faq';
