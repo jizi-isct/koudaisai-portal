@@ -20,13 +20,11 @@
         "name": "next"
       }
     ],
-    "paths": {
-       "@koudaisai/shared-ui": ["../../libs/shared-ui/src/index.ts"],
-    "@koudaisai/shared-api": ["../../libs/shared-api/src/index.ts"],
-    "@koudaisai/shared-auth-members": ["../../libs/shared-auth-members/src/index.ts"],
-    "@koudaisai/shared-types": ["../../libs/shared-types/src/index.ts"],
-    "@koudaisai/shared-utils": ["../../libs/shared-utils/src/index.ts"]
+
+   "paths": {
+      "@/*": ["./src/*"]
     },
+
     "outDir": "dist",
     "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
@@ -52,5 +50,14 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  
+ "references": [
+    { "path": "../../libs/shared-api" },
+    { "path": "../../libs/shared-utils" },
+    { "path": "../../libs/shared-auth" },
+    { "path": "../../libs/shared-auth-members" },
+    { "path": "../../libs/shared-types" },
+    { "path": "../../libs/shared-ui" }
   ]
 }
