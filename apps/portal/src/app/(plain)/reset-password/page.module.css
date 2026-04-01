@@ -1,0 +1,33 @@
+.root {
+    display: flex;
+    gap: 30px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+}
+
+.p {
+    margin: 0;
+}
+
+.error {
+    color: red;
+}
+
+.input {
+    width: min(100%, 450px);
+}
+
+.links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
