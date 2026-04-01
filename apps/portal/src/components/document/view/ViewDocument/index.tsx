@@ -1,6 +1,6 @@
 "use client";
 
-import {DocumentRead} from "@/lib";
+import { DocumentRead } from "@koudaisai/shared-types";
 import {ViewDocumentFormatPdf} from "@/components/document/view/ViewDocumentFormatPdf";
 import {ViewDocumentFormatMarkdown} from "@/components/document/view/ViewDocumentFormatMarkdown";
 import {ViewDocumentFormatMisc} from "@/components/document/view/ViewDocumentFormatMisc";

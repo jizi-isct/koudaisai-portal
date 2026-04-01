@@ -1,7 +1,9 @@
 "use client";
 
-import {DocumentFormatPdfRead, useDownload, useDownloadUrl} from "@/lib";
-import {Button, LoadingScreen} from "@/components/generic";
+import {useDownload, useDownloadUrl} from "@koudaisai/shared-utils";
+import { DocumentFormatPdfRead } from "@koudaisai/shared-types";
+import {Button, LoadingScreen} from "@koudaisai/shared-ui";
+import { fetchClientMembers } from "@/lib/api";
 
 type ViewDocumentFormatPdfProps = {
   format: DocumentFormatPdfRead
@@ -13,7 +15,7 @@ type ViewDocumentFormatPdfProps = {
  * @constructor
  */
 export function ViewDocumentFormatPdf({format}: ViewDocumentFormatPdfProps) {
-  const {downloadUrl, error} = useDownloadUrl(format.file_key, format.file_name);
+  const {downloadUrl, error} = useDownloadUrl( fetchClientMembers ,format.file_key, format.file_name);
   const download = useDownload()
 
   if (downloadUrl) {

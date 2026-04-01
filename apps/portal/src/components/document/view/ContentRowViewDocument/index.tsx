@@ -1,11 +1,13 @@
 "use client";
 
-import {DocumentRead, getDownloadUrl, useDownload} from "@/lib";
+import { DocumentRead } from "@koudaisai/shared-types";
+import { useDownload,getDownloadUrl } from "@koudaisai/shared-utils";
 import styles from "./ContentRowViewDocument.module.css";
 import Image from "next/image";
-import {Modal} from "@/components/generic";
+import {Modal} from "@koudaisai/shared-ui";
 import {ViewDocument} from "@/components/document/view/ViewDocument";
 import {useCallback, useState} from "react";
+import { fetchClientMembers } from "@/lib/api";
 
 type ContentRowViewDocumentProps = {
   document: DocumentRead
@@ -22,7 +24,7 @@ export function ContentRowViewDocument({document}: ContentRowViewDocumentProps) 
 
   const handleDownloadDocument = useCallback(async () => {
     if (document.format_pdf) {
-      const {data: downloadUrl} = await getDownloadUrl(document.format_pdf.file_key, document.format_pdf.file_name)
+      const {data: downloadUrl} = await getDownloadUrl(fetchClientMembers,document.format_pdf.file_key, document.format_pdf.file_name)
       if (downloadUrl?.presigned_url) {
         download(downloadUrl.presigned_url, document.format_pdf.file_name)
       }
@@ -33,7 +35,7 @@ export function ContentRowViewDocument({document}: ContentRowViewDocumentProps) 
       download(url, `${document.title}.md`)
     }
     if (document.format_misc) {
-      const {data: downloadUrl} = await getDownloadUrl(document.format_misc.file_key, document.format_misc.file_name)
+      const {data: downloadUrl} = await getDownloadUrl(fetchClientMembers,document.format_misc.file_key, document.format_misc.file_name)
       if (downloadUrl?.presigned_url) {
         download(downloadUrl.presigned_url, document.format_misc.file_name)
       }
