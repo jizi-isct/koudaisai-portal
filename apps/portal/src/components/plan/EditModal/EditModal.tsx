@@ -1,9 +1,8 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import React, {useMemo} from "react";
-import {$apiMembers} from "@/lib";
-import {Modal} from "@/components/generic/Modal/Modal";
-import {LoadingScreen} from "@/components/generic";
+import { $apiMembers } from "@/lib/api";
+import { Modal,LoadingScreen } from "@koudaisai/shared-ui";
 import {EditIssueForm} from "@/components/plan/IssueForm";
 import {EditPendingForm} from "@/components/plan/EditPendingForm";
 

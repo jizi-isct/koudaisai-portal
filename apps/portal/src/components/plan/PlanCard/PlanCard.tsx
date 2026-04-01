@@ -1,7 +1,7 @@
 import styles from "./PlanCard.module.css";
 import {Button, Tag, Tooltip} from "antd";
 import {PlanIcon} from "@/components/plan/PlanIcon";
-import {BasePlanRead} from "@/lib/plansInfoTypes";
+import { BasePlanRead } from "@koudaisai/shared-types";
 
 type ExhibitorCardProps = {
   plan: BasePlanRead;

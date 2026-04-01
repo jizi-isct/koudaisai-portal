@@ -1,5 +1,5 @@
-import {ApprovalRequestRead, getFilesRedirectUrl} from "@/lib";
-import {BasePlanRead} from "@/lib/plansInfoTypes";
+import { getFilesRedirectUrl } from "@koudaisai/shared-utils";
+import {ApprovalRequestRead,BasePlanRead} from "@koudaisai/shared-types";
 import Image from "next/image";
 import React from "react";
 

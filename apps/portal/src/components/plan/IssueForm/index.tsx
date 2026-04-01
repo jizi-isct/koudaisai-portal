@@ -1,10 +1,10 @@
 'use client'; // クライアントサイドコンポーネントとして実行するために追加
 
 import React from "react";
-import {$apiMembers} from "@/lib";
+import {$apiMembers} from "@/lib/api";
 import { Flex, Typography, Button, Input } from "antd";
 import {FileUploader} from "@/components/common/FileUploader";
-import {Heading1} from "@/components/generic";
+import {Heading1} from "@koudaisai/shared-ui";
 
 const { TextArea } = Input;
 

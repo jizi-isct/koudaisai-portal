@@ -1,9 +1,10 @@
 "use client"; // クライアントサイドコンポーネントとして実行するために追加
 
 import React from "react";
-import { $apiMembers, ApprovalRequestRead } from "@/lib";
+import { $apiMembers } from "@/lib/api";
+import { ApprovalRequestRead } from "@koudaisai/shared-types";
 import { Button } from "antd";
-import { Heading1, LoadingScreen } from "@/components/generic";
+import { Heading1, LoadingScreen } from "@koudaisai/shared-ui";
 import { ViewPendingEditExhibitionInfoRequest } from "@/components/plan/ViewPendingEditExhibitionInfoRequest";
 import { $plansInfoApiNoLogin } from "@/lib/plansInfoApi";
 
