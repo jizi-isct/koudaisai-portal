@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {Noto_Sans_JP} from "next/font/google";
 import {ConfigProvider} from "antd";
 import "./globals.css";
+import "./global.css"
 import "./members.css";
 
 const notoSans = Noto_Sans_JP({subsets: ["latin"], weight: ["400", "700"]});
