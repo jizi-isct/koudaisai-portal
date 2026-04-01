@@ -1,12 +1,12 @@
 import {useCallback, useState} from "react";
-import type {apiQueryClientType} from "@/lib";
+import {ApiQueryClient} from "@koudaisai/shared-api";
 import { Flex, Upload, Button, message, Spin } from "antd";
 import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 
 type FileUploaderProps = {
   callback: (fileKey: string, fileName: string) => (void | Promise<void>),
   fileType?: string,
-  client: apiQueryClientType,
+  client: ApiQueryClient,
 }
 
 export function FileUploader({callback, fileType, client}: FileUploaderProps) {
