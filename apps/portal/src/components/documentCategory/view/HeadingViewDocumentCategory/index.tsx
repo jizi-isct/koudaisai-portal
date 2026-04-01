@@ -1,7 +1,7 @@
 "use client";
 
-import {Heading2} from "@/components/generic";
-import {DocumentCategoryRead} from "@/lib";
+import {Heading2} from "@koudaisai/shared-ui";
+import { DocumentCategoryRead } from "@koudaisai/shared-types";
 
 type DocumentCategoryHeadingProps = {
   documentCategory: DocumentCategoryRead
