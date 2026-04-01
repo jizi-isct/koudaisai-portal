@@ -1,4 +1,5 @@
-import {getRepresentativeIndex, GroupRead, UserRead} from "@/lib";
+import {GroupRead, UserRead} from "@koudaisai/shared-types";
+import { getRepresentativeIndex } from "@koudaisai/shared-utils";
 import styles from "./UserInfoCard.module.css";
 
 type UserInfoCardProps = {
