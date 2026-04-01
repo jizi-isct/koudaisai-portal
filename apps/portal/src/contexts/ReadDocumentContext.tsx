@@ -1,5 +1,6 @@
 import {createContext, ReactNode, useCallback, useContext, useMemo, useState} from "react";
-import {apiQueryClientType, DocumentCategoryRead, DocumentRead} from "@/lib";
+import {DocumentCategoryRead, DocumentRead} from "@koudaisai/shared-types";
+import { ApiQueryClient } from "@koudaisai/shared-api";
 
 interface ReadDocumentContextType {
   documents: Array<{ category: DocumentCategoryRead | null, documents: DocumentRead[] }> | undefined;
@@ -21,7 +22,7 @@ export const useReadDocumentContext = () => useContext(ReadDocumentContext);
 
 type ReadDocumentProviderProps = {
   children: ReactNode,
-  queryClient: apiQueryClientType
+  queryClient: ApiQueryClient
 }
 
 export function ReadDocumentProvider({children, queryClient}: ReadDocumentProviderProps) {
