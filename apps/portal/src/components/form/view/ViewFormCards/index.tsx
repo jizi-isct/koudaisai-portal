@@ -1,13 +1,13 @@
 "use client";
 
-import {apiQueryClientType} from "@/lib";
-import {LoadingScreen} from "@/components/generic";
+import {ApiQueryClient} from "@koudaisai/shared-api";
+import {LoadingScreen} from "@koudaisai/shared-ui";
 import React from "react";
 import {FormCard} from "@/components/form/view/FormCard";
 import styles from "./ViewFormCards.module.css";
 
 type ViewFormCardsProps = {
-  client: apiQueryClientType
+  client: ApiQueryClient
 }
 
 export function ViewFormCards({client}: ViewFormCardsProps) {

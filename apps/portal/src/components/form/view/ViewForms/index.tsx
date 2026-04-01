@@ -1,13 +1,12 @@
 "use client";
 
-import {apiQueryClientType} from "@/lib";
-import {ContentList, LoadingScreen} from "@/components/generic";
-import {ContentRow} from "@/components/generic/ContentRow";
+import {ApiQueryClient} from "@koudaisai/shared-api";
+import {ContentRow ,ContentList, LoadingScreen} from "@koudaisai/shared-ui";
 import React from "react";
 import {useRouter} from "next/navigation";
 
 type ViewFormsProps = {
-  client: apiQueryClientType
+  client: ApiQueryClient
 }
 
 export function ViewForms({client}: ViewFormsProps) {

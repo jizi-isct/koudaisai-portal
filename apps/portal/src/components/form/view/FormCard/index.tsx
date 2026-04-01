@@ -1,5 +1,5 @@
 import styles from "./FormCard.module.css";
-import {FormRead} from "@/lib";
+import { FormRead } from "@koudaisai/shared-types";
 import {useMemo} from "react";
 
 type formCardProps = {
