@@ -3,7 +3,7 @@ import {NextPhaseButton} from "@/components/activation/NextPhaseButton";
 import {Input} from "@/components/common/Input";
 import React, {useState} from "react";
 import Logo from "@/components/Logo/Logo";
-import {validatePassword} from "@/lib";
+import {validatePassword} from "@koudaisai/shared-utils";
 
 type ActivationPhasePasswordProps = {
   mAddress: string;

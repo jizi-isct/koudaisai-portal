@@ -3,9 +3,10 @@
 import styles from "../ActivationPhase.module.css"
 import {NextPhaseButton} from "@/components/activation/NextPhaseButton";
 import Logo from "@/components/Logo/Logo";
-import {login} from "@/lib";
+import { login } from "@koudaisai/shared-auth-members";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
+import {authFetchClient} from "@/lib/api";
 
 type ActivationPhaseDoneProps = {
   m_address: string;
@@ -18,7 +19,7 @@ export function ActivationPhaseDone({m_address, password}: ActivationPhaseDonePr
 
   const handleClick = async () => {
     try {
-      await login(m_address, password)
+      await login(authFetchClient,m_address, password)
     } catch (e) {
       setError(`${e}`)
       return

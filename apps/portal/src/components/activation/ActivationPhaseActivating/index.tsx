@@ -1,8 +1,8 @@
 import styles from "../ActivationPhase.module.css"
-import {Loader} from "@/components/generic/Loader";
+import {Loader} from "@koudaisai/shared-ui";
 import Logo from "@/components/Logo/Logo";
 import {useEffect, useRef, useState} from "react";
-import {fetchClientAuth} from "@/lib";
+import {authFetchClient} from "@/lib/api";
 
 type ActivationPhaseActivatingProps = {
   mAddress: string
@@ -19,7 +19,7 @@ export function ActivationPhaseActivating({mAddress, password, token, next}: Act
     if (hasActivated.current) return
     hasActivated.current = true; // 二重リクエスト防止
     (async () => {
-      const {response} = await fetchClientAuth.POST("/activate", {
+      const {response} = await authFetchClient.POST("/activate", {
         body: {
           m_address: mAddress,
           token: token,

@@ -16,3 +16,4 @@ export * from './components/Footer/Footer'
 export * from './components/MobileNavigator/MobileNavigator'
 export * from './components/ContentRow';
 export * from './components/Faq';
+export * from './components/Loader';
