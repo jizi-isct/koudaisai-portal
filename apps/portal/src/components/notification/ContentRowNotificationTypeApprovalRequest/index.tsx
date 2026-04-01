@@ -1,9 +1,9 @@
 "use client";
 
-import {ContentRow} from "@/components/generic/ContentRow";
-import {$apiMembers, NotificationRead, NotificationReadTypeApprovalRequest} from "@/lib";
+import {Modal,ContentRow} from "@koudaisai/shared-ui";
+import {$apiMembers} from "@/lib/api";
+import { NotificationRead,NotificationReadTypeApprovalRequest} from "@koudaisai/shared-types";
 import {useState} from "react";
-import {Modal} from "@/components/generic";
 
 export type Content = {
   title: string,

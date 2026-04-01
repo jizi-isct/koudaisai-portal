@@ -1,6 +1,6 @@
 "use client";
 
-import {NotificationRead} from "@/lib";
+import { NotificationRead } from "@koudaisai/shared-types";
 import {ContentRowNotificationTypeMarkdown} from "@/components/notification/ContentRowNotificationTypeMarkdown";
 import {
   ContentRowNotificationTypeApprovalRequest

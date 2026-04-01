@@ -1,9 +1,10 @@
-import {ContentList, LoadingScreen} from "@/components/generic";
-import {apiQueryClientType, useUserIdFromAccessToken} from "@/lib";
+import {ContentList, LoadingScreen} from "@koudaisai/shared-ui";
+import {ApiQueryClient} from "@koudaisai/shared-api";
+import { useUserIdFromAccessToken } from "@/lib/api";
 import {ContentRowNotification} from "@/components/notification/ContentRowNotification";
 
 type ViewNotificationsProps = {
-  client: apiQueryClientType
+  client: ApiQueryClient
 }
 
 export function ViewNotifications({client}: ViewNotificationsProps) {

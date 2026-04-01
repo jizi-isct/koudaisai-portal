@@ -1,9 +1,8 @@
 "use client";
 
-import {ContentRow} from "@/components/generic/ContentRow";
-import {NotificationRead, NotificationReadTypeMarkdown} from "@/lib";
+import {Modal,ContentRow} from "@koudaisai/shared-ui";
+import {NotificationRead, NotificationReadTypeMarkdown} from "@koudaisai/shared-types";
 import {useState} from "react";
-import {Modal} from "@/components/generic";
 import Markdown from "react-markdown";
 
 export type Content = {
