@@ -1,4 +1,5 @@
-/target/
+target/
+**/target/
 /migration/target
 /debug/private-key.pem
 /debug/public-key.pem

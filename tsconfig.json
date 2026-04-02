@@ -3,6 +3,9 @@
   "files": [],
   "references": [
     {
+      "path": "./apps/web",
+    },
+    {
       "path": "./libs/shared-types"
     },
     {
@@ -25,6 +28,9 @@
     },
     {
       "path": "./libs/shared-auth"
+    },
+    {
+      "path": "./apps/admin"
     },
     {
       "path": "./apps/join"

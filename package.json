@@ -20,7 +20,7 @@
     "@nx/eslint": "22.4.4",
     "@nx/eslint-plugin": "22.4.4",
     "@nx/js": "22.4.4",
-    "@nx/next": "22.4.4",
+    "@nx/next": "22.6.3",
     "@nx/react": "22.4.4",
     "@nx/vite": "22.4.4",
     "@nx/web": "22.4.4",
