@@ -1,5 +1,6 @@
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::membership::Membership;
+use crate::domain::notification::Notification;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
 
@@ -186,6 +187,54 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:approval-request:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_get_all_notifications(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:read".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_get_notification(actor_ctx: &ActorContext, notification: &Notification) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:read".to_string())
+        }
+        ActorContext::User { .. } | ActorContext::NoLogin => notification
+            .target()
+            .iter()
+            .any(|target| target.does_actor_match(actor_ctx)),
+    }
+}
+
+pub fn can_create_notification(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_notification(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_notification(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:delete".to_string())
         }
         _ => false,
     }
