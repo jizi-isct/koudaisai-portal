@@ -11,6 +11,7 @@ pub mod approval_request;
 pub mod authz;
 pub mod error;
 mod group;
+pub mod notification;
 pub mod ports;
 pub mod transaction;
 pub mod user;
