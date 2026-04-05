@@ -1,37 +1,39 @@
 {
   "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
   "files": [],
   "references": [
     {
-      "path": "./apps/web-admin"
+      "path": "./apps/web",
     },
     {
-      "path": "./apps/web-members"
+      "path": "./libs/shared-types"
     },
     {
-      "path": "./libs/ui-generic"
+      "path": "./apps/web"
     },
     {
-      "path": "./libs/ui-edit_form"
+      "path": "./libs/shared-ui"
     },
     {
-      "path": "./libs/ui-edit_response"
+      "path": "./libs/shared-auth-members"
     },
     {
-      "path": "./libs/util"
+      "path": "./libs/shared-auth-admin"
     },
     {
-      "path": "./libs/ui-edit_document"
+      "path": "./libs/shared-api"
     },
     {
-      "path": "./libs/ui-show_document"
+      "path": "./libs/shared-utils"
+    },
+    {
+      "path": "./libs/shared-auth"
+    },
+    {
+      "path": "./apps/admin"
+    },
+    {
+      "path": "./apps/join"
     }
-  ],
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs",
-      "customConditions": null
-    }
-  }
+  ]
 }

@@ -41,7 +41,7 @@ impl User {
         m_address: EmailAddress,
         clock: C,
     ) -> Result<Self, FactoryError> {
-        if (name.trim().is_empty()) {
+        if name.trim().is_empty() {
             return Err(FactoryError::InvalidInput("Name is empty".to_string()));
         }
 

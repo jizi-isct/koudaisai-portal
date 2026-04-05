@@ -1,0 +1,27 @@
+{
+  "name": "@koudaisai/shared-utils",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    "./client": {
+      "development": "./src/ClientFile.ts",
+      "types": "./dist/ClientFile.d.ts",
+      "import": "./dist/ClientFile.js",
+      "default": "./dist/ClientFile.js"
+    },
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "vite-plugin-dts": "^4.5.4"
+  }
+}

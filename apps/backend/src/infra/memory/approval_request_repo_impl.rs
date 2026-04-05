@@ -1,12 +1,13 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
-use crate::domain::approval_request::{ApprovalRequest, ApprovalRequestId};
+use crate::domain::approval_request::{ApprovalRequest};
 use crate::domain::user_id::UserId;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+use crate::domain::approval_request_id::ApprovalRequestId;
 
 pub struct MemoryApprovalRequestRepo {
     approval_requests: Arc<RwLock<HashMap<ApprovalRequestId, ApprovalRequest>>>,
@@ -22,7 +23,10 @@ impl MemoryApprovalRequestRepo {
 
 #[async_trait]
 impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
-    async fn find_by_id(&self, id: ApprovalRequestId) -> Result<Option<ApprovalRequest>, FindError> {
+    async fn find_by_id(
+        &self,
+        id: ApprovalRequestId,
+    ) -> Result<Option<ApprovalRequest>, FindError> {
         let approval_requests = self
             .approval_requests
             .read()
@@ -38,7 +42,10 @@ impl ApprovalRequestRepo<MemoryTransaction> for MemoryApprovalRequestRepo {
         Ok(approval_requests.values().cloned().collect())
     }
 
-    async fn find_by_user_ids(&self, user_ids: &[UserId]) -> Result<Vec<ApprovalRequest>, FindError> {
+    async fn find_by_user_ids(
+        &self,
+        user_ids: &[UserId],
+    ) -> Result<Vec<ApprovalRequest>, FindError> {
         let approval_requests = self
             .approval_requests
             .read()

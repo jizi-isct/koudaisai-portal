@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
     "composite": true,
+    "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": [
-      "es2023",
-      "dom"
-    ],
+    "lib": ["es2023", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,

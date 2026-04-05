@@ -1,4 +1,5 @@
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::form::Form;
 use crate::domain::membership::Membership;
 use crate::domain::notification::Notification;
 use crate::domain::user::User;
@@ -106,6 +107,42 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+pub fn can_get_form(actor_ctx: &ActorContext, form: &Form) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:read".to_string())
+        }
+        _ => form.targets().iter().any(|t| t.does_actor_match(actor_ctx)),
+    }
+}
+
+pub fn can_create_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_form(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:form:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
 // ============================================================
 // 承認申請（ApprovalRequest）の認可ルール
 // ============================================================
@@ -187,6 +224,57 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:approval-request:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), CanGetByIdError> {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            if claims.contains(&"koudaisai-portal:admin:document-category:read".to_string()) {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::Unauthorized)
+            }
+        }
+        ActorContext::User { .. } => Ok(()),
+        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized),
+    }
+}
+
+pub fn can_get_all_document_categories(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document-category:read".to_string())
+        }
+        ActorContext::User { .. } => true,
+        ActorContext::NoLogin => false,
+    }
+}
+
+pub fn can_create_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document-category:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document-category:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_document_category(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document-category:delete".to_string())
         }
         _ => false,
     }

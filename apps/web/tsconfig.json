@@ -8,11 +8,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -23,17 +19,13 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "outDir": "dist",
     "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
-    "../../apps/web-members/.next/types/**/*.ts",
-    "../../dist/apps/web-members/.next/types/**/*.ts",
     "next-env.d.ts",
     "src/**/*.js",
     "src/**/*.jsx",
@@ -53,9 +45,5 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "references": [
-    {
-      "path": "../../libs/ui-edit_document"
-    }
-  ]
+  "references": []
 }

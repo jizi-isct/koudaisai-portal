@@ -15,7 +15,7 @@ use tracing_subscriber::util::SubscriberInitExt;
 
 mod application;
 pub mod config;
-mod domain;
+pub mod domain;
 pub mod entities;
 mod infra;
 pub mod middlewares;
