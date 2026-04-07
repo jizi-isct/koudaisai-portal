@@ -1,0 +1,4 @@
+{
+  "input": "user/id/invalid-uuid",
+  "ok": false
+}

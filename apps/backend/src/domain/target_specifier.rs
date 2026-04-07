@@ -101,65 +101,6 @@ mod tests {
     }
 
     #[test]
-    fn test_from_str() {
-        assert_eq!(
-            TargetSpecifier::from_str("group/type/project_general").unwrap(),
-            TargetSpecifier::GroupTypeProjectGeneral
-        );
-        assert_eq!(
-            TargetSpecifier::from_str("group/type/project_booth").unwrap(),
-            TargetSpecifier::GroupTypeProjectBooth
-        );
-        assert_eq!(
-            TargetSpecifier::from_str("group/type/project_stage").unwrap(),
-            TargetSpecifier::GroupTypeProjectStage
-        );
-        assert_eq!(
-            TargetSpecifier::from_str("group/type/project_labo").unwrap(),
-            TargetSpecifier::GroupTypeProjectLabo
-        );
-        assert_eq!(
-            TargetSpecifier::from_str("group/type/press").unwrap(),
-            TargetSpecifier::GroupTypePress
-        );
-        assert_eq!(
-            TargetSpecifier::from_str("user/nologin").unwrap(),
-            TargetSpecifier::UserNologin
-        );
-
-        let user_uuid = Uuid::new_v4();
-        let user_id_str = format!("user/id/{}", user_uuid);
-        assert_eq!(
-            TargetSpecifier::from_str(&user_id_str).unwrap(),
-            TargetSpecifier::UserId(UserId::new(user_uuid))
-        );
-
-        let group_id_str = "group/id/M-001";
-        assert_eq!(
-            TargetSpecifier::from_str(group_id_str).unwrap(),
-            TargetSpecifier::GroupId(GroupId::from_str("M-001").unwrap())
-        );
-
-        assert!(TargetSpecifier::from_str("invalid").is_err());
-        assert!(TargetSpecifier::from_str("user/id/invalid-uuid").is_err());
-        assert!(TargetSpecifier::from_str("group/id/invalid-id").is_err());
-    }
-
-    #[test]
-    fn test_into_string() {
-        let ts: String = (&TargetSpecifier::GroupTypeProjectGeneral).into();
-        assert_eq!(ts, "group/type/project_general");
-
-        let user_uuid = Uuid::new_v4();
-        let ts: String = (&TargetSpecifier::UserId(UserId::new(user_uuid))).into();
-        assert_eq!(ts, format!("user/id/{}", user_uuid));
-
-        let group_id = GroupId::from_str("M-001").unwrap();
-        let ts: String = (&TargetSpecifier::GroupId(group_id)).into();
-        assert_eq!(ts, "group/id/M-001");
-    }
-
-    #[test]
     fn test_does_actor_match() {
         let user_id = UserId::new(Uuid::new_v4());
         let group_id = GroupId::from_str("M-001").unwrap();

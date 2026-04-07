@@ -44,3 +44,14 @@ hyper = "1.6.0"
 futures-util = "0.3.31"
 regex = "1.11.1"
 async-trait = "0.1.89"
+
+[lib]
+name = "koudaisai_portal_backend"
+path = "src/lib.rs"
+
+[dev-dependencies]
+datatest-stable = "0.3.3"
+
+[[test]]
+name = "fixture_tests"
+harness = false

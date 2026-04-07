@@ -1,0 +1,5 @@
+{
+  "actor": "admin",
+  "is_same_user": true,
+  "expected": true
+}
