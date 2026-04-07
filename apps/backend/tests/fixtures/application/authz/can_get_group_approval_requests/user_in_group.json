@@ -1,0 +1,12 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "",
+      "group_ids": [
+        "G-001"
+      ]
+    }
+  },
+  "group_id": "G-001",
+  "expected": true
+}

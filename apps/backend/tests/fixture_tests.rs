@@ -1,4 +1,5 @@
-mod domain;
+pub(crate) mod domain;
+pub(crate) mod application;
 
 datatest_stable::harness! {
     // email_address
@@ -35,4 +36,28 @@ datatest_stable::harness! {
     { test = domain::actor_ctx::test_is_group_id,    root = "tests/fixtures/domain", pattern = r"actor_ctx/is_group_id/[^/]+\.json" },
     { test = domain::actor_ctx::test_is_user_id,     root = "tests/fixtures/domain", pattern = r"actor_ctx/is_user_id/[^/]+\.json" },
     { test = domain::actor_ctx::test_is_user_nologin,root = "tests/fixtures/domain", pattern = r"actor_ctx/is_user_nologin/[^/]+\.json" },
+    // application::authz
+    { test = application::authz::test_can_get_all_users,                      root = "tests/fixtures/application", pattern = r"authz/can_get_all_users/[^/]+\.json" },
+    { test = application::authz::test_can_get_user_by_id,                     root = "tests/fixtures/application", pattern = r"authz/can_get_user_by_id/[^/]+\.json" },
+    { test = application::authz::test_can_update_user,                        root = "tests/fixtures/application", pattern = r"authz/can_update_user/[^/]+\.json" },
+    { test = application::authz::test_can_change_m_address_of_the_user,       root = "tests/fixtures/application", pattern = r"authz/can_change_m_address_of_the_user/[^/]+\.json" },
+    { test = application::authz::test_can_get_all_groups,                     root = "tests/fixtures/application", pattern = r"authz/can_get_all_groups/[^/]+\.json" },
+    { test = application::authz::test_can_get_group_by_id,                    root = "tests/fixtures/application", pattern = r"authz/can_get_group_by_id/[^/]+\.json" },
+    { test = application::authz::test_can_create_group,                       root = "tests/fixtures/application", pattern = r"authz/can_create_group/[^/]+\.json" },
+    { test = application::authz::test_can_get_form,                           root = "tests/fixtures/application", pattern = r"authz/can_get_form/[^/]+\.json" },
+    { test = application::authz::test_can_create_form,                        root = "tests/fixtures/application", pattern = r"authz/can_create_form/[^/]+\.json" },
+    { test = application::authz::test_can_update_form,                        root = "tests/fixtures/application", pattern = r"authz/can_update_form/[^/]+\.json" },
+    { test = application::authz::test_can_delete_form,                        root = "tests/fixtures/application", pattern = r"authz/can_delete_form/[^/]+\.json" },
+    { test = application::authz::test_can_get_all_approval_requests,          root = "tests/fixtures/application", pattern = r"authz/can_get_all_approval_requests/[^/]+\.json" },
+    { test = application::authz::test_can_get_group_approval_requests,        root = "tests/fixtures/application", pattern = r"authz/can_get_group_approval_requests/[^/]+\.json" },
+    { test = application::authz::test_can_get_approval_request,               root = "tests/fixtures/application", pattern = r"authz/can_get_approval_request/[^/]+\.json" },
+    { test = application::authz::test_can_create_approval_request,            root = "tests/fixtures/application", pattern = r"authz/can_create_approval_request/[^/]+\.json" },
+    { test = application::authz::test_can_approve_or_reject_approval_request, root = "tests/fixtures/application", pattern = r"authz/can_approve_or_reject_approval_request/[^/]+\.json" },
+    { test = application::authz::test_can_close_approval_request,             root = "tests/fixtures/application", pattern = r"authz/can_close_approval_request/[^/]+\.json" },
+    { test = application::authz::test_can_delete_approval_request,            root = "tests/fixtures/application", pattern = r"authz/can_delete_approval_request/[^/]+\.json" },
+    { test = application::authz::test_can_get_document_category_by_id,        root = "tests/fixtures/application", pattern = r"authz/can_get_document_category_by_id/[^/]+\.json" },
+    { test = application::authz::test_can_get_all_document_categories,        root = "tests/fixtures/application", pattern = r"authz/can_get_all_document_categories/[^/]+\.json" },
+    { test = application::authz::test_can_create_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_create_document_category/[^/]+\.json" },
+    { test = application::authz::test_can_update_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_update_document_category/[^/]+\.json" },
+    { test = application::authz::test_can_delete_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_delete_document_category/[^/]+\.json" },
 }
