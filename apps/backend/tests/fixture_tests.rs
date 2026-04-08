@@ -60,4 +60,24 @@ datatest_stable::harness! {
     { test = application::authz::test_can_create_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_create_document_category/[^/]+\.json" },
     { test = application::authz::test_can_update_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_update_document_category/[^/]+\.json" },
     { test = application::authz::test_can_delete_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_delete_document_category/[^/]+\.json" },
+    // application::user
+    { test = application::user::test_get_all,           root = "tests/fixtures/application", pattern = r"user/get_all/[^/]+\.json" },
+    { test = application::user::test_get_by_id,         root = "tests/fixtures/application", pattern = r"user/get_by_id/[^/]+\.json" },
+    { test = application::user::test_update,            root = "tests/fixtures/application", pattern = r"user/update/[^/]+\.json" },
+    { test = application::user::test_change_m_address,  root = "tests/fixtures/application", pattern = r"user/change_m_address/[^/]+\.json" },
+    // application::form
+    { test = application::form::test_get_all,   root = "tests/fixtures/application", pattern = r"form/get_all/[^/]+\.json" },
+    { test = application::form::test_get_by_id, root = "tests/fixtures/application", pattern = r"form/get_by_id/[^/]+\.json" },
+    { test = application::form::test_create,    root = "tests/fixtures/application", pattern = r"form/create/[^/]+\.json" },
+    { test = application::form::test_update,    root = "tests/fixtures/application", pattern = r"form/update/[^/]+\.json" },
+    { test = application::form::test_delete,    root = "tests/fixtures/application", pattern = r"form/delete/[^/]+\.json" },
+    // application::group
+    { test = application::group::test_get_all,      root = "tests/fixtures/application", pattern = r"group/get_all/[^/]+\.json" },
+    { test = application::group::test_get_by_id,    root = "tests/fixtures/application", pattern = r"group/get_by_id/[^/]+\.json" },
+    { test = application::group::test_create_group, root = "tests/fixtures/application", pattern = r"group/create_group/[^/]+\.json" },
+    // application::document_category
+    { test = application::document_category::test_get_all,   root = "tests/fixtures/application", pattern = r"document_category/get_all/[^/]+\.json" },
+    { test = application::document_category::test_get_by_id, root = "tests/fixtures/application", pattern = r"document_category/get_by_id/[^/]+\.json" },
+    { test = application::document_category::test_update,    root = "tests/fixtures/application", pattern = r"document_category/update/[^/]+\.json" },
+    { test = application::document_category::test_delete,    root = "tests/fixtures/application", pattern = r"document_category/delete/[^/]+\.json" },
 }

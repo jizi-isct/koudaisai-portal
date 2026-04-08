@@ -1,5 +1,6 @@
+use crate::application::common::{build_actor, mem, parse_group_type, parse_target, uid, ActorSpec};
+use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::application::authz::*;
-use koudaisai_portal_backend::application::ports::clock::Clock;
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::approval_request::{
     ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType,
@@ -7,112 +8,15 @@ use koudaisai_portal_backend::domain::approval_request::{
 use koudaisai_portal_backend::domain::approval_request_id::ApprovalRequestId;
 use koudaisai_portal_backend::domain::form::{Form, FormType};
 use koudaisai_portal_backend::domain::form_id::FormId;
-use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
-use koudaisai_portal_backend::domain::membership::Membership;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
+use koudaisai_portal_backend::domain::membership::Membership;
 use koudaisai_portal_backend::domain::user_id::UserId;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
 use uuid::Uuid;
-
-struct FixedClock;
-impl Clock for FixedClock {
-    fn now(&self) -> DateTime<Utc> {
-        Utc::now()
-    }
-}
-impl Clock for &FixedClock {
-    fn now(&self) -> DateTime<Utc> {
-        Utc::now()
-    }
-}
-
-fn uid() -> UserId {
-    UserId::new(Uuid::new_v4())
-}
-
-fn mem(group_id: GroupId, user_id: UserId) -> Membership {
-    Membership::new(group_id, user_id, &FixedClock)
-}
-
-// ---------------------------------------------------------------------------
-// ActorSpec: fixture representation of ActorContext
-// ---------------------------------------------------------------------------
-//
-// JSON examples:
-//   {"Admin": {"claims": ["koudaisai-portal:admin:user:read"]}}
-//   {"User": {"group_type": "press", "group_ids": ["G-001"]}}
-//   "Nologin"
-
-#[derive(Deserialize)]
-enum ActorSpec {
-    Admin {
-        #[serde(default)]
-        claims: Vec<String>,
-    },
-    User {
-        #[serde(default)]
-        group_type: String,
-        #[serde(default)]
-        group_ids: Vec<String>,
-    },
-    Nologin,
-}
-
-fn parse_group_type(s: &str) -> GroupType {
-    match s {
-        "" | "press" => GroupType::Press { representative: uid() },
-        "general" => GroupType::GeneralProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "booth" => GroupType::BoothProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "stage" => GroupType::StageProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "labo" => GroupType::LabProject { representative: uid() },
-        s => panic!("unknown group_type: {s}"),
-    }
-}
-
-fn parse_target(s: &str) -> TargetSpecifier {
-    match s {
-        "press" => TargetSpecifier::GroupTypePress,
-        "general" => TargetSpecifier::GroupTypeProjectGeneral,
-        "booth" => TargetSpecifier::GroupTypeProjectBooth,
-        "stage" => TargetSpecifier::GroupTypeProjectStage,
-        "labo" => TargetSpecifier::GroupTypeProjectLabo,
-        s => TargetSpecifier::from_str(s).unwrap(),
-    }
-}
-
-/// Returns `(actor_user_id, ActorContext)`.
-/// The `actor_user_id` is needed for identity-based checks (e.g. can_close_approval_request).
-fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
-    let user_id = uid();
-    match spec {
-        ActorSpec::Admin { claims } => (user_id, ActorContext::Admin { user_id, claims }),
-        ActorSpec::User { group_type, group_ids } => {
-            let memberships: Vec<Membership> = group_ids
-                .iter()
-                .map(|g| mem(GroupId::from_str(g).unwrap(), user_id))
-                .collect();
-            let gt = parse_group_type(&group_type);
-            (user_id, ActorContext::User { user_id, memberships, group_type: gt })
-        }
-        ActorSpec::Nologin => (user_id, ActorContext::NoLogin),
-    }
-}
 
 fn matches_result(result: &Result<(), CanGetByIdError>, expected: &str) -> bool {
     match (result, expected) {

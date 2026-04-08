@@ -104,4 +104,24 @@ impl<
     pub fn form(&'_ self) -> form::FormApp<'_, FR, C> {
         form::FormApp::new(&self.form_repo, &self.clock)
     }
+
+    pub fn user_repo(&self) -> &UR {
+        &self.user_repo
+    }
+
+    pub fn membership_repo(&self) -> &MR {
+        &self.membership_repo
+    }
+
+    pub fn group_repo(&self) -> &GR {
+        &self.group_repo
+    }
+
+    pub fn form_repo(&self) -> &FR {
+        &self.form_repo
+    }
+
+    pub fn document_category_repo(&self) -> &DCR {
+        &self.document_category_repo
+    }
 }
