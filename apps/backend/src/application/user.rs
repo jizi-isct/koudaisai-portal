@@ -9,6 +9,12 @@ use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
+use crate::entities::notification::NotificationRead;
+use crate::entities::user::UserRead;
+use crate::entities::user_id::UserId as ApiUserId;
+use crate::middlewares::CurrentUser;
+use sea_orm::DbConn;
+use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
 pub struct UserApp<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock> {
@@ -16,6 +22,114 @@ pub struct UserApp<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>
     membership_repo: &'a MR,
     user_repo: &'a UR,
     clock: &'a C,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserNotificationWithReadStatus {
+    pub is_read: bool,
+    pub notification: NotificationRead,
+}
+
+#[derive(Debug)]
+pub enum GetUserNotificationsError {
+    Forbidden,
+    NotFound,
+    Internal(anyhow::Error),
+}
+
+pub async fn get_user_notifications_with_read_status(
+    current_user: &CurrentUser,
+    user_id: ApiUserId,
+    db_conn: &DbConn,
+) -> Result<Vec<UserNotificationWithReadStatus>, GetUserNotificationsError> {
+    match current_user {
+        CurrentUser::None => Err(GetUserNotificationsError::Forbidden),
+        CurrentUser::Admin(_) => {
+            let user_id = match user_id {
+                ApiUserId::Uuid(uuid) => uuid,
+                ApiUserId::Me => return Err(GetUserNotificationsError::NotFound),
+            };
+
+            let user = UserRead::find_from_id(user_id, db_conn)
+                .await
+                .map_err(|e| GetUserNotificationsError::Internal(e.into()))?
+                .ok_or(GetUserNotificationsError::NotFound)?;
+
+            let notifications = NotificationRead::get_all(db_conn)
+                .await
+                .map_err(GetUserNotificationsError::Internal)?;
+
+            let mut response = Vec::with_capacity(notifications.len());
+            for notification in notifications {
+                let is_read = user
+                    .is_notification_read(notification.id, db_conn)
+                    .await
+                    .map_err(GetUserNotificationsError::Internal)?;
+                response.push(UserNotificationWithReadStatus {
+                    is_read,
+                    notification,
+                });
+            }
+
+            Ok(response)
+        }
+        CurrentUser::User(claims) => {
+            let current_user = UserRead::from(claims.clone(), db_conn)
+                .await
+                .map_err(GetUserNotificationsError::Internal)?;
+
+            let target_user_id = match user_id {
+                ApiUserId::Uuid(uuid) => uuid,
+                ApiUserId::Me => current_user.id,
+            };
+
+            let user = UserRead::find_from_id(target_user_id, db_conn)
+                .await
+                .map_err(|e| GetUserNotificationsError::Internal(e.into()))?
+                .ok_or(GetUserNotificationsError::NotFound)?;
+
+            if user.group_id != current_user.group_id {
+                return Err(GetUserNotificationsError::NotFound);
+            }
+
+            let all_notifications = NotificationRead::get_all(db_conn)
+                .await
+                .map_err(GetUserNotificationsError::Internal)?;
+
+            let mut visible_notifications = vec![];
+            for notification in all_notifications {
+                let mut matches = false;
+                for target_specifier in &notification.target {
+                    if target_specifier
+                        .does_user_match(Some(&user), db_conn)
+                        .await
+                        .map_err(GetUserNotificationsError::Internal)?
+                    {
+                        matches = true;
+                        break;
+                    }
+                }
+
+                if matches {
+                    visible_notifications.push(notification);
+                }
+            }
+
+            let mut response = Vec::with_capacity(visible_notifications.len());
+            for notification in visible_notifications {
+                let is_read = user
+                    .is_notification_read(notification.id, db_conn)
+                    .await
+                    .map_err(GetUserNotificationsError::Internal)?;
+                response.push(UserNotificationWithReadStatus {
+                    is_read,
+                    notification,
+                });
+            }
+
+            Ok(response)
+        }
+    }
 }
 
 impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>

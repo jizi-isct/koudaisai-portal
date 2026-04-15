@@ -1,34 +1,10 @@
 use crate::application::ports::clock::Clock;
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
+use crate::domain::notification_id::NotificationId;
 use crate::domain::target_specifier::TargetSpecifier;
 use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
-use std::fmt::Display;
-use uuid::Uuid;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct NotificationId(Uuid);
-
-impl NotificationId {
-    pub fn new(id: Uuid) -> Self {
-        Self(id)
-    }
-
-    pub fn generate() -> Self {
-        Self(Uuid::new_v4())
-    }
-
-    pub fn as_uuid(&self) -> Uuid {
-        self.0
-    }
-}
-
-impl Display for NotificationId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum NotificationType {
@@ -83,7 +59,6 @@ impl Notification {
         created_by: Option<UserId>,
         clock: &C,
     ) -> Result<Self, FactoryError> {
-        Self::validate_target(&target)?;
         let now = clock.now();
 
         Ok(Self {
@@ -106,8 +81,6 @@ impl Notification {
         target: Vec<TargetSpecifier>,
         notification_type: NotificationType,
     ) -> Result<Self, FactoryError> {
-        Self::validate_target(&target)?;
-
         Ok(Self {
             id,
             created_at,
@@ -153,7 +126,6 @@ impl Notification {
         updated_by: Option<UserId>,
         clock: &C,
     ) -> Result<(), FactoryError> {
-        Self::validate_target(&target)?;
         self.target = target;
         self.updated_by = updated_by;
         self.updated_at = clock.now();
@@ -177,21 +149,13 @@ impl Notification {
             NotificationType::ApprovalRequest { .. } => Err(InvalidTransitionError),
         }
     }
-
-    fn validate_target(target: &[TargetSpecifier]) -> Result<(), FactoryError> {
-        if target.is_empty() {
-            return Err(FactoryError::InvalidInput(
-                "Notification target is empty".to_string(),
-            ));
-        }
-        Ok(())
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use chrono::TimeZone;
+    use uuid::Uuid;
 
     struct MockClock {
         now: DateTime<Utc>,
@@ -204,7 +168,7 @@ mod tests {
     }
 
     #[test]
-    fn create_fails_when_target_is_empty() {
+    fn create_allows_empty_target() {
         let clock = MockClock {
             now: Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap(),
         };
@@ -215,9 +179,52 @@ mod tests {
             NotificationType::approval_request(ApprovalRequestId::generate()),
             None,
             &clock,
-        );
+        )
+        .unwrap();
 
-        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+        assert!(result.target().is_empty());
+    }
+
+    #[test]
+    fn create_with_non_empty_target_sets_fields() {
+        let now = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+        let clock = MockClock { now };
+        let created_by = Some(UserId::new(Uuid::new_v4()));
+        let notification_type =
+            NotificationType::markdown("title".to_string(), "body".to_string()).unwrap();
+
+        let notification = Notification::create(
+            NotificationId::generate(),
+            vec![TargetSpecifier::UserNologin],
+            notification_type.clone(),
+            created_by,
+            &clock,
+        )
+        .unwrap();
+
+        assert_eq!(notification.target(), &[TargetSpecifier::UserNologin]);
+        assert_eq!(notification.created_at(), &now);
+        assert_eq!(notification.updated_at(), &now);
+        assert_eq!(notification.created_by(), created_by);
+        assert_eq!(notification.updated_by(), created_by);
+        assert_eq!(notification.notification_type(), &notification_type);
+    }
+
+    #[test]
+    fn restore_allows_empty_target() {
+        let now = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+        let notification = Notification::restore(
+            NotificationId::generate(),
+            now,
+            now,
+            None,
+            None,
+            vec![],
+            NotificationType::approval_request(ApprovalRequestId::generate()),
+        )
+        .unwrap();
+
+        assert!(notification.target().is_empty());
     }
 
     #[test]
@@ -256,5 +263,87 @@ mod tests {
         );
 
         assert!(matches!(result, Err(InvalidTransitionError)));
+    }
+
+    #[test]
+    fn update_target_allows_empty_target() {
+        let clock = MockClock {
+            now: Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap(),
+        };
+
+        let mut notification = Notification::create(
+            NotificationId::generate(),
+            vec![TargetSpecifier::UserNologin],
+            NotificationType::approval_request(ApprovalRequestId::generate()),
+            None,
+            &clock,
+        )
+        .unwrap();
+
+        notification.update_target(vec![], None, &clock).unwrap();
+        assert!(notification.target().is_empty());
+    }
+
+    #[test]
+    fn update_target_with_non_empty_target_updates_values() {
+        let created_at = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+        let updated_at = Utc.with_ymd_and_hms(2026, 1, 2, 0, 0, 0).unwrap();
+        let create_clock = MockClock { now: created_at };
+        let update_clock = MockClock { now: updated_at };
+        let updater = Some(UserId::new(Uuid::new_v4()));
+
+        let mut notification = Notification::create(
+            NotificationId::generate(),
+            vec![],
+            NotificationType::approval_request(ApprovalRequestId::generate()),
+            None,
+            &create_clock,
+        )
+        .unwrap();
+
+        notification
+            .update_target(vec![TargetSpecifier::UserNologin], updater, &update_clock)
+            .unwrap();
+
+        assert_eq!(notification.target(), &[TargetSpecifier::UserNologin]);
+        assert_eq!(notification.updated_by(), updater);
+        assert_eq!(notification.updated_at(), &updated_at);
+    }
+
+    #[test]
+    fn update_markdown_on_markdown_notification_updates_content() {
+        let created_at = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+        let updated_at = Utc.with_ymd_and_hms(2026, 1, 2, 0, 0, 0).unwrap();
+        let create_clock = MockClock { now: created_at };
+        let update_clock = MockClock { now: updated_at };
+        let updater = Some(UserId::new(Uuid::new_v4()));
+
+        let mut notification = Notification::create(
+            NotificationId::generate(),
+            vec![TargetSpecifier::UserNologin],
+            NotificationType::markdown("old title".to_string(), "old body".to_string()).unwrap(),
+            None,
+            &create_clock,
+        )
+        .unwrap();
+
+        notification
+            .update_markdown(
+                "new title".to_string(),
+                "new body".to_string(),
+                updater,
+                &update_clock,
+            )
+            .unwrap();
+
+        assert_eq!(notification.updated_by(), updater);
+        assert_eq!(notification.updated_at(), &updated_at);
+        assert_eq!(
+            notification.notification_type(),
+            &NotificationType::Markdown {
+                title: "new title".to_string(),
+                content: "new body".to_string(),
+            }
+        );
     }
 }

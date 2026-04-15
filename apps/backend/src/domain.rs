@@ -9,6 +9,7 @@ pub mod group;
 pub mod group_id;
 pub mod membership;
 pub mod notification;
+pub mod notification_id;
 pub mod password_credentials;
 pub mod target_specifier;
 pub mod user;

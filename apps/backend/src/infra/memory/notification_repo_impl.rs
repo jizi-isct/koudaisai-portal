@@ -1,6 +1,7 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
-use crate::domain::notification::{Notification, NotificationId};
+use crate::domain::notification::Notification;
+use crate::domain::notification_id::NotificationId;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use anyhow::anyhow;
 use async_trait::async_trait;

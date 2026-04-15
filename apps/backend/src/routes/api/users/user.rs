@@ -1,6 +1,8 @@
 mod approval_requests;
 
-use crate::entities::notification::NotificationRead;
+use crate::application::user::{
+    GetUserNotificationsError, get_user_notifications_with_read_status,
+};
 use crate::entities::user::{UserRead, UserUpdate};
 use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
@@ -95,12 +97,6 @@ async fn patch_user(
     Ok((StatusCode::NO_CONTENT, ().into_response()))
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct GetNotificationsResponseEntry {
-    is_read: bool,
-    notification: NotificationRead,
-}
-
 #[instrument(
     name = "GET /api/v2/users/{user_id}/notifications",
     skip(state, current_user)
@@ -111,94 +107,20 @@ async fn get_notifications(
     Extension(current_user): Extension<CurrentUser>,
     Path(user_id): Path<UserId>,
 ) -> AppResponse {
-    match current_user {
-        CurrentUser::Admin(_) => {
-            let user_id = match user_id {
-                UserId::Uuid(uuid) => uuid,
-                UserId::Me => return Ok((StatusCode::NOT_FOUND, ().into_response())),
-            };
-            // 管理者の場合: 全てのユーザーの通知を取得可能
-            // ユーザー情報を取得
-            let user = UserRead::find_from_id(user_id, &state.db_conn).await?;
-            if user.is_none() {
+    let notifications =
+        match get_user_notifications_with_read_status(&current_user, user_id, &state.db_conn).await
+        {
+            Ok(notifications) => notifications,
+            Err(GetUserNotificationsError::Forbidden) => {
+                return Ok((StatusCode::FORBIDDEN, ().into_response()));
+            }
+            Err(GetUserNotificationsError::NotFound) => {
                 return Ok((StatusCode::NOT_FOUND, ().into_response()));
             }
-            let user = user.unwrap();
+            Err(GetUserNotificationsError::Internal(e)) => return Err(e.into()),
+        };
 
-            // ユーザーの既読情報を取得
-            let notifications = NotificationRead::get_all(&state.db_conn).await?;
-            let mut response_body = vec![];
-            for notification in notifications {
-                let is_read = user
-                    .is_notification_read(notification.id, &state.db_conn)
-                    .await?;
-                let entry = GetNotificationsResponseEntry {
-                    is_read,
-                    notification,
-                };
-                response_body.push(entry);
-            }
-
-            // レスポンスを返す
-            Ok((StatusCode::OK, Json(response_body).into_response()))
-        }
-        CurrentUser::User(claims) => {
-            // 一般ユーザーの場合: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
-            let current_user = UserRead::from(claims, &state.db_conn).await?;
-            let user_id = match user_id {
-                UserId::Uuid(uuid) => uuid,
-                UserId::Me => current_user.id,
-            };
-
-            // ユーザー情報を取得
-            let user = UserRead::find_from_id(user_id, &state.db_conn).await?;
-            if user.is_none() {
-                return Ok((StatusCode::NOT_FOUND, ().into_response()));
-            }
-            let user = user.unwrap();
-
-            // ユーザーが所属する団体と現在のユーザーの団体が一致しない場合は404を返す
-            if user.group_id != current_user.group_id {
-                return Ok((StatusCode::NOT_FOUND, ().into_response()));
-            }
-
-            // ユーザーの通知を取得
-            let mut notifications = vec![];
-            // ユーザーがアクセス可能な通知を取得
-            for notification in NotificationRead::get_all(&state.db_conn).await? {
-                let mut matches = false;
-                for target_specifier in &notification.target {
-                    if target_specifier
-                        .does_user_match(Some(&user), &state.db_conn)
-                        .await?
-                    {
-                        matches = true;
-                        break; // 1つでもマッチすればOK
-                    }
-                }
-                if matches {
-                    notifications.push(notification);
-                }
-            }
-
-            // ユーザーが既読かどうかを確認
-            let mut response_body = vec![];
-            for notification in notifications {
-                let is_read = user
-                    .is_notification_read(notification.id, &state.db_conn)
-                    .await?;
-                let entry = GetNotificationsResponseEntry {
-                    is_read,
-                    notification,
-                };
-                response_body.push(entry);
-            }
-
-            // レスポンスを返す
-            Ok((StatusCode::OK, Json(response_body).into_response()))
-        }
-        _ => Ok((StatusCode::FORBIDDEN, ().into_response())),
-    }
+    Ok((StatusCode::OK, Json(notifications).into_response()))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

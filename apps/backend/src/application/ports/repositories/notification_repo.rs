@@ -1,6 +1,7 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::transaction::Transaction;
-use crate::domain::notification::{Notification, NotificationId};
+use crate::domain::notification::Notification;
+use crate::domain::notification_id::NotificationId;
 
 #[async_trait::async_trait]
 pub trait NotificationRepo<Tx: Transaction> {
