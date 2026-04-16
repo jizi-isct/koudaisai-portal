@@ -30,17 +30,21 @@ export function useDownloadUrl(fetchClient: ApiFetchClient, fileKey: string, fil
 export function useDownload() {
   return useCallback(
     (url: string, fileName: string) => {
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      if (url.startsWith("blob:")) {
-        URL.revokeObjectURL(url);
-      }
+      download(url, fileName);
     }, []
   );
+}
+
+export function download(url: string, fileName: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  if (url.startsWith("blob:")) {
+    URL.revokeObjectURL(url);
+  }
 }
