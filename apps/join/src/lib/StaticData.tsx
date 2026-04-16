@@ -75,10 +75,10 @@ export const topPageData: TopPageData = {
         </>
       },
       {
-        title: "事前安全講習会+第二回参加団体総会",
+        title: "事前安全講習会",
         date: "9/16(水)",
         children: <>
-          責任者3名に出席していただく必要がございます。
+          責任者3名に出席していただく必要がございます。また、第二回参加団体総会も付随しての開催となります。
           資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
@@ -157,10 +157,10 @@ export const topPageData: TopPageData = {
         </>
       },
       {
-        title: "事前安全講習会+第二回参加団体総会",
+        title: "事前安全講習会",
         date: "9/16(水)",
         children: <>
-          責任者のうち1名に出席していただく必要がございます。
+          責任者のうち1名に出席していただく必要がございます。また、第二回参加団体総会も付随しての開催となります。
           資料は<Link href={"/documents"}>こちら</Link>から
         </>
       },
