@@ -1,5 +1,8 @@
 import {Metadata} from "next";
-import { ConfigProvider } from "antd";
+import {ConfigProvider} from "antd";
+import {Footer, Header} from "@koudaisai/shared-ui";
+import '../globals.css';
+import '../members.css';
 
 export const metadata: Metadata = {
   title: '工大祭ポータル',
@@ -20,16 +23,18 @@ const antdTheme = {
 }
 
 export default function RootLayout({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode
 }) {
   return (
     <html lang="ja">
     <body id={"app"}>
-      <ConfigProvider theme={antdTheme}>
-        {children}
-      </ConfigProvider>
+    <Header/>
+    <ConfigProvider theme={antdTheme}>
+      {children}
+    </ConfigProvider>
+    <Footer isLoggedIn={false}/>
     </body>
     </html>
   )
