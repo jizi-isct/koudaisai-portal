@@ -1,6 +1,4 @@
-"use client";
-
-import {DocumentFormatMarkdownRead} from "@/lib";
+import {DocumentFormatMarkdownRead} from "@koudaisai/shared-types";
 import Markdown from "react-markdown";
 
 type ViewDocumentFormatMarkdownProps = {

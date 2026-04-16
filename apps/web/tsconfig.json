@@ -45,5 +45,12 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "references": []
+  "references": [
+    {
+      "path": "../../libs/shared-api"
+    },
+    {
+      "path": "../../libs/shared-ui-document"
+    }
+  ]
 }
