@@ -31,6 +31,12 @@
     },
     {
       "path": "./apps/join"
+    },
+    {
+      "path": "./libs/shared-ui-document"
+    },
+    {
+      "path": "./libs/shared-api-utils"
     }
   ]
 }
