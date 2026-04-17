@@ -3,13 +3,10 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/web",
+      "path": "./apps/web"
     },
     {
       "path": "./libs/shared-types"
-    },
-    {
-      "path": "./apps/web"
     },
     {
       "path": "./libs/shared-ui"
@@ -34,6 +31,12 @@
     },
     {
       "path": "./apps/join"
+    },
+    {
+      "path": "./libs/shared-ui-document"
+    },
+    {
+      "path": "./libs/shared-api-utils"
     }
   ]
 }
