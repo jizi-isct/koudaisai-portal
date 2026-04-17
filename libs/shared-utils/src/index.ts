@@ -5,4 +5,3 @@ export * from "./document"
 export * from './file';
 export * from './validation';
 export * from './representative';
-export * from './ClientFile';
