@@ -1,6 +1,8 @@
 pub mod actor_ctx;
 pub mod approval_request;
 pub mod approval_request_id;
+pub mod document;
+pub mod document_category;
 pub mod email_address;
 pub mod error;
 pub mod form;
@@ -12,4 +14,3 @@ pub mod password_credentials;
 pub mod target_specifier;
 pub mod user;
 pub mod user_id;
-pub mod document_category;
