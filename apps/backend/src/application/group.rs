@@ -53,7 +53,7 @@ impl<'a, Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRep
         actor_ctx: &ActorContext,
     ) -> Result<Vec<Group>, ApplicationOperationError<FindError>> {
         // auth
-        if (!authz::can_get_all_groups(actor_ctx)) {
+        if !authz::can_get_all_groups(actor_ctx) {
             return Err(ApplicationOperationError::Unauthorized);
         }
 
