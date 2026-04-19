@@ -1,0 +1,6 @@
+{
+  "actor": "user",
+  "actor_group_id": "G-001",
+  "query_group_id": "G-001",
+  "expected": true
+}

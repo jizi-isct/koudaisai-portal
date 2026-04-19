@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:user:change-email"
+      ]
+    }
+  },
+  "expected": true
+}

@@ -1,0 +1,12 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "press",
+      "group_ids": []
+    }
+  },
+  "form_targets": [
+    "press"
+  ],
+  "expected": true
+}

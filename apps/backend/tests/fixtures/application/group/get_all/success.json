@@ -1,0 +1,1 @@
+{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:group:read"]}}, "seed_group_count": 1, "expected": "ok"}
