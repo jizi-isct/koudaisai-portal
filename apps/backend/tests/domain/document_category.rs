@@ -42,6 +42,7 @@ pub fn test_change_title(_path: &Path, contents: String) -> datatest_stable::Res
     let result = cat.change_title(c.new_title.clone(), &FixedClock);
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_title);
+        assert_eq!(cat.title(), c.new_title.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.new_title);
     }
@@ -62,6 +63,7 @@ pub fn test_change_emoji(_path: &Path, contents: String) -> datatest_stable::Res
     let result = cat.change_emoji(c.new_emoji.clone(), &FixedClock);
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_emoji);
+        assert_eq!(cat.emoji(), c.new_emoji.as_deref());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.new_emoji);
     }

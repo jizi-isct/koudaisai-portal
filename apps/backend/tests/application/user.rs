@@ -134,6 +134,9 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         match c.expected.as_str() {
             "ok" => {
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
+                let saved = app.user_repo().find_by_id(user.id()).await.unwrap();
+                assert!(saved.is_some());
+                assert_eq!(saved.unwrap().name(), "Updated Name");
             }
             "unauthorized" => {
                 assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));

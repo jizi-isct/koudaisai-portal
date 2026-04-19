@@ -42,7 +42,9 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
         &FixedClock,
     );
     if c.ok {
-        assert!(result.is_ok(), "expected Ok for name={:?} summary={:?}", c.name, c.summary);
+        let form = result.expect(&format!("expected Ok for name={:?} summary={:?}", c.name, c.summary));
+        assert_eq!(form.name(), c.name.as_str());
+        assert_eq!(form.summary(), c.summary.as_str());
     } else {
         assert!(result.is_err(), "expected Err for name={:?} summary={:?}", c.name, c.summary);
     }
@@ -63,6 +65,7 @@ pub fn test_rename(_path: &Path, contents: String) -> datatest_stable::Result<()
     let result = form.rename(c.new_name.clone(), Uuid::new_v4(), &FixedClock);
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_name);
+        assert_eq!(form.name(), c.new_name.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.new_name);
     }
@@ -83,6 +86,7 @@ pub fn test_change_summary(_path: &Path, contents: String) -> datatest_stable::R
     let result = form.change_summary(c.new_summary.clone(), Uuid::new_v4(), &FixedClock);
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_summary);
+        assert_eq!(form.summary(), c.new_summary.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.new_summary);
     }

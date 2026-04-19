@@ -39,7 +39,8 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
     let group_type = GroupType::Press { representative: UserId::new(Uuid::new_v4()) };
     let result = Group::register(GroupId::new('A', 1).unwrap(), c.name.clone(), group_type, &FixedClock);
     if c.ok {
-        assert!(result.is_ok(), "expected Ok for {:?}", c.name);
+        let group = result.expect(&format!("expected Ok for {:?}", c.name));
+        assert_eq!(group.name(), c.name.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.name);
     }
@@ -60,6 +61,7 @@ pub fn test_rename(_path: &Path, contents: String) -> datatest_stable::Result<()
     let result = group.rename(c.new_name.clone(), &FixedClock);
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_name);
+        assert_eq!(group.name(), c.new_name.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.new_name);
     }
@@ -89,6 +91,12 @@ pub fn test_update_roles(_path: &Path, contents: String) -> datatest_stable::Res
     let result = group.update_roles(new_type, &FixedClock, &membership);
     if c.ok {
         assert!(result.is_ok(), "expected Ok: {:?}→{:?} match={}", c.from_type, c.to_type, c.membership_matches);
+        let expected = parse_group_type(&c.to_type);
+        assert_eq!(
+            std::mem::discriminant(group.r#type()),
+            std::mem::discriminant(&expected),
+            "expected group type {:?} but got {:?}", c.to_type, group.r#type()
+        );
     } else {
         assert!(result.is_err(), "expected Err: {:?}→{:?} match={}", c.from_type, c.to_type, c.membership_matches);
     }

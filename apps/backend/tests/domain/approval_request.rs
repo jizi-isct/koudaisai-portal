@@ -1,6 +1,6 @@
 use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::{
-    approval_request::{ApprovalRequest, ApprovalRequestType},
+    approval_request::{ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType},
     approval_request_id::ApprovalRequestId,
     user_id::UserId,
 };
@@ -37,7 +37,8 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
         &FixedClock,
     );
     if c.ok {
-        assert!(result.is_ok(), "expected Ok for reason {:?}", c.reason);
+        let req = result.expect(&format!("expected Ok for reason {:?}", c.reason));
+        assert_eq!(req.issue_reason(), c.reason.as_str());
     } else {
         assert!(result.is_err(), "expected Err for reason {:?}", c.reason);
     }
@@ -75,6 +76,12 @@ pub fn test_transition(_path: &Path, contents: String) -> datatest_stable::Resul
 
     if c.ok {
         assert!(result.is_ok(), "expected Ok: {:?} → {:?}", c.initial, c.operation);
+        match c.operation.as_str() {
+            "approve" => assert!(matches!(req.status(), ApprovalRequestStatus::Approved { .. }), "expected Approved status"),
+            "reject"  => assert!(matches!(req.status(), ApprovalRequestStatus::Rejected { .. }), "expected Rejected status"),
+            "close"   => assert!(matches!(req.status(), ApprovalRequestStatus::Closed { .. }), "expected Closed status"),
+            _ => unreachable!(),
+        }
     } else {
         assert!(result.is_err(), "expected Err: {:?} → {:?}", c.initial, c.operation);
     }
