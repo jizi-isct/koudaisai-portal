@@ -1,5 +1,5 @@
 import {DocumentFormatMiscRead} from "@koudaisai/shared-types";
-import {Button} from "@koudaisai/shared-ui";
+import {LargeButton} from "@koudaisai/shared-ui";
 
 type ViewDocumentFormatMiscProps = {
   download: () => void,
@@ -15,7 +15,7 @@ type ViewDocumentFormatMiscProps = {
 export function ViewDocumentFormatMisc({download, format}: ViewDocumentFormatMiscProps) {
   return (
     <div>
-      <Button text={"ダウンロード"} onClick={() => download()}/>
+      <LargeButton text={"ダウンロード"} onClick={() => download()}/>
     </div>
   )
 }
