@@ -1,8 +1,7 @@
-use crate::application::common::{build_actor, parse_target, ActorSpec};
-use crate::domain::common::FixedClock;
+use crate::application::common::{build_actor, parse_target, uid, ActorSpec};
 use koudaisai_portal_backend::application::error::{ApplicationOperationError, DeleteError, UpdateError};
-use koudaisai_portal_backend::application::ports::repositories::form_repo::FormRepo;
-use koudaisai_portal_backend::domain::form::{Form, FormType};
+use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
+use koudaisai_portal_backend::domain::form::FormType;
 use koudaisai_portal_backend::domain::form_id::FormId;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
@@ -15,19 +14,26 @@ fn make_app() -> MemoryApplication {
     MemoryApplication::new_memory_app(Utc::now())
 }
 
-async fn seed_form(app: &MemoryApplication, targets: Vec<TargetSpecifier>) -> Form {
-    let form = Form::register(
-        Uuid::new_v4(),
-        targets,
-        "Test Form".to_string(),
-        "Test Summary".to_string(),
-        Utc::now() + chrono::Duration::days(7),
-        FormType::TypeExternal { form_url: "https://example.com/form".to_string() },
-        &FixedClock,
-    )
-    .unwrap();
-    app.form_repo().insert(form.clone()).await.unwrap();
-    form
+fn admin_ctx() -> ActorContext {
+    ActorContext::Admin {
+        user_id: uid(),
+        claims: vec!["koudaisai-portal:admin:form:create".to_string()],
+    }
+}
+
+async fn seed_form(app: &MemoryApplication, targets: Vec<TargetSpecifier>) -> FormId {
+    let ctx = admin_ctx();
+    app.form()
+        .create(
+            &ctx,
+            targets,
+            "Test Form".to_string(),
+            "Test Summary".to_string(),
+            Utc::now() + chrono::Duration::days(7),
+            FormType::TypeExternal { form_url: "https://example.com/form".to_string() },
+        )
+        .await
+        .unwrap()
 }
 
 // --- get_all ---
@@ -73,8 +79,7 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
 
         let targets: Vec<TargetSpecifier> = c.form_targets.iter().map(|t| parse_target(t)).collect();
         let form_id = if c.form_exists {
-            let form = seed_form(&app, targets).await;
-            form.id()
+            seed_form(&app, targets).await
         } else {
             FormId::new(Uuid::new_v4())
         };
@@ -157,8 +162,7 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         let app = make_app();
 
         let form_id = if c.form_exists {
-            let form = seed_form(&app, vec![TargetSpecifier::GroupTypePress]).await;
-            form.id()
+            seed_form(&app, vec![TargetSpecifier::GroupTypePress]).await
         } else {
             FormId::new(Uuid::new_v4())
         };
@@ -206,8 +210,7 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
         let app = make_app();
 
         let form_id = if c.form_exists {
-            let form = seed_form(&app, vec![TargetSpecifier::GroupTypePress]).await;
-            form.id()
+            seed_form(&app, vec![TargetSpecifier::GroupTypePress]).await
         } else {
             FormId::new(Uuid::new_v4())
         };

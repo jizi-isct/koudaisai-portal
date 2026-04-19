@@ -1,7 +1,6 @@
-use crate::application::common::{build_actor, ActorSpec};
-use crate::domain::common::FixedClock;
+use crate::application::common::{build_actor, uid, ActorSpec};
 use koudaisai_portal_backend::application::error::{ApplicationOperationError, DeleteError, UpdateError};
-use koudaisai_portal_backend::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
+use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::document_category::DocumentCategory;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
 use chrono::Utc;
@@ -13,15 +12,19 @@ fn make_app() -> MemoryApplication {
     MemoryApplication::new_memory_app(Utc::now())
 }
 
+fn admin_ctx() -> ActorContext {
+    ActorContext::Admin {
+        user_id: uid(),
+        claims: vec!["koudaisai-portal:admin:document-category:create".to_string()],
+    }
+}
+
 async fn seed_category(app: &MemoryApplication) -> DocumentCategory {
-    let category = DocumentCategory::register(
-        "Test Category".to_string(),
-        Some("📃".to_string()),
-        &FixedClock,
-    )
-    .unwrap();
-    app.document_category_repo().insert(&category).await.unwrap();
-    category
+    let ctx = admin_ctx();
+    app.document_category()
+        .create(&ctx, "Test Category".to_string(), Some("📃".to_string()))
+        .await
+        .unwrap()
 }
 
 // --- get_all ---

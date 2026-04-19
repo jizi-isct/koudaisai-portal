@@ -2,7 +2,9 @@ use std::marker::PhantomData;
 use uuid::Uuid;
 
 use crate::application::authz::{self, CanGetByIdError};
-use crate::application::error::{ApplicationOperationError, DeleteError, FindError, UpdateError};
+use crate::application::error::{
+    ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
+};
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::transaction::Transaction;
 
@@ -27,6 +29,21 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
             document_category_repo,
             clock,
         }
+    }
+
+    pub async fn create(
+        &self,
+        actor_ctx: &ActorContext,
+        title: String,
+        emoji: Option<String>,
+    ) -> Result<DocumentCategory, ApplicationOperationError<InsertError>> {
+        if !authz::can_create_document_category(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        let category = DocumentCategory::register(title, emoji, self.clock)
+            .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
+        self.document_category_repo.insert(&category).await?;
+        Ok(category)
     }
 
     pub async fn get_all(

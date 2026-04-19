@@ -82,9 +82,12 @@ pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
     }
 }
 
-pub fn run<F: std::future::Future>(f: F) -> F::Output {
-    tokio::runtime::Builder::new_current_thread()
+thread_local! {
+    static RUNTIME: tokio::runtime::Runtime = tokio::runtime::Builder::new_current_thread()
         .build()
-        .unwrap()
-        .block_on(f)
+        .unwrap();
+}
+
+pub fn run<F: std::future::Future>(f: F) -> F::Output {
+    RUNTIME.with(|rt| rt.block_on(f))
 }

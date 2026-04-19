@@ -1,6 +1,6 @@
 use crate::application::authz;
 use crate::application::authz::CanGetByIdError;
-use crate::application::error::{ApplicationOperationError, FindError, UpdateError};
+use crate::application::error::{ApplicationOperationError, FindError, InsertError, UpdateError};
 use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
@@ -28,6 +28,25 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
             user_repo,
             clock,
         }
+    }
+
+    pub async fn register(
+        &self,
+        actor_ctx: &ActorContext,
+        user_id: UserId,
+        name: String,
+        m_address: EmailAddress,
+    ) -> Result<User, ApplicationOperationError<InsertError>>
+    where
+        &'a C: Clock,
+    {
+        if !authz::can_get_all_users(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        let user = User::register(user_id, name, m_address, self.clock)
+            .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
+        self.user_repo.insert(&user).await?;
+        Ok(user)
     }
 
     pub async fn get_all(
