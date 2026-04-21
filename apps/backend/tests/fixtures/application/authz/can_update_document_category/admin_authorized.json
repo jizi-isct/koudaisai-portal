@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:document-category:update"
+      ]
+    }
+  },
+  "expected": true
+}

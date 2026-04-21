@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:group:create"
+      ]
+    }
+  },
+  "expected": true
+}

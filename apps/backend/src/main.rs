@@ -13,9 +13,9 @@ use tracing::{debug, info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
-mod application;
+pub(crate) mod application;
 pub mod config;
-pub mod domain;
+pub(crate) mod domain;
 pub mod entities;
 mod infra;
 pub mod middlewares;

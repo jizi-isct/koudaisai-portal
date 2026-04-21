@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "",
+      "group_ids": []
+    }
+  },
+  "actor_is_issuer": true,
+  "expected": true
+}

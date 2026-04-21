@@ -1,0 +1,11 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:user:read"
+      ]
+    }
+  },
+  "target_group_ids": [],
+  "expected": "ok"
+}

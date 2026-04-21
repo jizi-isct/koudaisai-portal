@@ -1,0 +1,1 @@
+{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:group:read"]}}, "group_id": "P-001", "group_exists": false, "seed_actor_membership": false, "expected": "none"}

@@ -1,0 +1,5 @@
+{
+  "actor": "user_press",
+  "query": "press",
+  "expected": true
+}
