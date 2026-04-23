@@ -18,6 +18,7 @@ use uuid::Uuid;
 pub mod plan;
 pub mod press;
 
+#[deprecated]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GroupTypeCreate {

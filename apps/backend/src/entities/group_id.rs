@@ -1,6 +1,7 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 
+#[deprecated]
 #[derive(Debug, Clone)]
 pub enum GroupId {
     String(String),

@@ -2,6 +2,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 use uuid::Uuid;
 
+#[deprecated]
 #[derive(Debug, Clone)]
 pub enum UserId {
     Uuid(Uuid),

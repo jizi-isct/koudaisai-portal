@@ -11,12 +11,14 @@ use sea_orm::{DbConn, EntityTrait, NotSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[deprecated]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum FormType {
     TypeExternal { form_url: String },
 }
 
+#[deprecated]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FormCreate {
     pub targets: Vec<TargetSpecifier>,
