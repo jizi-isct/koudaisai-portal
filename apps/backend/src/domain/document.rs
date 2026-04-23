@@ -6,6 +6,7 @@ use crate::domain::user_id::UserId;
 
 use crate::{application::ports::clock::Clock, domain::error::FactoryError};
 
+#[derive(Debug, Clone)]
 pub struct Document {
     id: Uuid,
     created_at: DateTime<Utc>,
