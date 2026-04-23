@@ -1,5 +1,5 @@
-pub(crate) mod domain;
 pub(crate) mod application;
+pub(crate) mod domain;
 
 datatest_stable::harness! {
     // email_address
@@ -11,6 +11,13 @@ datatest_stable::harness! {
     // approval_request
     { test = domain::approval_request::test_create,     root = "tests/fixtures/domain", pattern = r"approval_request/create/[^/]+\.json" },
     { test = domain::approval_request::test_transition, root = "tests/fixtures/domain", pattern = r"approval_request/transition/[^/]+\.json" },
+    // document
+    { test = domain::document::test_register,           root = "tests/fixtures/domain", pattern = r"document/register/[^/]+\.json" },
+    { test = domain::document::test_change_title,       root = "tests/fixtures/domain", pattern = r"document/change_title/[^/]+\.json" },
+    { test = domain::document::test_change_category,    root = "tests/fixtures/domain", pattern = r"document/change_category/[^/]+\.json" },
+    { test = domain::document::test_change_format,       root = "tests/fixtures/domain", pattern = r"document/change_format/[^/]+\.json" },
+    { test = domain::document::test_change_targets,    root = "tests/fixtures/domain", pattern = r"document/change_targets/[^/]+\.json" },
+
     // document_category
     { test = domain::document_category::test_register,     root = "tests/fixtures/domain", pattern = r"document_category/register/[^/]+\.json" },
     { test = domain::document_category::test_change_title, root = "tests/fixtures/domain", pattern = r"document_category/change_title/[^/]+\.json" },
