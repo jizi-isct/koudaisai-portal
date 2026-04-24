@@ -1,0 +1,10 @@
+{
+  "actor": "Nologin",
+  "document_exists": true,
+  "new_title": "Updated Title",
+  "update_category": false,
+  "new_category": null,
+  "new_format": null,
+  "new_targets": null,
+  "expected": "unauthorized"
+}

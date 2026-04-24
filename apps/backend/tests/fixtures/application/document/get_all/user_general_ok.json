@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "general"
+    }
+  },
+  "seed_count": 2,
+  "expected_count": 2,
+  "expected": "ok"
+}

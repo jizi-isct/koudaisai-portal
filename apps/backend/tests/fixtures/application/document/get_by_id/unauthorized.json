@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "document_exists": true,
+  "expected": "unauthorized"
+}
