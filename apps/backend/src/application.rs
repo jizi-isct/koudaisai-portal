@@ -2,6 +2,7 @@ use crate::application::ports::clock::Clock;
 use crate::application::ports::email::Email;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
+use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
@@ -26,6 +27,7 @@ pub struct Application<
     GR: GroupRepo<Tx>,
     MR: MembershipRepo<Tx>,
     UR: UserRepo<Tx>,
+    DR: DocumentRepo<Tx>,
     DCR: DocumentCategoryRepo<Tx>,
     FR: FormRepo,
     C: Clock,
@@ -36,6 +38,7 @@ pub struct Application<
     group_repo: GR,
     membership_repo: MR,
     user_repo: UR,
+    document_repo: DR,
     document_category_repo: DCR,
     form_repo: FR,
     clock: C,
@@ -48,17 +51,19 @@ impl<
     GR: GroupRepo<Tx>,
     MR: MembershipRepo<Tx>,
     UR: UserRepo<Tx>,
+    DR: DocumentRepo<Tx>,
     DCR: DocumentCategoryRepo<Tx>,
     FR: FormRepo,
     C: Clock,
     E: Email,
-> Application<Tx, AR, GR, MR, UR, DCR, FR, C, E>
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E>
 {
     pub fn new(
         approval_request_repo: AR,
         group_repo: GR,
         membership_repo: MR,
         user_repo: UR,
+        document_repo: DR,
         document_category_repo: DCR,
         form_repo: FR,
         clock: C,
@@ -70,6 +75,7 @@ impl<
             group_repo,
             membership_repo,
             user_repo,
+            document_repo,
             document_category_repo,
             form_repo,
             clock,
@@ -96,6 +102,10 @@ impl<
 
     pub fn user(&'_ self) -> UserApp<'_, Tx, MR, UR, C> {
         UserApp::new(&self.membership_repo, &self.user_repo, &self.clock)
+    }
+
+    pub fn document(&'_ self) -> document::DocumentApp<'_, Tx, DR, C> {
+        document::DocumentApp::new(&self.document_repo, &self.clock)
     }
 
     pub fn document_category(&'_ self) -> document_category::DocumentCategoryApp<'_, Tx, DCR, C> {
