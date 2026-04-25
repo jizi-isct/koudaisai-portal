@@ -1,6 +1,7 @@
 {
   "actor": "Nologin",
-  "seed_count": 2,
+  "seed_count": 1,
+  "seed_targets": ["group/type/project_general"],
   "expected_count": 0,
   "expected": "ok"
 }

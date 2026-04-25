@@ -24,14 +24,14 @@ fn admin_ctx() -> ActorContext {
     }
 }
 
-async fn seed_document(app: &MemoryApplication) -> Document {
+async fn seed_document(app: &MemoryApplication, targets: Vec<TargetSpecifier>) -> Document {
     let ctx = admin_ctx();
     app.document()
         .create(
             &ctx,
             "Test Document".to_string(),
             Some(Uuid::new_v4()),
-            vec![TargetSpecifier::GroupTypeProjectGeneral],
+            targets,
             DocumentFormat::Markdown {
                 content: "Test Content".to_string(),
             },
@@ -119,6 +119,8 @@ impl From<TestDocumentFormat> for DocumentFormat {
 struct GetAllCase {
     actor: ActorSpec,
     seed_count: usize,
+    #[serde(default)]
+    seed_targets: Vec<String>,
     expected_count: usize,
     expected: String,
 }
@@ -128,8 +130,17 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
         let c: GetAllCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
+        let targets = if c.seed_targets.is_empty() {
+            vec![TargetSpecifier::GroupTypeProjectGeneral]
+        } else {
+            c.seed_targets
+                .iter()
+                .map(|s| TargetSpecifier::from_str(s).unwrap())
+                .collect()
+        };
+
         for _ in 0..c.seed_count {
-            seed_document(&app).await;
+            seed_document(&app, targets.clone()).await;
         }
 
         let (_, ctx) = build_actor(c.actor);
@@ -157,6 +168,8 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
 struct GetByCategoryCase {
     actor: ActorSpec,
     seed_count: usize,
+    #[serde(default)]
+    seed_targets: Vec<String>,
     expected_count: usize,
     expected: String,
 }
@@ -166,8 +179,17 @@ pub fn test_get_by_category(_path: &Path, contents: String) -> datatest_stable::
         let c: GetByCategoryCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
+        let targets = if c.seed_targets.is_empty() {
+            vec![TargetSpecifier::GroupTypeProjectGeneral]
+        } else {
+            c.seed_targets
+                .iter()
+                .map(|s| TargetSpecifier::from_str(s).unwrap())
+                .collect()
+        };
+
         for _ in 0..c.seed_count {
-            seed_document(&app).await;
+            seed_document(&app, targets.clone()).await;
         }
 
         let (_, ctx) = build_actor(c.actor);
@@ -196,6 +218,8 @@ pub fn test_get_by_category(_path: &Path, contents: String) -> datatest_stable::
 struct GetByIdCase {
     actor: ActorSpec,
     document_exists: bool,
+    #[serde(default)]
+    document_targets: Vec<String>,
     expected: String,
 }
 
@@ -205,7 +229,15 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
         let app = make_app();
 
         let document_id = if c.document_exists {
-            let doc = seed_document(&app).await;
+            let targets = if c.document_targets.is_empty() {
+                vec![TargetSpecifier::GroupTypeProjectGeneral]
+            } else {
+                c.document_targets
+                    .iter()
+                    .map(|s| TargetSpecifier::from_str(s).unwrap())
+                    .collect()
+            };
+            let doc = seed_document(&app, targets).await;
             doc.id()
         } else {
             Uuid::new_v4()
@@ -254,7 +286,7 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         let app = make_app();
 
         let document_id = if c.document_exists {
-            let doc = seed_document(&app).await;
+            let doc = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
             doc.id()
         } else {
             Uuid::new_v4()
@@ -334,7 +366,7 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
         let app = make_app();
 
         let document_id = if c.document_exists {
-            let doc = seed_document(&app).await;
+            let doc = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
             doc.id()
         } else {
             Uuid::new_v4()
