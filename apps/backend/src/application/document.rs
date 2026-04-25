@@ -14,8 +14,8 @@ use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::document::Document;
 use crate::domain::document::DocumentFormat;
-use crate::domain::document_category::DocumentCategory;
 use crate::domain::group::GroupType;
+use crate::domain::membership::Membership;
 use crate::domain::target_specifier::TargetSpecifier;
 use crate::domain::user_id::UserId;
 
@@ -34,8 +34,15 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
         }
     }
 
-    fn get_target_specifier(user_id: &UserId, group_type: &GroupType) -> Vec<TargetSpecifier> {
+    fn get_target_specifier(
+        user_id: &UserId,
+        memberships: &[Membership],
+        group_type: &GroupType,
+    ) -> Vec<TargetSpecifier> {
         let mut targets = vec![TargetSpecifier::UserId(user_id.clone())];
+        for membership in memberships {
+            targets.push(TargetSpecifier::GroupId(membership.group_id()));
+        }
         targets.push(match group_type {
             crate::domain::group::GroupType::GeneralProject { .. } => {
                 TargetSpecifier::GroupTypeProjectGeneral
@@ -97,7 +104,7 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
                 memberships,
                 group_type,
             } => {
-                let targets = Self::get_target_specifier(user_id, group_type);
+                let targets = Self::get_target_specifier(user_id, memberships, group_type);
 
                 Ok(self.document_repo.find_by_targets(targets).await?)
             }
@@ -120,10 +127,10 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             ActorContext::Admin { .. } => self.document_repo.find_all().await?,
             ActorContext::User {
                 user_id,
-                memberships: _,
+                memberships,
                 group_type,
             } => {
-                let targets = Self::get_target_specifier(user_id, group_type);
+                let targets = Self::get_target_specifier(user_id, memberships, group_type);
 
                 self.document_repo.find_by_targets(targets).await?
             }
