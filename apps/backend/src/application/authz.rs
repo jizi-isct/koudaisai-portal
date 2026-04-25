@@ -256,7 +256,17 @@ pub fn can_get_document_by_id(
             }
         }
 
-        ActorContext::NoLogin => Err(CanGetByIdError::NotFound),
+        ActorContext::NoLogin => {
+            if document
+                .targets()
+                .iter()
+                .any(|t| t.does_actor_match(actor_ctx))
+            {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::NotFound)
+            }
+        }
     }
 }
 
