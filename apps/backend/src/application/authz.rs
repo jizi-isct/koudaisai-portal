@@ -326,7 +326,7 @@ pub fn can_get_all_document_categories(actor_ctx: &ActorContext) -> bool {
             claims.contains(&"koudaisai-portal:admin:document-category:read".to_string())
         }
         ActorContext::User { .. } => true,
-        ActorContext::NoLogin => false,
+        ActorContext::NoLogin => true,
     }
 }
 
