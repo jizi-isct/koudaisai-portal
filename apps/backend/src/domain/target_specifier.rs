@@ -77,8 +77,7 @@ impl TargetSpecifier {
             TargetSpecifier::GroupTypePress => actor_ctx.is_group_type_press(),
             TargetSpecifier::GroupId(group_id) => actor_ctx.is_group_id(group_id),
             TargetSpecifier::UserId(user_id) => actor_ctx.is_user_id(user_id),
-            TargetSpecifier::UserNologin => actor_ctx.is_user_nologin(),
-        }
+            TargetSpecifier::UserNologin => true,
     }
 }
 

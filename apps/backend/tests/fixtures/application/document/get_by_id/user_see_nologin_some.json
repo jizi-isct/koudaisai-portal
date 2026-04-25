@@ -1,0 +1,11 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "general",
+      "group_ids": ["M-001"]
+    }
+  },
+  "document_exists": true,
+  "document_targets": ["user/nologin"],
+  "expected": "some"
+}
