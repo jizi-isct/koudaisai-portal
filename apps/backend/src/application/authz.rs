@@ -306,7 +306,7 @@ pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), C
             }
         }
         ActorContext::User { .. } => Ok(()),
-        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized),
+        ActorContext::NoLogin => Ok(()),
     }
 }
 

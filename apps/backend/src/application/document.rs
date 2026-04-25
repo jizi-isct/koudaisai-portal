@@ -39,7 +39,10 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
         memberships: &[Membership],
         group_type: &GroupType,
     ) -> Vec<TargetSpecifier> {
-        let mut targets = vec![TargetSpecifier::UserId(user_id.clone())];
+        let mut targets = vec![
+            TargetSpecifier::UserNologin,
+            TargetSpecifier::UserId(user_id.clone()),
+        ];
         for membership in memberships {
             targets.push(TargetSpecifier::GroupId(membership.group_id()));
         }
