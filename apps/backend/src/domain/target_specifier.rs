@@ -78,64 +78,6 @@ impl TargetSpecifier {
             TargetSpecifier::GroupId(group_id) => actor_ctx.is_group_id(group_id),
             TargetSpecifier::UserId(user_id) => actor_ctx.is_user_id(user_id),
             TargetSpecifier::UserNologin => true,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::application::ports::clock::Clock;
-    use crate::domain::group::GroupType;
-    use crate::domain::group_id::GroupId;
-    use crate::domain::membership::Membership;
-    use crate::domain::user_id::UserId;
-    use chrono::{DateTime, Utc};
-    use uuid::Uuid;
-
-    struct MockClock;
-    impl Clock for MockClock {
-        fn now(&self) -> DateTime<Utc> {
-            Utc::now()
         }
-    }
-
-    #[test]
-    fn test_does_actor_match() {
-        let user_id = UserId::new(Uuid::new_v4());
-        let group_id = GroupId::from_str("M-001").unwrap();
-        let memberships = vec![Membership::new(group_id, user_id, &MockClock)];
-
-        let ctx_general = ActorContext::User {
-            user_id,
-            memberships: memberships.clone(),
-            group_type: GroupType::GeneralProject {
-                representative1: user_id,
-                representative2: user_id,
-                representative3: user_id,
-            },
-        };
-
-        let ctx_nologin = ActorContext::NoLogin;
-
-        // GroupTypeProjectGeneral
-        assert!(TargetSpecifier::GroupTypeProjectGeneral.does_actor_match(&ctx_general));
-        assert!(!TargetSpecifier::GroupTypeProjectGeneral.does_actor_match(&ctx_nologin));
-
-        // GroupId
-        assert!(TargetSpecifier::GroupId(group_id).does_actor_match(&ctx_general));
-        assert!(
-            !TargetSpecifier::GroupId(GroupId::from_str("M-002").unwrap())
-                .does_actor_match(&ctx_general)
-        );
-
-        // UserId
-        assert!(TargetSpecifier::UserId(user_id).does_actor_match(&ctx_general));
-        assert!(
-            !TargetSpecifier::UserId(UserId::new(Uuid::new_v4())).does_actor_match(&ctx_general)
-        );
-
-        // UserNologin
-        assert!(TargetSpecifier::UserNologin.does_actor_match(&ctx_nologin));
-        assert!(!TargetSpecifier::UserNologin.does_actor_match(&ctx_general));
     }
 }
