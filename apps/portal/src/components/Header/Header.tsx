@@ -3,7 +3,7 @@
 import styles from "./Header.module.css";
 import Image from "next/image";
 import {usePathname} from "next/navigation";
-import {LargeButton, LargePulldown, PulldownItem} from "@koudaisai/shared-ui";
+import {LargeButton, LargePulldown} from "@koudaisai/shared-ui";
 import icon_account from './assets/icon_account.svg'
 
 import membersLogo from "./assets/members_logo.png";
