@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import styles from "./Modal.module.css";
 import {Modal as AntdModal} from "antd";
-
 
 type Props = {
   isOpen: boolean,
@@ -36,7 +34,7 @@ export function Modal({isOpen, setOpen, children}: Props) {
       }}
       style={{maxWidth: '90vw'}}
     >
-      <div className={styles.children}>
+      <div className="h-[calc(100%-5em)] max-h-[calc(100%-5em)] overflow-y-auto">
         {children}
       </div>
     </AntdModal>

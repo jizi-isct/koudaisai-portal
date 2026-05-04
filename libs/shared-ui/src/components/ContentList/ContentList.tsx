@@ -1,5 +1,4 @@
 'use client'
-import styles from "./ContentList.module.css";
 import React, {ReactNode, useMemo, useState} from "react";
 import {Pagination} from "antd";
 
@@ -16,7 +15,6 @@ export function ContentList({contents, pagination = false, pageSize = 10}: Props
     if(!pagination) {
       return contents;
     }
-    // ページ管理
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     return contents.slice(start, end);
@@ -27,11 +25,11 @@ export function ContentList({contents, pagination = false, pageSize = 10}: Props
   }
 
   return (
-    <div className={styles.root}>
+    <div className="w-full border border-darkblue rounded-[10px] py-2 px-[15px] shadow-[4px_4px_0_0_var(--darkblue)] my-8 bg-white">
       {
         currentContents.map((item, i) => (
           <React.Fragment key={`fragment-${i}`}>
-            { i > 0 && <div className={styles.separator}/>}
+            {i > 0 && <div className="h-px w-full bg-darkblue"/>}
             {item}
           </React.Fragment>
         ))

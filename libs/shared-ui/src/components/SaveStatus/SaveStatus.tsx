@@ -1,4 +1,3 @@
-import styles from "./SaveStatus.module.css";
 import {saved, saving, unsaved} from "../icons/save_status";
 import {SaveStatus as SaveStatus_} from "@koudaisai/shared-types";
 import Element = React.JSX.Element;
@@ -20,9 +19,9 @@ export const SaveStatus = ({status}: SaveStatusProps) => {
   };
 
   return (
-    <div className={styles.saveStatus}>
+    <div className="flex items-center">
       {statusIcons[status]}
-      <h6 className={styles.statusText}>{statusText[status]}</h6>
+      <h6 className="text-gray text-xs font-medium leading-normal tracking-[0.44px] ml-[10px]">{statusText[status]}</h6>
     </div>
   );
 };

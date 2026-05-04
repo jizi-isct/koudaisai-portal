@@ -1,12 +1,6 @@
 :root {
-    --background: #F2F5FF;
     --background-secondaly: white;
     --foreground: #171717;
-    --darkblue: #0048FF;
-    --lightblue: #9BB2FF;
-    --darkgray: #515151;
-    --gray: #B2B2B2;
-    --lightgray: #F8F8F8;
 }
 
 html,
@@ -32,4 +26,22 @@ body {
 a {
     color: inherit;
     text-decoration: none;
+}
+
+@keyframes loader-rotate1 {
+    0% { transform: rotate(-90deg); }
+    50% { transform: rotate(90deg); }
+    100% { transform: rotate(270deg); }
+}
+
+@keyframes loader-rotate2 {
+    0% { transform: rotate(30deg); }
+    50% { transform: rotate(210deg); }
+    100% { transform: rotate(390deg); }
+}
+
+@keyframes loader-rotate3 {
+    0% { transform: rotate(150deg); }
+    50% { transform: rotate(330deg); }
+    100% { transform: rotate(510deg); }
 }

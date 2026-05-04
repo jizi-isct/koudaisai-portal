@@ -1,0 +1,3 @@
+@import "tailwindcss";
+@import "../../../../libs/shared-ui/src/theme.css";
+@source "../../../../libs/shared-ui/src";

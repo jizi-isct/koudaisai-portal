@@ -1,8 +1,6 @@
-import styles from "./Faq.module.css"
-
 type Props = {
   number: number
-  content: 
+  content:
   {
     question: string
     answer: string
@@ -11,13 +9,13 @@ type Props = {
 
 export function Faq({number, content}: Props) {
   return (
-    <div className={styles.root}>
-      <p className={styles.question}>
-        <span className={styles.prefix}>Q{number}. </span>
+    <div className="w-full border border-darkblue rounded-[10px] py-[0.5em] px-[15px] shadow-[4px_4px_0_0_var(--darkblue)] my-[2em] bg-white">
+      <p className="w-[90%] mx-auto my-5 relative text-[15px]">
+        <span className="inline-block text-darkgray font-bold text-[20px] mr-2">Q{number}. </span>
         {content.question}
       </p>
-      <p className={styles.answer}>
-        <span className={styles.prefix}>A{number}. </span>
+      <p className="w-[90%] mx-auto my-5 relative text-[15px]">
+        <span className="inline-block text-darkgray font-bold text-[20px] mr-2">A{number}. </span>
         {content.answer}
       </p>
     </div>

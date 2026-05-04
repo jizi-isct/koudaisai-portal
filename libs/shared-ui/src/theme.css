@@ -1,0 +1,18 @@
+@theme {
+  --color-darkblue: #0048FF;
+  --color-lightblue: #9BB2FF;
+  --color-darkgray: #515151;
+  --color-gray: #B2B2B2;
+  --color-lightgray: #F8F8F8;
+  --color-background: #F2F5FF;
+}
+
+/* Aliases so var(--darkblue) keeps working in arbitrary values and plain CSS */
+:root {
+  --darkblue: var(--color-darkblue);
+  --lightblue: var(--color-lightblue);
+  --darkgray: var(--color-darkgray);
+  --gray: var(--color-gray);
+  --lightgray: var(--color-lightgray);
+  --background: var(--color-background);
+}

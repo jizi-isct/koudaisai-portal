@@ -1,22 +1,15 @@
 import {ReactNode} from "react";
-import styles from "./Heading1.module.css";
 
 type Props = {
   children: ReactNode,
   emoji: string
 }
 
-/**
- * 見出し
- * @param children 子要素
- * @param emoji 見出しの頭に表示する絵文字
- * @constructor
- */
 export function Heading1({children, emoji}: Props) {
   return (
-    <h1 className={styles.root}>
-      <span className={styles.emoji}>{emoji}</span>
-      <span className={styles.heading}>{children}</span>
+    <h1 className="text-center my-[1em]">
+      <span className="text-[32px] pr-2">{emoji}</span>
+      <span className="drop-shadow-[0_0_4px_white] text-[28px]">{children}</span>
     </h1>
   )
 }

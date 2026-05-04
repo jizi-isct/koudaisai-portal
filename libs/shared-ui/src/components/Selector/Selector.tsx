@@ -1,5 +1,3 @@
-import styles from "./Selector.module.css"
-
 type Props = {
   options: string[],
   selectedOption: string,
@@ -8,11 +6,15 @@ type Props = {
 
 export function Selector({options, selectedOption, setOption}: Props) {
   return (
-    <div className={styles.root}>
-      <div className={styles.optionContainer}>
+    <div className="w-full flex justify-center">
+      <div className="border border-darkblue rounded-[10px] px-[14px] py-[10px] bg-white inline-block">
         {
           options.map((option, i) => (
-            <div key={i} className={`${styles.option} ${selectedOption === option ? styles.selected : ""}`} onClick={() => setOption(option)}>
+            <div
+              key={i}
+              className={`cursor-pointer text-sm inline-block px-3 ${selectedOption === option ? "font-bold" : ""}`}
+              onClick={() => setOption(option)}
+            >
               {option}
             </div>
           ))

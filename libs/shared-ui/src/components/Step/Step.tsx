@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import styles from "./Step.module.css";
+import "./Step.css";
 
 type Props = {
   title: string,
@@ -9,18 +9,19 @@ type Props = {
 }
 
 export function Step({title, date, children, isFirst}: Props) {
+  const cardClass = `step-card ${isFirst ? "step-card--first" : "step-card--after"} relative bg-no-repeat drop-shadow-[4px_4px_0_var(--darkblue)]`;
+
   return (
-    <div className={`${styles.root} ${isFirst ? styles.rootFirst : styles.rootAfterSecond}`}>
-      {
-        date &&
-          <div className={styles.date}>
-            🕓 {date}
-          </div>
-      }
-      <h2 className={styles.heading}>
+    <div className={cardClass}>
+      {date && (
+        <div className="step-date absolute bg-darkblue text-white text-[10px] font-bold py-[0.1em] px-[0.5em] rounded-[0.5em]">
+          🕓 {date}
+        </div>
+      )}
+      <h2 className="step-heading font-bold text-[22px] text-[#253661]">
         {title}
       </h2>
-      <p className={styles.paragraph}>
+      <p className="text-[13px]">
         {children}
       </p>
     </div>

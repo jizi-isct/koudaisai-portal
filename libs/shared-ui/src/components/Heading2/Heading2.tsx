@@ -1,25 +1,18 @@
 import {ReactNode} from "react";
-import styles from "./Heading2.module.css";
 
 type Props = {
   children: ReactNode,
   emoji: string
 }
 
-/**
- * 見出し
- * @param children 子要素
- * @param emoji 見出しの頭に表示する絵文字
- * @constructor
- */
 export function Heading2({children, emoji}: Props) {
   return (
-    <h1 className={styles.root}>
-      <span className={styles.emoji}>
-        <span className={styles.emojiBackground}>{emoji}</span>
+    <h1 className="flex relative items-center max-[700px]:justify-center">
+      <span className="relative text-[32px] pr-2">
+        <span className="-z-[5] absolute text-[3em] opacity-5 -top-16 -left-12">{emoji}</span>
         {emoji}
       </span>
-      <div className={styles.heading}>{children}</div>
+      <div className="drop-shadow-[0_0_4px_white] text-2xl flex items-center gap-[0.3em]">{children}</div>
     </h1>
   )
 }
