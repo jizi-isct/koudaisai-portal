@@ -1,6 +1,7 @@
 import {Metadata} from "next";
 import {ConfigProvider} from "antd";
-import {Footer, Header} from "@koudaisai/shared-ui";
+import {Footer} from "@koudaisai/shared-ui";
+import {Header} from "@/components/Header";
 import '../globals.css';
 import '../members.css';
 
