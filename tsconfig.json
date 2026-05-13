@@ -33,6 +33,9 @@
       "path": "./apps/join"
     },
     {
+      "path": "./apps/join-legacy"
+    },
+    {
       "path": "./libs/shared-ui-document"
     },
     {

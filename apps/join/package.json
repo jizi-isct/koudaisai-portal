@@ -2,9 +2,13 @@
   "name": "@koudaisai-portal/join",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
   "dependencies": {
-    "next": "~16.1.7",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "astro": "^6.2.1"
   }
 }
