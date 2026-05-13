@@ -1,0 +1,13 @@
+name = "join-legacy"
+compatibility_date = "2025-09-05"
+preview_urls = true
+
+[assets]
+directory = "out"
+
+[observability]
+enabled = true
+
+[[routes]]
+pattern = "join.koudaisai.jp"
+custom_domain = true
