@@ -1,5 +1,3 @@
-"use server";
-
 import {getApiFetchClient} from "@koudaisai/shared-api";
 import ViewDocumentsWrapper from "../../../components/ViewDocumentsWrapper";
 import {Heading1} from "@koudaisai/shared-ui";
@@ -13,7 +11,6 @@ export default async function Page_() {
   if (error || !data) {
     throw error;
   }
-  console.log(data)
 
   return (
     <main className={styles.main}>
