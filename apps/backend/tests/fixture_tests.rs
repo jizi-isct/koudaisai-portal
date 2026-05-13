@@ -8,6 +8,7 @@ datatest_stable::harness! {
     { test = domain::group_id::test_new,         root = "tests/fixtures/domain", pattern = r"group_id/new/[^/]+\.json" },
     // target_specifier
     { test = domain::target_specifier::test_from_str, root = "tests/fixtures/domain", pattern = r"target_specifier/from_str/[^/]+\.json" },
+    { test = domain::target_specifier::test_does_actor_match, root = "tests/fixtures/domain", pattern = r"target_specifier/does_actor_match/[^/]+\.json" },
     // approval_request
     { test = domain::approval_request::test_create,     root = "tests/fixtures/domain", pattern = r"approval_request/create/[^/]+\.json" },
     { test = domain::approval_request::test_transition, root = "tests/fixtures/domain", pattern = r"approval_request/transition/[^/]+\.json" },

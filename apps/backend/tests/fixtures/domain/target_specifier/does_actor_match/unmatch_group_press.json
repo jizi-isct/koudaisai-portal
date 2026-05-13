@@ -1,0 +1,8 @@
+{
+  "target": "group/type/press",
+  "actor": {
+    "type": "User",
+    "group_type": "general"
+  },
+  "expected": false
+}

@@ -31,3 +31,91 @@ pub fn test_from_str(_path: &Path, contents: String) -> datatest_stable::Result<
     }
     Ok(())
 }
+
+#[derive(Deserialize)]
+struct DoesActorMatchCase {
+    target: String,
+    actor: ActorSpec,
+    expected: bool,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(tag = "type")]
+enum ActorSpec {
+    User {
+        #[serde(default)]
+        group_type: String,
+        #[serde(default)]
+        group_ids: Vec<String>,
+        #[serde(default)]
+        user_id: Option<String>,
+    },
+    Admin {
+        #[serde(default)]
+        user_id: Option<String>,
+    },
+    NoLogin,
+}
+
+fn uid(s: Option<&String>) -> UserId {
+    s.map(|s| UserId::new(Uuid::parse_str(s).unwrap()))
+        .unwrap_or_else(|| UserId::new(Uuid::new_v4()))
+}
+
+fn parse_group_type(s: &str) -> GroupType {
+    let u = || UserId::new(Uuid::new_v4());
+    match s {
+        "press" => GroupType::Press { representative: u() },
+        "general" => GroupType::GeneralProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
+        "booth" => GroupType::BoothProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
+        "stage" => GroupType::StageProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
+        "labo" => GroupType::LabProject { representative: u() },
+        _ => GroupType::Press { representative: u() },
+    }
+}
+
+pub fn test_does_actor_match(_path: &Path, contents: String) -> datatest_stable::Result<()> {
+    let c: DoesActorMatchCase = serde_json::from_str(&contents)?;
+    let target = TargetSpecifier::from_str(&c.target).expect("invalid target in fixture");
+
+    let actor = match &c.actor {
+        ActorSpec::User { group_type, group_ids, user_id } => {
+            let user_id = uid(user_id.as_ref());
+            let memberships = group_ids
+                .iter()
+                .map(|g| Membership::new(GroupId::from_str(g).unwrap(), user_id, &FixedClock))
+                .collect();
+            ActorContext::User {
+                user_id,
+                memberships,
+                group_type: parse_group_type(group_type),
+            }
+        }
+        ActorSpec::Admin { user_id } => ActorContext::Admin {
+            user_id: uid(user_id.as_ref()),
+            claims: vec![],
+        },
+        ActorSpec::NoLogin => ActorContext::NoLogin,
+    };
+
+    assert_eq!(
+        target.does_actor_match(&actor),
+        c.expected,
+        "failed for target: {}, actor: {:?}",
+        c.target,
+        c.actor
+    );
+    Ok(())
+}

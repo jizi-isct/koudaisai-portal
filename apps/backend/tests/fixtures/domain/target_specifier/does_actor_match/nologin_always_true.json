@@ -1,0 +1,7 @@
+{
+  "target": "user/nologin",
+  "actor": {
+    "type": "NoLogin"
+  },
+  "expected": true
+}
