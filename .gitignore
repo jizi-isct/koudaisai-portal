@@ -51,6 +51,12 @@ out
 # Astro
 .astro
 
+# Generated docs
+/docs/api_v2.html
+/docs/auth_v1.html
+/docs/api_v2.yml
+/docs/auth_v1.yml
+
 storybook-static
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
