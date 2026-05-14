@@ -2,7 +2,7 @@
 
 import {useDownload, useDownloadUrl} from "@koudaisai/shared-utils";
 import { DocumentFormatPdfRead } from "@koudaisai/shared-types";
-import {Button, LoadingScreen} from "@koudaisai/shared-ui";
+import {LargeButton, LoadingScreen} from "@koudaisai/shared-ui";
 import { fetchClientMembers } from "@/lib/api";
 
 type ViewDocumentFormatPdfProps = {
@@ -21,7 +21,7 @@ export function ViewDocumentFormatPdf({format}: ViewDocumentFormatPdfProps) {
   if (downloadUrl) {
     return (
       <div>
-        <Button text={"ダウンロード"} onClick={() => download(downloadUrl, format.file_name)}/>
+        <LargeButton text={"ダウンロード"} onClick={() => download(downloadUrl, format.file_name)}/>
       </div>
     )
   } else if (error) {

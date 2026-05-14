@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation';
 import { $apiMembers } from '@/lib/api';
 import { getTokensMembers } from '@koudaisai/shared-auth-members';
 import { UserRead ,GroupRead } from '@koudaisai/shared-types';
-import "../../globals.css";
+import "../globals.css";
 import {Heading1, LoadingScreen, Modal} from '@koudaisai/shared-ui';
 import {UserInfoCard} from "@/components/UserInfoCard/UserInfoCard";
 import {ViewNotifications} from "@/components/notification/ViewNotifications";
