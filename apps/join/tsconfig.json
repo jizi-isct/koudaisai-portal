@@ -10,6 +10,15 @@
   },
   "references": [
     {
+      "path": "../../libs/shared-ui-document"
+    },
+    {
+      "path": "../../libs/shared-api-utils"
+    },
+    {
+      "path": "../../libs/shared-types"
+    },
+    {
       "path": "../../libs/shared-utils"
     },
     {
