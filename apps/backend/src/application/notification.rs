@@ -1,3 +1,5 @@
+use tracing_subscriber::filter::targets;
+
 use crate::application::authz;
 use crate::application::error::{
     ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
@@ -56,7 +58,7 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
     pub async fn create(
         &self,
         actor_ctx: &ActorContext,
-        target: Vec<TargetSpecifier>,
+        targets: Vec<TargetSpecifier>,
         notification_type: NotificationType,
     ) -> Result<NotificationId, ApplicationOperationError<InsertError>> {
         if !authz::can_create_notification(actor_ctx) {
@@ -69,8 +71,9 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         };
 
         let id = NotificationId::generate();
-        let notification = Notification::create(id, target, notification_type, created_by, self.clock)
-            .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
+        let notification =
+            Notification::create(id, targets, notification_type, created_by, self.clock)
+                .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
 
         self.notification_repo.insert(&notification).await?;
         Ok(id)
@@ -80,7 +83,7 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         &self,
         actor_ctx: &ActorContext,
         id: NotificationId,
-        target: Option<Vec<TargetSpecifier>>,
+        targets: Option<Vec<TargetSpecifier>>,
         markdown: Option<(String, String)>,
     ) -> Result<Notification, ApplicationOperationError<UpdateError>> {
         if !authz::can_update_notification(actor_ctx) {
@@ -97,11 +100,13 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
             .find_by_id(id)
             .await
             .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
-            .ok_or(ApplicationOperationError::OperationFailed(UpdateError::NotFound))?;
+            .ok_or(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound,
+            ))?;
 
-        if let Some(target) = target {
+        if let Some(targets) = targets {
             notification
-                .update_target(target, updated_by, self.clock)
+                .update_target(targets, updated_by, self.clock)
                 .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
         }
 

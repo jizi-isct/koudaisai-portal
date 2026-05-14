@@ -47,14 +47,14 @@ pub struct Notification {
     updated_at: DateTime<Utc>,
     created_by: Option<UserId>,
     updated_by: Option<UserId>,
-    target: Vec<TargetSpecifier>,
+    targets: Vec<TargetSpecifier>,
     notification_type: NotificationType,
 }
 
 impl Notification {
     pub fn create<C: Clock>(
         id: NotificationId,
-        target: Vec<TargetSpecifier>,
+        targets: Vec<TargetSpecifier>,
         notification_type: NotificationType,
         created_by: Option<UserId>,
         clock: &C,
@@ -67,7 +67,7 @@ impl Notification {
             updated_at: now,
             created_by,
             updated_by: created_by,
-            target,
+            targets,
             notification_type,
         })
     }
@@ -78,7 +78,7 @@ impl Notification {
         updated_at: DateTime<Utc>,
         created_by: Option<UserId>,
         updated_by: Option<UserId>,
-        target: Vec<TargetSpecifier>,
+        targets: Vec<TargetSpecifier>,
         notification_type: NotificationType,
     ) -> Result<Self, FactoryError> {
         Ok(Self {
@@ -87,7 +87,7 @@ impl Notification {
             updated_at,
             created_by,
             updated_by,
-            target,
+            targets,
             notification_type,
         })
     }
@@ -112,8 +112,8 @@ impl Notification {
         self.updated_by
     }
 
-    pub fn target(&self) -> &[TargetSpecifier] {
-        &self.target
+    pub fn targets(&self) -> &[TargetSpecifier] {
+        &self.targets
     }
 
     pub fn notification_type(&self) -> &NotificationType {
@@ -122,11 +122,11 @@ impl Notification {
 
     pub fn update_target<C: Clock>(
         &mut self,
-        target: Vec<TargetSpecifier>,
+        targets: Vec<TargetSpecifier>,
         updated_by: Option<UserId>,
         clock: &C,
     ) -> Result<(), FactoryError> {
-        self.target = target;
+        self.targets = targets;
         self.updated_by = updated_by;
         self.updated_at = clock.now();
         Ok(())
@@ -202,7 +202,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(notification.target(), &[TargetSpecifier::UserNologin]);
+        assert_eq!(notification.targets(), &[TargetSpecifier::UserNologin]);
         assert_eq!(notification.created_at(), &now);
         assert_eq!(notification.updated_at(), &now);
         assert_eq!(notification.created_by(), created_by);
@@ -224,7 +224,7 @@ mod tests {
         )
         .unwrap();
 
-        assert!(notification.target().is_empty());
+        assert!(notification.targets().is_empty());
     }
 
     #[test]
@@ -281,7 +281,7 @@ mod tests {
         .unwrap();
 
         notification.update_target(vec![], None, &clock).unwrap();
-        assert!(notification.target().is_empty());
+        assert!(notification.targets().is_empty());
     }
 
     #[test]
@@ -305,7 +305,7 @@ mod tests {
             .update_target(vec![TargetSpecifier::UserNologin], updater, &update_clock)
             .unwrap();
 
-        assert_eq!(notification.target(), &[TargetSpecifier::UserNologin]);
+        assert_eq!(notification.targets(), &[TargetSpecifier::UserNologin]);
         assert_eq!(notification.updated_by(), updater);
         assert_eq!(notification.updated_at(), &updated_at);
     }
