@@ -1,0 +1,25 @@
+---
+import Footer from "@/features/footer/Footer.astro";
+import Header from "@/features/header/Header.astro";
+import BaseLayout from "./BaseLayout.astro";
+
+type Props = {
+  title?: string;
+  description?: string;
+  titleColor?: "white" | "black";
+  isLoggedIn?: boolean;
+};
+
+const {
+  title,
+  description,
+  titleColor = "black",
+  isLoggedIn = false,
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header titleColor={titleColor} />
+  <slot />
+  <Footer isLoggedIn={isLoggedIn} />
+</BaseLayout>
