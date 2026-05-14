@@ -41,9 +41,15 @@ Thumbs.db
 .nx/cache
 .nx/workspace-data
 
+# Codex/Claude worktrees
+.claude/worktrees/
+
 # Next.js
 .next
 out
+
+# Astro
+.astro
 
 storybook-static
 vite.config.*.timestamp*
