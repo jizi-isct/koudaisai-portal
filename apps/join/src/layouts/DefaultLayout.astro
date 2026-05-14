@@ -19,7 +19,23 @@ const {
 ---
 
 <BaseLayout title={title} description={description}>
-  <Header titleColor={titleColor} />
-  <slot />
-  <Footer isLoggedIn={isLoggedIn} />
+  <div class="default-layout">
+    <Header titleColor={titleColor} />
+    <main class="default-layout-content">
+      <slot />
+    </main>
+    <Footer isLoggedIn={isLoggedIn} />
+  </div>
 </BaseLayout>
+
+<style>
+  .default-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .default-layout-content {
+    flex: 1;
+  }
+</style>
