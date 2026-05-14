@@ -5,7 +5,7 @@ import {getApiFetchClient} from "@koudaisai/shared-api";
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
 
 const fetchClient = getApiFetchClient("https://portal.koudaisai.jp/api/v2");
-const { data, error } = await fetchClient.GET("/forms");
+const {data, error} = await fetchClient.GET("/forms", {cache: "no-store"});
 
 if (error || !data) {
   throw error;
