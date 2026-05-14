@@ -15,9 +15,11 @@
 }
 
 .site-footer-nav-item {
+  color: inherit;
   font-size: 14px;
   font-style: normal;
   font-weight: 700;
+  text-decoration: none;
 }
 
 .site-footer-contacts {
