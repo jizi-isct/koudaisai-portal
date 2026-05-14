@@ -10,7 +10,6 @@ use sea_orm::{ActiveModelTrait, DbConn, EntityTrait};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[deprecated]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {

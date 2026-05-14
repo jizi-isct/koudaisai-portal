@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[deprecated]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProductOption {
     pub name: String,

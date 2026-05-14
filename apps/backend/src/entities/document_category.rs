@@ -7,7 +7,6 @@ use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotS
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[deprecated]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCategoryWrite {
     #[serde(default)] // 逆シリアライズ時にフィールドが存在しない場合、デフォルト値(None)を使用

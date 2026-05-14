@@ -51,7 +51,6 @@ https://portal.koudaisai.jp/
 　ステージ企画 stage@koudaisai.jp
 　研究室公開企画 laboratory@koudaisai.jp"#;
 
-#[deprecated]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserCreate {
     pub name: String,

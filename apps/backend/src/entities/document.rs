@@ -7,7 +7,6 @@ use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityOrSelect, EntityTrait, NotS
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[deprecated]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentFormat {
@@ -31,7 +30,6 @@ pub enum DocumentWriteActiveModel {
     ),
 }
 
-#[deprecated]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DocumentCreate {
     pub title: String,
