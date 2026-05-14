@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:approval-request:read"
+      ]
+    }
+  },
+  "expected": true
+}

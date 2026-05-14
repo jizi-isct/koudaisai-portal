@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "target_group_ids": [],
+  "expected": "unauthorized"
+}
