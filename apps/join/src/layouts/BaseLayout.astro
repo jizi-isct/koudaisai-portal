@@ -1,0 +1,87 @@
+---
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "工大祭ポータル",
+  description = "このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。",
+} = Astro.props;
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --background: #f2f5ff;
+    --foreground: #171717;
+    --darkblue: #0048ff;
+    --lightblue: #9bb2ff;
+    --gray: #b2b2b2;
+    --lightgray: #f8f8f8;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: visible;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  p {
+    margin: 1.5em auto;
+    width: fit-content;
+  }
+
+  aside {
+    border-top: solid 0.5px gray;
+    color: gray;
+    font-size: 8px;
+    line-height: 1.25;
+    margin: 1em 0;
+    padding: 0.5em;
+    text-align: left;
+    width: fit-content;
+  }
+
+  small {
+    color: #1a1a1a;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .mdxeditor-popup-container {
+    position: relative;
+    z-index: 1105 !important;
+  }
+</style>

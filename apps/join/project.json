@@ -1,0 +1,26 @@
+{
+  "name": "join",
+  "sourceRoot": "apps/join/src",
+  "projectType": "application",
+  "implicitDependencies": ["@koudaisai-portal/shared-ui-forms", "@koudaisai/shared-api"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "command": "astro build",
+        "cwd": "apps/join"
+      },
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "astro dev",
+        "cwd": "apps/join"
+      }
+    }
+  }
+}

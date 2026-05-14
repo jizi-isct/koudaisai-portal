@@ -1,7 +1,6 @@
 {
-  "name": "@koudaisai/shared-auth-members",
+  "name": "@koudaisai-portal/shared-ui-forms",
   "version": "0.0.1",
-  "private": true,
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -14,9 +13,5 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     }
-  },
-  "dependencies": {
-    "openapi-fetch": "^0.17.0",
-    "next-base64": "^1.1.0"
   }
 }

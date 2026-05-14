@@ -1,0 +1,8 @@
+{
+  "name": "@koudaisai-portal/shared-api-utils",
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}

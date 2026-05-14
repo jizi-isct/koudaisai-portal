@@ -1,0 +1,8 @@
+{
+  "name": "@koudaisai/shared-auth-admin",
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}
