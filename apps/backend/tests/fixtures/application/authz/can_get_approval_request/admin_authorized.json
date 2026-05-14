@@ -1,0 +1,11 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": [
+        "koudaisai-portal:admin:approval-request:read"
+      ]
+    }
+  },
+  "issuer_group_ids": [],
+  "expected": true
+}

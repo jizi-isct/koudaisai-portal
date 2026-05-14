@@ -3,6 +3,7 @@ name = "koudaisai-portal-backend"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
+autotests = false
 
 [dependencies]
 tokio = { version = "1.43.0", features = ["full"] }
@@ -44,3 +45,14 @@ hyper = "1.6.0"
 futures-util = "0.3.31"
 regex = "1.11.1"
 async-trait = "0.1.89"
+
+[lib]
+name = "koudaisai_portal_backend"
+path = "src/lib.rs"
+
+[dev-dependencies]
+datatest-stable = "0.3.3"
+
+[[test]]
+name = "fixture_tests"
+harness = false

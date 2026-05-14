@@ -19,20 +19,3 @@ impl EmailAddress {
         Ok(Self { address })
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_valid_email() {
-        let email = EmailAddress::new("test@example.com".to_string());
-        assert!(email.is_ok());
-    }
-
-    #[test]
-    fn test_invalid_email() {
-        let email = EmailAddress::new("invalid_email".to_string());
-        assert!(email.is_err());
-    }
-}

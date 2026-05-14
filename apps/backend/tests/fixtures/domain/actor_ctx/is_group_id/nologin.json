@@ -1,0 +1,6 @@
+{
+  "actor": "nologin",
+  "actor_group_id": null,
+  "query_group_id": "G-001",
+  "expected": false
+}

@@ -55,18 +55,6 @@ mod tests {
     }
 
     #[test]
-    fn test_new_success() {
-        let now = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
-        let clock = MockClock { now };
-        let phc = "argon2id$v=19$m=4096,t=3,p=1$somesalt$somehash".to_string();
-
-        let creds = PasswordCredentials::new(phc.clone(), clock).unwrap();
-
-        assert_eq!(creds.phc(), phc);
-        assert_eq!(creds.changed_at(), &now);
-    }
-
-    #[test]
     fn test_restore_success() {
         let phc = "argon2id$v=19$m=4096,t=3,p=1$somesalt$somehash";
         let changed_at = Utc.with_ymd_and_hms(2023, 12, 31, 23, 59, 59).unwrap();
