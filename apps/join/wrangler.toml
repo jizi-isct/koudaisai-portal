@@ -8,6 +8,6 @@ directory = "out"
 [observability]
 enabled = true
 
-#[[routes]]
-#pattern = "join.koudaisai.jp"
-#custom_domain = true
+[[routes]]
+pattern = "join.koudaisai.jp"
+custom_domain = true

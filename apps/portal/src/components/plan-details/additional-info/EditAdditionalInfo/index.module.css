@@ -1,0 +1,182 @@
+.editorWrapper {
+  /* Ensure text inside the editor area is left-aligned by default */
+  text-align: left;
+}
+
+/* Reset global <p> centering within the editor area */
+.editorWrapper p {
+  margin-left: 0;
+  margin-right: 0;
+  width: auto;
+  text-align: left;
+}
+
+/* Scope styles to the editable content */
+.app {
+  line-height: 1.7;
+  color: #1a1a1a;
+}
+
+/* Headings: sizes approximating the RN component */
+.app h1 { font-size: clamp(24px, 4.2vw, 36px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h2 { font-size: clamp(22px, 3.6vw, 30px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h3 { font-size: clamp(20px, 3.0vw, 26px); font-weight: 700; margin: 0.6em 0 0.3em; }
+.app h4 { font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; margin: 0.6em 0 0.3em; }
+.app h5 { font-size: clamp(16px, 2.2vw, 20px); font-weight: 600; margin: 0.6em 0 0.3em; }
+.app h6 { font-size: clamp(14px, 2.0vw, 18px); font-weight: 600; margin: 0.6em 0 0.3em; }
+
+/* Decorative underline for H1–H3 (approximation of the Skia underline) */
+.app h1,
+.app h2,
+.app h3 {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.8em; /* space for green accent */
+  z-index: 0;
+}
+
+/* Per-level tuning variables (approximate RN Skia drawing) */
+.app h1 { --u-h: 3px;   --u-off: -0.28em; --leaf: 1; --leaf-size: 0.62em; --leaf-right: -0.12em; --leaf-bottom: -0.30em; --leaf-rotate: 5.73deg; }
+.app h2 { --u-h: 2.6px; --u-off: -0.26em; --leaf: 1; --leaf-size: 0.56em; --leaf-right: -0.10em; --leaf-bottom: -0.28em; --leaf-rotate: 5.73deg; }
+.app h3 { --u-h: 2.2px; --u-off: -0.22em; --leaf: 0; }
+
+.app h1::after,
+.app h2::after,
+.app h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0; /* underline spans text width */
+  bottom: var(--u-off, -0.24em);
+  height: var(--u-h, 3px);
+  background: linear-gradient(90deg, #e3c5ff 0 60%, #76499f 60% 100%);
+  border-radius: calc(var(--u-h, 3px) / 2);
+  pointer-events: none;
+  z-index: -1; /* keep decorations behind text selection */
+}
+
+/* green rounded square ("leaf") — shown on h1/h2 only */
+.app h1::before,
+.app h2::before {
+  content: "";
+  position: absolute;
+  width: var(--leaf-size, 0.6em);
+  height: var(--leaf-size, 0.6em);
+  right: var(--leaf-right, -0.1em);
+  bottom: var(--leaf-bottom, -0.28em);
+  background: #49c14e;
+  border-radius: 0.22em;
+  transform: rotate(var(--leaf-rotate, 5.73deg));
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ensure h3 has no leaf */
+.app h3::before { content: none; }
+
+/* Paragraph: left indent similar to wp(2) */
+.app p {
+  padding-left: clamp(8px, 2vw, 24px);
+  margin: 0.6em 0;
+}
+
+/* Lists */
+.app ul,
+.app ol {
+  margin-left: 1.25em;
+}
+
+/* Table styling to match RN */
+.app table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #9443ff;
+  margin: 10px 0;
+}
+.app thead {
+  border-bottom: 1px solid #9443ff;
+}
+.app th {
+  background-color: #e2cdff;
+  border: 1px solid #c2b1e3;
+  padding: 5px;
+}
+.app tr {
+  background-color: #f2e9fb;
+  border-bottom: 0.5px solid #c2b1e3;
+}
+.app td {
+  border: 0.5px solid #c2b1e3;
+  padding: 5px;
+}
+
+/* Link pill style */
+.app a {
+  position: relative;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border: 2px solid #831eff;
+  border-radius: 9999px;
+  background: #eedcfb;
+  text-decoration: none;
+}
+.app a::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 0.9em;
+  height: 0.9em;
+  background: #49c14e;
+  border-radius: 0.2em;
+  transform: rotate(10deg);
+}
+
+/* Admonitions (directives) — try multiple selector shapes for compatibility */
+.app .admonition,
+.app [data-kind],
+.app [data-admonition-type] {
+  border-radius: 6px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 0.75em 1em;
+  margin: 0.8em 0;
+}
+/* info */
+.app .admonition.info,
+.app [data-kind="info"],
+.app [data-admonition-type="info"] {
+  background: #D9EDF7;
+  border-color: #61848f;
+}
+/* danger */
+.app .admonition.danger,
+.app [data-kind="danger"],
+.app [data-admonition-type="danger"] {
+  background: #F2DEDE;
+  border-color: #A94442;
+}
+/* caution/warning */
+.app .admonition.caution,
+.app .admonition.warning,
+.app [data-kind="caution"],
+.app [data-admonition-type="caution"],
+.app [data-admonition-type="warning"] {
+  background: #FCF8E3;
+  border-color: #8a6d3b;
+}
+/* tip/success */
+.app .admonition.tip,
+.app .admonition.success,
+.app [data-kind="tip"],
+.app [data-admonition-type="tip"],
+.app [data-admonition-type="success"] {
+  background: #DFF0D8;
+  border-color: #3C763D;
+}
+/* spoiler (non-standard) */
+.app .admonition.spoiler,
+.app [data-admonition-type="spoiler"] {
+  background: #f3eff8;
+  border-color: #9389b1;
+}

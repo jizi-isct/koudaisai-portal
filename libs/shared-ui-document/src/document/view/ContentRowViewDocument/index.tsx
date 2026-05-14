@@ -6,6 +6,7 @@ import Image from "next/image";
 import {Modal} from "@koudaisai/shared-ui";
 import {ViewDocument} from "../ViewDocument";
 import {useCallback, useState} from "react";
+import downloadImg from "./download.svg";
 
 type ContentRowViewDocumentProps = {
   download: () => void
@@ -38,7 +39,7 @@ export function ContentRowViewDocument({download, document}: ContentRowViewDocum
         </span>
         </div>
         <div className={styles.download} onClick={download}>
-          <Image src={"/generic/download.svg"} width={24} height={24} alt={"ダウンロード"}/>
+          <Image src={downloadImg} width={24} height={24} alt={"ダウンロード"}/>
           <span>ダウンロード</span>
         </div>
       </div>
