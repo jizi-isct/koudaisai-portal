@@ -1,0 +1,33 @@
+.site-footer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+}
+
+.site-footer-nav-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.site-footer-nav-item {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.site-footer-contacts {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.site-footer-copyright-text {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
+}
