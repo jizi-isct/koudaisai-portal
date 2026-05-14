@@ -45,7 +45,7 @@ export function Tab({tabs, queryParam, queryValues}: Props) {
   };
 
   if (queryParam) {
-    const defaultTab = tabs.keys().next().value;
+    const defaultTab = tabs.keys().next().value as string;
     const script = `
       (() => {
         const root = document.currentScript?.previousElementSibling;

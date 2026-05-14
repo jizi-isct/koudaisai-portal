@@ -1,6 +1,8 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -10,19 +12,19 @@
   },
   "references": [
     {
+      "path": "../../libs/shared-ui"
+    },
+    {
       "path": "../../libs/shared-ui-document"
     },
     {
       "path": "../../libs/shared-api-utils"
     },
     {
-      "path": "../../libs/shared-types"
-    },
-    {
       "path": "../../libs/shared-utils"
     },
     {
-      "path": "../../libs/shared-ui"
+      "path": "../../libs/shared-types"
     }
   ]
 }

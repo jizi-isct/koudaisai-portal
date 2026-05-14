@@ -30,12 +30,6 @@
       "path": "./apps/admin"
     },
     {
-      "path": "./apps/join"
-    },
-    {
-      "path": "./apps/join-legacy"
-    },
-    {
       "path": "./libs/shared-ui-document"
     },
     {
@@ -46,6 +40,9 @@
     },
     {
       "path": "./libs/shared-ui-forms"
+    },
+    {
+      "path": "./apps/join"
     }
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "name": "@koudaisai-portal/shared-ui-document",
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}
