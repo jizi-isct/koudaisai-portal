@@ -7,5 +7,13 @@
         "src/*"
       ]
     }
-  }
+  },
+  "references": [
+    {
+      "path": "../../libs/shared-utils"
+    },
+    {
+      "path": "../../libs/shared-ui"
+    }
+  ]
 }
