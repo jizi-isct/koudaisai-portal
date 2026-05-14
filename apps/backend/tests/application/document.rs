@@ -1,7 +1,7 @@
 use crate::application::common::{ActorSpec, build_actor, uid};
 use chrono::Utc;
 use koudaisai_portal_backend::application::error::{
-    ApplicationOperationError, DeleteError, FindError, UpdateError,
+    ApplicationOperationError, DeleteError, UpdateError,
 };
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::document::Document;
@@ -356,6 +356,8 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
 
         match c.expected.as_str() {
             "ok" => {
+                result.expect("expected update Ok");
+
                 let after_doc = app
                     .document()
                     .get_by_id(&admin_ctx(), document_id)
@@ -446,6 +448,8 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
 
         match c.expected.as_str() {
             "ok" => {
+                result.expect("expected delete Ok");
+
                 let read_back = app
                     .document()
                     .get_all(&admin_ctx())
