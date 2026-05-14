@@ -2,6 +2,13 @@
   "name": "@koudaisai-portal/join",
   "version": "0.0.1",
   "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": ["{projectRoot}/out"]
+      }
+    }
+  },
   "dependencies": {
     "next": "~16.1.7",
     "react": "^19.0.0",

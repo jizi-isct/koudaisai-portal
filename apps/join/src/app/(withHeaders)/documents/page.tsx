@@ -19,5 +19,6 @@ export default async function Page_() {
         <ViewDocumentsWrapper documents={data}/>
       </div>
     </main>
+    
   )
 }
