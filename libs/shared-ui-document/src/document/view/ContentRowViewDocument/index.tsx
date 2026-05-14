@@ -5,7 +5,7 @@ import styles from "./ContentRowViewDocument.module.css";
 import {Modal} from "@koudaisai/shared-ui";
 import {ViewDocument} from "../ViewDocument";
 import {useCallback, useState} from "react";
-import downloadImg from "./download.svg";
+import downloadImg from "./download.svg?url";
 
 type ContentRowViewDocumentProps = {
   download: () => void
