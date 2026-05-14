@@ -1,0 +1,18 @@
+---
+import {Heading1} from "@koudaisai/shared-ui";
+import {ViewFormCards} from "@koudaisai-portal/shared-ui-forms";
+import {getApiFetchClient} from "@koudaisai/shared-api";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+
+const fetchClient = getApiFetchClient("https://portal.koudaisai.jp/api/v2");
+const { data, error } = await fetchClient.GET("/forms");
+
+if (error || !data) {
+  throw error;
+}
+---
+
+<DefaultLayout title="フォーム | 工大祭参加登録サイト">
+    <Heading1 emoji={"📝"}>フォーム</Heading1>
+    <ViewFormCards forms={data}/>
+</DefaultLayout>
