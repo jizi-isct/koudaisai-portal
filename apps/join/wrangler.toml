@@ -3,7 +3,7 @@ compatibility_date = "2025-09-05"
 preview_urls = true
 
 [assets]
-directory = "out"
+directory = "dist"
 
 [observability]
 enabled = true
