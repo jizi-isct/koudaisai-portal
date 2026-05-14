@@ -1,7 +1,23 @@
-export default function Page() {
+import styles from "../documents/page.module.css";
+import {Heading1} from "@koudaisai/shared-ui";
+import {getApiFetchClient} from "@koudaisai/shared-api";
+import {ViewFormCards} from "../../../components/form/view/ViewFormCards";
+
+export default async function Page() {
+  const fetchClient = getApiFetchClient("https://portal.koudaisai.jp/api/v2")
+
+  // フォーム一覧の取得
+  const {data, error} = await fetchClient.GET("/forms")
+  if (error || !data) {
+    throw error;
+  }
+
   return (
-    <div style={{minHeight: "calc(100vh - 300px)"}}>
-      <p>5/13（水）開催の参加説明会後、公開予定です。</p>
-    </div>
+    <main className={styles.main}>
+      <Heading1 emoji={"📝"}>フォーム</Heading1>
+      <div className={styles.container}>
+        <ViewFormCards forms={data}/>
+      </div>
+    </main>
   )
 }

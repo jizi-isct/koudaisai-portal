@@ -60,6 +60,9 @@
     },
     {
       "path": "../../libs/shared-ui"
+    },
+    {
+      "path": "../../libs/shared-api"
     }
   ]
 }
