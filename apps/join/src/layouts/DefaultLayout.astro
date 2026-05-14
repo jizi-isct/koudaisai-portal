@@ -1,6 +1,7 @@
 ---
 import Footer from "@/features/footer/Footer.astro";
 import Header from "@/features/header/Header.astro";
+import MobileNavigator from "@/features/mobile-navigator/MobileNavigator.astro";
 import BaseLayout from "./BaseLayout.astro";
 
 type Props = {
@@ -24,6 +25,7 @@ const {
     <main class="default-layout-content">
       <slot />
     </main>
+    <MobileNavigator />
     <Footer isLoggedIn={isLoggedIn} />
   </div>
 </BaseLayout>
