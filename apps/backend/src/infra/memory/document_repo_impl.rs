@@ -31,32 +31,6 @@ impl DocumentRepo<MemoryTransaction> for MemoryDocumentRepo {
         Ok(documents.get(&id).cloned())
     }
 
-    async fn find_by_targets(
-        &self,
-        targets: Vec<TargetSpecifier>,
-    ) -> Result<Vec<Document>, FindError> {
-        if targets.is_empty() {
-            return Ok(vec![]);
-        }
-
-        let documents = self
-            .documents
-            .read()
-            .map_err(|e| FindError::InternalError(anyhow!(e.to_string())))?;
-
-        let matched = documents
-            .values()
-            .filter(|doc| {
-                doc.targets()
-                    .iter()
-                    .any(|doc_target| targets.contains(doc_target))
-            })
-            .cloned()
-            .collect();
-
-        Ok(matched)
-    }
-
     async fn find_all(&self) -> Result<Vec<Document>, FindError> {
         let documents = self
             .documents

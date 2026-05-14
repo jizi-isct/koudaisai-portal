@@ -231,7 +231,7 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     }
 }
 
-pub fn can_get_document_by_id(
+pub fn can_get_document(
     actor_ctx: &ActorContext,
     document: &Document,
 ) -> Result<(), CanGetByIdError> {
@@ -267,15 +267,6 @@ pub fn can_get_document_by_id(
                 Err(CanGetByIdError::NotFound)
             }
         }
-    }
-}
-
-pub fn can_get_all_document(actor_ctx: &ActorContext) -> bool {
-    match actor_ctx {
-        ActorContext::Admin { claims, .. } => {
-            claims.contains(&"koudaisai-portal:admin:document:read".to_string())
-        }
-        _ => true, // 後々、絞り込むときに0件になる
     }
 }
 

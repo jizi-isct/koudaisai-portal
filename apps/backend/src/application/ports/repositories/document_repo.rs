@@ -11,10 +11,6 @@ use crate::domain::document::Document;
 #[async_trait::async_trait]
 pub trait DocumentRepo<Tx: Transaction> {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Document>, FindError>;
-    async fn find_by_targets(
-        &self,
-        targets: Vec<TargetSpecifier>,
-    ) -> Result<Vec<Document>, FindError>;
     async fn find_all(&self) -> Result<Vec<Document>, FindError>;
 
     async fn insert(&self, document: &Document) -> Result<(), InsertError>;

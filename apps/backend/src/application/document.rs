@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use uuid::Uuid;
 
-use crate::application::authz::{self, CanGetByIdError};
+use crate::application::authz::{self, CanGetByIdError, can_get_document};
 use crate::application::transaction::Transaction;
 
 use crate::application::ports::clock::Clock;
@@ -92,67 +92,32 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
         &self,
         actor_ctx: &ActorContext,
     ) -> Result<Vec<Document>, ApplicationOperationError<FindError>> {
-        // auth
-        if !authz::can_get_all_document(actor_ctx) {
-            return Err(ApplicationOperationError::Unauthorized);
-        }
-
-        match actor_ctx {
-            ActorContext::Admin { user_id, claims } => {
-                // find all using repo
-                Ok(self.document_repo.find_all().await?)
-            }
-            ActorContext::User {
-                user_id,
-                memberships,
-                group_type,
-            } => {
-                let targets = Self::get_target_specifier(user_id, memberships, group_type);
-
-                Ok(self.document_repo.find_by_targets(targets).await?)
-            }
-            ActorContext::NoLogin => Ok(self
-                .document_repo
-                .find_by_targets(vec![TargetSpecifier::UserNologin])
-                .await?),
-        }
+        Ok(self
+            .document_repo
+            .find_all()
+            .await?
+            .into_iter()
+            .filter(|doc| can_get_document(actor_ctx, doc).is_ok())
+            .collect())
     }
 
     pub async fn get_by_category(
         &self,
         actor_ctx: &ActorContext,
     ) -> Result<HashMap<Option<Uuid>, Vec<Document>>, ApplicationOperationError<FindError>> {
-        if !authz::can_get_all_document(actor_ctx) {
-            return Err(ApplicationOperationError::Unauthorized);
-        }
-
-        let documents = match actor_ctx {
-            ActorContext::Admin { .. } => self.document_repo.find_all().await?,
-            ActorContext::User {
-                user_id,
-                memberships,
-                group_type,
-            } => {
-                let targets = Self::get_target_specifier(user_id, memberships, group_type);
-
-                self.document_repo.find_by_targets(targets).await?
-            }
-            ActorContext::NoLogin => {
-                self.document_repo
-                    .find_by_targets(vec![TargetSpecifier::UserNologin])
-                    .await?
-            }
-        };
-
-        let mut grouped = HashMap::<Option<Uuid>, Vec<Document>>::new();
-        grouped.entry(None).or_default();
-        for document in documents {
-            grouped
-                .entry(document.category())
-                .or_default()
-                .push(document);
-        }
-        Ok(grouped)
+        let documents = self
+            .document_repo
+            .find_all()
+            .await?
+            .into_iter()
+            .filter(|doc| can_get_document(actor_ctx, doc).is_ok())
+            .fold(HashMap::new(), |mut acc, doc| {
+                acc.entry(doc.category().clone())
+                    .or_insert_with(Vec::new)
+                    .push(doc);
+                acc
+            });
+        Ok(documents)
     }
 
     pub async fn get_by_id(
@@ -164,7 +129,7 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             return Ok(None);
         };
 
-        match authz::can_get_document_by_id(actor_ctx, &document) {
+        match authz::can_get_document(actor_ctx, &document) {
             Ok(()) => Ok(Some(document)),
             Err(CanGetByIdError::NotFound) => Ok(None),
             Err(CanGetByIdError::Unauthorized) => Err(ApplicationOperationError::Unauthorized),
