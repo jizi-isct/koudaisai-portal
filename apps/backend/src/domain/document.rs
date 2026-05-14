@@ -28,7 +28,6 @@ pub enum DocumentFormat {
 
 impl Document {
     /// 新規登録用コンストラクタ
-    /// タイトル、カテゴリID(optional)、フォーマット、対象、作成者のUserIdを受け取り、現在の日時を作成日時と更新日時に設定。
     pub fn register<C: Clock>(
         title: String,
         category: Option<Uuid>,
@@ -65,7 +64,7 @@ impl Document {
     }
 
     /// 復元用コンストラクタ
-    /// ID、作成日時、更新日時、作成者、更新者、タイトル、カテゴリ(optional)、フォーマット、対象を受け取り、それらをそのままフィールドに設定。
+    /// 入力をそのままフィールドに設定
     pub fn restore(
         id: Uuid,
         created_at: DateTime<Utc>,

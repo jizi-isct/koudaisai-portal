@@ -158,9 +158,9 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             ));
         };
 
-        let updated_by = actor_ctx
-            .user_id()
-            .ok_or_else(|| ApplicationOperationError::Unauthorized)?;
+        let updated_by = actor_ctx.user_id().ok_or_else(|| {
+            ApplicationOperationError::InternalError(anyhow::anyhow!("missing user_id"))
+        })?;
 
         if let Some(title) = title {
             document
