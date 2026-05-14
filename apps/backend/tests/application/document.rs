@@ -1,7 +1,7 @@
 use crate::application::common::{ActorSpec, build_actor, uid};
 use chrono::Utc;
 use koudaisai_portal_backend::application::error::{
-    ApplicationOperationError, DeleteError, UpdateError,
+    ApplicationOperationError, DeleteError, FindError, UpdateError,
 };
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::document::Document;
@@ -20,7 +20,10 @@ fn make_app() -> MemoryApplication {
 fn admin_ctx() -> ActorContext {
     ActorContext::Admin {
         user_id: uid(),
-        claims: vec!["koudaisai-portal:admin:document:create".to_string()],
+        claims: vec![
+            "koudaisai-portal:admin:document:read".to_string(),
+            "koudaisai-portal:admin:document:create".to_string(),
+        ],
     }
 }
 
@@ -63,6 +66,11 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
             .collect();
 
         let (_, ctx) = build_actor(c.actor);
+        let expected_title = c.title.clone();
+        let expected_category = c.category;
+        let expected_targets = targets.clone();
+        let expected_format: DocumentFormat = c.format.clone().into();
+
         let result = app
             .document()
             .create(&ctx, c.title, c.category, targets, c.format.into())
@@ -70,13 +78,37 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
 
         match c.expected.as_str() {
             "ok" => {
-                assert!(result.is_ok(), "expected Ok, got {:?}", result);
+                let created = result.expect("expected create Ok");
+
+                // read back (永続化確認)
+                let read_back = app
+                    .document()
+                    .get_by_id(&admin_ctx(), created.id())
+                    .await
+                    .expect("expected get_by_id Ok");
+
+                let persisted = read_back.expect("created document should exist (Some)");
+
+                assert_eq!(persisted.title(), expected_title.as_str());
+                assert_eq!(persisted.category(), expected_category);
+                assert_eq!(persisted.targets(), expected_targets.as_slice());
+                assert_eq!(persisted.format(), &expected_format);
             }
             "unauthorized" => {
                 assert!(matches!(
                     result,
                     Err(ApplicationOperationError::Unauthorized)
                 ));
+
+                let admin = admin_ctx(); // 全件取得
+
+                let read_back = app
+                    .document()
+                    .get_all(&admin)
+                    .await
+                    .expect("expected get_all Ok");
+
+                assert_eq!(read_back.len(), 0);
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -152,10 +184,8 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
                 assert_eq!(documents.len(), c.expected_count);
             }
             "unauthorized" => {
-                assert!(matches!(
-                    result,
-                    Err(ApplicationOperationError::Unauthorized)
-                ));
+                let documents = result.expect("expected Ok");
+                assert_eq!(documents.len(), c.expected_count);
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -202,10 +232,8 @@ pub fn test_get_by_category(_path: &Path, contents: String) -> datatest_stable::
                 assert_eq!(visible_count, c.expected_count);
             }
             "unauthorized" => {
-                assert!(matches!(
-                    result,
-                    Err(ApplicationOperationError::Unauthorized)
-                ));
+                let documents = result.expect("expected Ok");
+                assert_eq!(documents.len(), c.expected_count);
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -285,9 +313,9 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         let c: UpdateCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
+        let before_doc = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
         let document_id = if c.document_exists {
-            let doc = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
-            doc.id()
+            before_doc.id()
         } else {
             Uuid::new_v4()
         };
@@ -321,20 +349,60 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 document_id,
                 c.new_title.clone(),
                 category_update,
-                format_update,
-                targets_update,
+                format_update.clone(),
+                targets_update.clone(),
             )
             .await;
 
         match c.expected.as_str() {
             "ok" => {
-                assert!(result.is_ok(), "expected Ok, got {:?}", result);
+                let after_doc = app
+                    .document()
+                    .get_by_id(&admin_ctx(), document_id)
+                    .await
+                    .expect("expected get_all Ok")
+                    .expect("Some");
+
+                if let Some(title) = c.new_title {
+                    assert_eq!(title, after_doc.title());
+                } else {
+                    assert_eq!(before_doc.title(), after_doc.title());
+                }
+
+                if let Some(category) = category_update {
+                    assert_eq!(category, after_doc.category());
+                } else {
+                    assert_eq!(before_doc.category(), after_doc.category());
+                }
+
+                if let Some(format) = format_update {
+                    assert_eq!(&format, after_doc.format());
+                } else {
+                    assert_eq!(before_doc.format(), after_doc.format());
+                }
+
+                if let Some(targets) = targets_update {
+                    assert_eq!(&targets, after_doc.targets());
+                } else {
+                    assert_eq!(before_doc.targets(), after_doc.targets());
+                }
             }
             "unauthorized" => {
+                let after_doc = app
+                    .document()
+                    .get_by_id(&admin_ctx(), document_id)
+                    .await
+                    .expect("expected get_all Ok")
+                    .expect("Some");
+
                 assert!(matches!(
                     result,
                     Err(ApplicationOperationError::Unauthorized)
                 ));
+                assert_eq!(before_doc.title(), after_doc.title());
+                assert_eq!(before_doc.category(), after_doc.category());
+                assert_eq!(before_doc.format(), after_doc.format());
+                assert_eq!(before_doc.targets(), after_doc.targets());
             }
             "not_found" => {
                 assert!(matches!(
@@ -365,9 +433,10 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
         let c: DeleteCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
+        let document = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
+
         let document_id = if c.document_exists {
-            let doc = seed_document(&app, vec![TargetSpecifier::GroupTypeProjectGeneral]).await;
-            doc.id()
+            document.id()
         } else {
             Uuid::new_v4()
         };
@@ -377,13 +446,30 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
 
         match c.expected.as_str() {
             "ok" => {
-                assert!(result.is_ok(), "expected Ok, got {:?}", result);
+                let read_back = app
+                    .document()
+                    .get_all(&admin_ctx())
+                    .await
+                    .expect("expected get_all Ok");
+                assert_eq!(read_back.len(), 0);
             }
             "unauthorized" => {
                 assert!(matches!(
                     result,
                     Err(ApplicationOperationError::Unauthorized)
                 ));
+                let read_back = app
+                    .document()
+                    .get_by_id(&admin_ctx(), document_id)
+                    .await
+                    .expect("expected get_all Ok")
+                    .expect("Some");
+
+                assert_eq!(document.id(), read_back.id());
+                assert_eq!(document.title(), read_back.title());
+                assert_eq!(document.category(), read_back.category());
+                assert_eq!(document.targets(), read_back.targets());
+                assert_eq!(document.format(), read_back.format());
             }
             "not_found" => {
                 assert!(matches!(
