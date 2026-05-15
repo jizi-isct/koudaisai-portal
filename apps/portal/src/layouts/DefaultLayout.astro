@@ -30,6 +30,25 @@ const {
   </div>
 </BaseLayout>
 
+<script>
+  import {getTokensMembers} from "@koudaisai/shared-auth-members";
+  import {authFetchClient} from "@/features/auth/authClient";
+
+  const redirectToLogin = () => {
+    window.location.replace("/login/");
+  };
+
+  try {
+    const tokens = await getTokensMembers(authFetchClient);
+
+    if (!tokens) {
+      redirectToLogin();
+    }
+  } catch {
+    redirectToLogin();
+  }
+</script>
+
 <style>
   .default-layout {
     display: flex;
