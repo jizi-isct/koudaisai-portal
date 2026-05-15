@@ -36,6 +36,9 @@
       "path": "./libs/shared-api-utils"
     },
     {
+      "path": "./apps/portal"
+    },
+    {
       "path": "./apps/portal-legacy"
     },
     {
