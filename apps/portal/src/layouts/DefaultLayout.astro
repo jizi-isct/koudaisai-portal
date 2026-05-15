@@ -32,7 +32,7 @@ const {
 
 <script>
   import {getTokensMembers} from "@koudaisai/shared-auth-members";
-  import {authFetchClient} from "@/features/auth/authClient";
+  import {authFetchClient} from "../features/api/api.ts";
 
   const redirectToLogin = () => {
     window.location.replace("/login/");
