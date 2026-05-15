@@ -4,6 +4,7 @@
 dist
 tmp
 out-tsc
+*.tsbuildinfo
 
 # dependencies
 node_modules
@@ -53,6 +54,7 @@ out
 
 # Astro
 .astro
+astro.config.d.mts
 
 # Generated docs
 /docs/api_v2.html
