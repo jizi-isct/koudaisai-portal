@@ -1,0 +1,10 @@
+---
+import {LoginForm} from "@/features/login/LoginForm.tsx";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="ログイン | 工大祭ポータル">
+  <main>
+    <LoginForm client:load />
+  </main>
+</BaseLayout>

@@ -12,6 +12,12 @@
   },
   "references": [
     {
+      "path": "../../libs/shared-api"
+    },
+    {
+      "path": "../../libs/shared-auth"
+    },
+    {
       "path": "../../libs/shared-auth-members"
     },
     {
