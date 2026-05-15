@@ -1,6 +1,5 @@
 import styles from "./LargeButton.module.css";
 import {ReactNode, useCallback} from "react";
-import {useRouter} from "next/navigation";
 
 type ButtonProps = {
   children: ReactNode
@@ -10,15 +9,14 @@ type ButtonProps = {
 }
 
 export const LargeButton = ({children, type, onClick, href}: ButtonProps) => {
-  const router = useRouter()
   const handleClick = useCallback(() => {
     if (onClick) {
       onClick();
     }
     if (href) {
-      router.push(href)
+      window.location.assign(href)
     }
-  }, [onClick, href, router])
+  }, [onClick, href])
   return (
     <button
       className={`${styles.button} ${type === "primary" && styles.primary} ${type === "secondary" && styles.secondary}`}

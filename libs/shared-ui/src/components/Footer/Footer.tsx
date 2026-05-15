@@ -1,27 +1,24 @@
 "use client";
 
 import styles from "./Footer.module.css";
-import Link from "next/link";
-import Image from "next/image";
-
 import membersLogo from "./assets/members_logo.svg"
 
 export const Footer = ({isLoggedIn}: {isLoggedIn ?: boolean}) => {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoWrapper}>
-        <Image
-          src={membersLogo}
+        <img
+          src={typeof membersLogo === "string" ? membersLogo : membersLogo.src}
           alt="Koudaisai Portal Members Site Logo"
           width={40}
           height={40}
         />
       </div>
       <div className={styles.navWrapper}>
-        <Link href="/" className={styles.navItem}>ホーム</Link>
-        <Link href="/forms/" className={styles.navItem}>フォーム</Link>
-        <Link href="/documents/" className={styles.navItem}>資料</Link>
-        <Link href="/questions/" className={styles.navItem}>よくある質問</Link>
+        <a href="/" className={styles.navItem}>ホーム</a>
+        <a href="/forms/" className={styles.navItem}>フォーム</a>
+        <a href="/documents/" className={styles.navItem}>資料</a>
+        <a href="/questions/" className={styles.navItem}>よくある質問</a>
       </div>
       <p className={styles.contacts}>
         公式LINEアカウント：{
