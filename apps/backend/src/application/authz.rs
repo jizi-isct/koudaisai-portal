@@ -1,8 +1,11 @@
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::document::Document;
 use crate::domain::form::Form;
+use crate::domain::group::Group;
 use crate::domain::membership::Membership;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
+use uuid::Uuid;
 
 pub fn can_get_all_users(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
@@ -228,6 +231,72 @@ pub fn can_delete_approval_request(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+pub fn can_get_document(
+    actor_ctx: &ActorContext,
+    document: &Document,
+) -> Result<(), CanGetByIdError> {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            if claims.contains(&"koudaisai-portal:admin:document:read".to_string()) {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::Unauthorized)
+            }
+        }
+        ActorContext::User { .. } => {
+            if document
+                .targets()
+                .iter()
+                .any(|t| t.does_actor_match(actor_ctx))
+            {
+                Ok(())
+            } else {
+                // 閲覧権限がない場合は、セキュリティのため「存在しない」として扱う
+                Err(CanGetByIdError::NotFound)
+            }
+        }
+
+        ActorContext::NoLogin => {
+            if document
+                .targets()
+                .iter()
+                .any(|t| t.does_actor_match(actor_ctx))
+            {
+                Ok(())
+            } else {
+                Err(CanGetByIdError::NotFound)
+            }
+        }
+    }
+}
+
+pub fn can_create_document(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_document(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_document(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:document:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
 pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -238,7 +307,7 @@ pub fn can_get_document_category_by_id(actor_ctx: &ActorContext) -> Result<(), C
             }
         }
         ActorContext::User { .. } => Ok(()),
-        ActorContext::NoLogin => Err(CanGetByIdError::Unauthorized),
+        ActorContext::NoLogin => Ok(()),
     }
 }
 
@@ -248,7 +317,7 @@ pub fn can_get_all_document_categories(actor_ctx: &ActorContext) -> bool {
             claims.contains(&"koudaisai-portal:admin:document-category:read".to_string())
         }
         ActorContext::User { .. } => true,
-        ActorContext::NoLogin => false,
+        ActorContext::NoLogin => true,
     }
 }
 

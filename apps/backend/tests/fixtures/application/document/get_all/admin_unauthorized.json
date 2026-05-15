@@ -1,0 +1,10 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "seed_count": 1,
+  "expected_count": 0,
+  "expected": "unauthorized"
+}

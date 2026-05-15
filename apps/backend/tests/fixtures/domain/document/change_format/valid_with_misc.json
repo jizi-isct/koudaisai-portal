@@ -1,0 +1,8 @@
+{
+  "new_format": {
+    "type": "misc",
+    "file_key": "new_key",
+    "file_name": "new_name"
+  },
+  "ok": true
+}
