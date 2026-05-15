@@ -34,8 +34,8 @@
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
-    "../../apps/portal/.next/types/**/*.ts",
-    "../../dist/apps/portal/.next/types/**/*.ts",
+    "../../apps/portal-legacy/.next/types/**/*.ts",
+    "../../dist/apps/portal-legacy/.next/types/**/*.ts",
     "next-env.d.ts"
   ],
   "exclude": [

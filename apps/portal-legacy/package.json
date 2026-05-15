@@ -1,5 +1,5 @@
 {
-  "name": "@koudaisai-portal/portal",
+  "name": "@koudaisai-portal/portal-legacy",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
