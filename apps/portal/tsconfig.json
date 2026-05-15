@@ -10,5 +10,12 @@
       ]
     }
   },
-  "references": []
+  "references": [
+    {
+      "path": "../../libs/shared-auth-members"
+    },
+    {
+      "path": "../../libs/shared-ui"
+    }
+  ]
 }

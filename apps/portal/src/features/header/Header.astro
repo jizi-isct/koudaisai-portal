@@ -1,6 +1,7 @@
 ---
 import { headerItems } from "./navItems";
 import membersLogo from "./assets/members_logo.png";
+import { UserMenu } from "./UserMenu";
 import "./header.css";
 
 type Props = {
@@ -52,4 +53,8 @@ const normalizePath = (path: string) => {
       })
     }
   </nav>
+
+  <div class="site-header-user-menu">
+    <UserMenu client:load />
+  </div>
 </header>

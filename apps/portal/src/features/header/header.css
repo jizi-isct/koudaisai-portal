@@ -80,6 +80,13 @@
     color: black;
     border-color: #0048ff;
   }
+
+  .site-header-user-menu {
+    position: fixed;
+    right: 40px;
+    top: 30px;
+    z-index: 1001;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -99,7 +106,8 @@
   }
 
   .site-header-logo-text-wrapper,
-  .site-header-menu-wrapper {
+  .site-header-menu-wrapper,
+  .site-header-user-menu {
     display: none;
   }
 }
