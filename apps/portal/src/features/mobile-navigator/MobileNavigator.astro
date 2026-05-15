@@ -1,0 +1,35 @@
+---
+import { headerItems } from "@/features/header/navItems";
+import "./mobile-navigator.css";
+
+const currentPath = Astro.url.pathname;
+
+const normalizePath = (path: string) => {
+  if (path === "/") return path;
+  return path.endsWith("/") ? path : `${path}/`;
+};
+---
+
+<div class="mobile-navigator-root">
+  <nav class="mobile-navigator-nav" aria-label="モバイルナビゲーション">
+    {
+      headerItems.map((item) => {
+        const isActive = normalizePath(currentPath) === item.href;
+
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              "mobile-navigator-link",
+              item.className,
+              isActive ? "mobile-navigator-active-nav" : "mobile-navigator-inactive-nav",
+            ]}
+          >
+            <span class="mobile-navigator-emoji">{item.emoji}</span>
+            <span class="mobile-navigator-text">{item.mobileText}</span>
+          </a>
+        );
+      })
+    }
+  </nav>
+</div>

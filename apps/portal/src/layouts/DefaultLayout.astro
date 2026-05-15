@@ -1,27 +1,54 @@
 ---
+import Footer from "@/features/footer/Footer.astro";
+import Header from "@/features/header/Header.astro";
+import MobileNavigator from "@/features/mobile-navigator/MobileNavigator.astro";
 import BaseLayout from "./BaseLayout.astro";
 
 type Props = {
   title?: string;
   description?: string;
+  titleColor?: "white" | "black";
+  isLoggedIn?: boolean;
 };
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  titleColor = "black",
+  isLoggedIn = false,
+} = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-  <main class="default-layout-content">
-    <slot />
-  </main>
+  <div class="default-layout">
+    <Header titleColor={titleColor} />
+    <main class="default-layout-content">
+      <slot />
+    </main>
+    <MobileNavigator />
+    <Footer isLoggedIn={isLoggedIn} />
+  </div>
 </BaseLayout>
 
 <style>
+  .default-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
   .default-layout-content {
     box-sizing: border-box;
+    flex: 1;
     margin: 0 auto;
     max-width: 700px;
-    min-height: 100vh;
-    padding: 3rem 1rem;
+    padding: 0 1rem 2rem;
     width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .default-layout-content {
+      padding-top: 100px;
+    }
   }
 </style>
