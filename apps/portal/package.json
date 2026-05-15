@@ -13,6 +13,7 @@
     "@koudaisai/shared-api": "0.0.1",
     "@koudaisai/shared-auth": "0.0.1",
     "@koudaisai/shared-auth-members": "0.0.1",
+    "@koudaisai/shared-utils": "0.0.1",
     "@koudaisai/shared-ui": "0.0.1",
     "astro": "^6.2.1"
   }

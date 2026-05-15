@@ -1,0 +1,17 @@
+---
+import membersLogo from "@/features/header/assets/members_logo.png";
+import styles from "@/features/plain-form/PlainForm.module.css";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="パスワードのリセット | 工大祭ポータル">
+  <main class={styles.root}>
+    <div class={styles.logoSmall}>
+      <img src={membersLogo.src} alt="Koudaisai Portal Logo" width="40" height="40" />
+    </div>
+    <h1 class={styles.title}>パスワードのリセット</h1>
+    <p class={styles.description}>
+      入力されたmアドレスで登録された参加団体責任者アカウントが存在する場合、入力されたmアドレス宛にパスワードのご案内を送信されました。ご確認ください。
+    </p>
+  </main>
+</BaseLayout>
