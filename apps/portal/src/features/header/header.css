@@ -106,8 +106,16 @@
   }
 
   .site-header-logo-text-wrapper,
-  .site-header-menu-wrapper,
-  .site-header-user-menu {
+  .site-header-menu-wrapper {
     display: none;
+  }
+
+  .site-header-user-menu {
+    position: fixed;
+    right: 12px;
+    top: 28px;
+    transform: scale(0.85);
+    transform-origin: top right;
+    z-index: 1001;
   }
 }
