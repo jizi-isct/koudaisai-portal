@@ -1,0 +1,40 @@
+---
+const {title} = Astro.props;
+
+type Props = {
+    title: string;
+}
+---
+
+
+<div class="root">
+    <div class="optionContainer">
+        <p class="selected">
+            {title}
+        </p>
+    </div>
+</div>
+
+<style>
+    .root {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .optionContainer{
+        border: 1px solid var(--darkblue);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin: 0;
+        background-color: white;
+        display: inline-block;
+    }
+
+    .selected{
+        font-weight: bold;
+        font-size: 14px;
+        margin: 0 10px;
+    }
+</style>
