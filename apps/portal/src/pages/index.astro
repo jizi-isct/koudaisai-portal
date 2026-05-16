@@ -10,7 +10,10 @@ import {Heading1} from "@koudaisai/shared-ui";
     <ViewNotifications client:load />
 
     <Heading1 emoji="📄">企画情報</Heading1>
+    <p class="coming-soon">Coming soon...</p>
+
     <Heading1 emoji="📱">企画詳細情報</Heading1>
+    <p class="coming-soon">Coming soon...</p>
   </section>
 </DefaultLayout>
 
@@ -20,5 +23,9 @@ import {Heading1} from "@koudaisai/shared-ui";
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .coming-soon {
+    text-align: center;
   }
 </style>
