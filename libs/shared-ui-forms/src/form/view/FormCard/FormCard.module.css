@@ -1,4 +1,5 @@
 .forms {
+    display: block;
     width: 45%;
     border: 1px solid var(--darkblue);
     border-radius: 10px;
@@ -6,6 +7,8 @@
     box-shadow: 4px 4px 0px 0px var(--darkblue);
     min-height: 160px;
     background-color: white;
+    color: inherit;
+    text-decoration: none;
 }
 
 .title {
