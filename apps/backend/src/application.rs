@@ -17,6 +17,7 @@ pub mod document_category;
 pub mod error;
 pub mod form;
 pub mod group;
+pub mod notification;
 pub mod ports;
 pub mod transaction;
 pub mod user;

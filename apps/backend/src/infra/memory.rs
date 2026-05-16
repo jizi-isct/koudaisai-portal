@@ -6,6 +6,7 @@ pub mod email_impl;
 pub mod form_repo_impl;
 pub mod group_repo_impl;
 pub mod membership_repo_impl;
+pub mod notification_repo_impl;
 pub mod transaction_impl;
 pub mod user_repo_impl;
 

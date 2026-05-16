@@ -3,6 +3,7 @@ use crate::domain::document::Document;
 use crate::domain::form::Form;
 use crate::domain::group::Group;
 use crate::domain::membership::Membership;
+use crate::domain::notification::Notification;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
 use uuid::Uuid;
