@@ -1,7 +1,17 @@
 ---
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {Faq, Heading1, Selector} from "@koudaisai/shared-ui";
+import {questionDataNoLogin} from "../../features/questionData/questionDataNoLogIn";
+import QuestionTitle from "./questionTitle.astro";
 ---
 
 <DefaultLayout title="よくある質問 | 工大祭参加登録サイト">
-    <p>5/13（水）開催の参加説明会後、公開予定です。</p>
+    <section class="questions-page">
+        <Heading1 emoji="❓">よくある質問</Heading1>
+        <QuestionTitle title="～参加申請関連～" />
+        {questionDataNoLogin["〜参加申請関連〜"].map((data, i) => (
+            <Faq number={i+1} content={data}/>
+        ))}
+        <p>その他何かご不明などございましたら、当委員会までお気軽にお問い合わせください！</p>
+    </section>
 </DefaultLayout>

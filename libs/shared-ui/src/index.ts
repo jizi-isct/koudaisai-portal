@@ -1,5 +1,5 @@
 export * from './components/LargeButton';
-export * from './components/LargePulldown'
+// export * from './components/LargePulldown'
 export * from './components/TextInput';
 export * from './components/Heading1';
 export * from './components/Heading2';
