@@ -1,0 +1,11 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "form_targets": [
+    "press"
+  ],
+  "expected": false
+}

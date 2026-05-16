@@ -1,0 +1,1 @@
+{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:document-category:update"]}}, "category_exists": true, "new_title": "New Title", "update_emoji": true, "new_emoji": "✅", "expected": "ok"}

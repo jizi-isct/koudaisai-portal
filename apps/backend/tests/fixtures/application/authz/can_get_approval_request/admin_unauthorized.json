@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "issuer_group_ids": [],
+  "expected": false
+}

@@ -11,14 +11,14 @@
     "./client": {
       "development": "./src/ClientFile.ts",
       "types": "./dist/ClientFile.d.ts",
-      "import": "./dist/ClientFile.js",
-      "default": "./dist/ClientFile.js"
+      "import": "./src/ClientFile.ts",
+      "default": "./src/ClientFile.ts"
     },
     ".": {
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "devDependencies": {

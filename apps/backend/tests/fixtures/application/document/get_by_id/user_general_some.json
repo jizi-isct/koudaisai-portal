@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "User": {
+      "group_type": "general"
+    }
+  },
+  "document_exists": true,
+  "expected": "some"
+}

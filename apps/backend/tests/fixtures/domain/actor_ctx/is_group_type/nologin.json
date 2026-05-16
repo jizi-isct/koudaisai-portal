@@ -1,0 +1,5 @@
+{
+  "actor": "nologin",
+  "query": "project_general",
+  "expected": false
+}

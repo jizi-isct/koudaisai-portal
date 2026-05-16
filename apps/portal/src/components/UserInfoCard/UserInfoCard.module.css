@@ -1,0 +1,15 @@
+.user {
+    padding: 2rem;
+    text-align: center;
+}
+
+.user h1{
+    font-size: 20px;
+    display: inline-block;
+    margin: 0 20px;
+}
+
+.user h2{
+    font-size: 14px;
+    display: inline-block;
+}

@@ -1,0 +1,37 @@
+---
+import Hero from "@/features/hero/Hero.astro";
+import { TopPageTabs } from "@/features/top-page/TopPageTabs";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import { Heading2 } from "@koudaisai/shared-ui";
+---
+
+<DefaultLayout title="工大祭参加登録サイト" titleColor="white">
+  <Hero />
+  <Heading2 emoji="ℹ️">このサイトについて</Heading2>
+  <p class="top-page-about">
+    このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。
+    <br />
+    このサイトを通じて工大祭への参加に関する各種手続きを行うことができます。
+    <br />
+    一緒に工大祭を創りあげましょう！
+  </p>
+  <TopPageTabs client:load />
+</DefaultLayout>
+
+<script>
+  const updateHeaderTitleColor = () => {
+    const logoText = document.querySelector(".site-header-logo-text");
+    logoText?.classList.toggle("site-header-logo-text-white", window.scrollY <= window.innerHeight - 80);
+  };
+
+  updateHeaderTitleColor();
+  window.addEventListener("scroll", updateHeaderTitleColor, { passive: true });
+  window.addEventListener("resize", updateHeaderTitleColor);
+</script>
+
+<style>
+  .top-page-about {
+    margin: 1.5em auto;
+    width: fit-content;
+  }
+</style>

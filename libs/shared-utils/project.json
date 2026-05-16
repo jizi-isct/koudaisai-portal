@@ -1,0 +1,8 @@
+{
+  "name": "@koudaisai/shared-utils",
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}

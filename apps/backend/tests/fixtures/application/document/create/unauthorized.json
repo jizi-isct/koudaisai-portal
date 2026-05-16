@@ -1,0 +1,11 @@
+{
+  "actor": "Nologin",
+  "title": "New Document",
+  "category": null,
+  "targets": ["group/type/project_general"],
+  "format": {
+    "type": "markdown",
+    "content": "# Hello"
+  },
+  "expected": "unauthorized"
+}

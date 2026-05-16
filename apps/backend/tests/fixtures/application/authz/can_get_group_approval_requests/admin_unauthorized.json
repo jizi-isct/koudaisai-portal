@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": []
+    }
+  },
+  "group_id": "G-001",
+  "expected": false
+}

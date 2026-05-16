@@ -1,0 +1,9 @@
+{
+  "actor": {
+    "Admin": {
+      "claims": ["koudaisai-portal:admin:document:delete"]
+    }
+  },
+  "document_exists": false,
+  "expected": "not_found"
+}
