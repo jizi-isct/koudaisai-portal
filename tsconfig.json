@@ -39,9 +39,6 @@
       "path": "./apps/portal"
     },
     {
-      "path": "./apps/portal-legacy"
-    },
-    {
       "path": "./libs/shared-ui-forms"
     },
     {
