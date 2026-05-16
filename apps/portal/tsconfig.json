@@ -15,6 +15,9 @@
       "path": "../../libs/shared-ui-document"
     },
     {
+      "path": "../../libs/shared-ui-forms"
+    },
+    {
       "path": "../../libs/shared-api"
     },
     {
