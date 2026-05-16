@@ -1,0 +1,10 @@
+---
+import {ViewQuestionsWrapper} from "@/features/questions/ViewQuestionsWrapper";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {Heading1} from "@koudaisai/shared-ui";
+---
+
+<DefaultLayout title="よくある質問 | 工大祭ポータル">
+  <Heading1 emoji="❓">よくある質問</Heading1>
+  <ViewQuestionsWrapper client:load />
+</DefaultLayout>
