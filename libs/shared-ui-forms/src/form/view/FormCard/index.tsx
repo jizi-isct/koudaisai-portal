@@ -29,7 +29,7 @@ export function FormCard({form}: FormCardProps) {
   }, [form.due_date]);
 
   return (
-    <a key={form.id} href={formLink} className={styles.forms}>
+    <a href={formLink} className={styles.forms}>
       <h2 className={styles.title}>{form.form_name}</h2>
       <p className={styles.summary}>{form.summary}</p>
       <h2 className={styles.dueDate}>回答期限: {formattedDueDate}</h2>
