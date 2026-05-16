@@ -1,6 +1,6 @@
 import {login} from "@koudaisai/shared-auth-members";
 import {useCallback, useState} from "react";
-import {authFetchClient} from "../api/authClient";
+import {authFetchClient} from "../api/api";
 import membersLogo from "@/features/header/assets/members_logo.png";
 import styles from "./LoginForm.module.css";
 

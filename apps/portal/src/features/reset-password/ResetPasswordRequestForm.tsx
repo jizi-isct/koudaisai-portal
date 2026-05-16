@@ -1,5 +1,5 @@
 import {useCallback, useState} from "react";
-import {authFetchClient} from "../api/authClient";
+import {authFetchClient} from "../api/api";
 import membersLogo from "@/features/header/assets/members_logo.png";
 import {NextPhaseButton} from "@/features/plain-form/NextPhaseButton";
 import styles from "@/features/plain-form/PlainForm.module.css";

@@ -2,7 +2,7 @@ import {validatePassword} from "@koudaisai/shared-utils";
 import {login} from "@koudaisai/shared-auth-members";
 import {useCallback, useEffect, useRef, useState} from "react";
 import type {FormEvent} from "react";
-import {authFetchClient} from "../api/authClient";
+import {authFetchClient} from "../api/api";
 import membersLogo from "@/features/header/assets/members_logo.png";
 import {NextPhaseButton} from "@/features/plain-form/NextPhaseButton";
 import formStyles from "@/features/plain-form/PlainForm.module.css";
