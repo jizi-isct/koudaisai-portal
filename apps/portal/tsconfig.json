@@ -21,6 +21,9 @@
       "path": "../../libs/shared-auth-members"
     },
     {
+      "path": "../../libs/shared-types"
+    },
+    {
       "path": "../../libs/shared-utils"
     },
     {
