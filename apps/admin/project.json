@@ -1,0 +1,35 @@
+{
+  "name": "admin",
+  "sourceRoot": "apps/admin/src",
+  "projectType": "application",
+  "implicitDependencies": [
+    "@koudaisai/shared-api",
+    "@koudaisai/shared-auth",
+    "@koudaisai/shared-auth-admin",
+    "@koudaisai/shared-types",
+    "@koudaisai/shared-ui",
+    "@koudaisai/shared-utils"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "command": "astro build",
+        "cwd": "apps/admin"
+      },
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "astro dev",
+        "cwd": "apps/admin"
+      }
+    }
+  }
+}

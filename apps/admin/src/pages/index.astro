@@ -1,0 +1,28 @@
+---
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="工大祭管理画面">
+  <section class="admin-home">
+    <h1>工大祭管理画面</h1>
+    <p>Astro 版の管理画面です。</p>
+  </section>
+</DefaultLayout>
+
+<style>
+  .admin-home {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    line-height: 1.4;
+  }
+
+  p {
+    color: var(--muted);
+    line-height: 1.8;
+  }
+</style>
