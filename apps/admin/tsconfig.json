@@ -1,0 +1,33 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
+  },
+  "references": [
+    {
+      "path": "../../libs/shared-api"
+    },
+    {
+      "path": "../../libs/shared-auth"
+    },
+    {
+      "path": "../../libs/shared-auth-admin"
+    },
+    {
+      "path": "../../libs/shared-types"
+    },
+    {
+      "path": "../../libs/shared-utils"
+    },
+    {
+      "path": "../../libs/shared-ui"
+    }
+  ]
+}
