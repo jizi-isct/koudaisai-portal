@@ -32,8 +32,8 @@
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
-    "../../apps/admin/.next/types/**/*.ts",
-    "../../dist/apps/admin/.next/types/**/*.ts",
+    "../../apps/admin-legacy/.next/types/**/*.ts",
+    "../../dist/apps/admin-legacy/.next/types/**/*.ts",
     "next-env.d.ts"
   ],
   "exclude": [
