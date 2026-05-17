@@ -15,7 +15,9 @@ type ViewDocumentFormatMiscProps = {
 export function ViewDocumentFormatMisc({download, format}: ViewDocumentFormatMiscProps) {
   return (
     <div>
-      <LargeButton text={"ダウンロード"} onClick={() => download()}/>
+      <LargeButton type="secondary" onClick={() => download()}>
+        ダウンロード
+      </LargeButton>
     </div>
   )
 }

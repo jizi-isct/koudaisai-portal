@@ -1,0 +1,29 @@
+.empty {
+  text-align: center;
+}
+
+.modalContent {
+  line-height: 1.8;
+}
+
+.modalContent h1 {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.modalContent h2 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  margin: 1rem 0 0.5rem;
+}
+
+.modalContent p {
+  margin: 0.5rem 0;
+}
+
+.modalContent ul,
+.modalContent ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}

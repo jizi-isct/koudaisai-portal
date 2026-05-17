@@ -14,7 +14,9 @@ type ViewDocumentFormatPdfProps = {
 export function ViewDocumentFormatPdf({download}: ViewDocumentFormatPdfProps) {
   return (
     <div>
-      <LargeButton text={"ダウンロード"} onClick={() => download()}/>
+      <LargeButton type="secondary" onClick={() => download()}>
+        ダウンロード
+      </LargeButton>
     </div>
   )
 }

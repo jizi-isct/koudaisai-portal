@@ -2,9 +2,23 @@
   "name": "@koudaisai-portal/portal",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
   "dependencies": {
-    "next": "~16.0.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "@astrojs/react": "^5.0.5",
+    "@koudaisai-portal/shared-ui-document": "0.0.1",
+    "@koudaisai-portal/shared-ui-forms": "0.0.1",
+    "@koudaisai/shared-api": "0.0.1",
+    "@koudaisai/shared-auth": "0.0.1",
+    "@koudaisai/shared-auth-members": "0.0.1",
+    "@koudaisai/shared-types": "0.0.1",
+    "@koudaisai/shared-utils": "0.0.1",
+    "@koudaisai/shared-ui": "0.0.1",
+    "astro": "^6.2.1",
+    "react-markdown": "^10.1.0"
   }
 }

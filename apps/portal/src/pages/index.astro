@@ -1,0 +1,34 @@
+---
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {ViewNotifications} from "@/features/notification/ViewNotifications";
+import {ViewUserInfo} from "@/features/user-info/ViewUserInfo";
+import {Heading1} from "@koudaisai/shared-ui";
+---
+
+<DefaultLayout title="工大祭ポータル">
+  <section class="portal-home">
+    <ViewUserInfo client:load />
+
+    <Heading1 emoji="🔔">実行委員会からのお知らせ</Heading1>
+    <ViewNotifications client:load />
+
+    <Heading1 emoji="📄">企画情報</Heading1>
+    <p class="coming-soon">Coming soon...</p>
+
+    <Heading1 emoji="📱">企画詳細情報</Heading1>
+    <p class="coming-soon">Coming soon...</p>
+  </section>
+</DefaultLayout>
+
+<style>
+  .portal-home {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .coming-soon {
+    text-align: center;
+  }
+</style>

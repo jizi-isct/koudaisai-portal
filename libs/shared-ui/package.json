@@ -12,6 +12,12 @@
       "types": "./dist/index.d.ts",
       "import": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./LargePulldown": {
+      "development": "./src/components/LargePulldown/index.ts",
+      "types": "./dist/components/LargePulldown/index.d.ts",
+      "import": "./src/components/LargePulldown/index.ts",
+      "default": "./src/components/LargePulldown/index.ts"
     }
   },
   "files": [

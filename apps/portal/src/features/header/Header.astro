@@ -1,0 +1,60 @@
+---
+import { headerItems } from "./navItems";
+import membersLogo from "./assets/members_logo.png";
+import { UserMenu } from "./UserMenu";
+import "./header.css";
+
+type Props = {
+  titleColor?: "white" | "black";
+};
+
+const { titleColor = "black" } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const normalizePath = (path: string) => {
+  if (path === "/") return path;
+  return path.endsWith("/") ? path : `${path}/`;
+};
+---
+
+<header class="site-header site-header-members">
+  <a class="site-header-logo-wrapper" href="/" aria-label="工大祭ポータル ホーム">
+    <img
+      src={membersLogo.src}
+      alt="Koudaisai Portal Logo"
+      width="50"
+      height="50"
+    />
+    <span class="site-header-logo-text-wrapper">
+      <span class:list={["site-header-logo-text", titleColor === "white" && "site-header-logo-text-white"]}>
+        工大祭ポータル
+      </span>
+    </span>
+  </a>
+
+  <nav class="site-header-menu-wrapper" aria-label="メインナビゲーション">
+    {
+      headerItems.map((item) => {
+        const isActive = normalizePath(currentPath) === item.href;
+
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              "site-header-nav",
+              item.className,
+              isActive ? "site-header-active-nav" : "site-header-inactive-nav",
+            ]}
+          >
+            <span class="site-header-desktop-text">{item.desktopText}</span>
+            <span class="site-header-mobile-text">{item.mobileText}</span>
+          </a>
+        );
+      })
+    }
+  </nav>
+
+  <div class="site-header-user-menu">
+    <UserMenu client:load />
+  </div>
+</header>
