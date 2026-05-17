@@ -4,8 +4,19 @@ import DefaultLayout from "@/layouts/DefaultLayout.astro";
 
 <DefaultLayout title="工大祭管理画面">
   <section class="admin-home">
-    <h1>工大祭管理画面</h1>
-    <p>Astro 版の管理画面です。</p>
+    <img
+      src="/logo.jpg"
+      alt="Koudaisai Portal Admin Site Logo"
+      width="150"
+      height="150"
+    />
+    <h1>ようこそ</h1>
+    <h2>ページ一覧</h2>
+    <ul>
+      <li><a href="/admin/forms/">フォーム一覧</a></li>
+      <li><a href="/admin/documents/">資料一覧</a></li>
+      <li><a href="/admin/notifications/">通知一覧</a></li>
+    </ul>
   </section>
 </DefaultLayout>
 
@@ -13,16 +24,33 @@ import DefaultLayout from "@/layouts/DefaultLayout.astro";
   .admin-home {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   h1 {
-    font-size: 1.75rem;
+    font-size: 2rem;
+    font-weight: 700;
     line-height: 1.4;
   }
 
-  p {
-    color: var(--muted);
-    line-height: 1.8;
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style-position: inside;
+  }
+
+  a {
+    color: var(--brand);
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 </style>
