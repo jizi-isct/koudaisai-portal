@@ -3,6 +3,9 @@ name: Backend Format Check
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   format-check:
     name: nx format-check backend
