@@ -1,4 +1,5 @@
 ---
+import {AdminShell} from "./AdminShell";
 import BaseLayout from "./BaseLayout.astro";
 
 type Props = {
@@ -7,48 +8,11 @@ type Props = {
 };
 
 const {title, description} = Astro.props;
+const currentPath = Astro.url.pathname;
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="default-layout">
-    <header class="default-layout-header">
-      <a class="brand" href="/admin/">工大祭管理画面</a>
-    </header>
-    <main class="default-layout-content">
-      <slot />
-    </main>
-  </div>
+  <AdminShell currentPath={currentPath} client:load>
+    <slot />
+  </AdminShell>
 </BaseLayout>
-
-
-<style>
-  .default-layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .default-layout-header {
-    align-items: center;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    height: 64px;
-    padding: 0 1.5rem;
-  }
-
-  .brand {
-    color: var(--brand);
-    font-size: 1.125rem;
-    font-weight: 700;
-  }
-
-  .default-layout-content {
-    box-sizing: border-box;
-    flex: 1;
-    margin: 0 auto;
-    max-width: 960px;
-    padding: 2rem 1rem;
-    width: 100%;
-  }
-</style>
