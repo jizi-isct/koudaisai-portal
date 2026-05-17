@@ -1,9 +1,11 @@
-use crate::application::common::{build_actor, uid, ActorSpec};
-use koudaisai_portal_backend::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::application::common::{ActorSpec, build_actor, uid};
+use chrono::Utc;
+use koudaisai_portal_backend::application::error::{
+    ApplicationOperationError, DeleteError, UpdateError,
+};
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::document_category::DocumentCategory;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use uuid::Uuid;
@@ -54,7 +56,10 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
                 assert_eq!(categories.len(), c.seed_count);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -96,7 +101,10 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
                 assert!(opt.is_none(), "expected None");
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -146,12 +154,17 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "not_found" => {
                 assert!(matches!(
                     result,
-                    Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound))
+                    Err(ApplicationOperationError::OperationFailed(
+                        UpdateError::NotFound
+                    ))
                 ));
             }
             e => panic!("unknown expected: {e}"),
@@ -182,19 +195,27 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
         };
 
         let (_, ctx) = build_actor(c.actor);
-        let result = app.document_category().delete_document_category(&ctx, category_id).await;
+        let result = app
+            .document_category()
+            .delete_document_category(&ctx, category_id)
+            .await;
 
         match c.expected.as_str() {
             "ok" => {
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "not_found" => {
                 assert!(matches!(
                     result,
-                    Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound))
+                    Err(ApplicationOperationError::OperationFailed(
+                        DeleteError::NotFound
+                    ))
                 ));
             }
             e => panic!("unknown expected: {e}"),

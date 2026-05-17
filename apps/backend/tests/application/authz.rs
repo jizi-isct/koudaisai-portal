@@ -1,5 +1,8 @@
-use crate::application::common::{build_actor, mem, parse_group_type, parse_target, uid, ActorSpec};
+use crate::application::common::{
+    ActorSpec, build_actor, mem, parse_group_type, parse_target, uid,
+};
 use crate::domain::common::FixedClock;
+use chrono::Utc;
 use koudaisai_portal_backend::application::authz::*;
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::approval_request::{
@@ -9,10 +12,9 @@ use koudaisai_portal_backend::domain::approval_request_id::ApprovalRequestId;
 use koudaisai_portal_backend::domain::form::{Form, FormType};
 use koudaisai_portal_backend::domain::form_id::FormId;
 use koudaisai_portal_backend::domain::group_id::GroupId;
-use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::domain::membership::Membership;
+use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::domain::user_id::UserId;
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
@@ -32,7 +34,10 @@ fn make_request(issued_by: UserId) -> ApprovalRequest {
         ApprovalRequestId::generate(),
         Utc::now(),
         issued_by,
-        ApprovalRequestType::EditExhibitionInfo { description: None, icon_key: None },
+        ApprovalRequestType::EditExhibitionInfo {
+            description: None,
+            icon_key: None,
+        },
         ApprovalRequestStatus::Pending,
         "reason".to_string(),
     )
@@ -83,7 +88,11 @@ pub fn test_can_get_user_by_id(_path: &Path, contents: String) -> datatest_stabl
         .collect();
     let (_, ctx) = build_actor(c.actor);
     let result = can_get_user_by_id(&ctx, memberships_of_user);
-    assert!(matches_result(&result, &c.expected), "expected={}", c.expected);
+    assert!(
+        matches_result(&result, &c.expected),
+        "expected={}",
+        c.expected
+    );
     Ok(())
 }
 
@@ -146,7 +155,11 @@ pub fn test_can_get_group_by_id(_path: &Path, contents: String) -> datatest_stab
         _ => vec![],
     };
     let result = can_get_group_by_id(&ctx, &members);
-    assert!(matches_result(&result, &c.expected), "expected={}", c.expected);
+    assert!(
+        matches_result(&result, &c.expected),
+        "expected={}",
+        c.expected
+    );
     Ok(())
 }
 
@@ -182,7 +195,9 @@ pub fn test_can_get_form(_path: &Path, contents: String) -> datatest_stable::Res
         "form".to_string(),
         "summary".to_string(),
         now,
-        FormType::TypeExternal { form_url: "https://example.com".to_string() },
+        FormType::TypeExternal {
+            form_url: "https://example.com".to_string(),
+        },
     );
     let (_, ctx) = build_actor(c.actor);
     assert_eq!(can_get_form(&ctx, &form), c.expected);
@@ -263,7 +278,10 @@ pub fn test_can_get_approval_request(
         .map(|g| mem(GroupId::from_str(g).unwrap(), issuer_uid))
         .collect();
     let (_, ctx) = build_actor(c.actor);
-    assert_eq!(can_get_approval_request(&ctx, &request, &memberships_of_issuer), c.expected);
+    assert_eq!(
+        can_get_approval_request(&ctx, &request, &memberships_of_issuer),
+        c.expected
+    );
     Ok(())
 }
 
@@ -305,13 +323,23 @@ pub fn test_can_close_approval_request(
     let (_, ctx) = if c.actor_is_issuer {
         // Override the actor's user_id to match the request's issued_by.
         match c.actor {
-            ActorSpec::User { group_type, group_ids } => {
+            ActorSpec::User {
+                group_type,
+                group_ids,
+            } => {
                 let memberships: Vec<Membership> = group_ids
                     .iter()
                     .map(|g| mem(GroupId::from_str(g).unwrap(), issuer_uid))
                     .collect();
                 let gt = parse_group_type(&group_type);
-                (issuer_uid, ActorContext::User { user_id: issuer_uid, memberships, group_type: gt })
+                (
+                    issuer_uid,
+                    ActorContext::User {
+                        user_id: issuer_uid,
+                        memberships,
+                        group_type: gt,
+                    },
+                )
             }
             spec => build_actor(spec),
         }
@@ -343,7 +371,11 @@ pub fn test_can_get_document_category_by_id(
     let c: ResultCase = serde_json::from_str(&contents)?;
     let (_, ctx) = build_actor(c.actor);
     let result = can_get_document_category_by_id(&ctx);
-    assert!(matches_result(&result, &c.expected), "expected={}", c.expected);
+    assert!(
+        matches_result(&result, &c.expected),
+        "expected={}",
+        c.expected
+    );
     Ok(())
 }
 

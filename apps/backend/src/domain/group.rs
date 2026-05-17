@@ -184,5 +184,4 @@ mod tests {
         assert_eq!(group.created_at(), created_at);
         assert_eq!(group.updated_at(), updated_at);
     }
-
 }

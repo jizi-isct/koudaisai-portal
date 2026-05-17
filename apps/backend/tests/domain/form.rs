@@ -1,9 +1,9 @@
 use crate::domain::common::FixedClock;
+use chrono::Utc;
 use koudaisai_portal_backend::domain::{
     form::{Form, FormType},
     target_specifier::TargetSpecifier,
 };
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use uuid::Uuid;
@@ -15,7 +15,9 @@ fn make_form() -> Form {
         "Test Form".to_string(),
         "Test Summary".to_string(),
         Utc::now() + chrono::Duration::days(7),
-        FormType::TypeExternal { form_url: "https://example.com/form".to_string() },
+        FormType::TypeExternal {
+            form_url: "https://example.com/form".to_string(),
+        },
         &FixedClock,
     )
     .unwrap()
@@ -38,15 +40,25 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
         c.name.clone(),
         c.summary.clone(),
         Utc::now() + chrono::Duration::days(7),
-        FormType::TypeExternal { form_url: "https://example.com/form".to_string() },
+        FormType::TypeExternal {
+            form_url: "https://example.com/form".to_string(),
+        },
         &FixedClock,
     );
     if c.ok {
-        let form = result.expect(&format!("expected Ok for name={:?} summary={:?}", c.name, c.summary));
+        let form = result.expect(&format!(
+            "expected Ok for name={:?} summary={:?}",
+            c.name, c.summary
+        ));
         assert_eq!(form.name(), c.name.as_str());
         assert_eq!(form.summary(), c.summary.as_str());
     } else {
-        assert!(result.is_err(), "expected Err for name={:?} summary={:?}", c.name, c.summary);
+        assert!(
+            result.is_err(),
+            "expected Err for name={:?} summary={:?}",
+            c.name,
+            c.summary
+        );
     }
     Ok(())
 }

@@ -81,7 +81,9 @@ pub fn test_status_transition(_path: &Path, contents: String) -> datatest_stable
 
     match c.initial.as_str() {
         "registered" => {}
-        "active"     => { user.activate(creds.clone(), &FixedClock).unwrap(); }
+        "active" => {
+            user.activate(creds.clone(), &FixedClock).unwrap();
+        }
         "deactivated" => {
             user.activate(creds.clone(), &FixedClock).unwrap();
             user.deactivate("reason".to_string(), &FixedClock).unwrap();
@@ -90,20 +92,38 @@ pub fn test_status_transition(_path: &Path, contents: String) -> datatest_stable
     }
 
     let result = match c.operation.as_str() {
-        "activate"   => user.activate(creds.clone(), &FixedClock).map_err(|_| ()),
-        "deactivate" => user.deactivate("reason".to_string(), &FixedClock).map_err(|_| ()),
+        "activate" => user.activate(creds.clone(), &FixedClock).map_err(|_| ()),
+        "deactivate" => user
+            .deactivate("reason".to_string(), &FixedClock)
+            .map_err(|_| ()),
         s => panic!("unknown operation: {s}"),
     };
 
     if c.ok {
-        assert!(result.is_ok(), "expected Ok: {:?} → {:?}", c.initial, c.operation);
+        assert!(
+            result.is_ok(),
+            "expected Ok: {:?} → {:?}",
+            c.initial,
+            c.operation
+        );
         match c.operation.as_str() {
-            "activate"   => assert!(matches!(user.status(), UserStatus::Active { .. }), "expected Active status after activate"),
-            "deactivate" => assert!(matches!(user.status(), UserStatus::Deactivated { .. }), "expected Deactivated status after deactivate"),
+            "activate" => assert!(
+                matches!(user.status(), UserStatus::Active { .. }),
+                "expected Active status after activate"
+            ),
+            "deactivate" => assert!(
+                matches!(user.status(), UserStatus::Deactivated { .. }),
+                "expected Deactivated status after deactivate"
+            ),
             _ => unreachable!(),
         }
     } else {
-        assert!(result.is_err(), "expected Err: {:?} → {:?}", c.initial, c.operation);
+        assert!(
+            result.is_err(),
+            "expected Err: {:?} → {:?}",
+            c.initial,
+            c.operation
+        );
     }
     Ok(())
 }

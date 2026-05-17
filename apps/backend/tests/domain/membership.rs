@@ -1,9 +1,6 @@
 use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::{
-    group::GroupType,
-    group_id::GroupId,
-    membership::Membership,
-    user_id::UserId,
+    group::GroupType, group_id::GroupId, membership::Membership, user_id::UserId,
 };
 use serde::Deserialize;
 use std::path::Path;
@@ -23,11 +20,27 @@ pub fn test_from_group_type(_path: &Path, contents: String) -> datatest_stable::
     let u = || UserId::new(Uuid::new_v4());
 
     let group_type = match c.group_type.as_str() {
-        "press"           => GroupType::Press { representative: u() },
-        "general_project" => GroupType::GeneralProject { representative1: u(), representative2: u(), representative3: u() },
-        "booth_project"   => GroupType::BoothProject   { representative1: u(), representative2: u(), representative3: u() },
-        "lab_project"     => GroupType::LabProject     { representative: u() },
-        "stage_project"   => GroupType::StageProject   { representative1: u(), representative2: u(), representative3: u() },
+        "press" => GroupType::Press {
+            representative: u(),
+        },
+        "general_project" => GroupType::GeneralProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
+        "booth_project" => GroupType::BoothProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
+        "lab_project" => GroupType::LabProject {
+            representative: u(),
+        },
+        "stage_project" => GroupType::StageProject {
+            representative1: u(),
+            representative2: u(),
+            representative3: u(),
+        },
         s => panic!("unknown group_type: {s}"),
     };
 

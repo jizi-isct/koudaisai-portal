@@ -12,7 +12,10 @@ fn make_pending() -> ApprovalRequest {
     ApprovalRequest::create(
         ApprovalRequestId::generate(),
         UserId::new(Uuid::new_v4()),
-        ApprovalRequestType::EditExhibitionInfo { description: None, icon_key: None },
+        ApprovalRequestType::EditExhibitionInfo {
+            description: None,
+            icon_key: None,
+        },
         "test reason".to_string(),
         &FixedClock,
     )
@@ -32,7 +35,10 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
     let result = ApprovalRequest::create(
         ApprovalRequestId::generate(),
         UserId::new(Uuid::new_v4()),
-        ApprovalRequestType::EditExhibitionInfo { description: None, icon_key: None },
+        ApprovalRequestType::EditExhibitionInfo {
+            description: None,
+            icon_key: None,
+        },
         c.reason.clone(),
         &FixedClock,
     );
@@ -60,30 +66,55 @@ pub fn test_transition(_path: &Path, contents: String) -> datatest_stable::Resul
     let user = UserId::new(Uuid::new_v4());
 
     match c.initial.as_str() {
-        "pending"  => {}
-        "approved" => { req.approve(user, None, &FixedClock).unwrap(); }
-        "rejected" => { req.reject(user, None, &FixedClock).unwrap(); }
-        "closed"   => { req.close(&FixedClock).unwrap(); }
+        "pending" => {}
+        "approved" => {
+            req.approve(user, None, &FixedClock).unwrap();
+        }
+        "rejected" => {
+            req.reject(user, None, &FixedClock).unwrap();
+        }
+        "closed" => {
+            req.close(&FixedClock).unwrap();
+        }
         s => panic!("unknown initial state: {s}"),
     }
 
     let result = match c.operation.as_str() {
         "approve" => req.approve(user, None, &FixedClock).map_err(|_| ()),
-        "reject"  => req.reject(user, None, &FixedClock).map_err(|_| ()),
-        "close"   => req.close(&FixedClock).map_err(|_| ()),
+        "reject" => req.reject(user, None, &FixedClock).map_err(|_| ()),
+        "close" => req.close(&FixedClock).map_err(|_| ()),
         s => panic!("unknown operation: {s}"),
     };
 
     if c.ok {
-        assert!(result.is_ok(), "expected Ok: {:?} → {:?}", c.initial, c.operation);
+        assert!(
+            result.is_ok(),
+            "expected Ok: {:?} → {:?}",
+            c.initial,
+            c.operation
+        );
         match c.operation.as_str() {
-            "approve" => assert!(matches!(req.status(), ApprovalRequestStatus::Approved { .. }), "expected Approved status"),
-            "reject"  => assert!(matches!(req.status(), ApprovalRequestStatus::Rejected { .. }), "expected Rejected status"),
-            "close"   => assert!(matches!(req.status(), ApprovalRequestStatus::Closed { .. }), "expected Closed status"),
+            "approve" => assert!(
+                matches!(req.status(), ApprovalRequestStatus::Approved { .. }),
+                "expected Approved status"
+            ),
+            "reject" => assert!(
+                matches!(req.status(), ApprovalRequestStatus::Rejected { .. }),
+                "expected Rejected status"
+            ),
+            "close" => assert!(
+                matches!(req.status(), ApprovalRequestStatus::Closed { .. }),
+                "expected Closed status"
+            ),
             _ => unreachable!(),
         }
     } else {
-        assert!(result.is_err(), "expected Err: {:?} → {:?}", c.initial, c.operation);
+        assert!(
+            result.is_err(),
+            "expected Err: {:?} → {:?}",
+            c.initial,
+            c.operation
+        );
     }
     Ok(())
 }
