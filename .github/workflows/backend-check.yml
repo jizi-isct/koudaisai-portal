@@ -3,6 +3,9 @@ name: Backend Check
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: nx check backend
