@@ -4,8 +4,12 @@ use serde::Deserialize;
 use std::path::Path;
 
 fn make_category() -> DocumentCategory {
-    DocumentCategory::register("Test Category".to_string(), Some("📃".to_string()), &FixedClock)
-        .unwrap()
+    DocumentCategory::register(
+        "Test Category".to_string(),
+        Some("📃".to_string()),
+        &FixedClock,
+    )
+    .unwrap()
 }
 
 // --- register ---
@@ -21,9 +25,19 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
     let c: RegisterCase = serde_json::from_str(&contents)?;
     let result = DocumentCategory::register(c.title.clone(), c.emoji.clone(), &FixedClock);
     if c.ok {
-        assert!(result.is_ok(), "expected Ok for title={:?} emoji={:?}", c.title, c.emoji);
+        assert!(
+            result.is_ok(),
+            "expected Ok for title={:?} emoji={:?}",
+            c.title,
+            c.emoji
+        );
     } else {
-        assert!(result.is_err(), "expected Err for title={:?} emoji={:?}", c.title, c.emoji);
+        assert!(
+            result.is_err(),
+            "expected Err for title={:?} emoji={:?}",
+            c.title,
+            c.emoji
+        );
     }
     Ok(())
 }

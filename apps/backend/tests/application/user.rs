@@ -1,5 +1,6 @@
-use crate::application::common::{build_actor, uid, ActorSpec};
+use crate::application::common::{ActorSpec, build_actor, uid};
 use crate::domain::common::FixedClock;
+use chrono::Utc;
 use koudaisai_portal_backend::application::error::{ApplicationOperationError, UpdateError};
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::email_address::EmailAddress;
@@ -7,7 +8,6 @@ use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
 use koudaisai_portal_backend::infra::memory::transaction_impl::MemoryTransaction;
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
@@ -61,7 +61,10 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
                 assert_eq!(users.len(), c.seed_user_count);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -97,7 +100,9 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
 
         for (i, gid_str) in c.target_group_ids.iter().enumerate() {
             let gid = GroupId::from_str(gid_str).unwrap();
-            let group_type = GroupType::Press { representative: target_user_id };
+            let group_type = GroupType::Press {
+                representative: target_user_id,
+            };
             let admin = ActorContext::Admin {
                 user_id: uid(),
                 claims: vec!["koudaisai-portal:admin:group:create".to_string()],
@@ -128,7 +133,10 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
                 assert!(opt.is_none(), "expected None");
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -150,7 +158,8 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         let app = make_app();
 
         let mut user = seed_user(&app).await;
-        user.rename("Updated Name".to_string(), &FixedClock).unwrap();
+        user.rename("Updated Name".to_string(), &FixedClock)
+            .unwrap();
 
         let (_, ctx) = build_actor(c.actor);
         let result = app.user().update_user(&ctx, &user).await;
@@ -164,7 +173,10 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 assert_eq!(saved.unwrap().name(), "Updated Name");
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -198,19 +210,27 @@ pub fn test_change_m_address(_path: &Path, contents: String) -> datatest_stable:
 
         let new_email = EmailAddress::new("new@example.com".to_string()).unwrap();
         let (_, ctx) = build_actor(c.actor);
-        let result = app.user().change_m_address(&ctx, target_user_id, new_email).await;
+        let result = app
+            .user()
+            .change_m_address(&ctx, target_user_id, new_email)
+            .await;
 
         match c.expected.as_str() {
             "ok" => {
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "not_found" => {
                 assert!(matches!(
                     result,
-                    Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound))
+                    Err(ApplicationOperationError::OperationFailed(
+                        UpdateError::NotFound
+                    ))
                 ));
             }
             e => panic!("unknown expected: {e}"),

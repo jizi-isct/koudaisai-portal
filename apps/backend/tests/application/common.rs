@@ -1,10 +1,10 @@
+use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
 use koudaisai_portal_backend::domain::membership::Membership;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::domain::user_id::UserId;
-use crate::domain::common::FixedClock;
 use serde::Deserialize;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -34,7 +34,9 @@ pub enum ActorSpec {
 
 pub fn parse_group_type(s: &str) -> GroupType {
     match s {
-        "" | "press" => GroupType::Press { representative: uid() },
+        "" | "press" => GroupType::Press {
+            representative: uid(),
+        },
         "general" => GroupType::GeneralProject {
             representative1: uid(),
             representative2: uid(),
@@ -50,7 +52,9 @@ pub fn parse_group_type(s: &str) -> GroupType {
             representative2: uid(),
             representative3: uid(),
         },
-        "labo" => GroupType::LabProject { representative: uid() },
+        "labo" => GroupType::LabProject {
+            representative: uid(),
+        },
         s => panic!("unknown group_type: {s}"),
     }
 }
@@ -70,13 +74,23 @@ pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
     let user_id = uid();
     match spec {
         ActorSpec::Admin { claims } => (user_id, ActorContext::Admin { user_id, claims }),
-        ActorSpec::User { group_type, group_ids } => {
+        ActorSpec::User {
+            group_type,
+            group_ids,
+        } => {
             let memberships: Vec<Membership> = group_ids
                 .iter()
                 .map(|g| mem(GroupId::from_str(g).unwrap(), user_id))
                 .collect();
             let gt = parse_group_type(&group_type);
-            (user_id, ActorContext::User { user_id, memberships, group_type: gt })
+            (
+                user_id,
+                ActorContext::User {
+                    user_id,
+                    memberships,
+                    group_type: gt,
+                },
+            )
         }
         ActorSpec::Nologin => (user_id, ActorContext::NoLogin),
     }

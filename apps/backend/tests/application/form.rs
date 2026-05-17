@@ -1,11 +1,13 @@
-use crate::application::common::{build_actor, parse_target, uid, ActorSpec};
-use koudaisai_portal_backend::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::application::common::{ActorSpec, build_actor, parse_target, uid};
+use chrono::Utc;
+use koudaisai_portal_backend::application::error::{
+    ApplicationOperationError, DeleteError, UpdateError,
+};
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::form::FormType;
 use koudaisai_portal_backend::domain::form_id::FormId;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use uuid::Uuid;
@@ -30,7 +32,9 @@ async fn seed_form(app: &MemoryApplication, targets: Vec<TargetSpecifier>) -> Fo
             "Test Form".to_string(),
             "Test Summary".to_string(),
             Utc::now() + chrono::Duration::days(7),
-            FormType::TypeExternal { form_url: "https://example.com/form".to_string() },
+            FormType::TypeExternal {
+                form_url: "https://example.com/form".to_string(),
+            },
         )
         .await
         .unwrap()
@@ -50,7 +54,8 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
         let c: GetAllCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
-        let targets: Vec<TargetSpecifier> = c.form_targets.iter().map(|t| parse_target(t)).collect();
+        let targets: Vec<TargetSpecifier> =
+            c.form_targets.iter().map(|t| parse_target(t)).collect();
         seed_form(&app, targets).await;
 
         let (_, ctx) = build_actor(c.actor);
@@ -77,7 +82,8 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
         let c: GetByIdCase = serde_json::from_str(&contents)?;
         let app = make_app();
 
-        let targets: Vec<TargetSpecifier> = c.form_targets.iter().map(|t| parse_target(t)).collect();
+        let targets: Vec<TargetSpecifier> =
+            c.form_targets.iter().map(|t| parse_target(t)).collect();
         let form_id = if c.form_exists {
             seed_form(&app, targets).await
         } else {
@@ -125,7 +131,9 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
                 c.form_name.clone(),
                 "Summary".to_string(),
                 Utc::now() + chrono::Duration::days(7),
-                FormType::TypeExternal { form_url: "https://example.com".to_string() },
+                FormType::TypeExternal {
+                    form_url: "https://example.com".to_string(),
+                },
             )
             .await;
 
@@ -134,10 +142,16 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "invalid_input" => {
-                assert!(matches!(result, Err(ApplicationOperationError::InvalidInput(_))));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::InvalidInput(_))
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -170,7 +184,15 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         let (_, ctx) = build_actor(c.actor);
         let result = app
             .form()
-            .update(&ctx, form_id, None, c.new_name.clone(), c.new_summary.clone(), None, None)
+            .update(
+                &ctx,
+                form_id,
+                None,
+                c.new_name.clone(),
+                c.new_summary.clone(),
+                None,
+                None,
+            )
             .await;
 
         match c.expected.as_str() {
@@ -178,16 +200,24 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "not_found" => {
                 assert!(matches!(
                     result,
-                    Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound))
+                    Err(ApplicationOperationError::OperationFailed(
+                        UpdateError::NotFound
+                    ))
                 ));
             }
             "invalid_input" => {
-                assert!(matches!(result, Err(ApplicationOperationError::InvalidInput(_))));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::InvalidInput(_))
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -223,12 +253,17 @@ pub fn test_delete(_path: &Path, contents: String) -> datatest_stable::Result<()
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             "not_found" => {
                 assert!(matches!(
                     result,
-                    Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound))
+                    Err(ApplicationOperationError::OperationFailed(
+                        DeleteError::NotFound
+                    ))
                 ));
             }
             e => panic!("unknown expected: {e}"),

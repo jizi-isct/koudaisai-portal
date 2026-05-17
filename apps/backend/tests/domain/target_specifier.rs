@@ -65,7 +65,9 @@ fn uid(s: Option<&String>) -> UserId {
 fn parse_group_type(s: &str) -> GroupType {
     let u = || UserId::new(Uuid::new_v4());
     match s {
-        "press" => GroupType::Press { representative: u() },
+        "press" => GroupType::Press {
+            representative: u(),
+        },
         "general" => GroupType::GeneralProject {
             representative1: u(),
             representative2: u(),
@@ -81,8 +83,12 @@ fn parse_group_type(s: &str) -> GroupType {
             representative2: u(),
             representative3: u(),
         },
-        "labo" => GroupType::LabProject { representative: u() },
-        _ => GroupType::Press { representative: u() },
+        "labo" => GroupType::LabProject {
+            representative: u(),
+        },
+        _ => GroupType::Press {
+            representative: u(),
+        },
     }
 }
 
@@ -91,7 +97,11 @@ pub fn test_does_actor_match(_path: &Path, contents: String) -> datatest_stable:
     let target = TargetSpecifier::from_str(&c.target).expect("invalid target in fixture");
 
     let actor = match &c.actor {
-        ActorSpec::User { group_type, group_ids, user_id } => {
+        ActorSpec::User {
+            group_type,
+            group_ids,
+            user_id,
+        } => {
             let user_id = uid(user_id.as_ref());
             let memberships = group_ids
                 .iter()

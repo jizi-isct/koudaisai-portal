@@ -16,7 +16,8 @@ pub struct DocumentCategoryWrite {
 }
 
 impl DocumentCategoryWrite {
-    pub fn into_active_model(self, id: Uuid) -> sea_orm_entities::document_category::ActiveModel { // ActiveModelはDBへの書き込み操作用のデータ構造
+    pub fn into_active_model(self, id: Uuid) -> sea_orm_entities::document_category::ActiveModel {
+        // ActiveModelはDBへの書き込み操作用のデータ構造
         let title = match self.title {
             Some(title) => Set(title),
             None => NotSet,

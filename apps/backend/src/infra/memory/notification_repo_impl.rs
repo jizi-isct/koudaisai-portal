@@ -55,7 +55,9 @@ impl NotificationRepo<MemoryTransaction> for MemoryNotificationRepo {
         _tx: &mut MemoryTransaction,
         notification: &Notification,
     ) -> Result<(), anyhow::Error> {
-        self.insert(notification).await.map_err(|e| anyhow::anyhow!(e))
+        self.insert(notification)
+            .await
+            .map_err(|e| anyhow::anyhow!(e))
     }
 
     async fn update(&self, notification: &Notification) -> Result<(), UpdateError> {
@@ -75,7 +77,9 @@ impl NotificationRepo<MemoryTransaction> for MemoryNotificationRepo {
         _tx: &mut MemoryTransaction,
         notification: &Notification,
     ) -> Result<(), anyhow::Error> {
-        self.update(notification).await.map_err(|e| anyhow::anyhow!(e))
+        self.update(notification)
+            .await
+            .map_err(|e| anyhow::anyhow!(e))
     }
 
     async fn delete(&self, id: NotificationId) -> Result<(), DeleteError> {

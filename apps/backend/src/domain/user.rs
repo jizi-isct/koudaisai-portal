@@ -240,5 +240,4 @@ mod tests {
         assert_eq!(user.m_address(), &new_address);
         assert_eq!(user.updated_at(), &update_time);
     }
-
 }
