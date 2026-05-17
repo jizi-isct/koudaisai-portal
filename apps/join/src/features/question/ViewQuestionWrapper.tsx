@@ -1,6 +1,6 @@
 'use client'
 
-import {questionDataNoLogin} from "../../features/question/questionDataNoLogIn";
+import {questionDataNoLogin} from "./questionDataNoLogIn";
 import {Faq, Selector} from "@koudaisai/shared-ui";
 import {useState} from "react";
 
