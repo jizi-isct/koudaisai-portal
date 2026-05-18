@@ -182,7 +182,7 @@ mod tests {
         )
         .unwrap();
 
-        assert!(result.target().is_empty());
+        assert!(result.targets().is_empty());
     }
 
     #[test]
