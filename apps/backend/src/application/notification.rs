@@ -137,3 +137,78 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
+    use crate::infra::memory::clock_impl::MemoryClock;
+    use crate::domain::actor_ctx::ActorContext;
+    use crate::domain::user_id::UserId;
+    use chrono::Utc;
+    use uuid::Uuid;
+
+    fn admin_ctx() -> ActorContext {
+        ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            claims: vec![
+                "koudaisai-portal:admin:notification:read".to_string(),
+                "koudaisai-portal:admin:notification:create".to_string(),
+                "koudaisai-portal:admin:notification:update".to_string(),
+                "koudaisai-portal:admin:notification:delete".to_string(),
+            ],
+        }
+    }
+
+    #[tokio::test]
+    async fn test_create_update_delete_notification_flow() {
+        let repo = MemoryNotificationRepo::new();
+        let clock = MemoryClock::new(Utc::now());
+        let app = NotificationApp::new(&repo, &clock);
+        let ctx = admin_ctx();
+
+        let targets = vec![TargetSpecifier::UserNologin];
+        let nt = NotificationType::markdown("title".to_string(), "body".to_string()).unwrap();
+        let id = app.create(&ctx, targets.clone(), nt.clone()).await.unwrap();
+
+        let fetched = repo.find_by_id(id).await.unwrap().unwrap();
+        assert_eq!(fetched.id(), id);
+
+        let got = app.get_by_id(&ctx, id).await.unwrap().unwrap();
+        assert_eq!(got.id(), id);
+
+        let updated = app
+            .update(
+                &ctx,
+                id,
+                Some(vec![]),
+                Some(("newtitle".to_string(), "newbody".to_string())),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(updated.targets(), &[]);
+        assert_eq!(
+            updated.notification_type(),
+            &NotificationType::Markdown {
+                title: "newtitle".to_string(),
+                content: "newbody".to_string(),
+            }
+        );
+
+        app.delete(&ctx, id).await.unwrap();
+        assert!(repo.find_by_id(id).await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn test_create_unauthorized_non_admin() {
+        let repo = MemoryNotificationRepo::new();
+        let clock = MemoryClock::new(Utc::now());
+        let app = NotificationApp::new(&repo, &clock);
+        let ctx = ActorContext::NoLogin;
+        let targets = vec![TargetSpecifier::UserNologin];
+        let nt = NotificationType::markdown("t".to_string(), "b".to_string()).unwrap();
+        let res = app.create(&ctx, targets, nt).await;
+        assert!(matches!(res, Err(ApplicationOperationError::Unauthorized)));
+    }
+}
