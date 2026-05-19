@@ -141,10 +141,10 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
-    use crate::infra::memory::clock_impl::MemoryClock;
     use crate::domain::actor_ctx::ActorContext;
     use crate::domain::user_id::UserId;
+    use crate::infra::memory::clock_impl::MemoryClock;
+    use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
     use chrono::Utc;
     use uuid::Uuid;
 
