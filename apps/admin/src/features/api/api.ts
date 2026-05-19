@@ -15,3 +15,6 @@ export const $api = getApiQueryClient(api);
 
 export const plansInfoApi = getPlansInfoFetchClient(PLANS_INFO_API_URL, authMiddleware)
 export const $plansInfoApi = getPlansInfoQueryClient(plansInfoApi);
+
+export const plansInfoApiNoAuth = getPlansInfoFetchClient(PLANS_INFO_API_URL);
+export const $plansInfoApiNoAuth = getPlansInfoQueryClient(plansInfoApiNoAuth);
