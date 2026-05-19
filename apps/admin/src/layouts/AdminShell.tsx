@@ -7,10 +7,13 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
+import {getTokensAdmin} from "@koudaisai/shared-auth-admin";
+import {LoadingScreen} from "@koudaisai/shared-ui";
 import {StyleProvider} from '@ant-design/cssinjs';
 import {Button, ConfigProvider, Flex, Layout, Menu, theme} from "antd";
 import type {ReactNode} from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {authFetchClient} from "@/features/api/api";
 
 type Props = {
   children: ReactNode;
@@ -34,11 +37,27 @@ const antdTheme = {
 
 function AdminLayoutContent({children, currentPath}: Props) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
   const selectedKeys = [currentPath.endsWith("/") ? currentPath : `${currentPath}/`];
+
+  useEffect(() => {
+    (async () => {
+      const tokens = await getTokensAdmin(authFetchClient);
+
+      if (tokens) {
+        setIsAuthenticated(true);
+        return;
+      }
+
+      window.location.assign("/login");
+    })().catch(() => {
+      window.location.assign("/login");
+    });
+  }, []);
 
   return (
     <StyleProvider>
@@ -132,7 +151,7 @@ function AdminLayoutContent({children, currentPath}: Props) {
               width: "auto",
             }}
           >
-            {children}
+            {isAuthenticated ? children : <LoadingScreen />}
           </Content>
         </Layout>
       </Layout>
