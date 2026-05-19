@@ -9,7 +9,7 @@ import {API_URL, AUTH_URL, PLANS_INFO_API_URL} from "astro:env/client";
 import {getAuthFetchClient} from "@koudaisai/shared-auth";
 
 export const authFetchClient = getAuthFetchClient(AUTH_URL);
-const authMiddleware = getAuthMiddleware(authFetchClient);
+const authMiddleware = getAuthMiddleware(authFetchClient, "/login");
 export const api = getApiFetchClient(API_URL, authMiddleware);
 export const $api = getApiQueryClient(api);
 
