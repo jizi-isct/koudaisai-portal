@@ -7,7 +7,7 @@
 ```mermaid
 graph TD
     User([ユーザー/団体]) <--> Frontend[フロントエンド: apps/portal, apps/join<br/>Astro]
-    Admin([管理者: JIZI]) <--> AdminFrontend[管理画面: apps/admin<br/>Next.js]
+    Admin([管理者: JIZI]) <--> AdminFrontend[管理画面: apps/admin<br/>Astro]
     
     Frontend <--> Backend[バックエンド: apps/backend<br/>Rust/Axum]
     AdminFrontend <--> Backend
@@ -25,7 +25,7 @@ graph TD
 ## フロントエンド (`apps/portal`, `apps/admin`, `apps/join`)
 
 ### 技術スタック
-- **Framework**: Astro / Next.js (TypeScript)
+- **Framework**: Astro (TypeScript)
 - **State Management**: React Context / Hooks
 
 ### 特徴・配信手法

@@ -1,6 +1,5 @@
-import {AuthFetchClient, decodeAccessToken} from "@koudaisai/shared-auth";
+import {AuthFetchClient, decodeAccessToken, decodeJwtPayload} from "@koudaisai/shared-auth";
 import type {Middleware} from "openapi-fetch";
-import nextBase64 from "next-base64";
 
 const ACCESS_TOKEN_KEY = 'exhibitor_access_token';
 const REFRESH_TOKEN_KEY = 'exhibitor_refresh_token';
@@ -43,8 +42,7 @@ export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
   }
 
   //リフレッシュトークンのexp確認
-  const refresh_token_payload_base64 = refresh_token!.split(".")[1]
-  const refresh_token_payload = JSON.parse(nextBase64.decode(refresh_token_payload_base64))
+  const refresh_token_payload = decodeJwtPayload(refresh_token)
   const refresh_token_exp = refresh_token_payload.exp as number;
   if (refresh_token_exp * 1000 < Date.now()) {
     //有効期限ダメ
