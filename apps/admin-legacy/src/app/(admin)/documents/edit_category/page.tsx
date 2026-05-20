@@ -2,9 +2,9 @@
 import {LoadingScreen} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Flex, Form, Input, message, Result} from 'antd';
-import {useSearchParams} from "next/navigation";
 import {useState} from "react";
 import {$apiAdmin} from "@/lib/api";
+import {getSearchParam} from "@/lib/browserNavigation";
 
 type FormValues = {
   title: string;
@@ -12,8 +12,7 @@ type FormValues = {
 }
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const categoryId = searchParams.get("category_id")
+  const categoryId = getSearchParam("category_id")
   if (!categoryId) {
     return (
       <Result

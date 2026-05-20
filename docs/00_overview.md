@@ -14,7 +14,7 @@
 
 ### コンポーネント
 - **フロントエンド (`apps/portal`, `apps/admin`, `apps/join`)**
-  - 技術: Astro / Next.js (TypeScript)
+  - 技術: Astro (TypeScript)
   - 役割: 団体向けダッシュボード，管理者（JIZI）向け管理画面，参加登録画面の提供．
 - **バックエンド (`apps/backend`)**
   - 技術: Rust (Axum), SeaORM
