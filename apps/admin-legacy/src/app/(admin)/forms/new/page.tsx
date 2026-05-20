@@ -3,10 +3,10 @@ import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Flex, Form, Input, message, Radio, Space} from 'antd';
 import TextArea from "antd/es/input/TextArea";
-import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {TargetSpecifier} from "@/components/TargetSpecifier";
 import {$apiAdmin, fetchClientAdmin} from "@/lib/api";
+import {navigateTo} from "@/lib/browserNavigation";
 
 export default function Page() {
   return (
@@ -20,7 +20,6 @@ function Inner() {
   const [messageApi, contextHolder] = message.useMessage();
   const {mutateAsync: mutateFormCreate} = $apiAdmin.useMutation("post", "/forms")
   const [submitting, setSubmitting] = useState(false)
-  const router = useRouter()
   const [form] = Form.useForm<{
     formName: string,
     summary: string,
@@ -57,7 +56,7 @@ function Inner() {
     }
     setSubmitting(false)
     messageApi.success('保存しました')
-    router.push("..")
+    navigateTo("..")
   }
 
   const syncFormNameAndSummary = async () => {

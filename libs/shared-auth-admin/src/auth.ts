@@ -1,6 +1,5 @@
-import nextBase64 from 'next-base64';
-
 import type {Middleware} from "openapi-fetch";
+import {decodeJwtPayload} from "@koudaisai/shared-auth";
 import type {AuthFetchClient, Tokens} from "@koudaisai/shared-auth";
 
 export function getAuthMiddleware(fetchClient: AuthFetchClient, loginPath = "/admin/login"): Middleware {
@@ -35,10 +34,7 @@ export async function getTokensAdmin(fetchClient: AuthFetchClient): Promise<Toke
 
   // アクセストークン有効期限チェック
   // TODO: decodeAccessToken() と重複している
-  const access_token_payload_base64 = access_token.split(".")[1]
-  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64
-    .replace(/-/g, "+")
-    .replace(/_/g, "/")))
+  const access_token_payload = decodeJwtPayload(access_token)
   const access_token_exp = access_token_payload.exp as number;
   if (access_token_exp * 1000 >= Date.now()) {
     //有効期限OK
@@ -46,8 +42,7 @@ export async function getTokensAdmin(fetchClient: AuthFetchClient): Promise<Toke
   }
 
   //リフレッシュトークンのexp確認
-  const refresh_token_payload_base64 = refresh_token.split(".")[1]
-  const refresh_token_payload = JSON.parse(nextBase64.decode(refresh_token_payload_base64))
+  const refresh_token_payload = decodeJwtPayload(refresh_token)
   const refresh_token_exp = refresh_token_payload.exp as number;
   if (refresh_token_exp * 1000 < Date.now()) {
     //有効期限ダメ

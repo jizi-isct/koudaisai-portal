@@ -1,9 +1,7 @@
-import nextBase64 from "next-base64";
+export const decodeJwtPayload = (token: string): any => {
+  const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  const paddedPayload = payload.padEnd(Math.ceil(payload.length / 4) * 4, "=");
+  return JSON.parse(atob(paddedPayload));
+};
 
-export const decodeAccessToken = (access_token: string): any => {
-  const access_token_payload_base64 = access_token.split(".")[1];
-  const access_token_payload = JSON.parse(nextBase64.decode(access_token_payload_base64
-    .replace(/-/g, "+")
-    .replace(/_/g, "/")));
-  return access_token_payload;
-}
+export const decodeAccessToken = decodeJwtPayload;

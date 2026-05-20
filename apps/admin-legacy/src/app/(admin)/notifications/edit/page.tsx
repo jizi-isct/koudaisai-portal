@@ -4,14 +4,13 @@ import {LoadingScreen} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Flex, Form, Input, message, Radio, Result, Space} from 'antd';
 import TextArea from "antd/es/input/TextArea";
-import {useSearchParams} from "next/navigation";
 import {useState} from "react";
 import {TargetSpecifier} from "@/components/TargetSpecifier";
 import {$apiAdmin} from "@/lib/api";
+import {getSearchParam} from "@/lib/browserNavigation";
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const notificationId = searchParams.get("notification_id")
+  const notificationId = getSearchParam("notification_id")
   if (!notificationId) {
     return (
       <Result

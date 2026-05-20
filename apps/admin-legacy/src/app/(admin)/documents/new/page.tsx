@@ -3,10 +3,10 @@ import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from "@ant-design/ico
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Flex, Form, Input, message, Radio, Result, Select, Space, Upload, type UploadFile,} from 'antd';
 import TextArea from "antd/es/input/TextArea";
-import {useRouter, useSearchParams} from "next/navigation";
 import {useMemo, useState} from "react";
 import {TargetSpecifier} from "@/components/TargetSpecifier";
 import {$apiAdmin} from "@/lib/api";
+import {getSearchParam, navigateTo} from "@/lib/browserNavigation";
 
 
 type FormValues = {
@@ -30,8 +30,7 @@ type FormValues = {
 }
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const categoryId = searchParams.get("category_id")
+  const categoryId = getSearchParam("category_id")
   if (!categoryId) {
     return (
       <Result
@@ -78,7 +77,6 @@ function Inner({categoryId}: { categoryId: string }) {
     }) ?? []
   }, [categories])
   const [submitting, setSubmitting] = useState(false)
-  const router = useRouter()
   const documentFormat = Form.useWatch("documentFormat", form)
 
   const handleSubmit = async (values: FormValues) => {
@@ -155,7 +153,7 @@ function Inner({categoryId}: { categoryId: string }) {
     }
     setSubmitting(false)
     messageApi.success('保存しました')
-    router.push("..")
+    navigateTo("..")
   }
 
   return (

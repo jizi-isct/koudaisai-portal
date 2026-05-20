@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
-
 export default function Page() {
   return (
     <div>
       <main>
-        <Image
+        <img
           src="/logo.jpg"
           alt="Koudaisai Portal Admin Site Logo"
           width={150}

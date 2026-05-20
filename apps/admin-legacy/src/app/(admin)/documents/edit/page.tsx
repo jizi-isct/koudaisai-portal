@@ -4,10 +4,10 @@ import {LoadingScreen} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Flex, Form, Input, message, Result, Select, Space, Tag, Upload, UploadFile} from 'antd';
 import TextArea from "antd/es/input/TextArea";
-import {useSearchParams} from "next/navigation";
 import {useMemo, useState} from "react";
 import {TargetSpecifier} from "@/components/TargetSpecifier";
 import {$apiAdmin} from "@/lib/api";
+import {getSearchParam} from "@/lib/browserNavigation";
 
 type FormValues = {
   title: string;
@@ -20,8 +20,7 @@ type FormValues = {
 }
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const documentId = searchParams.get("document_id")
+  const documentId = getSearchParam("document_id")
   if (!documentId) {
     return (
       <Result
