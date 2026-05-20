@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Portal site for 工大祭 (Koudai Festival at Institute of Science Tokyo). Groups submit applications, view resources, and communicate with JIZI (festival organizing committee). Nx monorepo with Next.js frontend and Rust/Axum backend.
+Portal site for 工大祭 (Koudai Festival at Institute of Science Tokyo). Groups submit applications, view resources, and communicate with JIZI (festival organizing committee). Nx monorepo with frontend apps and a Rust/Axum backend.
 
 ## Common Commands
 
@@ -12,21 +12,25 @@ Portal site for 工大祭 (Koudai Festival at Institute of Science Tokyo). Group
 # Install dependencies (use ci, not install)
 npm ci
 
-# Start development (frontend + backend with hot reload)
+# Start development (frontend apps + backend with hot reload)
 npx nx dev
 
 # Start Docker services (PostgreSQL, Keycloak)
 npx nx docker-up backend
 
 # Build
-npx nx build web      # Frontend (Next.js SSG → apps/web/out/)
+npx nx build portal   # Member portal frontend
+npx nx build @koudaisai-portal/admin  # Admin frontend
+npx nx build join     # Join frontend
 npx nx build backend  # Backend (Rust release)
 
 # Test
 npx nx test backend   # cargo test
 
 # Lint
-npx nx lint web       # ESLint
+npx nx lint portal    # ESLint
+npx nx lint @koudaisai-portal/admin
+npx nx lint join
 npx nx lint backend
 
 # Database migrations (in apps/backend/)
@@ -37,7 +41,9 @@ sea-orm-cli generate entity  # Generate SeaORM entities from DB schema
 ## Architecture
 
 ### Monorepo Structure
-- `apps/web/` - Next.js 15 frontend (TypeScript, Ant Design, SSG)
+- `apps/portal/` - Member portal frontend
+- `apps/admin/` - Admin frontend
+- `apps/join/` - Join frontend
 - `apps/backend/` - Rust/Axum backend (SeaORM, PostgreSQL)
 - `docs/` - OpenAPI specs and documentation
 
@@ -74,7 +80,7 @@ sea-orm-cli generate entity  # Generate SeaORM entities from DB schema
    - macOS: `~/Library/Application Support/rs.koudaisai-portal/`
    - Linux: `~/.config/koudaisai-portal/`
 5. `npx nx docker-up backend`
-6. `npx nx dev` → Frontend: localhost:3000, Backend: localhost:8000
+6. `npx nx dev` → Frontend apps and backend start in parallel
 
 ## Branch Naming
 
