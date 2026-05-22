@@ -1,5 +1,16 @@
 # dbの起動
 `$ docker compose up -d`
+
+# config
+デフォルトでは OS ごとの標準設定ディレクトリから `koudaisai-portal` の設定を読み込みます．
+任意の場所にある config を使う場合は，環境変数 `KOUDAISAI_PORTAL_CONFIG_PATH` に TOML ファイルのパスを指定してください．
+
+```shell
+export KOUDAISAI_PORTAL_CONFIG_PATH=/path/to/config.toml
+```
+
+`nx dev backend` では `apps/backend/debug/default-config.toml` を自動で読み込みます．
+
 # migration
 > [!IMPORTANT]
 > `$ nx docker-up backend`で開発環境を起動する必要があります．

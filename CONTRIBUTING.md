@@ -34,6 +34,9 @@ Docker と Docker Compose は開発用 DB・Keycloak の起動に使います．
     ./init-keys.sh
     ```
 4. **コンフィグを正しい位置に配置**
+    `npx nx dev backend` または `npx nx dev` で開発環境を起動する場合は，`apps/backend/debug/default-config.toml` が自動で読み込まれます．
+
+    手動で backend を起動する場合は，以下のようにコンフィグを配置してください．
     ```shell
     cd apps/backend/debug
     cp default-config.toml <配置先>
@@ -42,6 +45,11 @@ Docker と Docker Compose は開発用 DB・Keycloak の起動に使います．
    - macOS: `~/Library/Application Support/rs.koudaisai-portal/`
    - Linux: `~/.config/koudaisai-portal/`
    - Windows: `C:\Users\<ユーザー名>\AppData\Roaming\rs.koudaisai-portal\`
+
+   または，環境変数 `KOUDAISAI_PORTAL_CONFIG_PATH` にコンフィグファイルのパスを指定できます．
+   ```shell
+   export KOUDAISAI_PORTAL_CONFIG_PATH=/path/to/config.toml
+   ```
     
 5. **開発環境用データベース・Keycloakを起動**
     ```shell

@@ -3,11 +3,16 @@ use confy::ConfyError;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
-use std::fs;
+use std::{env, fs, path::PathBuf};
 use tracing_core::LevelFilter;
 
+pub const CONFIG_PATH_ENV: &str = "KOUDAISAI_PORTAL_CONFIG_PATH";
+
 pub fn init_config() -> Result<Config, ConfyError> {
-    confy::load("koudaisai-portal", None)
+    match env::var_os(CONFIG_PATH_ENV).filter(|path| !path.is_empty()) {
+        Some(path) => confy::load_path(PathBuf::from(path)),
+        None => confy::load("koudaisai-portal", None),
+    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
