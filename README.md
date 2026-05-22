@@ -6,7 +6,13 @@
 ## Contributing
 私たちはこのリポジトリに対する貢献を歓迎します！
 
-[quickstart](CONTRIBUTING.md)
+開発環境は Nix flakes と direnv で管理しています．Nix と direnv をインストールした上で，リポジトリルートで初回のみ次を実行してください．
+
+```shell
+direnv allow
+```
+
+以降はリポジトリに入った時点で開発環境が有効になります．詳しいセットアップ手順と貢献の流れは [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください．
 
 ## Documents
 - [プロジェクト概観.md](docs/00_overview.md)
