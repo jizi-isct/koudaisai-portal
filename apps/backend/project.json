@@ -42,7 +42,10 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo watch -x run",
-        "cwd": "apps/backend"
+        "cwd": "apps/backend",
+        "env": {
+          "KOUDAISAI_PORTAL_CONFIG_PATH": "./debug/default-config.toml"
+        }
       },
       "dependsOn": [
         "docker-up"
