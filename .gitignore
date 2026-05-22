@@ -29,6 +29,7 @@ node_modules
 .zed/*
 
 # misc
+/.direnv/
 /.sass-cache
 /connect.lock
 /coverage
