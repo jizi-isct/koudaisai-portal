@@ -1,0 +1,19 @@
+{
+	auto_https off
+}
+
+http://portal.koudaisai.localhost {
+	reverse_proxy 127.0.0.1:3000
+}
+
+http://admin.koudaisai.localhost {
+	reverse_proxy 127.0.0.1:3001
+}
+
+http://join.koudaisai.localhost {
+	reverse_proxy 127.0.0.1:3002
+}
+
+http://api.koudaisai.localhost {
+	reverse_proxy 127.0.0.1:8080
+}
