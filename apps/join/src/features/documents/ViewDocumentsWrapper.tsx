@@ -8,11 +8,12 @@ import { ViewDocuments } from "@koudaisai-portal/shared-ui-document";
 
 interface Props {
   documents: Array<{ category: DocumentCategoryRead | null; documents: DocumentRead[] }>;
+  apiUrl: string;
 }
 
-export default function ViewDocumentsWrapper({ documents }: Props) {
+export default function ViewDocumentsWrapper({ documents, apiUrl }: Props) {
   const download = useDownload();
-  const fetchClient = useApiFetchClientWithNoAuth("https://portal.koudaisai.jp/api/v2");
+  const fetchClient = useApiFetchClientWithNoAuth(apiUrl);
   const handleDownload = useCallback(
     async (documentId: string) => {
       const matchedEntries = documents

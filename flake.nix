@@ -27,16 +27,19 @@
             nodejs_25
 
             # Useful tools
+            caddy
             git
           ];
 
           shellHook = ''
                       corepack enable pnpm >/dev/null 2>&1 || true
+                      export NX_SOCKET_DIR="/tmp/koudaisai-portal-nx"
 
                       echo "dev shell"
                       echo "node: $(node --version)"
                       echo "npm: $(npm --version)"
                       echo "cargo: $(cargo --version)"
+                      echo "NX_SOCKET_DIR: $NX_SOCKET_DIR"
 
                       if ! docker info >/dev/null 2>&1; then
                         echo ""

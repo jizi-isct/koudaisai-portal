@@ -59,7 +59,14 @@ Docker と Docker Compose は開発用 DB・Keycloak の起動に使います．
     ```shell
     npx nx dev
     ```
-    フロントエンドは`localhost:3000`，バックエンドは`localhost:8000`でホストされます．
+
+    次の URL で各アプリケーションにアクセスできます．
+    - portal: `http://portal.koudaisai.localhost`
+    - admin: `http://admin.koudaisai.localhost`
+    - join: `http://join.koudaisai.localhost`
+    - backend API: `http://api.koudaisai.localhost`
+
+    Caddy が 80 番ポートを利用できない環境では，管理者権限での実行が必要になる場合があります．
 
 ## 貢献の方法 / How to Contribute
 1. Issue を立てるか，既存の Issue を確認して，取り組みたいものを見つける．

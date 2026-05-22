@@ -3,8 +3,9 @@ import {Heading1} from "@koudaisai/shared-ui";
 import {ViewFormCards} from "@koudaisai-portal/shared-ui-forms";
 import {getApiFetchClient} from "@koudaisai/shared-api";
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {API_URL} from "astro:env/client";
 
-const fetchClient = getApiFetchClient("https://portal.koudaisai.jp/api/v2");
+const fetchClient = getApiFetchClient(API_URL);
 const {data, error} = await fetchClient.GET("/forms", {cache: "no-store"});
 
 if (error || !data) {
