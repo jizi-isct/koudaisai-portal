@@ -50,6 +50,13 @@
       "dependsOn": [
         "docker-up"
       ]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo clippy --all-targets --all-features -- -D warnings",
+        "cwd": "apps/backend"
+      }
     }
   }
 }
