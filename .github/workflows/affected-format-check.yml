@@ -1,4 +1,4 @@
-name: Backend Format Check
+name: Affected Format Check
 
 on:
   pull_request:
@@ -8,10 +8,12 @@ permissions:
 
 jobs:
   format-check:
-    name: nx format-check backend
+    name: nx affected -t format:check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run backend format check
-        run: npx nx format-check backend
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run affected format check
+        run: npx nx affected -t format:check

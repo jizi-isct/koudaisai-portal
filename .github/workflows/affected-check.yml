@@ -1,4 +1,4 @@
-name: Backend Test
+name: Affected Check
 
 on:
   pull_request:
@@ -7,11 +7,13 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: nx test backend
+  check:
+    name: nx affected -t check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run backend tests
-        run: npx nx test backend
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run affected check
+        run: npx nx affected -t check
