@@ -27,9 +27,6 @@
       "path": "./apps/admin"
     },
     {
-      "path": "./apps/admin-legacy"
-    },
-    {
       "path": "./libs/shared-ui-document"
     },
     {
