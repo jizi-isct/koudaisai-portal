@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format": "prettier . --write && npx nx run backend:format",
+    "format:check": "prettier . --check && npx nx run backend:format-check"
   },
   "private": true,
   "dependencies": {
