@@ -41,6 +41,7 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 ## アーキテクチャ
 
 ### モノレポ構成
+
 - `apps/portal/` - 参加団体向けポータル（フロントエンド）
 - `apps/admin/` - 管理画面（フロントエンド）
 - `apps/join/` - Join フロントエンド
@@ -48,6 +49,7 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 - `docs/` - OpenAPI 仕様とドキュメント
 
 ### バックエンドレイヤー（`apps/backend/src/`）
+
 1. `routes/` - HTTP エンドポイント
 2. `middlewares.rs` - 認証、ロギング
 3. `entities/` - ビジネスロジック
@@ -56,10 +58,12 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 6. `util/` - JWT、OIDC、ハッシュ化
 
 ### 認証
+
 - **JIZI（管理者）**: Keycloak OIDC
 - **Group（参加団体）**: 初回ログイン時に有効化するカスタム JWT
 
 ### 外部サービス
+
 - PostgreSQL（データ）、S3/Wasabi（ファイル）、Keycloak（認証）
 - Discord（通知）、SendGrid/SES（メール）
 - 外部 API: api2025.jizi.jp（企画情報同期）
@@ -76,6 +80,7 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 このリポジトリでは Nix flakes を使って開発に必要なツールを揃えます（主なツール: Rust、Node.js、cargo-watch、git）。
 
 ### 事前に必要なもの
+
 - Nix
 - direnv
 - Docker daemon を起動できる環境（Docker Desktop など）
@@ -83,6 +88,7 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 > Docker と Docker Compose は開発用 DB・Keycloak の起動に使用します。`npx nx docker-up backend` の実行前に Docker daemon を起動してください。
 
 ### セットアップ手順
+
 1. `direnv allow` を実行して Nix の開発環境を有効化
 2. リポジトリルートで `npm ci` を実行
 3. JWT キーを生成: `cd apps/backend/debug && ./init-keys.sh`
@@ -98,6 +104,7 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 6. 開発環境を起動: `npx nx dev`
 
 利用 URL:
+
 - portal: `http://portal.koudaisai.localhost`
 - admin: `http://admin.koudaisai.localhost`
 - join: `http://join.koudaisai.localhost`
@@ -110,4 +117,5 @@ sea-orm-cli generate entity  # DB スキーマから SeaORM エンティティ�
 ```
 <prefix>/#<issue>-<short-title>
 ```
+
 プレフィックス: feature, fix, hotfix, refactor, chore, test
