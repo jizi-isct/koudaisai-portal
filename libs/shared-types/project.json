@@ -2,7 +2,8 @@
   "name": "@koudaisai/shared-types",
   "targets": {
     "build": {
-      "executor": "nx:noop"
+      "executor": "nx:noop",
+      "dependsOn": ["docs-api:update-clients"]
     }
   }
 }

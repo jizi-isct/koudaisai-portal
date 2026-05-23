@@ -1,0 +1,30 @@
+{
+  "name": "docs-api",
+  "projectType": "library",
+  "sourceRoot": "docs/api",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash build.sh",
+        "cwd": "docs/api"
+      },
+      "outputs": [
+        "{projectRoot}/api_v2.html",
+        "{projectRoot}/auth_v1.html"
+      ]
+    },
+    "update-clients": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash update_clients.sh",
+        "cwd": "docs/api"
+      },
+      "outputs": [
+        "{workspaceRoot}/libs/shared-types/src/api_v2.d.ts",
+        "{workspaceRoot}/libs/shared-types/src/auth_v1.d.ts",
+        "{workspaceRoot}/libs/shared-types/src/plans_info_api_v1.d.ts"
+      ]
+    }
+  }
+}
