@@ -4,3 +4,6 @@
 /.nx/cache
 /.nx/workspace-data
 **/target
+/libs/shared-types/src/api_v2.d.ts
+/libs/shared-types/src/auth_v1.d.ts
+/libs/shared-types/src/plans_info_api_v1.d.ts
