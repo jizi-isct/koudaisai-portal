@@ -1,35 +1,38 @@
-import {AuthFetchClient, decodeAccessToken, decodeJwtPayload} from "@koudaisai/shared-auth";
-import type {Middleware} from "openapi-fetch";
+import {
+  AuthFetchClient,
+  decodeAccessToken,
+  decodeJwtPayload,
+} from '@koudaisai/shared-auth';
+import type { Middleware } from 'openapi-fetch';
 
 const ACCESS_TOKEN_KEY = 'exhibitor_access_token';
 const REFRESH_TOKEN_KEY = 'exhibitor_refresh_token';
 
 export function getAuthMiddleware(fetchClient: AuthFetchClient): Middleware {
   return {
-    async onRequest({request}) {
+    async onRequest({ request }) {
       const tokens = await getTokensMembers(fetchClient);
 
       //ログインされてない->ログイン画面へ
       if (!tokens) {
-        window.location.assign("/login")
+        window.location.assign('/login');
         return;
       }
 
-      request.headers.set("Authorization", `Bearer ${tokens.access_token}`);
+      request.headers.set('Authorization', `Bearer ${tokens.access_token}`);
       return request;
-    }
-  }
-
+    },
+  };
 }
 
 //団体向けトークンの取得
 export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
-  const refresh_token = localStorage.getItem(REFRESH_TOKEN_KEY)
-  const access_token = localStorage.getItem(ACCESS_TOKEN_KEY)
+  const refresh_token = localStorage.getItem(REFRESH_TOKEN_KEY);
+  const access_token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
   //nullだったらundefinedに
   if (refresh_token === null || access_token === null) {
-    return undefined
+    return undefined;
   }
 
   //アクセストークンのexp確認
@@ -37,64 +40,65 @@ export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
   if (access_token_exp * 1000 >= Date.now()) {
     //有効期限OK
     return {
-      refresh_token: refresh_token, access_token: access_token
-    }
+      refresh_token: refresh_token,
+      access_token: access_token,
+    };
   }
 
   //リフレッシュトークンのexp確認
-  const refresh_token_payload = decodeJwtPayload(refresh_token)
+  const refresh_token_payload = decodeJwtPayload(refresh_token);
   const refresh_token_exp = refresh_token_payload.exp as number;
   if (refresh_token_exp * 1000 < Date.now()) {
     //有効期限ダメ
-    localStorage.removeItem("exhibitor_refresh_token")
-    localStorage.removeItem("exhibitor_access_token")
-    return undefined
+    localStorage.removeItem('exhibitor_refresh_token');
+    localStorage.removeItem('exhibitor_access_token');
+    return undefined;
   }
 
   //トークンのリフレッシュを試みる
-  const {data} = await fetchClient.POST(
-    "/refresh",
-    {
-      body: {
-        refresh_token: refresh_token
-      }
-    }
-  )
+  const { data } = await fetchClient.POST('/refresh', {
+    body: {
+      refresh_token: refresh_token,
+    },
+  });
 
   //リフレッシュに成功した場合トークンを保存しreturn
   if (data) {
-    localStorage.setItem("exhibitor_access_token", data.access_token)
-    return data
+    localStorage.setItem('exhibitor_access_token', data.access_token);
+    return data;
   } else {
     // refresh tokenが無効
-    return undefined
+    return undefined;
   }
 };
 
 //団体向けログイン
-export const login = async (fetchClient: AuthFetchClient, email: string, password: string) => {
-  const {data, response} = await fetchClient.POST(
-    "/login",
-    {
-      body: {
-        m_address: email,
-        password: password
-      }
-    }
-  )
+export const login = async (
+  fetchClient: AuthFetchClient,
+  email: string,
+  password: string,
+) => {
+  const { data, response } = await fetchClient.POST('/login', {
+    body: {
+      m_address: email,
+      password: password,
+    },
+  });
 
   if (data) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token)
-    localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token)
-    return data
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
+    return data;
   } else {
     switch (response.status) {
       case 401:
-        throw new Error("mアドレスまたはパスワードが間違えています。");
+        throw new Error('mアドレスまたはパスワードが間違えています。');
       case 429:
-        throw new Error("ログイン試行回数が多すぎます。しばらく時間を置いてから再度お試しください。");
+        throw new Error(
+          'ログイン試行回数が多すぎます。しばらく時間を置いてから再度お試しください。',
+        );
       default:
-        throw new Error("内部エラー。開発者に問い合わせてください。");
+        throw new Error('内部エラー。開発者に問い合わせてください。');
     }
   }
 };

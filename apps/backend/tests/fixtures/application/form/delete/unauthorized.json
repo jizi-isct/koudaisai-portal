@@ -1,1 +1,1 @@
-{"actor": {"User": {}}, "form_exists": true, "expected": "unauthorized"}
+{ "actor": { "User": {} }, "form_exists": true, "expected": "unauthorized" }

@@ -1,9 +1,9 @@
-import {LargePulldown} from "@koudaisai/shared-ui/LargePulldown";
-import {logout} from "@koudaisai/shared-auth-members";
+import { LargePulldown } from '@koudaisai/shared-ui/LargePulldown';
+import { logout } from '@koudaisai/shared-auth-members';
 
 const handleLogout = () => {
   logout();
-  window.location.assign("/login/");
+  window.location.assign('/login/');
 };
 
 export function UserMenu() {
@@ -11,9 +11,7 @@ export function UserMenu() {
     <LargePulldown
       type="secondary"
       align="right"
-      items={[
-        {label: "ログアウト", onClick: handleLogout, danger: true},
-      ]}
+      items={[{ label: 'ログアウト', onClick: handleLogout, danger: true }]}
     >
       ユーザー
     </LargePulldown>

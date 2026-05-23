@@ -4,7 +4,7 @@ info:
   description: 工大祭のapiです。
   version: '2'
 servers:
-  - url: "https://portal.koudaisai.jp/api/v2"
+  - url: 'https://portal.koudaisai.jp/api/v2'
 tags:
   - name: user
     description: ユーザー情報

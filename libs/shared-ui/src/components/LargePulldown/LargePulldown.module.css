@@ -1,107 +1,107 @@
 .root {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 }
 
 .button {
-    align-items: center;
-    border: 1px solid;
-    border-color: var(--darkblue);
-    border-radius: 30px;
-    box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
-    cursor: pointer;
-    display: inline-flex;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    gap: 10px;
-    height: 55px;
-    justify-content: center;
-    margin: 0 10px;
-    min-width: 120px;
-    padding-left: 30px;
-    padding-right: 24px;
-    transition: all 0.3s ease-out;
+  align-items: center;
+  border: 1px solid;
+  border-color: var(--darkblue);
+  border-radius: 30px;
+  box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  gap: 10px;
+  height: 55px;
+  justify-content: center;
+  margin: 0 10px;
+  min-width: 120px;
+  padding-left: 30px;
+  padding-right: 24px;
+  transition: all 0.3s ease-out;
 }
 
 .button:hover {
-    box-shadow: 0 0 12px 0 var(--darkblue);
-    transform: scale(1.05);
+  box-shadow: 0 0 12px 0 var(--darkblue);
+  transform: scale(1.05);
 }
 
 .buttonContent {
-    align-items: center;
-    display: inline-flex;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  align-items: center;
+  display: inline-flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .caret {
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid currentColor;
-    display: inline-block;
-    height: 0;
-    width: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid currentColor;
+  display: inline-block;
+  height: 0;
+  width: 0;
 }
 
 .primary {
-    background-color: var(--darkblue);
-    color: white;
+  background-color: var(--darkblue);
+  color: white;
 }
 
 .secondary {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }
 
 .menu {
-    background-color: white;
-    border: 1px solid var(--darkblue);
-    border-radius: 16px;
-    box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
-    margin-top: 8px;
-    min-width: calc(100% - 20px);
-    overflow: hidden;
-    padding: 6px;
-    position: absolute;
-    top: 100%;
-    z-index: 1100;
+  background-color: white;
+  border: 1px solid var(--darkblue);
+  border-radius: 16px;
+  box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+  margin-top: 8px;
+  min-width: calc(100% - 20px);
+  overflow: hidden;
+  padding: 6px;
+  position: absolute;
+  top: 100%;
+  z-index: 1100;
 }
 
 .menuLeft {
-    left: 10px;
+  left: 10px;
 }
 
 .menuRight {
-    right: 10px;
+  right: 10px;
 }
 
 .menuItem {
-    background: transparent;
-    border: 0;
-    border-radius: 10px;
-    color: black;
-    cursor: pointer;
-    display: block;
-    font: inherit;
-    font-size: 14px;
-    padding: 12px 14px;
-    text-align: left;
-    text-decoration: none;
-    width: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: black;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  font-size: 14px;
+  padding: 12px 14px;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
 }
 
 .menuItem:hover {
-    background-color: var(--lightgray);
+  background-color: var(--lightgray);
 }
 
 .menuItem:disabled {
-    color: var(--gray);
-    cursor: not-allowed;
+  color: var(--gray);
+  cursor: not-allowed;
 }
 
 .danger {
-    color: #c62828;
+  color: #c62828;
 }

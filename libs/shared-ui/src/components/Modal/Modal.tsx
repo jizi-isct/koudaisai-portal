@@ -1,17 +1,16 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import styles from "./Modal.module.css";
-import {Modal as AntdModal} from "antd";
-
+import * as React from 'react';
+import styles from './Modal.module.css';
+import { Modal as AntdModal } from 'antd';
 
 type Props = {
-  isOpen: boolean,
-  setOpen: (isOpen: boolean) => void
-  children: React.ReactNode,
-}
+  isOpen: boolean;
+  setOpen: (isOpen: boolean) => void;
+  children: React.ReactNode;
+};
 
-export function Modal({isOpen, setOpen, children}: Props) {
+export function Modal({ isOpen, setOpen, children }: Props) {
   function closeModal() {
     setOpen(false);
   }
@@ -34,11 +33,9 @@ export function Modal({isOpen, setOpen, children}: Props) {
           backdropFilter: 'blur(8px)',
         },
       }}
-      style={{maxWidth: '90vw'}}
+      style={{ maxWidth: '90vw' }}
     >
-      <div className={styles.children}>
-        {children}
-      </div>
+      <div className={styles.children}>{children}</div>
     </AntdModal>
-  )
+  );
 }

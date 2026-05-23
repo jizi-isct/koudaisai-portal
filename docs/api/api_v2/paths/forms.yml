@@ -14,13 +14,13 @@ get:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/form/FormRead.yml"
+              $ref: '../components/schemas/form/FormRead.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
     - admin_oidc:
         - k-portal:admin:all
 post:
@@ -32,7 +32,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/form/FormCreate.yml"
+          $ref: '../components/schemas/form/FormCreate.yml'
   responses:
     '204':
       description: NoContent

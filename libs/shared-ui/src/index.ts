@@ -1,5 +1,5 @@
 export * from './components/LargeButton';
-export * from './components/LargePulldown'
+export * from './components/LargePulldown';
 export * from './components/TextInput';
 export * from './components/Heading1';
 export * from './components/Heading2';
@@ -11,7 +11,7 @@ export * from './components/SaveStatus';
 export * from './components/Selector';
 export * from './components/LoadingScreen';
 export * from './components/lib/types';
-export * from './components/Footer/Footer'
+export * from './components/Footer/Footer';
 export * from './components/ContentRow';
 export * from './components/Faq';
 export * from './components/Loader';

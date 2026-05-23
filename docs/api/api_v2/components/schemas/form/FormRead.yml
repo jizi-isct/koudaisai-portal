@@ -2,16 +2,16 @@ type: object
 description: Form read request
 oneOf:
   - allOf:
-      - $ref: "./FormReadGeneric.yml"
+      - $ref: './FormReadGeneric.yml'
       - properties:
           type_builtin:
-            $ref: "./FormReadTypeBuiltin.yml"
+            $ref: './FormReadTypeBuiltin.yml'
         required:
           - type_builtin
   - allOf:
-      - $ref: "./FormReadGeneric.yml"
+      - $ref: './FormReadGeneric.yml'
       - properties:
           type_external:
-            $ref: "./FormReadTypeExternal.yml"
+            $ref: './FormReadTypeExternal.yml'
         required:
           - type_external

@@ -1,16 +1,16 @@
 'use client';
 
-import styles from "./Tab.module.css"
-import {JSX, useEffect, useState} from "react";
+import styles from './Tab.module.css';
+import { JSX, useEffect, useState } from 'react';
 
 type Props = {
-  tabs: Map<string, JSX.Element>,
-  queryParam?: string,
-  queryValues?: Map<string, string>,
-}
+  tabs: Map<string, JSX.Element>;
+  queryParam?: string;
+  queryValues?: Map<string, string>;
+};
 
-export function Tab({tabs, queryParam, queryValues}: Props) {
-  const [selectedTab, setSelectedTab] = useState(tabs.keys().next().value)
+export function Tab({ tabs, queryParam, queryValues }: Props) {
+  const [selectedTab, setSelectedTab] = useState(tabs.keys().next().value);
   const entries = Array.from(tabs.entries());
   const getQueryValue = (tab: string) => queryValues?.get(tab) ?? tab;
 
@@ -21,14 +21,16 @@ export function Tab({tabs, queryParam, queryValues}: Props) {
 
     const selectFromQuery = () => {
       const value = new URLSearchParams(window.location.search).get(queryParam);
-      const matchedTab = Array.from(tabs.keys()).find((tab) => getQueryValue(tab) === value);
+      const matchedTab = Array.from(tabs.keys()).find(
+        (tab) => getQueryValue(tab) === value,
+      );
       setSelectedTab(matchedTab ?? tabs.keys().next().value);
     };
 
     selectFromQuery();
-    window.addEventListener("popstate", selectFromQuery);
+    window.addEventListener('popstate', selectFromQuery);
     return () => {
-      window.removeEventListener("popstate", selectFromQuery);
+      window.removeEventListener('popstate', selectFromQuery);
     };
   }, [queryParam, queryValues, tabs]);
 
@@ -41,7 +43,7 @@ export function Tab({tabs, queryParam, queryValues}: Props) {
 
     const url = new URL(window.location.href);
     url.searchParams.set(queryParam, getQueryValue(tab));
-    window.history.pushState({}, "", url);
+    window.history.pushState({}, '', url);
   };
 
   if (queryParam) {
@@ -101,39 +103,39 @@ export function Tab({tabs, queryParam, queryValues}: Props) {
           data-selected-class={styles.tabSelected}
         >
           <div className={styles.tabs} role="tablist">
-            {
-              entries.map(([label], i) => {
-                const value = getQueryValue(label);
-
-                return (
-                  <a
-                    aria-selected={label === defaultTab}
-                    className={`${label === defaultTab ? styles.tabSelected : ""} ${styles.tab}`}
-                    data-tab-trigger
-                    data-tab-value={value}
-                    href={`?${queryParam}=${encodeURIComponent(value)}`}
-                    key={`tab-${i}`}
-                    role="tab"
-                  >
-                    {label}
-                  </a>
-                );
-              })
-            }
-          </div>
-          {
-            entries.map(([label, content], i) => {
+            {entries.map(([label], i) => {
               const value = getQueryValue(label);
 
               return (
-                <div data-tab-panel={value} hidden={label !== defaultTab} key={`tab-panel-${i}`}>
-                  {content}
-                </div>
+                <a
+                  aria-selected={label === defaultTab}
+                  className={`${label === defaultTab ? styles.tabSelected : ''} ${styles.tab}`}
+                  data-tab-trigger
+                  data-tab-value={value}
+                  href={`?${queryParam}=${encodeURIComponent(value)}`}
+                  key={`tab-${i}`}
+                  role="tab"
+                >
+                  {label}
+                </a>
               );
-            })
-          }
+            })}
+          </div>
+          {entries.map(([label, content], i) => {
+            const value = getQueryValue(label);
+
+            return (
+              <div
+                data-tab-panel={value}
+                hidden={label !== defaultTab}
+                key={`tab-panel-${i}`}
+              >
+                {content}
+              </div>
+            );
+          })}
         </div>
-        <script dangerouslySetInnerHTML={{__html: script}} />
+        <script dangerouslySetInnerHTML={{ __html: script }} />
       </>
     );
   }
@@ -141,26 +143,20 @@ export function Tab({tabs, queryParam, queryValues}: Props) {
   return (
     <>
       <div className={styles.tabs}>
-        {
-          entries.map((entry, i) => (
-            <a
-              key={`tab-${i}`}
-              className={`${entry[0] === selectedTab ? styles.tabSelected : ""} ${styles.tab}`}
-              onClick={(event) => {
-                event.preventDefault();
-                selectTab(entry[0]);
-              }}
-            >
-              {entry[0]}
-            </a>
-          ))
-        }
+        {entries.map((entry, i) => (
+          <a
+            key={`tab-${i}`}
+            className={`${entry[0] === selectedTab ? styles.tabSelected : ''} ${styles.tab}`}
+            onClick={(event) => {
+              event.preventDefault();
+              selectTab(entry[0]);
+            }}
+          >
+            {entry[0]}
+          </a>
+        ))}
       </div>
-      <div>
-        {
-          selectedTab && tabs.get(selectedTab)
-        }
-      </div>
+      <div>{selectedTab && tabs.get(selectedTab)}</div>
     </>
-  )
+  );
 }

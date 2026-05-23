@@ -8,7 +8,7 @@ get:
       description: ユーザーID
       required: true
       schema:
-        $ref: "../../../components/schemas/common/UserId.yml"
+        $ref: '../../../components/schemas/common/UserId.yml'
   responses:
     '200':
       description: OK
@@ -20,7 +20,7 @@ get:
               type: object
               properties:
                 notification:
-                  $ref: "../../../components/schemas/notification/NotificationRead.yml"
+                  $ref: '../../../components/schemas/notification/NotificationRead.yml'
                 is_read:
                   type: boolean
                   description: |
@@ -32,4 +32,4 @@ get:
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []

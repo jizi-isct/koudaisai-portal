@@ -14,13 +14,13 @@ get:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/document/ReadDocument.yml"
+              $ref: '../components/schemas/document/ReadDocument.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
     - admin_oidc:
         - k-portal:admin:all
 post:
@@ -32,14 +32,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/document/CreateDocument.yml"
+          $ref: '../components/schemas/document/CreateDocument.yml'
   responses:
     '201':
       description: Changed
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/document/ReadDocument.yml"
+            $ref: '../components/schemas/document/ReadDocument.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':

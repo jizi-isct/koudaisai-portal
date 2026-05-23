@@ -20,13 +20,13 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../components/schemas/form/FormRead.yml"
+            $ref: '../../components/schemas/form/FormRead.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
     - admin_oidc:
         - k-portal:admin:all
 patch:
@@ -46,7 +46,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: "../../components/schemas/form/FormUpdate.yml"
+          $ref: '../../components/schemas/form/FormUpdate.yml'
   responses:
     '204':
       description: No Content

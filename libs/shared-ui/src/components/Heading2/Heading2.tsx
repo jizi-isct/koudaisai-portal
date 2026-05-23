@@ -1,10 +1,10 @@
-import {ReactNode} from "react";
-import styles from "./Heading2.module.css";
+import { ReactNode } from 'react';
+import styles from './Heading2.module.css';
 
 type Props = {
-  children: ReactNode,
-  emoji: string
-}
+  children: ReactNode;
+  emoji: string;
+};
 
 /**
  * 見出し
@@ -12,7 +12,7 @@ type Props = {
  * @param emoji 見出しの頭に表示する絵文字
  * @constructor
  */
-export function Heading2({children, emoji}: Props) {
+export function Heading2({ children, emoji }: Props) {
   return (
     <h1 className={styles.root}>
       <span className={styles.emoji}>
@@ -21,5 +21,5 @@ export function Heading2({children, emoji}: Props) {
       </span>
       <div className={styles.heading}>{children}</div>
     </h1>
-  )
+  );
 }

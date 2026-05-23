@@ -10,7 +10,7 @@ get:
           schema:
             type: array
             items:
-              $ref: "../components/schemas/notification/NotificationRead.yml"
+              $ref: '../components/schemas/notification/NotificationRead.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -27,7 +27,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../components/schemas/notification/NotificationCreate.yml"
+          $ref: '../components/schemas/notification/NotificationCreate.yml'
   responses:
     '201':
       description: Created

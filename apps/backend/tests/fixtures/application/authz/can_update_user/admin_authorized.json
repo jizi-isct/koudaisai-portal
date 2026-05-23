@@ -1,9 +1,7 @@
 {
   "actor": {
     "Admin": {
-      "claims": [
-        "koudaisai-portal:admin:user:update"
-      ]
+      "claims": ["koudaisai-portal:admin:user:update"]
     }
   },
   "expected": true

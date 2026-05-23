@@ -4,6 +4,6 @@ oneOf:
   - type: object
     properties:
       type_edit_exhibition_info:
-        $ref: "./ApprovalRequestTypeEditExhibitionInfo.yml"
+        $ref: './ApprovalRequestTypeEditExhibitionInfo.yml'
     required:
       - type_edit_exhibition_info

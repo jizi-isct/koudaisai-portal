@@ -1,1 +1,7 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:user:change-email"]}}, "target_exists": true, "expected": "ok"}
+{
+  "actor": {
+    "Admin": { "claims": ["koudaisai-portal:admin:user:change-email"] }
+  },
+  "target_exists": true,
+  "expected": "ok"
+}

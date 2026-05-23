@@ -1,15 +1,14 @@
-import styles from "./Faq.module.css"
+import styles from './Faq.module.css';
 
 type Props = {
-  number: number
-  content: 
-  {
-    question: string
-    answer: string
-  }
-}
+  number: number;
+  content: {
+    question: string;
+    answer: string;
+  };
+};
 
-export function Faq({number, content}: Props) {
+export function Faq({ number, content }: Props) {
   return (
     <div className={styles.root}>
       <p className={styles.question}>
@@ -21,5 +20,5 @@ export function Faq({number, content}: Props) {
         {content.answer}
       </p>
     </div>
-  )
+  );
 }

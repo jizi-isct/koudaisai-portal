@@ -1,8 +1,8 @@
-import type {FormRead} from "@koudaisai/shared-types";
-import {ViewFormCards} from "@koudaisai-portal/shared-ui-forms";
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {useEffect, useState} from "react";
-import {api} from "@/features/api/api";
+import type { FormRead } from '@koudaisai/shared-types';
+import { ViewFormCards } from '@koudaisai-portal/shared-ui-forms';
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { useEffect, useState } from 'react';
+import { api } from '@/features/api/api';
 
 export function ViewFormsWrapper() {
   const [forms, setForms] = useState<FormRead[] | null>(null);
@@ -10,7 +10,7 @@ export function ViewFormsWrapper() {
 
   useEffect(() => {
     (async () => {
-      const {data, error} = await api.GET("/forms");
+      const { data, error } = await api.GET('/forms');
 
       if (error) {
         setError(`${error}`);

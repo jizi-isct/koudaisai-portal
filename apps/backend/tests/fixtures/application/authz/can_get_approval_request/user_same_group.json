@@ -2,13 +2,9 @@
   "actor": {
     "User": {
       "group_type": "",
-      "group_ids": [
-        "G-001"
-      ]
+      "group_ids": ["G-001"]
     }
   },
-  "issuer_group_ids": [
-    "G-001"
-  ],
+  "issuer_group_ids": ["G-001"],
   "expected": true
 }

@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import {questionDataNoLogin} from "./questionDataNoLogIn";
-import {Faq, Selector} from "@koudaisai/shared-ui";
-import {useState} from "react";
+import { questionDataNoLogin } from './questionDataNoLogIn';
+import { Faq, Selector } from '@koudaisai/shared-ui';
+import { useState } from 'react';
 
 export default function ViewQuestionWrapper() {
   const first = Object.keys(questionDataNoLogin)[0];
@@ -16,9 +16,11 @@ export default function ViewQuestionWrapper() {
         setOption={setQuestionType}
       />
       {questionDataNoLogin[questionType].map((data, i) => (
-        <Faq key={i+1} number={i+1} content={data}/>
+        <Faq key={i + 1} number={i + 1} content={data} />
       ))}
-      <p>その他何かご不明などございましたら、当委員会までお気軽にお問い合わせください！</p>
+      <p>
+        その他何かご不明などございましたら、当委員会までお気軽にお問い合わせください！
+      </p>
     </>
   );
 }

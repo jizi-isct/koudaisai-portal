@@ -1,4 +1,8 @@
-import {DeleteOutlined, DownloadOutlined, UploadOutlined} from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import type {
   BasePlanRead,
   BoothPlanCreate,
@@ -14,16 +18,26 @@ import type {
   ScheduleUpdate,
   StagePlanCreate,
   StagePlanUpdate,
-} from "@koudaisai/shared-types";
-import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
-import {useDownload} from "@koudaisai/shared-utils";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Checkbox, Flex, message, Popconfirm, Table, Tag, Tooltip, Upload} from "antd";
-import type {TableProps} from "antd";
-import objectHash from "object-hash";
-import Papa from "papaparse";
-import {useState} from "react";
-import {$plansInfoApi} from "@/features/api/api";
+} from '@koudaisai/shared-types';
+import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
+import { useDownload } from '@koudaisai/shared-utils';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  Button,
+  Checkbox,
+  Flex,
+  message,
+  Popconfirm,
+  Table,
+  Tag,
+  Tooltip,
+  Upload,
+} from 'antd';
+import type { TableProps } from 'antd';
+import objectHash from 'object-hash';
+import Papa from 'papaparse';
+import { useState } from 'react';
+import { $plansInfoApi } from '@/features/api/api';
 
 type BulkCreateRow = {
   id: string;
@@ -60,51 +74,62 @@ type BulkUpdateRow = {
 };
 
 function buildDaySchedule(startTime: string, endTime: string): DaySchedule {
-  return {start_time: startTime, end_time: endTime};
+  return { start_time: startTime, end_time: endTime };
 }
 
-function buildLocation(building: string, locationName: string): (IndoorLocation | OutdoorLocation)[] {
-  if (building !== "") {
-    return [{type: "indoor", building, room: locationName}];
+function buildLocation(
+  building: string,
+  locationName: string,
+): (IndoorLocation | OutdoorLocation)[] {
+  if (building !== '') {
+    return [{ type: 'indoor', building, room: locationName }];
   }
-  return [{type: "outdoor", name: locationName}];
+  return [{ type: 'outdoor', name: locationName }];
 }
 
 function buildCreateSchedule(row: BulkCreateRow): ScheduleCreate {
   return {
     day1:
-      row.day1_start_time !== "" && row.day1_end_time !== ""
+      row.day1_start_time !== '' && row.day1_end_time !== ''
         ? buildDaySchedule(row.day1_start_time, row.day1_end_time)
         : null,
     day2:
-      row.day2_start_time !== "" && row.day2_end_time !== ""
+      row.day2_start_time !== '' && row.day2_end_time !== ''
         ? buildDaySchedule(row.day2_start_time, row.day2_end_time)
         : null,
   };
 }
 
-function buildPlanCreate(row: BulkCreateRow): BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate {
+function buildPlanCreate(
+  row: BulkCreateRow,
+): BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate {
   const base = {
     organization_name: row.organization_name,
     plan_name: row.plan_name,
     description: row.description,
-    is_child_friendly: row.is_child_friendly === "true",
-    is_recommended: row.is_recommended === "true",
+    is_child_friendly: row.is_child_friendly === 'true',
+    is_recommended: row.is_recommended === 'true',
     schedule: buildCreateSchedule(row),
     location: buildLocation(row.building, row.location),
   };
 
   switch (row.id.charAt(0)) {
-    case "M":
-      return {...base, type: "booth", categories: []};
-    case "I":
-      return {...base, type: "general", categories: []};
-    case "S":
-      return {...base, type: "stage"};
-    case "L":
-      return {...base, type: "labo", is_lab_tour: row.is_lab_tour.toLowerCase() === "true"};
+    case 'M':
+      return { ...base, type: 'booth', categories: [] };
+    case 'I':
+      return { ...base, type: 'general', categories: [] };
+    case 'S':
+      return { ...base, type: 'stage' };
+    case 'L':
+      return {
+        ...base,
+        type: 'labo',
+        is_lab_tour: row.is_lab_tour.toLowerCase() === 'true',
+      };
     default:
-      throw new Error("企画番号の頭文字はM, I, S, Lのいずれかである必要があります。");
+      throw new Error(
+        '企画番号の頭文字はM, I, S, Lのいずれかである必要があります。',
+      );
   }
 }
 
@@ -112,49 +137,69 @@ function buildUpdateSchedule(row: BulkUpdateRow): ScheduleUpdate | undefined {
   let day1: DaySchedule | null | undefined;
   let day2: DaySchedule | null | undefined;
 
-  if (row.day1_start_time === "null") {
+  if (row.day1_start_time === 'null') {
     day1 = null;
-  } else if (row.day1_start_time && row.day1_start_time !== "" && row.day1_end_time && row.day1_end_time !== "") {
+  } else if (
+    row.day1_start_time &&
+    row.day1_start_time !== '' &&
+    row.day1_end_time &&
+    row.day1_end_time !== ''
+  ) {
     day1 = buildDaySchedule(row.day1_start_time, row.day1_end_time);
   }
 
-  if (row.day2_start_time === "null") {
+  if (row.day2_start_time === 'null') {
     day2 = null;
-  } else if (row.day2_start_time && row.day2_start_time !== "" && row.day2_end_time && row.day2_end_time !== "") {
+  } else if (
+    row.day2_start_time &&
+    row.day2_start_time !== '' &&
+    row.day2_end_time &&
+    row.day2_end_time !== ''
+  ) {
     day2 = buildDaySchedule(row.day2_start_time, row.day2_end_time);
   }
 
   if (day1 !== undefined || day2 !== undefined) {
-    return {day1, day2};
+    return { day1, day2 };
   }
   return undefined;
 }
 
-function buildUpdateLocation(row: BulkUpdateRow): (IndoorLocation | OutdoorLocation)[] | undefined {
+function buildUpdateLocation(
+  row: BulkUpdateRow,
+): (IndoorLocation | OutdoorLocation)[] | undefined {
   if (row.location && row.building) {
-    return [{type: "indoor", building: row.building, room: row.location}];
+    return [{ type: 'indoor', building: row.building, room: row.location }];
   }
   if (row.location) {
-    return [{type: "outdoor", name: row.location}];
+    return [{ type: 'outdoor', name: row.location }];
   }
   return undefined;
 }
 
-function buildPlanUpdate(row: BulkUpdateRow): BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate {
+function buildPlanUpdate(
+  row: BulkUpdateRow,
+): BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate {
   const base = {
     organization_name: row.organization_name,
     plan_name: row.plan_name,
     description: row.description,
-    is_child_friendly: row.is_child_friendly ? row.is_child_friendly === "true" : undefined,
-    is_recommended: row.is_recommended ? row.is_recommended === "true" : undefined,
+    is_child_friendly: row.is_child_friendly
+      ? row.is_child_friendly === 'true'
+      : undefined,
+    is_recommended: row.is_recommended
+      ? row.is_recommended === 'true'
+      : undefined,
     schedule: buildUpdateSchedule(row),
     location: buildUpdateLocation(row),
   };
 
-  if (row.id.charAt(0) === "L") {
+  if (row.id.charAt(0) === 'L') {
     return {
       ...base,
-      is_lab_tour: row.is_lab_tour ? row.is_lab_tour.toLowerCase() === "true" : undefined,
+      is_lab_tour: row.is_lab_tour
+        ? row.is_lab_tour.toLowerCase() === 'true'
+        : undefined,
     };
   }
   return base;
@@ -173,11 +218,23 @@ export function PlansInfoPage() {
 function PlansInfoTable() {
   const download = useDownload();
   const [messageApi, contextHolder] = message.useMessage();
-  const {data, isLoading, refetch} = $plansInfoApi.useQuery("get", "/plans");
-  const {mutateAsync: mutatePlanBulkCreate} = $plansInfoApi.useMutation("post", "/admin/plans:bulk");
-  const {mutateAsync: mutatePlanIconImport} = $plansInfoApi.useMutation("post", "/admin/plans/{planId}/icon:import");
-  const {mutateAsync: mutatePlanUpdate} = $plansInfoApi.useMutation("patch", "/admin/plans/{planId}");
-  const {mutateAsync: mutatePlanDelete} = $plansInfoApi.useMutation("delete", "/admin/plans/{planId}");
+  const { data, isLoading, refetch } = $plansInfoApi.useQuery('get', '/plans');
+  const { mutateAsync: mutatePlanBulkCreate } = $plansInfoApi.useMutation(
+    'post',
+    '/admin/plans:bulk',
+  );
+  const { mutateAsync: mutatePlanIconImport } = $plansInfoApi.useMutation(
+    'post',
+    '/admin/plans/{planId}/icon:import',
+  );
+  const { mutateAsync: mutatePlanUpdate } = $plansInfoApi.useMutation(
+    'patch',
+    '/admin/plans/{planId}',
+  );
+  const { mutateAsync: mutatePlanDelete } = $plansInfoApi.useMutation(
+    'delete',
+    '/admin/plans/{planId}',
+  );
 
   const handleDelete = (id: string) => async () => {
     await mutatePlanDelete({
@@ -192,7 +249,10 @@ function PlansInfoTable() {
 
   const handleBulkCreate = async (csv: string) => {
     const hash = objectHash(csv);
-    const plans: Map<string, BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate> = new Map();
+    const plans: Map<
+      string,
+      BoothPlanCreate | GeneralPlanCreate | StagePlanCreate | LaboPlanCreate
+    > = new Map();
     const iconUrls: Map<string, string> = new Map();
     let isAborted = false;
 
@@ -200,16 +260,16 @@ function PlansInfoTable() {
       header: true,
       skipEmptyLines: true,
       worker: true,
-      encoding: "UTF-8",
+      encoding: 'UTF-8',
       step: (result, parser) => {
         try {
           const row = result.data;
           plans.set(row.id, buildPlanCreate(row));
-          if (row.icon_url !== "") {
+          if (row.icon_url !== '') {
             iconUrls.set(row.id, row.icon_url);
           }
         } catch (error) {
-          console.error("Error in step processing:", error);
+          console.error('Error in step processing:', error);
           messageApi.error({
             content: `行の処理中にエラーが発生しました：${String(error)}`,
             key: hash,
@@ -224,7 +284,7 @@ function PlansInfoTable() {
         let isError = false;
         messageApi.destroy(hash);
         messageApi.loading({
-          content: "企画情報を挿入中... ブラウザを閉じないでください",
+          content: '企画情報を挿入中... ブラウザを閉じないでください',
           key: hash,
           duration: 0,
         });
@@ -245,7 +305,7 @@ function PlansInfoTable() {
 
         messageApi.destroy(hash);
         messageApi.loading({
-          content: "画像のインポート中...",
+          content: '画像のインポート中...',
           key: hash,
           duration: 0,
         });
@@ -254,8 +314,8 @@ function PlansInfoTable() {
         await Promise.all(
           [...iconUrls.entries()].map(([id, iconUrl]) =>
             mutatePlanIconImport({
-              params: {path: {planId: id}},
-              body: {url: iconUrl},
+              params: { path: { planId: id } },
+              body: { url: iconUrl },
             })
               .then(() => {
                 i++;
@@ -281,7 +341,8 @@ function PlansInfoTable() {
         if (!isError) {
           messageApi.destroy(hash);
           messageApi.success({
-            content: "新規作成が完了しました。反映には最長で１分ほどかかる可能性があります。",
+            content:
+              '新規作成が完了しました。反映には最長で１分ほどかかる可能性があります。',
             key: hash,
           });
         }
@@ -298,7 +359,10 @@ function PlansInfoTable() {
 
   const handleBulkUpdate = async (csv: string) => {
     const hash = objectHash(csv);
-    const plans: Map<string, BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate> = new Map();
+    const plans: Map<
+      string,
+      BoothPlanUpdate | GeneralPlanUpdate | StagePlanUpdate | LaboPlanUpdate
+    > = new Map();
     const iconUrls: Map<string, string> = new Map();
     let isAborted = false;
 
@@ -306,16 +370,16 @@ function PlansInfoTable() {
       header: true,
       skipEmptyLines: true,
       worker: true,
-      encoding: "UTF-8",
+      encoding: 'UTF-8',
       step: (result, parser) => {
         try {
           const row = result.data;
           plans.set(row.id, buildPlanUpdate(row));
-          if (row.icon_url && row.icon_url !== "") {
+          if (row.icon_url && row.icon_url !== '') {
             iconUrls.set(row.id, row.icon_url);
           }
         } catch (error) {
-          console.error("Error in step processing:", error);
+          console.error('Error in step processing:', error);
           messageApi.error({
             content: `行の処理中にエラーが発生しました：${String(error)}`,
             key: hash,
@@ -342,7 +406,7 @@ function PlansInfoTable() {
 
             try {
               await mutatePlanUpdate({
-                params: {path: {planId: id}},
+                params: { path: { planId: id } },
                 body: plan,
               });
             } catch (err) {
@@ -367,7 +431,7 @@ function PlansInfoTable() {
 
         messageApi.destroy(hash);
         messageApi.loading({
-          content: "画像のインポート中...",
+          content: '画像のインポート中...',
           key: hash,
           duration: 0,
         });
@@ -376,8 +440,8 @@ function PlansInfoTable() {
         await Promise.all(
           [...iconUrls.entries()].map(([id, iconUrl]) =>
             mutatePlanIconImport({
-              params: {path: {planId: id}},
-              body: {url: iconUrl},
+              params: { path: { planId: id } },
+              body: { url: iconUrl },
             })
               .then(() => {
                 i2++;
@@ -409,7 +473,8 @@ function PlansInfoTable() {
         } else {
           messageApi.destroy(hash);
           messageApi.success({
-            content: "更新が完了しました。反映には最長で１分ほどかかる可能性があります。",
+            content:
+              '更新が完了しました。反映には最長で１分ほどかかる可能性があります。',
             key: hash,
           });
         }
@@ -427,14 +492,14 @@ function PlansInfoTable() {
   const handleDownload = async () => {
     const rows =
       data?.plans?.map((plan) => {
-        let building = "";
-        let location = "";
+        let building = '';
+        let location = '';
         switch (plan.location[0].type) {
-          case "indoor":
+          case 'indoor':
             building = plan.location[0].building;
             location = plan.location[0].room;
             break;
-          case "outdoor":
+          case 'outdoor':
             location = plan.location[0].name;
             break;
         }
@@ -444,64 +509,69 @@ function PlansInfoTable() {
           organization_name: plan.organization_name,
           plan_name: plan.plan_name,
           description: plan.description,
-          is_child_friendly: plan.is_child_friendly ? "true" : "false",
-          is_recommended: plan.is_recommended ? "true" : "false",
-          day1_start_time: plan.schedule.day1?.start_time ?? "",
-          day1_end_time: plan.schedule.day1?.end_time ?? "",
-          day2_start_time: plan.schedule.day2?.start_time ?? "",
-          day2_end_time: plan.schedule.day2?.end_time ?? "",
+          is_child_friendly: plan.is_child_friendly ? 'true' : 'false',
+          is_recommended: plan.is_recommended ? 'true' : 'false',
+          day1_start_time: plan.schedule.day1?.start_time ?? '',
+          day1_end_time: plan.schedule.day1?.end_time ?? '',
+          day2_start_time: plan.schedule.day2?.start_time ?? '',
+          day2_end_time: plan.schedule.day2?.end_time ?? '',
           building,
           location,
-          is_lab_tour: "is_lab_tour" in plan ? (plan.is_lab_tour ? "true" : "false") : "false",
+          is_lab_tour:
+            'is_lab_tour' in plan
+              ? plan.is_lab_tour
+                ? 'true'
+                : 'false'
+              : 'false',
           icon_url: `https://api2025.jizi.jp/v1/plans/${plan.id}/icon`,
         };
       }) ?? [];
 
-    const csv = Papa.unparse(rows, {newline: "\r\n"});
-    const bom = "\uFEFF";
-    const blob = new Blob([bom + csv], {type: "text/csv;charset=utf-8;"});
-    download(URL.createObjectURL(blob), "plans.csv");
+    const csv = Papa.unparse(rows, { newline: '\r\n' });
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    download(URL.createObjectURL(blob), 'plans.csv');
   };
 
-  const columns: TableProps<BasePlanRead>["columns"] = [
+  const columns: TableProps<BasePlanRead>['columns'] = [
     {
-      key: "id",
+      key: 'id',
       title: <Tooltip title="id">企画番号</Tooltip>,
-      dataIndex: "id",
-      rowScope: "row",
+      dataIndex: 'id',
+      rowScope: 'row',
     },
     {
-      key: "type",
+      key: 'type',
       title: <Tooltip title="type">種類</Tooltip>,
-      dataIndex: "type",
+      dataIndex: 'type',
       filters: [
-        {text: "模擬店企画", value: "booth"},
-        {text: "一般企画", value: "general"},
-        {text: "ステージ企画", value: "stage"},
-        {text: "研究室公開企画", value: "labo"},
+        { text: '模擬店企画', value: 'booth' },
+        { text: '一般企画', value: 'general' },
+        { text: 'ステージ企画', value: 'stage' },
+        { text: '研究室公開企画', value: 'labo' },
       ],
       onFilter: (value, record) => record.type === value,
       render: (value) => {
         switch (value) {
-          case "booth":
+          case 'booth':
             return (
               <Tooltip title="booth">
                 <Tag color="red">模擬店企画</Tag>
               </Tooltip>
             );
-          case "general":
+          case 'general':
             return (
               <Tooltip title="general">
                 <Tag color="blue">一般企画</Tag>
               </Tooltip>
             );
-          case "stage":
+          case 'stage':
             return (
               <Tooltip title="stage">
                 <Tag color="green">ステージ企画</Tag>
               </Tooltip>
             );
-          case "labo":
+          case 'labo':
             return (
               <Tooltip title="labo">
                 <Tag color="orange">研究室公開企画</Tag>
@@ -513,10 +583,10 @@ function PlansInfoTable() {
       },
     },
     {
-      key: "icon",
+      key: 'icon',
       title: <Tooltip title="icon">アイコン</Tooltip>,
-      dataIndex: "id",
-      rowScope: "row",
+      dataIndex: 'id',
+      rowScope: 'row',
       render: (_value, record) => (
         <img
           src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${record.id}/icon`}
@@ -527,50 +597,50 @@ function PlansInfoTable() {
       ),
     },
     {
-      key: "organization_name",
+      key: 'organization_name',
       title: <Tooltip title="organization_name">団体名</Tooltip>,
-      dataIndex: "organization_name",
-      rowScope: "row",
+      dataIndex: 'organization_name',
+      rowScope: 'row',
     },
     {
-      key: "plan_name",
+      key: 'plan_name',
       title: <Tooltip title="plan_name">企画名</Tooltip>,
-      dataIndex: "plan_name",
-      rowScope: "row",
+      dataIndex: 'plan_name',
+      rowScope: 'row',
     },
     {
-      key: "description",
+      key: 'description',
       title: <Tooltip title="description">概要</Tooltip>,
-      dataIndex: "description",
-      rowScope: "row",
+      dataIndex: 'description',
+      rowScope: 'row',
     },
     {
-      key: "is_child_friendly",
+      key: 'is_child_friendly',
       title: <Tooltip title="is_child_friendly">子供向け企画?</Tooltip>,
-      dataIndex: "is_child_friendly",
-      rowScope: "row",
+      dataIndex: 'is_child_friendly',
+      rowScope: 'row',
       render: (_value, record) => (
-        <Tooltip title={record.is_child_friendly ? "true" : "false"}>
+        <Tooltip title={record.is_child_friendly ? 'true' : 'false'}>
           <Checkbox checked={record.is_child_friendly} disabled />
         </Tooltip>
       ),
     },
     {
-      key: "is_recommended",
+      key: 'is_recommended',
       title: <Tooltip title="is_recommended">おすすめ企画?</Tooltip>,
-      dataIndex: "is_recommended",
-      rowScope: "row",
+      dataIndex: 'is_recommended',
+      rowScope: 'row',
       render: (_value, record) => (
-        <Tooltip title={record.is_recommended ? "true" : "false"}>
+        <Tooltip title={record.is_recommended ? 'true' : 'false'}>
           <Checkbox checked={record.is_recommended} disabled />
         </Tooltip>
       ),
     },
     {
-      key: "actions",
-      title: "操作",
-      dataIndex: "id",
-      fixed: "right",
+      key: 'actions',
+      title: '操作',
+      dataIndex: 'id',
+      fixed: 'right',
       render: (value) => (
         <Flex gap={5}>
           <Popconfirm
@@ -598,7 +668,7 @@ function PlansInfoTable() {
     <>
       {contextHolder}
       <Heading1 emoji="💁">企画情報</Heading1>
-      <Flex gap={8} align="center" wrap="wrap" style={{marginBottom: "16px"}}>
+      <Flex gap={8} align="center" wrap="wrap" style={{ marginBottom: '16px' }}>
         <Upload
           maxCount={1}
           accept=".csv"
@@ -627,10 +697,10 @@ function PlansInfoTable() {
       <Flex gap={8} vertical>
         <Table<BasePlanRead>
           size="small"
-          dataSource={data.plans.map((item) => ({...item, key: item.id}))}
+          dataSource={data.plans.map((item) => ({ ...item, key: item.id }))}
           columns={columns}
           bordered
-          scroll={{x: "max-content"}}
+          scroll={{ x: 'max-content' }}
         />
       </Flex>
     </>

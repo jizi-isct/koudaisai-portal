@@ -1,1 +1,6 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:form:read"]}}, "form_exists": true, "form_targets": ["press"], "expected": "some"}
+{
+  "actor": { "Admin": { "claims": ["koudaisai-portal:admin:form:read"] } },
+  "form_exists": true,
+  "form_targets": ["press"],
+  "expected": "some"
+}

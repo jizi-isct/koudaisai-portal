@@ -1,11 +1,11 @@
 .root {
-    border: none;
-    background: none;
-    height: 24px;
-    width: 24px;
-    cursor: pointer;
+  border: none;
+  background: none;
+  height: 24px;
+  width: 24px;
+  cursor: pointer;
 }
 
 .root:hover {
-    filter: brightness(3);
+  filter: brightness(3);
 }

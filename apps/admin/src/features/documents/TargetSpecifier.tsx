@@ -1,6 +1,6 @@
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {Cascader} from "antd";
-import {$api} from "@/features/api/api";
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { Cascader } from 'antd';
+import { $api } from '@/features/api/api';
 
 type Option = {
   value: string;
@@ -13,9 +13,9 @@ type TargetSpecifierProps = {
   onChange?: (value: string[]) => void;
 };
 
-export function TargetSpecifier({value, onChange}: TargetSpecifierProps) {
-  const {data: users} = $api.useQuery("get", "/users");
-  const {data: groups} = $api.useQuery("get", "/groups");
+export function TargetSpecifier({ value, onChange }: TargetSpecifierProps) {
+  const { data: users } = $api.useQuery('get', '/users');
+  const { data: groups } = $api.useQuery('get', '/groups');
 
   if (!users || !groups) {
     return <LoadingScreen />;
@@ -23,23 +23,23 @@ export function TargetSpecifier({value, onChange}: TargetSpecifierProps) {
 
   const options: Option[] = [
     {
-      value: "group",
-      label: "団体",
+      value: 'group',
+      label: '団体',
       children: [
         {
-          value: "type",
-          label: "種類",
+          value: 'type',
+          label: '種類',
           children: [
-            {value: "plan_general", label: "一般企画"},
-            {value: "plan_booth", label: "模擬店企画"},
-            {value: "plan_stage", label: "ステージ企画"},
-            {value: "plan_labo", label: "研究室企画"},
-            {value: "press", label: "学内取材団体"},
+            { value: 'plan_general', label: '一般企画' },
+            { value: 'plan_booth', label: '模擬店企画' },
+            { value: 'plan_stage', label: 'ステージ企画' },
+            { value: 'plan_labo', label: '研究室企画' },
+            { value: 'press', label: '学内取材団体' },
           ],
         },
         {
-          value: "id",
-          label: "指定",
+          value: 'id',
+          label: '指定',
           children: groups.map((group) => ({
             value: group.id,
             label: `${group.id} - ${group.name}`,
@@ -48,13 +48,13 @@ export function TargetSpecifier({value, onChange}: TargetSpecifierProps) {
       ],
     },
     {
-      value: "user",
-      label: "ユーザー",
+      value: 'user',
+      label: 'ユーザー',
       children: [
-        {value: "nologin", label: "非ログイン"},
+        { value: 'nologin', label: '非ログイン' },
         {
-          value: "id",
-          label: "個人",
+          value: 'id',
+          label: '個人',
           children: users.map((user) => ({
             value: user.id,
             label: `${user.group_id}の${user.name}`,
@@ -65,10 +65,17 @@ export function TargetSpecifier({value, onChange}: TargetSpecifierProps) {
   ];
 
   const handleChange = (val: string[] | string[][]) => {
-    if (onChange && val.every((v): v is string => typeof v === "string")) {
+    if (onChange && val.every((v): v is string => typeof v === 'string')) {
       onChange(val);
     }
   };
 
-  return <Cascader value={value} options={options} onChange={handleChange} showSearch />;
+  return (
+    <Cascader
+      value={value}
+      options={options}
+      onChange={handleChange}
+      showSearch
+    />
+  );
 }

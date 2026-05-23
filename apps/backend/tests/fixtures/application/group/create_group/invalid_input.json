@@ -1,1 +1,6 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:group:create"]}}, "group_id": "P-001", "group_name": "", "expected": "invalid_input"}
+{
+  "actor": { "Admin": { "claims": ["koudaisai-portal:admin:group:create"] } },
+  "group_id": "P-001",
+  "group_name": "",
+  "expected": "invalid_input"
+}

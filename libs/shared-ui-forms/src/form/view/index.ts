@@ -1,2 +1,2 @@
-export * from "./FormCard"
-export * from "./ViewFormCards"
+export * from './FormCard';
+export * from './ViewFormCards';

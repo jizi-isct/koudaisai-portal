@@ -1,2 +1,2 @@
-export * from "./document"
-export * from "./documentCategory"
+export * from './document';
+export * from './documentCategory';

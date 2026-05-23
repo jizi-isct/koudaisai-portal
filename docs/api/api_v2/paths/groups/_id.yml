@@ -24,8 +24,8 @@ get:
     '404':
       description: 団体が存在しない
   security:
-    - exhibitor_bearer: [ ]
-    - admin_oidc: [ ]
+    - exhibitor_bearer: []
+    - admin_oidc: []
 put:
   summary: 団体を追加
   tags:
@@ -36,7 +36,7 @@ put:
       description: 団体のID
       required: true
       schema:
-        $ref: "../../components/schemas/common/GroupId.yml"
+        $ref: '../../components/schemas/common/GroupId.yml'
   requestBody:
     required: true
     content:
@@ -49,13 +49,13 @@ put:
       content:
         application/json:
           schema:
-            $ref: "../../components/schemas/PutGroupResponse.yml"
+            $ref: '../../components/schemas/PutGroupResponse.yml'
     '400':
       description: 不正なrequest bodyの形式
     '409':
       description: 団体またはユーザーがすでに存在する
   security:
-    - admin_oidc: [ ]
+    - admin_oidc: []
 patch:
   summary: 団体を編集
   description: |-
@@ -86,8 +86,8 @@ patch:
     '404':
       description: 団体が存在しない
   security:
-    - exhibitor_bearer: [ ]
-    - admin_oidc: [ ]
+    - exhibitor_bearer: []
+    - admin_oidc: []
 delete:
   summary: 団体を削除
   tags:
@@ -106,4 +106,4 @@ delete:
     '404':
       description: 団体が存在しない
   security:
-    - admin_oidc: [ ]
+    - admin_oidc: []

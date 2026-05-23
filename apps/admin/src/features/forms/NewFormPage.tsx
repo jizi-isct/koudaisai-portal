@@ -1,9 +1,9 @@
-import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Flex, Form, Input, message, Radio, Space} from "antd";
-import {useState} from "react";
-import {api, $api} from "@/features/api/api";
-import {TargetSpecifier} from "@/features/documents/TargetSpecifier";
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Button, Flex, Form, Input, message, Radio, Space } from 'antd';
+import { useState } from 'react';
+import { api, $api } from '@/features/api/api';
+import { TargetSpecifier } from '@/features/documents/TargetSpecifier';
 
 type FormValues = {
   formName: string;
@@ -25,18 +25,24 @@ export function NewFormPage() {
 
 function NewForm() {
   const [messageApi, contextHolder] = message.useMessage();
-  const {mutateAsync: mutateFormCreate} = $api.useMutation("post", "/forms");
+  const { mutateAsync: mutateFormCreate } = $api.useMutation('post', '/forms');
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
-  const urlValue = Form.useWatch("url", form) ?? "";
+  const urlValue = Form.useWatch('url', form) ?? '';
 
-  const handleSubmit = async ({formName, summary, url, targets, dueDate}: FormValues) => {
+  const handleSubmit = async ({
+    formName,
+    summary,
+    url,
+    targets,
+    dueDate,
+  }: FormValues) => {
     setSubmitting(true);
     try {
       await mutateFormCreate({
         body: {
           form_name: formName,
-          targets: targets.map((target) => target.join("/")),
+          targets: targets.map((target) => target.join('/')),
           summary,
           type_external: {
             form_url: url,
@@ -51,69 +57,92 @@ function NewForm() {
     }
 
     setSubmitting(false);
-    messageApi.success("保存しました");
-    window.location.assign("/forms");
+    messageApi.success('保存しました');
+    window.location.assign('/forms');
   };
 
   const syncFormNameAndSummary = async () => {
-    messageApi.loading("外部フォームのメタデータを取得中...");
+    messageApi.loading('外部フォームのメタデータを取得中...');
     try {
-      const result = await api.GET("/util/meta", {
-        params: {query: {url: urlValue}},
+      const result = await api.GET('/util/meta', {
+        params: { query: { url: urlValue } },
       });
 
       if (!result.data) {
         messageApi.destroy();
-        messageApi.error(`外部フォームのメタデータを取得できませんでした: ${String(result.error)}`);
+        messageApi.error(
+          `外部フォームのメタデータを取得できませんでした: ${String(result.error)}`,
+        );
         return;
       }
 
       if (!result.data.title || !result.data.description) {
         messageApi.destroy();
-        messageApi.warning("外部フォームのメタデータにタイトルまたは要約が含まれていません");
+        messageApi.warning(
+          '外部フォームのメタデータにタイトルまたは要約が含まれていません',
+        );
       } else {
         messageApi.destroy();
-        messageApi.success("外部フォームのメタデータを取得しました");
+        messageApi.success('外部フォームのメタデータを取得しました');
       }
 
       if (result.data.title) {
-        form.setFieldsValue({formName: result.data.title});
+        form.setFieldsValue({ formName: result.data.title });
       }
       if (result.data.description) {
-        form.setFieldsValue({summary: result.data.description});
+        form.setFieldsValue({ summary: result.data.description });
       }
     } catch (e) {
       messageApi.destroy();
-      messageApi.error(`外部フォームのメタデータのfetchに失敗しました: ${String(e)}`);
+      messageApi.error(
+        `外部フォームのメタデータのfetchに失敗しました: ${String(e)}`,
+      );
     }
   };
 
   return (
     <>
-      <Form form={form} onFinish={handleSubmit} initialValues={{targets: [], formType: "external"}}>
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        initialValues={{ targets: [], formType: 'external' }}
+      >
         <h1>新規フォームを作成</h1>
-        <Form.Item name="formName" label="フォーム名" rules={[{required: true}]}>
+        <Form.Item
+          name="formName"
+          label="フォーム名"
+          rules={[{ required: true }]}
+        >
           <Input placeholder="フォーム名を入力してください" />
         </Form.Item>
 
-        <Form.Item name="summary" label="要約" rules={[{required: true}]}>
+        <Form.Item name="summary" label="要約" rules={[{ required: true }]}>
           <Input.TextArea placeholder="フォームの要約を入力してください" />
         </Form.Item>
 
-        <Form.Item label="対象" rules={[{required: true}]}>
+        <Form.Item label="対象" rules={[{ required: true }]}>
           <Form.List name="targets">
-            {(fields, {add, remove}) => (
+            {(fields, { add, remove }) => (
               <Flex gap={16} vertical>
                 {fields.map((field) => (
                   <Space key={field.key}>
-                    <Form.Item name={field.name} noStyle rules={[{required: true}]}>
+                    <Form.Item
+                      name={field.name}
+                      noStyle
+                      rules={[{ required: true }]}
+                    >
                       <TargetSpecifier />
                     </Form.Item>
                     <MinusCircleOutlined onClick={() => remove(field.name)} />
                   </Space>
                 ))}
                 <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
                     追加
                   </Button>
                 </Form.Item>
@@ -128,7 +157,11 @@ function NewForm() {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item name="url" label="外部フォームurl" rules={[{required: true}]}>
+        <Form.Item
+          name="url"
+          label="外部フォームurl"
+          rules={[{ required: true }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item>

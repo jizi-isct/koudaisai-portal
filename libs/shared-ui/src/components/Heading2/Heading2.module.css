@@ -1,37 +1,37 @@
 .root {
-    display: flex;
-    position: relative;
-    align-items: center;
+  display: flex;
+  position: relative;
+  align-items: center;
 }
 
 .emojiBackground {
-    z-index: -5;
+  z-index: -5;
 
-    position: absolute;
-    font-size: 3em;
-    opacity: 0.05;
+  position: absolute;
+  font-size: 3em;
+  opacity: 0.05;
 
-    top: -4rem;
-    left: -3rem;
+  top: -4rem;
+  left: -3rem;
 }
 
 .emoji {
-    position: relative;
+  position: relative;
 
-    font-size: 32px;
-    padding-right: 0.5rem;
+  font-size: 32px;
+  padding-right: 0.5rem;
 }
 
 .heading {
-    filter: drop-shadow(0 0 4px white);
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    gap: 0.3em;
+  filter: drop-shadow(0 0 4px white);
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
 }
 
 @media screen and (max-width: 700px) {
-    .root {
-        justify-content: center;
-    }
+  .root {
+    justify-content: center;
+  }
 }

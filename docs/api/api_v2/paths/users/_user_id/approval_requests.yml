@@ -18,7 +18,7 @@ get:
           schema:
             type: array
             items:
-              $ref: "../../../components/schemas/approval_request/ReadApprovalRequest.yml"
+              $ref: '../../../components/schemas/approval_request/ReadApprovalRequest.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -26,7 +26,7 @@ get:
     '500':
       description: サーバーエラー
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
 post:
   summary: 承認申請を新規作成
   tags:
@@ -44,7 +44,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../../../components/schemas/approval_request/CreateApprovalRequest.yml"
+          $ref: '../../../components/schemas/approval_request/CreateApprovalRequest.yml'
   responses:
     '204':
       description: No Content
@@ -55,4 +55,4 @@ post:
     '500':
       description: サーバーエラー
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []

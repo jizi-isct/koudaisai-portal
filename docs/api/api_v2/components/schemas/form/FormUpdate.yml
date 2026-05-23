@@ -1,18 +1,18 @@
 type: object
 oneOf:
   - allOf:
-      - $ref: "./FormUpdateGeneric.yml"
+      - $ref: './FormUpdateGeneric.yml'
       - properties:
           type_builtin:
-            $ref: "./FormUpdateTypeBuiltin.yml"
+            $ref: './FormUpdateTypeBuiltin.yml'
         required:
           - type_builtin
   - allOf:
-      - $ref: "./FormUpdateGeneric.yml"
+      - $ref: './FormUpdateGeneric.yml'
       - properties:
           type_external:
-            $ref: "./FormUpdateTypeExternal.yml"
+            $ref: './FormUpdateTypeExternal.yml'
         required:
           - type_external
   - allOf:
-      - $ref: "./FormUpdateGeneric.yml"
+      - $ref: './FormUpdateGeneric.yml'

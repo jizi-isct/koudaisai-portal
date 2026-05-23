@@ -1,1 +1,5 @@
-{"actor": {"User": {"group_type": "press"}}, "form_targets": ["general"], "expected_count": 0}
+{
+  "actor": { "User": { "group_type": "press" } },
+  "form_targets": ["general"],
+  "expected_count": 0
+}

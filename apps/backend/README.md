@@ -1,7 +1,9 @@
 # dbの起動
+
 `$ docker compose up -d`
 
 # config
+
 デフォルトでは OS ごとの標準設定ディレクトリから `koudaisai-portal` の設定を読み込みます．
 任意の場所にある config を使う場合は，環境変数 `KOUDAISAI_PORTAL_CONFIG_PATH` に TOML ファイルのパスを指定してください．
 
@@ -12,19 +14,28 @@ export KOUDAISAI_PORTAL_CONFIG_PATH=/path/to/config.toml
 `nx dev backend` では `apps/backend/debug/default-config.toml` を自動で読み込みます．
 
 # migration
+
 > [!IMPORTANT]
 > `$ nx docker-up backend`で開発環境を起動する必要があります．
+
 ## migrationの生成
+
 `$ sea-orm-cli migrate generate <migration名>`
+
 ## dbのリセット
+
 `$ sea-orm-cli migrate refresh -u postgres://root:root@localhost/koudaisai-portal`
 
 ## db up
 
 `$ sea-orm-cli migrate up -u postgres://root:root@localhost/koudaisai-portal`
+
 ## entityの生成
+
 `$ sea-orm-cli generate entity -u postgres://root:root@localhost/koudaisai-portal -o ./src/sea_orm_entities`
+
 # デバッグ用データ挿入クエリ
+
 ```postgresql
 BEGIN;
 INSERT INTO users (id, first_name, last_name, m_address, exhibition_id)

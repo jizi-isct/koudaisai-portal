@@ -8,10 +8,10 @@
 graph TD
     User([ユーザー/団体]) <--> Frontend[フロントエンド: apps/portal, apps/join<br/>Astro]
     Admin([管理者: JIZI]) <--> AdminFrontend[管理画面: apps/admin<br/>Astro]
-    
+
     Frontend <--> Backend[バックエンド: apps/backend<br/>Rust/Axum]
     AdminFrontend <--> Backend
-    
+
     subgraph "External Services / Infrastructure"
         Backend <--> DB[(PostgreSQL)]
         Backend <--> S3[S3: Wasabi<br/>オブジェクトストレージ]
@@ -25,21 +25,25 @@ graph TD
 ## フロントエンド (`apps/portal`, `apps/admin`, `apps/join`)
 
 ### 技術スタック
+
 - **Framework**: Astro (TypeScript)
 - **State Management**: React Context / Hooks
 
 ### 特徴・配信手法
+
 - **静的配信**:
   各フロントエンドアプリのビルド時に HTML/JS/CSS を生成します．
 
 ## バックエンド (`apps/backend`)
 
 ### 技術スタック
+
 - **Language**: Rust
 - **Web Framework**: Axum (Tokio stack)
 - **ORM**: SeaORM (PostgreSQL)
 
 ### 内部構造 (Layered Architecture)
+
 バックエンドは以下の役割ごとにレイヤー化されています．
 
 1. **Routes (`src/routes`)**:
@@ -56,6 +60,7 @@ graph TD
    JWT操作，ハッシュ計算，OIDCクライアントなどの共通ユーティリティ．
 
 ### 認証の仕組み
+
 本システムでは，対象ユーザーに応じて2種類の認証方式を併用しています．
 
 - **管理者 (JIZI)**:
@@ -66,10 +71,12 @@ graph TD
 ## インフラ・外部連携
 
 ### データの永続化
+
 - **PostgreSQL**: 団体情報，申請データ，お知らせ，ユーザー情報などの構造化データを管理します．
 - **S3 (Wasabi)**: 団体がアップロードした資料や，配布資料のPDFファイルなどを格納します．
 
 ### 外部連携
+
 - **外部企画情報API (`api2025.jizi.jp`)**:
   既存の企画管理システムと連携し，企画情報の同期や更新（承認後の反映など）を行います．
 - **通知連携**:

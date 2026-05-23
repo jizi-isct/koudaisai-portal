@@ -1,1 +1,7 @@
-{"actor": {"User": {}}, "form_exists": true, "new_name": "Updated Form", "new_summary": null, "expected": "unauthorized"}
+{
+  "actor": { "User": {} },
+  "form_exists": true,
+  "new_name": "Updated Form",
+  "new_summary": null,
+  "expected": "unauthorized"
+}

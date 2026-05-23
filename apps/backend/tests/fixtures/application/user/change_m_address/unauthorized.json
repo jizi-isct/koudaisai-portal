@@ -1,1 +1,1 @@
-{"actor": "Nologin", "target_exists": true, "expected": "unauthorized"}
+{ "actor": "Nologin", "target_exists": true, "expected": "unauthorized" }
