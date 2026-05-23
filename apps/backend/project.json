@@ -17,7 +17,7 @@
         "cwd": "apps/backend"
       }
     },
-    "format-check": {
+    "format:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo fmt --all -- --check",
@@ -47,9 +47,7 @@
           "KOUDAISAI_PORTAL_CONFIG_PATH": "./debug/default-config.toml"
         }
       },
-      "dependsOn": [
-        "docker-up"
-      ]
+      "dependsOn": ["docker-up"]
     },
     "lint": {
       "executor": "nx:run-commands",
