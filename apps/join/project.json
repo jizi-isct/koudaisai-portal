@@ -7,14 +7,31 @@
     "@koudaisai/shared-api"
   ],
   "targets": {
-    "build": {
+    "build:development": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "command": "astro build",
+        "command": "astro build --mode development",
         "cwd": "apps/join"
       },
       "dependsOn": ["^build"]
+    },
+    "build:production": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "astro build --mode production",
+        "cwd": "apps/join"
+      },
+      "dependsOn": ["^build"]
+    },
+    "deploy:production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx wrangler deploy",
+        "cwd": "apps/join"
+      },
+      "dependsOn": ["build:production"]
     },
     "dev": {
       "executor": "nx:run-commands",

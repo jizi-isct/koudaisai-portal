@@ -12,14 +12,31 @@
     "@koudaisai/shared-utils"
   ],
   "targets": {
-    "build": {
+    "build:development": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "command": "astro build",
+        "command": "astro build --mode development",
         "cwd": "apps/portal"
       },
       "dependsOn": ["^build"]
+    },
+    "build:production": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "astro build --mode production",
+        "cwd": "apps/portal"
+      },
+      "dependsOn": ["^build"]
+    },
+    "deploy:production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx wrangler deploy",
+        "cwd": "apps/portal"
+      },
+      "dependsOn": ["build:production"]
     },
     "dev": {
       "executor": "nx:run-commands",
