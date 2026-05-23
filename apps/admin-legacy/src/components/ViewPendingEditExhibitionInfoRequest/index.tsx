@@ -1,7 +1,6 @@
 import {ApprovalRequestRead} from "@koudaisai/shared-types";
 import {BasePlanRead} from "@koudaisai/shared-types";
 import {getFilesRedirectUrl} from "@koudaisai/shared-utils";
-import Image from "next/image";
 import React from "react";
 
 type Props = {
@@ -29,14 +28,14 @@ export function ViewPendingEditExhibitionInfoRequest({approvalRequest, plan}: Pr
         approvalRequest.type_edit_exhibition_info.icon_key ?
           <div>
             <h3>変更前</h3>
-            <Image
+            <img
               src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${plan.id}/icon`}
               alt={"現在の企画のアイコン"}
               width={128}
               height={128}
             />
             <h3>変更後</h3>
-            <Image
+            <img
               src={getFilesRedirectUrl(approvalRequest.type_edit_exhibition_info.icon_key)}
               alt={"新しい企画アイコン"}
               width={128}

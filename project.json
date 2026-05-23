@@ -5,7 +5,13 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many --target dev -p backend web --parallel"
+        "command": "nx run-many --target dev -p backend portal admin join --parallel & caddy run --config dev/Caddyfile --adapter caddyfile"
+      }
+    },
+    "dev-proxy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "caddy run --config dev/Caddyfile --adapter caddyfile"
       }
     },
     "local-registry": {

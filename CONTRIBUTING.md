@@ -4,13 +4,25 @@ We welcome contributions to this repository!
 
 ## 開発環境を構築する
 
-1. 以下のツールをインストールする．
-    - Rust
-    - Node.js
-    - Docker
-    - Docker Compose
-    - [cargo-watch](https://github.com/watchexec/cargo-watch)
-2. **依存関係をインストール** 
+このリポジトリでは Nix flakes を使って開発に必要なツールを揃えます．`flake.nix` で管理している主なツールは Rust，Node.js，cargo-watch，git です．
+
+### 事前に必要なもの
+
+- [Nix](https://nixos.org/download/)
+- [direnv](https://direnv.net/)
+- Docker Desktop など，Docker daemon を起動できる環境
+
+Docker と Docker Compose は開発用 DB・Keycloak の起動に使います．Nix の dev shell には Docker daemon は含まれないため，`npx nx docker-up backend` を実行する前に Docker Desktop などを起動してください．
+
+### セットアップ手順
+
+1. **direnv で Nix の開発環境を有効化**
+    ```shell
+    direnv allow
+    ```
+
+    以降はリポジトリディレクトリに入ると自動で Nix の開発環境が有効になります．
+2. **依存関係をインストール**
     リポジトリルートで
     ```shell
     npm ci
@@ -47,7 +59,14 @@ We welcome contributions to this repository!
     ```shell
     npx nx dev
     ```
-    フロントエンドは`localhost:3000`，バックエンドは`localhost:8000`でホストされます．
+
+    次の URL で各アプリケーションにアクセスできます．
+    - portal: `http://portal.koudaisai.localhost`
+    - admin: `http://admin.koudaisai.localhost`
+    - join: `http://join.koudaisai.localhost`
+    - backend API: `http://api.koudaisai.localhost`
+
+    Caddy が 80 番ポートを利用できない環境では，管理者権限での実行が必要になる場合があります．
 
 ## 貢献の方法 / How to Contribute
 1. Issue を立てるか，既存の Issue を確認して，取り組みたいものを見つける．

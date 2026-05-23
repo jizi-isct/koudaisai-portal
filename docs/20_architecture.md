@@ -6,10 +6,11 @@
 
 ```mermaid
 graph TD
-    User([ユーザー/団体]) <--> Frontend[フロントエンド: apps/web<br/>Next.js]
-    Admin([管理者: JIZI]) <--> Frontend
+    User([ユーザー/団体]) <--> Frontend[フロントエンド: apps/portal, apps/join<br/>Astro]
+    Admin([管理者: JIZI]) <--> AdminFrontend[管理画面: apps/admin<br/>Astro]
     
     Frontend <--> Backend[バックエンド: apps/backend<br/>Rust/Axum]
+    AdminFrontend <--> Backend
     
     subgraph "External Services / Infrastructure"
         Backend <--> DB[(PostgreSQL)]
@@ -21,15 +22,15 @@ graph TD
     end
 ```
 
-## フロントエンド (`apps/web`)
+## フロントエンド (`apps/portal`, `apps/admin`, `apps/join`)
 
 ### 技術スタック
-- **Framework**: Next.js (TypeScript)
+- **Framework**: Astro (TypeScript)
 - **State Management**: React Context / Hooks
 
 ### 特徴・配信手法
-- **SSG (Static Site Generation)**:
-  Next.jsの静的書き出し機能を利用し，ビルド時に HTML/JS/CSS を生成します．
+- **静的配信**:
+  各フロントエンドアプリのビルド時に HTML/JS/CSS を生成します．
 
 ## バックエンド (`apps/backend`)
 

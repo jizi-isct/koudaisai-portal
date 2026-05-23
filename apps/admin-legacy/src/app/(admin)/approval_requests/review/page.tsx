@@ -4,10 +4,10 @@ import {LoadingScreen} from "@koudaisai/shared-ui";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Card, Flex, Form, message, Result, Tag} from 'antd';
 import TextArea from "antd/es/input/TextArea";
-import {useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {ViewPendingEditExhibitionInfoRequest} from "@/components/ViewPendingEditExhibitionInfoRequest";
 import {$apiAdmin} from "@/lib/api";
+import {getSearchParam} from "@/lib/browserNavigation";
 import {$plansInfoApiNoLogin} from "@/lib/plansInfoApi";
 
 type FormValues = {
@@ -15,8 +15,7 @@ type FormValues = {
 }
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const approvalRequestId = searchParams.get("approval_request_id")
+  const approvalRequestId = getSearchParam("approval_request_id")
   if (!approvalRequestId) {
     return (
       <Result

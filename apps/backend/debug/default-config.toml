@@ -5,7 +5,7 @@ json = false
 [web.server]
 host = "0.0.0.0"
 port = 8080
-base_url = "http://localhost:8080/admin"
+base_url = "http://admin.koudaisai.localhost"
 
 [web.auth]
 password_salt = "P3Z9Pya4ixZg73HH"

@@ -20,7 +20,6 @@ import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
 import {useDownload} from "@koudaisai/shared-utils";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Button, Checkbox, Flex, message, Popconfirm, Table, TableProps, Tag, Tooltip, Upload} from "antd";
-import Image from "next/image";
 import objectHash from "object-hash";
 import Papa from "papaparse";
 import {$plansInfoApiAdmin} from "@/lib/plansInfoApi";
@@ -487,7 +486,7 @@ function Inner() {
       dataIndex: "id",
       rowScope: "row",
       render: (_value, record) => (
-        <Image
+        <img
           src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${record.id}/icon`}
           alt={"企画のアイコン"}
           width={128}
