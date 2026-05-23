@@ -12,4 +12,4 @@ get:
             items:
               $ref: ../components/schemas/group/GroupRead.yml
   security:
-    - admin_oidc: [ ]
+    - admin_oidc: []

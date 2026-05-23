@@ -1,29 +1,29 @@
-import styles from "./FormCard.module.css";
-import {FormRead} from "@koudaisai/shared-types";
-import {useMemo} from "react";
+import styles from './FormCard.module.css';
+import { FormRead } from '@koudaisai/shared-types';
+import { useMemo } from 'react';
 
 type FormCardProps = {
-  form: FormRead
+  form: FormRead;
 };
 
-export function FormCard({form}: FormCardProps) {
+export function FormCard({ form }: FormCardProps) {
   const formLink = useMemo(() => {
     if ('type_external' in form) {
       return form.type_external.form_url;
     } else {
       return `/forms/form?formId=${form.id}`;
     }
-  }, [form])
+  }, [form]);
 
   // フォームの回答期限を12/12 12:34のような形式で表示
   const formattedDueDate = useMemo(() => {
-    if (!form.due_date) return "なし";
+    if (!form.due_date) return 'なし';
 
-    return new Intl.DateTimeFormat("ja-JP", {
-      month: "numeric",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Intl.DateTimeFormat('ja-JP', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: false,
     }).format(new Date(form.due_date));
   }, [form.due_date]);
@@ -34,5 +34,5 @@ export function FormCard({form}: FormCardProps) {
       <p className={styles.summary}>{form.summary}</p>
       <h2 className={styles.dueDate}>回答期限: {formattedDueDate}</h2>
     </a>
-  )
+  );
 }

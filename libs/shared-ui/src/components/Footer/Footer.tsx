@@ -1,31 +1,43 @@
-"use client";
+'use client';
 
-import styles from "./Footer.module.css";
-import membersLogo from "./assets/members_logo.svg"
+import styles from './Footer.module.css';
+import membersLogo from './assets/members_logo.svg';
 
-export const Footer = ({isLoggedIn}: {isLoggedIn ?: boolean}) => {
+export const Footer = ({ isLoggedIn }: { isLoggedIn?: boolean }) => {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoWrapper}>
         <img
-          src={typeof membersLogo === "string" ? membersLogo : membersLogo.src}
+          src={typeof membersLogo === 'string' ? membersLogo : membersLogo.src}
           alt="Koudaisai Portal Members Site Logo"
           width={40}
           height={40}
         />
       </div>
       <div className={styles.navWrapper}>
-        <a href="/" className={styles.navItem}>ホーム</a>
-        <a href="/forms/" className={styles.navItem}>フォーム</a>
-        <a href="/documents/" className={styles.navItem}>資料</a>
-        <a href="/questions/" className={styles.navItem}>よくある質問</a>
+        <a href="/" className={styles.navItem}>
+          ホーム
+        </a>
+        <a href="/forms/" className={styles.navItem}>
+          フォーム
+        </a>
+        <a href="/documents/" className={styles.navItem}>
+          資料
+        </a>
+        <a href="/questions/" className={styles.navItem}>
+          よくある質問
+        </a>
       </div>
       <p className={styles.contacts}>
-        公式LINEアカウント：{
-        isLoggedIn === undefined ? <>...</> : isLoggedIn
-          ? <a href={"https://lin.ee/9Sud7lK"}>https://lin.ee/9Sud7lK</a>
-          : <a href={"https://lin.ee/43ugikz"}>https://lin.ee/43ugikz</a>
-      } <br/>
+        公式LINEアカウント：
+        {isLoggedIn === undefined ? (
+          <>...</>
+        ) : isLoggedIn ? (
+          <a href={'https://lin.ee/9Sud7lK'}>https://lin.ee/9Sud7lK</a>
+        ) : (
+          <a href={'https://lin.ee/43ugikz'}>https://lin.ee/43ugikz</a>
+        )}{' '}
+        <br />
         メールアドレス([at]を@に置き換えてください)：sanka[at]koudaisai.jp
       </p>
       <p className={styles.copyrightText}>©︎ 2025 JIZI All Rights Reserved.</p>

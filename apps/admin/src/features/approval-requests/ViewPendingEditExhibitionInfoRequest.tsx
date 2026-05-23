@@ -1,12 +1,18 @@
-import type {ApprovalRequestRead, BasePlanRead} from "@koudaisai/shared-types";
-import {getFilesRedirectUrl} from "@koudaisai/shared-utils";
+import type {
+  ApprovalRequestRead,
+  BasePlanRead,
+} from '@koudaisai/shared-types';
+import { getFilesRedirectUrl } from '@koudaisai/shared-utils';
 
 type Props = {
   approvalRequest: ApprovalRequestRead;
   plan: BasePlanRead;
 };
 
-export function ViewPendingEditExhibitionInfoRequest({approvalRequest, plan}: Props) {
+export function ViewPendingEditExhibitionInfoRequest({
+  approvalRequest,
+  plan,
+}: Props) {
   return (
     <div>
       <h2>企画内容紹介文</h2>
@@ -33,7 +39,9 @@ export function ViewPendingEditExhibitionInfoRequest({approvalRequest, plan}: Pr
           />
           <h3>変更後</h3>
           <img
-            src={getFilesRedirectUrl(approvalRequest.type_edit_exhibition_info.icon_key)}
+            src={getFilesRedirectUrl(
+              approvalRequest.type_edit_exhibition_info.icon_key,
+            )}
             alt="新しい企画アイコン"
             width={128}
             height={128}

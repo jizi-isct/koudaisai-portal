@@ -1,33 +1,33 @@
 .footer {
-    background-color: white;
-    width: 100%;
-    text-align: center;
-    padding: 20px 0;
-    box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
 }
 
 .navWrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
 }
 
-.navItem {  
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
+.navItem {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .contacts {
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
 }
 
 .copyrightText {
-    font-size: 10px;
-    font-style: normal;
-    font-weight: 500;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
 }

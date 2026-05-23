@@ -1,8 +1,8 @@
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Flex, Form, Input, message, Result} from "antd";
-import {useEffect, useState} from "react";
-import {$api} from "@/features/api/api";
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Button, Flex, Form, Input, message, Result } from 'antd';
+import { useEffect, useState } from 'react';
+import { $api } from '@/features/api/api';
 
 type FormValues = {
   title: string;
@@ -14,7 +14,9 @@ export function EditDocumentCategoryPage() {
   const [categoryId, setCategoryId] = useState<string | null>();
 
   useEffect(() => {
-    setCategoryId(new URLSearchParams(window.location.search).get("category_id"));
+    setCategoryId(
+      new URLSearchParams(window.location.search).get('category_id'),
+    );
   }, []);
 
   if (categoryId === undefined) {
@@ -43,23 +45,24 @@ export function EditDocumentCategoryPage() {
   );
 }
 
-function EditDocumentCategoryForm({categoryId}: {categoryId: string}) {
+function EditDocumentCategoryForm({ categoryId }: { categoryId: string }) {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const {data: documentCategoryRead, isLoading, error, refetch} = $api.useQuery(
-    "get",
-    "/document-categories/{category_id}",
-    {
-      params: {
-        path: {
-          category_id: categoryId,
-        },
+  const {
+    data: documentCategoryRead,
+    isLoading,
+    error,
+    refetch,
+  } = $api.useQuery('get', '/document-categories/{category_id}', {
+    params: {
+      path: {
+        category_id: categoryId,
       },
     },
-  );
-  const {mutateAsync: mutateDocumentCategoryUpdate} = $api.useMutation(
-    "patch",
-    "/document-categories/{category_id}",
+  });
+  const { mutateAsync: mutateDocumentCategoryUpdate } = $api.useMutation(
+    'patch',
+    '/document-categories/{category_id}',
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -84,7 +87,7 @@ function EditDocumentCategoryForm({categoryId}: {categoryId: string}) {
 
   const handleSubmit = async (values: FormValues) => {
     setSubmitting(true);
-    messageApi.loading("保存中...");
+    messageApi.loading('保存中...');
     try {
       await mutateDocumentCategoryUpdate({
         params: {
@@ -106,7 +109,7 @@ function EditDocumentCategoryForm({categoryId}: {categoryId: string}) {
 
     setSubmitting(false);
     messageApi.destroy();
-    messageApi.success("保存しました");
+    messageApi.success('保存しました');
     await refetch();
   };
 
@@ -122,7 +125,11 @@ function EditDocumentCategoryForm({categoryId}: {categoryId: string}) {
       >
         <h1>資料カテゴリを編集</h1>
         <Form.Item name="emoji" label="絵文字">
-          <Input placeholder="アイコン絵文字を入力してください" addonBefore="絵文字" style={{width: "100%"}} />
+          <Input
+            placeholder="アイコン絵文字を入力してください"
+            addonBefore="絵文字"
+            style={{ width: '100%' }}
+          />
         </Form.Item>
 
         <Form.Item name="title" label="タイトル" required>

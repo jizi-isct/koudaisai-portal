@@ -1,1 +1,6 @@
-{"actor": "Nologin", "group_id": "P-001", "group_name": "New Group", "expected": "unauthorized"}
+{
+  "actor": "Nologin",
+  "group_id": "P-001",
+  "group_name": "New Group",
+  "expected": "unauthorized"
+}

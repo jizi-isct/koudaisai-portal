@@ -6,7 +6,7 @@ services:
     build: .
     platform: linux/amd64
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - keycloak-data:/opt/keycloak/data
       - ./kc-init-realms:/opt/keycloak/data/import
@@ -15,7 +15,7 @@ services:
     image: postgres:14
     platform: linux/amd64
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db-store:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
@@ -24,7 +24,11 @@ services:
       POSTGRES_PASSWORD: 'root'
       POSTGRES_DB: 'koudaisai-portal'
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1" ]
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1',
+        ]
       interval: 10s
       timeout: 10s
       retries: 5

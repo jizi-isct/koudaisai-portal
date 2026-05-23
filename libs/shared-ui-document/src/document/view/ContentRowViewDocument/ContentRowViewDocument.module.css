@@ -1,50 +1,50 @@
 .root {
-    display: flex;
+  display: flex;
 
-    height: 2.5em;
+  height: 2.5em;
 
-    margin: 0.1em 1em;
+  margin: 0.1em 1em;
 
-    justify-content: center;
+  justify-content: center;
 }
 
 .document {
-    flex: 1 1 auto;
+  flex: 1 1 auto;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    min-width: 0;
+  min-width: 0;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .document > span {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .document:hover {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .download {
-    flex-grow: 0;
-    flex-shrink: 0;
+  flex-grow: 0;
+  flex-shrink: 0;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .download:hover {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 @media screen and (max-width: 768px) {
-    .download > span {
-        display: none;
-    }
+  .download > span {
+    display: none;
+  }
 }

@@ -1,8 +1,8 @@
-import type {GroupRead, UserRead} from "@koudaisai/shared-types";
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {useEffect, useState} from "react";
-import {api} from "@/features/api/api";
-import {UserInfoCard} from "./UserInfoCard";
+import type { GroupRead, UserRead } from '@koudaisai/shared-types';
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { useEffect, useState } from 'react';
+import { api } from '@/features/api/api';
+import { UserInfoCard } from './UserInfoCard';
 
 export function ViewUserInfo() {
   const [user, setUser] = useState<UserRead | null>(null);
@@ -12,21 +12,26 @@ export function ViewUserInfo() {
 
   useEffect(() => {
     (async () => {
-      const {data: user, error: userError} = await api.GET("/users/{user_id}", {
-        params: {
-          path: {
-            user_id: "me",
+      const { data: user, error: userError } = await api.GET(
+        '/users/{user_id}',
+        {
+          params: {
+            path: {
+              user_id: 'me',
+            },
           },
         },
-      });
+      );
 
       if (userError || !user) {
-        setError(userError ? `${userError}` : "ユーザー情報を取得できませんでした。");
+        setError(
+          userError ? `${userError}` : 'ユーザー情報を取得できませんでした。',
+        );
         setIsLoading(false);
         return;
       }
 
-      const {data: group, error: groupError} = await api.GET("/groups/{id}", {
+      const { data: group, error: groupError } = await api.GET('/groups/{id}', {
         params: {
           path: {
             id: user.group_id,
@@ -35,7 +40,9 @@ export function ViewUserInfo() {
       });
 
       if (groupError || !group) {
-        setError(groupError ? `${groupError}` : "団体情報を取得できませんでした。");
+        setError(
+          groupError ? `${groupError}` : '団体情報を取得できませんでした。',
+        );
         setIsLoading(false);
         return;
       }

@@ -1,1 +1,1 @@
-export * from "./HeadingViewDocumentCategory"
+export * from './HeadingViewDocumentCategory';

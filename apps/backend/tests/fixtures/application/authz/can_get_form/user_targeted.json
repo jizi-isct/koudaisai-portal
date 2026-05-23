@@ -5,8 +5,6 @@
       "group_ids": []
     }
   },
-  "form_targets": [
-    "press"
-  ],
+  "form_targets": ["press"],
   "expected": true
 }

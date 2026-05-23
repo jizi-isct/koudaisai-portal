@@ -4,2999 +4,3030 @@
  */
 
 export interface paths {
-    "/groups": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** すべての団体を取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["GroupRead"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/groups/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** すべての団体を取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['GroupRead'][];
+          };
         };
-        /**
-         * 団体を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する団体のみ取得可能
-         *     - **admin_oidcの場合**: 存在する全ての団体を取得可能
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体ID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["GroupRead"];
-                    };
-                };
-                /** @description 団体が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        /** 団体を追加 */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体のID */
-                    id: components["schemas"]["GroupId"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["GroupCreate"];
-                };
-            };
-            responses: {
-                /** @description 団体が追加された */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PutGroupResponse"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 団体またはユーザーがすでに存在する */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        post?: never;
-        /** 団体を削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体ID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 団体が削除された */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 団体が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        /**
-         * 団体を編集
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する団体のみ編集可能
-         *     - **admin_oidcの場合**: 存在する全ての団体を編集可能
-         */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体ID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["GroupUpdate"];
-                };
-            };
-            responses: {
-                /** @description 団体が編集された */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 団体が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        trace?: never;
+      };
     };
-    "/groups/{id}/plan-details": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 企画の詳細情報を取得
-         * @description 自分が属する団体の企画のみ取得可能。取材団体等の企画と紐付けされていない団体は404が返されます。
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体のID */
-                    id: components["schemas"]["GroupId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PlanDetailsRead"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 企画が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        /**
-         * 企画詳細情報を上書き
-         * @description 自分が属する団体のみ上書き可能
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 団体のID */
-                    id: components["schemas"]["GroupId"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["PlanDetailsCreate"];
-                };
-            };
-            responses: {
-                /** @description 企画情報が正常に編集された */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 企画が存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/groups/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/forms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * 団体を取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が属する団体のみ取得可能
+     *     - **admin_oidcの場合**: 存在する全ての団体を取得可能
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体ID */
+          id: string;
         };
-        /**
-         * アクセス可能なフォームをすべて取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームを取得
-         *     - **admin_oidcの場合**: 存在するフォームを全て取得
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["FormRead"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['GroupRead'];
+          };
         };
-        put?: never;
-        /** フォームを新規作成 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["FormCreate"];
-                };
-            };
-            responses: {
-                /** @description NoContent */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 団体が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/forms/{form_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** 団体を追加 */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体のID */
+          id: components['schemas']['GroupId'];
         };
-        /**
-         * フォームを取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームな場合取得
-         *     - **admin_oidcの場合**: 存在するフォームを全て取得
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["FormRead"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['GroupCreate'];
         };
-        put?: never;
-        post?: never;
-        /** フォームを削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description 団体が追加された */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PutGroupResponse'];
+          };
         };
-        options?: never;
-        head?: never;
-        /** フォームを更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    form_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["FormUpdate"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        trace?: never;
+        /** @description 団体またはユーザーがすでに存在する */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/documents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    post?: never;
+    /** 団体を削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体ID */
+          id: string;
         };
-        /**
-         * アクセス可能な資料をすべて取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料を取得
-         *     - **admin_oidcの場合**: 存在する資料を全て取得
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocument"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 団体が削除された */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        /** 資料を新規作成 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateDocument"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocument"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 団体が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/documents/by-category": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    options?: never;
+    head?: never;
+    /**
+     * 団体を編集
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が属する団体のみ編集可能
+     *     - **admin_oidcの場合**: 存在する全ての団体を編集可能
+     */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体ID */
+          id: string;
         };
-        /**
-         * 資料カテゴリと資料のマップを取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
-         *     - **admin_oidcの場合**: 存在する資料を全て取得可能
-         */
-        get: {
-            parameters: {
-                query?: {
-                    /**
-                     * @description 空のカテゴリも含めるかどうか。デフォルトは`false`。
-                     *     `true`の場合、資料が存在しないカテゴリも含まれる。
-                     */
-                    include_empty_categories?: boolean;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            category: components["schemas"]["ReadDocumentCategory"] | null;
-                            documents: components["schemas"]["ReadDocument"][];
-                        }[];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['GroupUpdate'];
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description 団体が編集された */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 団体が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/documents/{document_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 資料を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
-         *     - **admin_oidcの場合**: 存在する資料を全て取得可能
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料のID */
-                    document_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocument"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        /** 資料を削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description フォームID */
-                    document_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 削除成功 */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        /** 資料を更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料のID */
-                    document_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateDocument"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocument"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        trace?: never;
+    trace?: never;
+  };
+  '/groups/{id}/plan-details': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/document-categories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * 企画の詳細情報を取得
+     * @description 自分が属する団体の企画のみ取得可能。取材団体等の企画と紐付けされていない団体は404が返されます。
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体のID */
+          id: components['schemas']['GroupId'];
         };
-        /** 資料カテゴリをすべて取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocumentCategory"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PlanDetailsRead'];
+          };
         };
-        put?: never;
-        /** 資料カテゴリを新規作成 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateDocumentCategory"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocumentCategory"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 企画が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/document-categories/{category_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * 企画詳細情報を上書き
+     * @description 自分が属する団体のみ上書き可能
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 団体のID */
+          id: components['schemas']['GroupId'];
         };
-        /** 資料カテゴリを取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料カテゴリのID */
-                    category_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocumentCategory"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['PlanDetailsCreate'];
         };
-        put?: never;
-        post?: never;
-        /** 資料カテゴリを削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description カテゴリID */
-                    category_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 削除成功 */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description 企画情報が正常に編集された */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        options?: never;
-        head?: never;
-        /** 資料カテゴリを更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 資料カテゴリのID */
-                    category_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateDocumentCategory"];
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadDocumentCategory"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        trace?: never;
+        /** @description 企画が存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/files/upload": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** ファイルのアップロードurlを取得 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        file_name: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            presigned_url: string;
-                            key: string;
-                        };
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/forms': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/files/download": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * アクセス可能なフォームをすべて取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームを取得
+     *     - **admin_oidcの場合**: 存在するフォームを全て取得
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['FormRead'][];
+          };
         };
-        /** ファイルのダウンロードurlを取得 */
-        get: {
-            parameters: {
-                query: {
-                    key: string;
-                    file_name: string;
-                    /** @description リダイレクトするかどうか．デフォルト値は`false` */
-                    redirect?: boolean;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Changed */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            presigned_url?: string;
-                        };
-                    };
-                };
-                /** @description redirect=trueの場合に返される．リソースへのリダイレクト */
-                302: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    /** フォームを新規作成 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['FormCreate'];
         };
-        /** ユーザーを全て取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserRead"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description NoContent */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/users/{user_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * ユーザー情報を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
-         *     - **admin_oidcの場合**: いかなるユーザー情報も取得可能
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーID */
-                    user_id: components["schemas"]["UserId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserRead"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** ユーザー情報を更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーID */
-                    user_id: components["schemas"]["UserId"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UserUpdate"];
-                };
-            };
-            responses: {
-                /** @description 更新成功 */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        trace?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/forms/{form_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/{user_id}/notifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * フォームを取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: targetに基づいてアクセス可能なフォームな場合取得
+     *     - **admin_oidcの場合**: 存在するフォームを全て取得
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description フォームID */
+          form_id: string;
         };
-        /** そのユーザー向けの通知と既読状況を取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーID */
-                    user_id: components["schemas"]["UserId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            notification: components["schemas"]["NotificationRead"];
-                            /**
-                             * @description その通知が既読かどうかを示すフラグ
-                             *     trueの場合、通知は既読であることを示す
-                             */
-                            is_read: boolean;
-                        }[];
-                    };
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['FormRead'];
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/users/{user_id}/approval_requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post?: never;
+    /** フォームを削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description フォームID */
+          form_id: string;
         };
-        /** 承認申請をすべて取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーのID */
-                    user_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadApprovalRequest"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        /** 承認申請を新規作成 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーのID */
-                    user_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateApprovalRequest"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description フォームが存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/users/{user_id}/approval_requests/{request_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    options?: never;
+    head?: never;
+    /** フォームを更新 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description フォームID */
+          form_id: string;
         };
-        /** 承認申請を取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーのID */
-                    user_id: string;
-                    /** @description 承認申請のID */
-                    request_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadApprovalRequest"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 承認申請が存在しないか、アクセス権限がない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['FormUpdate'];
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/users/{user_id}/approval_requests/{request_id}/close": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 承認申請を取り下げる */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーのID */
-                    user_id: string;
-                    /** @description 承認申請のID */
-                    request_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    trace?: never;
+  };
+  '/documents': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/{user_id}/m_address": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * アクセス可能な資料をすべて取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料を取得
+     *     - **admin_oidcの場合**: 存在する資料を全て取得
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocument'][];
+          };
         };
-        get?: never;
-        put?: never;
-        /** mアドレスを変更する */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description ユーザーのID */
-                    user_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /**
-                         * Format: email
-                         * @description 新しいmアドレス
-                         */
-                        m_address: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @description 新規mアドレスを有効化するためのアクティベーショントークン */
-                            activation_token?: string;
-                        };
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/notifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    /** 資料を新規作成 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateDocument'];
         };
-        /** 全ての通知を取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotificationRead"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocument'];
+          };
         };
-        put?: never;
-        /** 通知を新規作成 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["NotificationCreate"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/notifications/{notification_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 通知を取得
-         * @description ### authの違いによる挙動の違い
-         *     - **exhibitor_bearerの場合**: 自分が通知対象である場合通知を取得可能
-         *     - **admin_oidcの場合**: 存在する通知を全て取得可能
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 通知id */
-                    notification_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotificationRead"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        /** 通知を削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 通知ID */
-                    notification_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        /** 通知を更新 */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 通知ID */
-                    notification_id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["NotificationUpdate"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        trace?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/documents/by-category': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/util/meta": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * 資料カテゴリと資料のマップを取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
+     *     - **admin_oidcの場合**: 存在する資料を全て取得可能
+     */
+    get: {
+      parameters: {
+        query?: {
+          /**
+           * @description 空のカテゴリも含めるかどうか。デフォルトは`false`。
+           *     `true`の場合、資料が存在しないカテゴリも含まれる。
+           */
+          include_empty_categories?: boolean;
         };
-        /** ページのメタデータを取得 */
-        get: {
-            parameters: {
-                query: {
-                    /** @description フォームID */
-                    url: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @description The title of the page. */
-                            title: string | null;
-                            /** @description The description of the page. */
-                            description: string | null;
-                        };
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              category: components['schemas']['ReadDocumentCategory'] | null;
+              documents: components['schemas']['ReadDocument'][];
+            }[];
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/approval-requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 承認申請をすべて取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadApprovalRequest"][];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/documents/{document_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/approval-requests/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /**
+     * 資料を取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が属する参加団体の属性に基づいてアクセス可能な資料な場合取得
+     *     - **admin_oidcの場合**: 存在する資料を全て取得可能
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 資料のID */
+          document_id: string;
         };
-        /** 承認申請を取得 */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ReadApprovalRequest"];
-                    };
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocument'];
+          };
         };
-        put?: never;
-        post?: never;
-        /** 承認申請を削除 */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 削除成功 */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description フォームが存在しない */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/approval-requests/{id}/approve": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post?: never;
+    /** 資料を削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description フォームID */
+          document_id: string;
         };
-        get?: never;
-        put?: never;
-        /** 承認申請を承認 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** @description 承認理由 */
-                        approval_reason: string | null;
-                    };
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 削除成功 */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description フォームが存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/approval-requests/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    options?: never;
+    head?: never;
+    /** 資料を更新 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 資料のID */
+          document_id: string;
         };
-        get?: never;
-        put?: never;
-        /** 承認申請を却下 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description 承認申請のID */
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** @description 承認理由 */
-                        approval_reason: string | null;
-                    };
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 不正なrequest bodyの形式 */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description 資格情報が無効だった場合 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description サーバーエラー */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateDocument'];
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocument'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
+    trace?: never;
+  };
+  '/document-categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 資料カテゴリをすべて取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocumentCategory'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    /** 資料カテゴリを新規作成 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateDocumentCategory'];
+        };
+      };
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocumentCategory'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/document-categories/{category_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 資料カテゴリを取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 資料カテゴリのID */
+          category_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocumentCategory'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /** 資料カテゴリを削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description カテゴリID */
+          category_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 削除成功 */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description フォームが存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    /** 資料カテゴリを更新 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 資料カテゴリのID */
+          category_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateDocumentCategory'];
+        };
+      };
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadDocumentCategory'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    trace?: never;
+  };
+  '/files/upload': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** ファイルのアップロードurlを取得 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            file_name: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              presigned_url: string;
+              key: string;
+            };
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/files/download': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ファイルのダウンロードurlを取得 */
+    get: {
+      parameters: {
+        query: {
+          key: string;
+          file_name: string;
+          /** @description リダイレクトするかどうか．デフォルト値は`false` */
+          redirect?: boolean;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Changed */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              presigned_url?: string;
+            };
+          };
+        };
+        /** @description redirect=trueの場合に返される．リソースへのリダイレクト */
+        302: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ユーザーを全て取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRead'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{user_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * ユーザー情報を取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: ユーザーが自身の所属する参加団体に所属している場合のみ取得可能
+     *     - **admin_oidcの場合**: いかなるユーザー情報も取得可能
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーID */
+          user_id: components['schemas']['UserId'];
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRead'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** ユーザー情報を更新 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーID */
+          user_id: components['schemas']['UserId'];
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UserUpdate'];
+        };
+      };
+      responses: {
+        /** @description 更新成功 */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    trace?: never;
+  };
+  '/users/{user_id}/notifications': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** そのユーザー向けの通知と既読状況を取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーID */
+          user_id: components['schemas']['UserId'];
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              notification: components['schemas']['NotificationRead'];
+              /**
+               * @description その通知が既読かどうかを示すフラグ
+               *     trueの場合、通知は既読であることを示す
+               */
+              is_read: boolean;
+            }[];
+          };
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{user_id}/approval_requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 承認申請をすべて取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadApprovalRequest'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    /** 承認申請を新規作成 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateApprovalRequest'];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{user_id}/approval_requests/{request_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 承認申請を取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+          /** @description 承認申請のID */
+          request_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadApprovalRequest'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 承認申請が存在しないか、アクセス権限がない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{user_id}/approval_requests/{request_id}/close': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 承認申請を取り下げる */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+          /** @description 承認申請のID */
+          request_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{user_id}/m_address': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** mアドレスを変更する */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ユーザーのID */
+          user_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            /**
+             * Format: email
+             * @description 新しいmアドレス
+             */
+            m_address: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @description 新規mアドレスを有効化するためのアクティベーショントークン */
+              activation_token?: string;
+            };
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 全ての通知を取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['NotificationRead'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    /** 通知を新規作成 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['NotificationCreate'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/{notification_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * 通知を取得
+     * @description ### authの違いによる挙動の違い
+     *     - **exhibitor_bearerの場合**: 自分が通知対象である場合通知を取得可能
+     *     - **admin_oidcの場合**: 存在する通知を全て取得可能
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 通知id */
+          notification_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['NotificationRead'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /** 通知を削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 通知ID */
+          notification_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description フォームが存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    /** 通知を更新 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 通知ID */
+          notification_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['NotificationUpdate'];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    trace?: never;
+  };
+  '/util/meta': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ページのメタデータを取得 */
+    get: {
+      parameters: {
+        query: {
+          /** @description フォームID */
+          url: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @description The title of the page. */
+              title: string | null;
+              /** @description The description of the page. */
+              description: string | null;
+            };
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/approval-requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 承認申請をすべて取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadApprovalRequest'][];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/approval-requests/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 承認申請を取得 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 承認申請のID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReadApprovalRequest'];
+          };
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /** 承認申請を削除 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 承認申請のID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 削除成功 */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description フォームが存在しない */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/approval-requests/{id}/approve': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 承認申請を承認 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 承認申請のID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            /** @description 承認理由 */
+            approval_reason: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/approval-requests/{id}/reject': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 承認申請を却下 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description 承認申請のID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            /** @description 承認理由 */
+            approval_reason: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 不正なrequest bodyの形式 */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description 資格情報が無効だった場合 */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description サーバーエラー */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        BoothRead: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3: string;
-        };
-        GeneralRead: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3: string;
-        };
-        LaboRead: {
-            /**
-             * Format: uuid
-             * @description 代表者 ID
-             */
-            representative: string;
-        };
-        StageRead: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3: string;
-        };
-        PlanRead: {
-            type_booth?: components["schemas"]["BoothRead"];
-            type_general?: components["schemas"]["GeneralRead"];
-            type_labo?: components["schemas"]["LaboRead"];
-            type_stage?: components["schemas"]["StageRead"];
-        };
-        PressRead: {
-            /**
-             * Format: uuid
-             * @description 代表者ID
-             */
-            representative: string;
-        };
-        GroupRead: {
-            /** @description 団体ID */
-            readonly id: string;
-            /**
-             * Format: date-time
-             * @description 作成日時
-             */
-            readonly created_at: string;
-            /**
-             * Format: date-time
-             * @description 最終更新日時
-             */
-            readonly updated_at: string;
-            /**
-             * @description 団体名
-             * @example 工大祭実行委員会
-             */
-            name: string;
-            type_plan?: components["schemas"]["PlanRead"];
-            type_press?: components["schemas"]["PressRead"];
-        };
-        GroupId: string | "us";
-        UserCreate: {
-            /**
-             * @description 名前
-             * @example Paul Johnson
-             */
-            name: string;
-            /**
-             * @description mアドレス(新旧どちらも含む)
-             * @example johnson.p.5703@m.isct.ac.jp
-             */
-            m_address: string;
-        };
-        BoothCreate: {
-            representative1: components["schemas"]["UserCreate"];
-            representative2: components["schemas"]["UserCreate"];
-            representative3: components["schemas"]["UserCreate"];
-        };
-        GeneralCreate: {
-            representative1: components["schemas"]["UserCreate"];
-            representative2: components["schemas"]["UserCreate"];
-            representative3: components["schemas"]["UserCreate"];
-        };
-        LaboCreate: {
-            representative: components["schemas"]["UserCreate"];
-        };
-        StageCreate: {
-            representative1: components["schemas"]["UserCreate"];
-            representative2: components["schemas"]["UserCreate"];
-            representative3: components["schemas"]["UserCreate"];
-        };
-        PlanCreate: {
-            type_booth?: components["schemas"]["BoothCreate"];
-            type_general?: components["schemas"]["GeneralCreate"];
-            type_labo?: components["schemas"]["LaboCreate"];
-            type_stage?: components["schemas"]["StageCreate"];
-        };
-        PressCreate: {
-            representative: components["schemas"]["UserCreate"];
-        };
-        GroupCreate: {
-            /**
-             * @description 団体名
-             * @example 工大祭実行委員会
-             */
-            name: string;
-            type_plan?: components["schemas"]["PlanCreate"];
-            type_press?: components["schemas"]["PressCreate"];
-        };
-        PutGroupResponse: {
-            /** @description 団体新規作成により追加されたユーザーのactivation token */
-            activation_tokens: unknown;
-        };
-        BoothUpdate: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1?: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2?: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3?: string;
-        };
-        GeneralUpdate: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1?: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2?: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3?: string;
-        };
-        LaboUpdate: {
-            /**
-             * Format: uuid
-             * @description 代表者 ID
-             */
-            representative?: string;
-        };
-        StageUpdate: {
-            /**
-             * Format: uuid
-             * @description 代表者1 ID
-             */
-            representative1?: string;
-            /**
-             * Format: uuid
-             * @description 代表者2 ID
-             */
-            representative2?: string;
-            /**
-             * Format: uuid
-             * @description 代表者3 ID
-             */
-            representative3?: string;
-        };
-        PlanUpdate: {
-            type_booth?: components["schemas"]["BoothUpdate"];
-            type_general?: components["schemas"]["GeneralUpdate"];
-            type_labo?: components["schemas"]["LaboUpdate"];
-            type_stage?: components["schemas"]["StageUpdate"];
-        };
-        PressUpdate: {
-            /**
-             * Format: uuid
-             * @description 代表者ID
-             */
-            representative?: string;
-        };
-        GroupUpdate: {
-            /**
-             * @description 団体名
-             * @example 工大祭実行委員会
-             */
-            name?: string;
-            type_plan?: components["schemas"]["PlanUpdate"];
-            type_press?: components["schemas"]["PressUpdate"];
-        };
-        /** @description 当日販売される商品情報（読み取り用） */
-        ProductsRead: {
-            /** @description 商品の一覧 */
-            items: {
-                /** @description 商品名 */
-                name: string;
-                /** @description 値段 */
-                price: number | null;
-                /** @description トッピングやフレーバーなどのオプション */
-                options: {
-                    /** @description 商品名 */
-                    name: string;
-                    /** @description 値段 */
-                    price: number | null;
-                }[];
-            }[];
-            /** @description 商品全体の説明文 */
-            description: string;
-        };
-        PlanDetailsRead: {
-            product?: components["schemas"]["ProductsRead"];
-            /** @description 追加情報（マークダウン形式） */
-            additional_info?: string | null;
-        };
-        /** @description 当日販売される商品情報（更新用） */
-        ProductsCreate: {
-            /** @description 商品の一覧 */
-            items?: {
-                /** @description 商品名 */
-                name?: string;
-                /** @description 値段 */
-                price?: number | null;
-                /** @description トッピングやフレーバーなどのオプション */
-                options?: {
-                    /** @description 商品名 */
-                    name?: string;
-                    /** @description 値段 */
-                    price?: number | null;
-                }[];
-            }[];
-            /** @description 商品全体の説明文 */
-            description?: string;
-        };
-        PlanDetailsCreate: {
-            product?: components["schemas"]["ProductsCreate"];
-            /** @description 追加情報（マークダウン形式） */
-            additional_info?: string | null;
-        };
-        /** @description Target specifier for forms */
-        TargetSpecifier: string & (("group/type/plan_general" | "group/type/plan_booth" | "group/type/plan_stage" | "group/type/plan_labo" | "group/type/press" | "user/nologin") | unknown | unknown);
-        /** @description Generic form properties */
-        FormReadGeneric: {
-            /**
-             * Format: uuid
-             * @description Unique identifier
-             */
-            id: string;
-            /**
-             * Format: date-time
-             * @description Timestamp when the form was created
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description Timestamp when the form was last updated
-             */
-            updated_at: string;
-            /**
-             * Format: uuid
-             * @description User ID of the creator
-             */
-            created_by: string;
-            /**
-             * Format: uuid
-             * @description User ID of the last updater
-             */
-            updated_by: string;
-            /** @description Target specifiers for the form */
-            targets: components["schemas"]["TargetSpecifier"][];
-            /** @description Name of the form */
-            form_name: string;
-            /** @description Summary or description of the form */
-            summary: string;
-            /**
-             * Format: date-time
-             * @description Due date for the form submission
-             */
-            due_date: string | null;
-        };
-        /** @description フォームの一般情報 */
-        Info: {
-            /** @description 回答者に表示されるフォームのタイトル */
-            title: string;
-            /** @description 編集者に表示されるフォームのタイトル */
-            document_title: string;
-            /** @description フォームの説明 */
-            description: string;
-            /**
-             * Format: datetime
-             * @description フォームの回答期限
-             */
-            deadline?: string;
-        };
-        ItemGeneric: {
-            /**
-             * Format: uuid
-             * @description アイテムのID
-             */
-            readonly item_id: string;
-            /** @description 回答者に表示される項目のタイトル */
-            title: string;
-            /** @description 回答者に表示される項目の説明 */
-            description: string;
-        };
-        QuestionGeneric: {
-            /** @description 回答必須かどうか */
-            required: boolean;
-        };
-        /** @description テキスト */
-        QuestionText: {
-            /** @description trueの場合複数行にわたるテキスト。falseの場合一行の回答。 */
-            paragraph: boolean;
-        };
-        /** @description ラジオボタン */
-        QuestionRadioButton: {
-            /** @description 選択肢 */
-            choices: string[];
-        };
-        /** @description チェックボックス */
-        QuestionCheckBox: {
-            /** @description 選択肢 */
-            choices: string[];
-        };
-        /** @description フォームの質問 */
-        Question: components["schemas"]["QuestionGeneric"] & {
-            question_text?: components["schemas"]["QuestionText"];
-            question_radio_button?: components["schemas"]["QuestionRadioButton"];
-            question_check_box?: components["schemas"]["QuestionCheckBox"];
-        };
-        /** @description 一つの質問を含む項目 */
-        ItemQuestion: {
-            question: components["schemas"]["Question"];
-        };
-        /** @description 改ページ */
-        ItemPageBreak: Record<string, never>;
-        /** @description テキスト */
-        ItemText: Record<string, never>;
-        /** @description フォームの単一の項目 */
-        Item: components["schemas"]["ItemGeneric"] & {
-            item_question?: components["schemas"]["ItemQuestion"];
-            item_page_break?: components["schemas"]["ItemPageBreak"];
-            item_text?: components["schemas"]["ItemText"];
-        };
-        /** @description フォーム */
-        Form: {
-            /**
-             * Format: uuid
-             * @description フォームID
-             */
-            readonly form_id?: string;
-            info: components["schemas"]["Info"];
-            /** @description フォームのアイテムのリスト（質問、改ページ、テキストなど） */
-            items: components["schemas"]["Item"][];
-        };
-        /** @description External form type */
-        FormReadTypeExternal: {
-            /**
-             * Format: uri
-             * @description URL of the external form
-             */
-            form_url: string;
-        };
-        /** @description Form read request */
-        FormRead: (components["schemas"]["FormReadGeneric"] & {
-            type_builtin: components["schemas"]["Form"];
-        }) | (components["schemas"]["FormReadGeneric"] & {
-            type_external: components["schemas"]["FormReadTypeExternal"];
-        });
-        /** @description Generic form properties */
-        FormCreateGeneric: {
-            /** @description Target specifiers for the form */
-            targets: components["schemas"]["TargetSpecifier"][];
-            /** @description Name of the form */
-            form_name: string;
-            /** @description Summary or description of the form */
-            summary: string;
-            /**
-             * Format: date-time
-             * @description Due date for the form submission
-             */
-            due_date: string | null;
-        };
-        /** @description External form type */
-        FormCreateTypeExternal: {
-            /**
-             * Format: uri
-             * @description URL of the external form
-             */
-            form_url: string;
-        };
-        /** @description Form creation request */
-        FormCreate: components["schemas"]["FormCreateGeneric"] & ({
-            type_builtin: components["schemas"]["Form"];
-        } | {
-            type_external: components["schemas"]["FormCreateTypeExternal"];
-        });
-        /** @description Generic form properties */
-        FormUpdateGeneric: {
-            /** @description Target specifiers for the form */
-            targets?: components["schemas"]["TargetSpecifier"][];
-            /** @description Name of the form */
-            form_name?: string;
-            /** @description Summary or description of the form */
-            summary?: string;
-            /**
-             * Format: date-time
-             * @description Due date for the form submission
-             */
-            due_date?: string | null;
-        };
-        /** @description External form type */
-        FormUpdateTypeExternal: {
-            /**
-             * Format: uri
-             * @description URL of the external form
-             */
-            form_url?: string;
-        };
-        FormUpdate: (components["schemas"]["FormUpdateGeneric"] & {
-            type_builtin: components["schemas"]["Form"];
-        }) | (components["schemas"]["FormUpdateGeneric"] & {
-            type_external: components["schemas"]["FormUpdateTypeExternal"];
-        }) | components["schemas"]["FormUpdateGeneric"];
-        ReadDocumentGeneric: {
-            /** Format: uuid */
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uuid */
-            created_by: string;
-            /** Format: uuid */
-            updated_by: string;
-            title: string;
-            /** Format: uuid */
-            category: string | null;
-            /** @description Target specifiers for the form */
-            targets: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウン形式の資料 */
-        ReadDocumentFormatMarkdown: {
-            content: string;
-        };
-        /** @description pdf形式の資料 */
-        ReadDocumentFormatPdf: {
-            file_key: string;
-            file_name: string;
-        };
-        /** @description 任意形式の資料 */
-        ReadDocumentFormatMisc: {
-            file_key: string;
-            file_name: string;
-        };
-        ReadDocument: components["schemas"]["ReadDocumentGeneric"] & {
-            format_markdown?: components["schemas"]["ReadDocumentFormatMarkdown"];
-            format_pdf?: components["schemas"]["ReadDocumentFormatPdf"];
-            format_misc?: components["schemas"]["ReadDocumentFormatMisc"];
-        };
-        CreateDocumentGeneric: {
-            title: string;
-            /** Format: uuid */
-            category: string | null;
-            /** @description Target specifiers for the form */
-            targets: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウン形式の資料 */
-        CreateDocumentFormatMarkdown: {
-            content: string;
-        };
-        /** @description pdf形式の資料 */
-        CreateDocumentFormatPdf: {
-            file_key: string;
-            file_name: string;
-        };
-        /** @description 任意形式の資料 */
-        CreateDocumentFormatMisc: {
-            file_key: string;
-            file_name: string;
-        };
-        CreateDocument: components["schemas"]["CreateDocumentGeneric"] & {
-            format_markdown?: components["schemas"]["CreateDocumentFormatMarkdown"];
-            format_pdf?: components["schemas"]["CreateDocumentFormatPdf"];
-            format_misc?: components["schemas"]["CreateDocumentFormatMisc"];
-        };
-        /** @description 資料のカテゴリー */
-        ReadDocumentCategory: {
-            /** Format: uuid */
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** Format: date-time */
-            updated_at: string;
-            title: string;
-            emoji: string | null;
-        };
-        UpdateDocumentGeneric: {
-            title?: string;
-            /** Format: uuid */
-            category?: string | null;
-            /** @description Target specifiers for the form */
-            targets?: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウン形式の資料 */
-        UpdateDocumentFormatMarkdown: {
-            content: string;
-        };
-        /** @description pdf形式の資料 */
-        UpdateDocumentFormatPdf: {
-            file_key: string;
-            file_name: string;
-        };
-        /** @description 任意形式の資料 */
-        UpdateDocumentFormatMisc: {
-            file_key: string;
-            file_name: string;
-        };
-        UpdateDocument: (components["schemas"]["UpdateDocumentGeneric"] & {
-            format_markdown?: components["schemas"]["UpdateDocumentFormatMarkdown"];
-        }) | (components["schemas"]["UpdateDocumentGeneric"] & {
-            format_pdf?: components["schemas"]["UpdateDocumentFormatPdf"];
-        }) | (components["schemas"]["UpdateDocumentGeneric"] & {
-            format_misc?: components["schemas"]["UpdateDocumentFormatMisc"];
-        }) | components["schemas"]["UpdateDocumentGeneric"];
-        /** @description 資料のカテゴリー */
-        CreateDocumentCategory: {
-            title: string;
-            emoji: string | null;
-        };
-        /** @description 資料のカテゴリー */
-        UpdateDocumentCategory: {
-            title?: string;
-            emoji?: string | null;
-        };
-        UserRead: {
-            /**
-             * Format: uuid
-             * @description unique id
-             */
-            readonly id: string;
-            /**
-             * Format: date-time
-             * @description 作成日時
-             */
-            readonly created_at: string;
-            /**
-             * Format: date-time
-             * @description 最終更新日時
-             */
-            readonly updated_at: string;
-            /**
-             * @description 名前
-             * @example Paul Johnson
-             */
-            name: string;
-            /**
-             * @description mアドレス(新旧どちらも含む)
-             * @example johnson.p.5703@m.isct.ac.jp
-             */
-            m_address: string;
-            /**
-             * @description 団体id
-             * @example T-001
-             */
-            group_id: string;
-        };
-        UserId: string | "me";
-        UserUpdate: {
-            /**
-             * @description 名前
-             * @example Paul Johnson
-             */
-            name?: string;
-            /**
-             * @description mアドレス(新旧どちらも含む)
-             * @example johnson.p.5703@m.isct.ac.jp
-             */
-            m_address?: string;
-        };
-        NotificationReadGeneric: {
-            /**
-             * Format: uuid
-             * @description 通知ID
-             */
-            id: string;
-            /**
-             * Format: date-time
-             * @description 作成日時
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description 最終更新日時
-             */
-            updated_at: string;
-            /**
-             * Format: uuid
-             * @description 作成者のユーザーID
-             */
-            created_by: string;
-            /**
-             * Format: uuid
-             * @description 最終更新者のユーザーID
-             */
-            updated_by: string;
-            /** @description Target specifiers for the form */
-            target: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウンタイプの通知 */
-        NotificationReadTypeMarkdown: {
-            /** @description 通知のタイトル */
-            title: string;
-            content: string;
-        };
-        /** @description 承認申請の通知タイプ */
-        NotificationReadTypeApprovalRequest: {
-            /**
-             * Format: uuid
-             * @description 承認申請のID
-             */
-            approval_request_id: string;
-        };
-        NotificationRead: (components["schemas"]["NotificationReadGeneric"] & {
-            type_markdown: components["schemas"]["NotificationReadTypeMarkdown"];
-        }) | (components["schemas"]["NotificationReadGeneric"] & {
-            type_approval_request: components["schemas"]["NotificationReadTypeApprovalRequest"];
-        });
-        /**
-         * @description Status of the approval request
-         * @example pending
-         * @enum {string}
-         */
-        ApprovalRequestStatus: "pending" | "approved" | "rejected" | "closed";
-        /** @description 企画情報訂正申請 */
-        ApprovalRequestTypeEditExhibitionInfo: {
-            /** @description 企画内容説明文 */
-            description?: string;
-            /** @description 企画アイコンのキー． */
-            icon_key?: string;
-        };
-        /** @description Type of the approval request */
-        ApprovalRequestType: {
-            type_edit_exhibition_info: components["schemas"]["ApprovalRequestTypeEditExhibitionInfo"];
-        };
-        /** @description Response for reading an approval request */
-        ReadApprovalRequest: {
-            /**
-             * Format: uuid
-             * @description ID of the approval request
-             */
-            id: string;
-            /**
-             * Format: date-time
-             * @description Time when the approval request was issued
-             */
-            issued_at: string;
-            /**
-             * Format: uuid
-             * @description ID of the user who issued the approval request
-             */
-            issued_by: string;
-            status: components["schemas"]["ApprovalRequestStatus"];
-            /**
-             * Format: uuid
-             * @description ID of the user who approved or rejected the request
-             */
-            approved_by?: string | null;
-            /** @description Reason for issuing the approval request */
-            issue_reason: string;
-            /** @description Reason for approving or rejecting the request */
-            approval_reason: string | null;
-        } & components["schemas"]["ApprovalRequestType"];
-        /** @description Request to create an approval request */
-        CreateApprovalRequest: components["schemas"]["ApprovalRequestType"] & {
-            /** @description 承認申請の理由 */
-            issue_reason?: string;
-        };
-        NotificationCreateGeneric: {
-            /** @description Target specifiers for the form */
-            target: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウンタイプの通知 */
-        NotificationCreateTypeMarkdown: {
-            /** @description 通知のタイトル */
-            title: string;
-            content: string;
-        };
-        /** @description 承認申請の通知タイプ */
-        NotificationCreateTypeApprovalRequest: {
-            /**
-             * Format: uuid
-             * @description 承認申請のID
-             */
-            approval_request_id: string;
-        };
-        NotificationCreate: (components["schemas"]["NotificationCreateGeneric"] & {
-            type_markdown: components["schemas"]["NotificationCreateTypeMarkdown"];
-        }) | (components["schemas"]["NotificationCreateGeneric"] & {
-            type_approval_request: components["schemas"]["NotificationCreateTypeApprovalRequest"];
-        });
-        NotificationUpdateGeneric: {
-            /** @description Target specifiers for the form */
-            target?: components["schemas"]["TargetSpecifier"][];
-        };
-        /** @description マークダウンタイプの通知 */
-        NotificationUpdateTypeMarkdown: {
-            /** @description 通知のタイトル */
-            title?: string;
-            content?: string;
-        };
-        /** @description 承認申請の通知タイプ */
-        NotificationUpdateTypeApprovalRequest: {
-            /**
-             * Format: uuid
-             * @description 承認申請のID
-             */
-            approval_request_id?: string;
-        };
-        NotificationUpdate: (components["schemas"]["NotificationUpdateGeneric"] & {
-            type_markdown: components["schemas"]["NotificationUpdateTypeMarkdown"];
-        }) | (components["schemas"]["NotificationUpdateGeneric"] & {
-            type_approval_request: components["schemas"]["NotificationUpdateTypeApprovalRequest"];
-        });
+  schemas: {
+    BoothRead: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3: string;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    GeneralRead: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3: string;
+    };
+    LaboRead: {
+      /**
+       * Format: uuid
+       * @description 代表者 ID
+       */
+      representative: string;
+    };
+    StageRead: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3: string;
+    };
+    PlanRead: {
+      type_booth?: components['schemas']['BoothRead'];
+      type_general?: components['schemas']['GeneralRead'];
+      type_labo?: components['schemas']['LaboRead'];
+      type_stage?: components['schemas']['StageRead'];
+    };
+    PressRead: {
+      /**
+       * Format: uuid
+       * @description 代表者ID
+       */
+      representative: string;
+    };
+    GroupRead: {
+      /** @description 団体ID */
+      readonly id: string;
+      /**
+       * Format: date-time
+       * @description 作成日時
+       */
+      readonly created_at: string;
+      /**
+       * Format: date-time
+       * @description 最終更新日時
+       */
+      readonly updated_at: string;
+      /**
+       * @description 団体名
+       * @example 工大祭実行委員会
+       */
+      name: string;
+      type_plan?: components['schemas']['PlanRead'];
+      type_press?: components['schemas']['PressRead'];
+    };
+    GroupId: string | 'us';
+    UserCreate: {
+      /**
+       * @description 名前
+       * @example Paul Johnson
+       */
+      name: string;
+      /**
+       * @description mアドレス(新旧どちらも含む)
+       * @example johnson.p.5703@m.isct.ac.jp
+       */
+      m_address: string;
+    };
+    BoothCreate: {
+      representative1: components['schemas']['UserCreate'];
+      representative2: components['schemas']['UserCreate'];
+      representative3: components['schemas']['UserCreate'];
+    };
+    GeneralCreate: {
+      representative1: components['schemas']['UserCreate'];
+      representative2: components['schemas']['UserCreate'];
+      representative3: components['schemas']['UserCreate'];
+    };
+    LaboCreate: {
+      representative: components['schemas']['UserCreate'];
+    };
+    StageCreate: {
+      representative1: components['schemas']['UserCreate'];
+      representative2: components['schemas']['UserCreate'];
+      representative3: components['schemas']['UserCreate'];
+    };
+    PlanCreate: {
+      type_booth?: components['schemas']['BoothCreate'];
+      type_general?: components['schemas']['GeneralCreate'];
+      type_labo?: components['schemas']['LaboCreate'];
+      type_stage?: components['schemas']['StageCreate'];
+    };
+    PressCreate: {
+      representative: components['schemas']['UserCreate'];
+    };
+    GroupCreate: {
+      /**
+       * @description 団体名
+       * @example 工大祭実行委員会
+       */
+      name: string;
+      type_plan?: components['schemas']['PlanCreate'];
+      type_press?: components['schemas']['PressCreate'];
+    };
+    PutGroupResponse: {
+      /** @description 団体新規作成により追加されたユーザーのactivation token */
+      activation_tokens: unknown;
+    };
+    BoothUpdate: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1?: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2?: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3?: string;
+    };
+    GeneralUpdate: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1?: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2?: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3?: string;
+    };
+    LaboUpdate: {
+      /**
+       * Format: uuid
+       * @description 代表者 ID
+       */
+      representative?: string;
+    };
+    StageUpdate: {
+      /**
+       * Format: uuid
+       * @description 代表者1 ID
+       */
+      representative1?: string;
+      /**
+       * Format: uuid
+       * @description 代表者2 ID
+       */
+      representative2?: string;
+      /**
+       * Format: uuid
+       * @description 代表者3 ID
+       */
+      representative3?: string;
+    };
+    PlanUpdate: {
+      type_booth?: components['schemas']['BoothUpdate'];
+      type_general?: components['schemas']['GeneralUpdate'];
+      type_labo?: components['schemas']['LaboUpdate'];
+      type_stage?: components['schemas']['StageUpdate'];
+    };
+    PressUpdate: {
+      /**
+       * Format: uuid
+       * @description 代表者ID
+       */
+      representative?: string;
+    };
+    GroupUpdate: {
+      /**
+       * @description 団体名
+       * @example 工大祭実行委員会
+       */
+      name?: string;
+      type_plan?: components['schemas']['PlanUpdate'];
+      type_press?: components['schemas']['PressUpdate'];
+    };
+    /** @description 当日販売される商品情報（読み取り用） */
+    ProductsRead: {
+      /** @description 商品の一覧 */
+      items: {
+        /** @description 商品名 */
+        name: string;
+        /** @description 値段 */
+        price: number | null;
+        /** @description トッピングやフレーバーなどのオプション */
+        options: {
+          /** @description 商品名 */
+          name: string;
+          /** @description 値段 */
+          price: number | null;
+        }[];
+      }[];
+      /** @description 商品全体の説明文 */
+      description: string;
+    };
+    PlanDetailsRead: {
+      product?: components['schemas']['ProductsRead'];
+      /** @description 追加情報（マークダウン形式） */
+      additional_info?: string | null;
+    };
+    /** @description 当日販売される商品情報（更新用） */
+    ProductsCreate: {
+      /** @description 商品の一覧 */
+      items?: {
+        /** @description 商品名 */
+        name?: string;
+        /** @description 値段 */
+        price?: number | null;
+        /** @description トッピングやフレーバーなどのオプション */
+        options?: {
+          /** @description 商品名 */
+          name?: string;
+          /** @description 値段 */
+          price?: number | null;
+        }[];
+      }[];
+      /** @description 商品全体の説明文 */
+      description?: string;
+    };
+    PlanDetailsCreate: {
+      product?: components['schemas']['ProductsCreate'];
+      /** @description 追加情報（マークダウン形式） */
+      additional_info?: string | null;
+    };
+    /** @description Target specifier for forms */
+    TargetSpecifier: string &
+      (
+        | (
+            | 'group/type/plan_general'
+            | 'group/type/plan_booth'
+            | 'group/type/plan_stage'
+            | 'group/type/plan_labo'
+            | 'group/type/press'
+            | 'user/nologin'
+          )
+        | unknown
+        | unknown
+      );
+    /** @description Generic form properties */
+    FormReadGeneric: {
+      /**
+       * Format: uuid
+       * @description Unique identifier
+       */
+      id: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the form was created
+       */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the form was last updated
+       */
+      updated_at: string;
+      /**
+       * Format: uuid
+       * @description User ID of the creator
+       */
+      created_by: string;
+      /**
+       * Format: uuid
+       * @description User ID of the last updater
+       */
+      updated_by: string;
+      /** @description Target specifiers for the form */
+      targets: components['schemas']['TargetSpecifier'][];
+      /** @description Name of the form */
+      form_name: string;
+      /** @description Summary or description of the form */
+      summary: string;
+      /**
+       * Format: date-time
+       * @description Due date for the form submission
+       */
+      due_date: string | null;
+    };
+    /** @description フォームの一般情報 */
+    Info: {
+      /** @description 回答者に表示されるフォームのタイトル */
+      title: string;
+      /** @description 編集者に表示されるフォームのタイトル */
+      document_title: string;
+      /** @description フォームの説明 */
+      description: string;
+      /**
+       * Format: datetime
+       * @description フォームの回答期限
+       */
+      deadline?: string;
+    };
+    ItemGeneric: {
+      /**
+       * Format: uuid
+       * @description アイテムのID
+       */
+      readonly item_id: string;
+      /** @description 回答者に表示される項目のタイトル */
+      title: string;
+      /** @description 回答者に表示される項目の説明 */
+      description: string;
+    };
+    QuestionGeneric: {
+      /** @description 回答必須かどうか */
+      required: boolean;
+    };
+    /** @description テキスト */
+    QuestionText: {
+      /** @description trueの場合複数行にわたるテキスト。falseの場合一行の回答。 */
+      paragraph: boolean;
+    };
+    /** @description ラジオボタン */
+    QuestionRadioButton: {
+      /** @description 選択肢 */
+      choices: string[];
+    };
+    /** @description チェックボックス */
+    QuestionCheckBox: {
+      /** @description 選択肢 */
+      choices: string[];
+    };
+    /** @description フォームの質問 */
+    Question: components['schemas']['QuestionGeneric'] & {
+      question_text?: components['schemas']['QuestionText'];
+      question_radio_button?: components['schemas']['QuestionRadioButton'];
+      question_check_box?: components['schemas']['QuestionCheckBox'];
+    };
+    /** @description 一つの質問を含む項目 */
+    ItemQuestion: {
+      question: components['schemas']['Question'];
+    };
+    /** @description 改ページ */
+    ItemPageBreak: Record<string, never>;
+    /** @description テキスト */
+    ItemText: Record<string, never>;
+    /** @description フォームの単一の項目 */
+    Item: components['schemas']['ItemGeneric'] & {
+      item_question?: components['schemas']['ItemQuestion'];
+      item_page_break?: components['schemas']['ItemPageBreak'];
+      item_text?: components['schemas']['ItemText'];
+    };
+    /** @description フォーム */
+    Form: {
+      /**
+       * Format: uuid
+       * @description フォームID
+       */
+      readonly form_id?: string;
+      info: components['schemas']['Info'];
+      /** @description フォームのアイテムのリスト（質問、改ページ、テキストなど） */
+      items: components['schemas']['Item'][];
+    };
+    /** @description External form type */
+    FormReadTypeExternal: {
+      /**
+       * Format: uri
+       * @description URL of the external form
+       */
+      form_url: string;
+    };
+    /** @description Form read request */
+    FormRead:
+      | (components['schemas']['FormReadGeneric'] & {
+          type_builtin: components['schemas']['Form'];
+        })
+      | (components['schemas']['FormReadGeneric'] & {
+          type_external: components['schemas']['FormReadTypeExternal'];
+        });
+    /** @description Generic form properties */
+    FormCreateGeneric: {
+      /** @description Target specifiers for the form */
+      targets: components['schemas']['TargetSpecifier'][];
+      /** @description Name of the form */
+      form_name: string;
+      /** @description Summary or description of the form */
+      summary: string;
+      /**
+       * Format: date-time
+       * @description Due date for the form submission
+       */
+      due_date: string | null;
+    };
+    /** @description External form type */
+    FormCreateTypeExternal: {
+      /**
+       * Format: uri
+       * @description URL of the external form
+       */
+      form_url: string;
+    };
+    /** @description Form creation request */
+    FormCreate: components['schemas']['FormCreateGeneric'] &
+      (
+        | {
+            type_builtin: components['schemas']['Form'];
+          }
+        | {
+            type_external: components['schemas']['FormCreateTypeExternal'];
+          }
+      );
+    /** @description Generic form properties */
+    FormUpdateGeneric: {
+      /** @description Target specifiers for the form */
+      targets?: components['schemas']['TargetSpecifier'][];
+      /** @description Name of the form */
+      form_name?: string;
+      /** @description Summary or description of the form */
+      summary?: string;
+      /**
+       * Format: date-time
+       * @description Due date for the form submission
+       */
+      due_date?: string | null;
+    };
+    /** @description External form type */
+    FormUpdateTypeExternal: {
+      /**
+       * Format: uri
+       * @description URL of the external form
+       */
+      form_url?: string;
+    };
+    FormUpdate:
+      | (components['schemas']['FormUpdateGeneric'] & {
+          type_builtin: components['schemas']['Form'];
+        })
+      | (components['schemas']['FormUpdateGeneric'] & {
+          type_external: components['schemas']['FormUpdateTypeExternal'];
+        })
+      | components['schemas']['FormUpdateGeneric'];
+    ReadDocumentGeneric: {
+      /** Format: uuid */
+      id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+      /** Format: uuid */
+      created_by: string;
+      /** Format: uuid */
+      updated_by: string;
+      title: string;
+      /** Format: uuid */
+      category: string | null;
+      /** @description Target specifiers for the form */
+      targets: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウン形式の資料 */
+    ReadDocumentFormatMarkdown: {
+      content: string;
+    };
+    /** @description pdf形式の資料 */
+    ReadDocumentFormatPdf: {
+      file_key: string;
+      file_name: string;
+    };
+    /** @description 任意形式の資料 */
+    ReadDocumentFormatMisc: {
+      file_key: string;
+      file_name: string;
+    };
+    ReadDocument: components['schemas']['ReadDocumentGeneric'] & {
+      format_markdown?: components['schemas']['ReadDocumentFormatMarkdown'];
+      format_pdf?: components['schemas']['ReadDocumentFormatPdf'];
+      format_misc?: components['schemas']['ReadDocumentFormatMisc'];
+    };
+    CreateDocumentGeneric: {
+      title: string;
+      /** Format: uuid */
+      category: string | null;
+      /** @description Target specifiers for the form */
+      targets: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウン形式の資料 */
+    CreateDocumentFormatMarkdown: {
+      content: string;
+    };
+    /** @description pdf形式の資料 */
+    CreateDocumentFormatPdf: {
+      file_key: string;
+      file_name: string;
+    };
+    /** @description 任意形式の資料 */
+    CreateDocumentFormatMisc: {
+      file_key: string;
+      file_name: string;
+    };
+    CreateDocument: components['schemas']['CreateDocumentGeneric'] & {
+      format_markdown?: components['schemas']['CreateDocumentFormatMarkdown'];
+      format_pdf?: components['schemas']['CreateDocumentFormatPdf'];
+      format_misc?: components['schemas']['CreateDocumentFormatMisc'];
+    };
+    /** @description 資料のカテゴリー */
+    ReadDocumentCategory: {
+      /** Format: uuid */
+      id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+      title: string;
+      emoji: string | null;
+    };
+    UpdateDocumentGeneric: {
+      title?: string;
+      /** Format: uuid */
+      category?: string | null;
+      /** @description Target specifiers for the form */
+      targets?: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウン形式の資料 */
+    UpdateDocumentFormatMarkdown: {
+      content: string;
+    };
+    /** @description pdf形式の資料 */
+    UpdateDocumentFormatPdf: {
+      file_key: string;
+      file_name: string;
+    };
+    /** @description 任意形式の資料 */
+    UpdateDocumentFormatMisc: {
+      file_key: string;
+      file_name: string;
+    };
+    UpdateDocument:
+      | (components['schemas']['UpdateDocumentGeneric'] & {
+          format_markdown?: components['schemas']['UpdateDocumentFormatMarkdown'];
+        })
+      | (components['schemas']['UpdateDocumentGeneric'] & {
+          format_pdf?: components['schemas']['UpdateDocumentFormatPdf'];
+        })
+      | (components['schemas']['UpdateDocumentGeneric'] & {
+          format_misc?: components['schemas']['UpdateDocumentFormatMisc'];
+        })
+      | components['schemas']['UpdateDocumentGeneric'];
+    /** @description 資料のカテゴリー */
+    CreateDocumentCategory: {
+      title: string;
+      emoji: string | null;
+    };
+    /** @description 資料のカテゴリー */
+    UpdateDocumentCategory: {
+      title?: string;
+      emoji?: string | null;
+    };
+    UserRead: {
+      /**
+       * Format: uuid
+       * @description unique id
+       */
+      readonly id: string;
+      /**
+       * Format: date-time
+       * @description 作成日時
+       */
+      readonly created_at: string;
+      /**
+       * Format: date-time
+       * @description 最終更新日時
+       */
+      readonly updated_at: string;
+      /**
+       * @description 名前
+       * @example Paul Johnson
+       */
+      name: string;
+      /**
+       * @description mアドレス(新旧どちらも含む)
+       * @example johnson.p.5703@m.isct.ac.jp
+       */
+      m_address: string;
+      /**
+       * @description 団体id
+       * @example T-001
+       */
+      group_id: string;
+    };
+    UserId: string | 'me';
+    UserUpdate: {
+      /**
+       * @description 名前
+       * @example Paul Johnson
+       */
+      name?: string;
+      /**
+       * @description mアドレス(新旧どちらも含む)
+       * @example johnson.p.5703@m.isct.ac.jp
+       */
+      m_address?: string;
+    };
+    NotificationReadGeneric: {
+      /**
+       * Format: uuid
+       * @description 通知ID
+       */
+      id: string;
+      /**
+       * Format: date-time
+       * @description 作成日時
+       */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @description 最終更新日時
+       */
+      updated_at: string;
+      /**
+       * Format: uuid
+       * @description 作成者のユーザーID
+       */
+      created_by: string;
+      /**
+       * Format: uuid
+       * @description 最終更新者のユーザーID
+       */
+      updated_by: string;
+      /** @description Target specifiers for the form */
+      target: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウンタイプの通知 */
+    NotificationReadTypeMarkdown: {
+      /** @description 通知のタイトル */
+      title: string;
+      content: string;
+    };
+    /** @description 承認申請の通知タイプ */
+    NotificationReadTypeApprovalRequest: {
+      /**
+       * Format: uuid
+       * @description 承認申請のID
+       */
+      approval_request_id: string;
+    };
+    NotificationRead:
+      | (components['schemas']['NotificationReadGeneric'] & {
+          type_markdown: components['schemas']['NotificationReadTypeMarkdown'];
+        })
+      | (components['schemas']['NotificationReadGeneric'] & {
+          type_approval_request: components['schemas']['NotificationReadTypeApprovalRequest'];
+        });
+    /**
+     * @description Status of the approval request
+     * @example pending
+     * @enum {string}
+     */
+    ApprovalRequestStatus: 'pending' | 'approved' | 'rejected' | 'closed';
+    /** @description 企画情報訂正申請 */
+    ApprovalRequestTypeEditExhibitionInfo: {
+      /** @description 企画内容説明文 */
+      description?: string;
+      /** @description 企画アイコンのキー． */
+      icon_key?: string;
+    };
+    /** @description Type of the approval request */
+    ApprovalRequestType: {
+      type_edit_exhibition_info: components['schemas']['ApprovalRequestTypeEditExhibitionInfo'];
+    };
+    /** @description Response for reading an approval request */
+    ReadApprovalRequest: {
+      /**
+       * Format: uuid
+       * @description ID of the approval request
+       */
+      id: string;
+      /**
+       * Format: date-time
+       * @description Time when the approval request was issued
+       */
+      issued_at: string;
+      /**
+       * Format: uuid
+       * @description ID of the user who issued the approval request
+       */
+      issued_by: string;
+      status: components['schemas']['ApprovalRequestStatus'];
+      /**
+       * Format: uuid
+       * @description ID of the user who approved or rejected the request
+       */
+      approved_by?: string | null;
+      /** @description Reason for issuing the approval request */
+      issue_reason: string;
+      /** @description Reason for approving or rejecting the request */
+      approval_reason: string | null;
+    } & components['schemas']['ApprovalRequestType'];
+    /** @description Request to create an approval request */
+    CreateApprovalRequest: components['schemas']['ApprovalRequestType'] & {
+      /** @description 承認申請の理由 */
+      issue_reason?: string;
+    };
+    NotificationCreateGeneric: {
+      /** @description Target specifiers for the form */
+      target: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウンタイプの通知 */
+    NotificationCreateTypeMarkdown: {
+      /** @description 通知のタイトル */
+      title: string;
+      content: string;
+    };
+    /** @description 承認申請の通知タイプ */
+    NotificationCreateTypeApprovalRequest: {
+      /**
+       * Format: uuid
+       * @description 承認申請のID
+       */
+      approval_request_id: string;
+    };
+    NotificationCreate:
+      | (components['schemas']['NotificationCreateGeneric'] & {
+          type_markdown: components['schemas']['NotificationCreateTypeMarkdown'];
+        })
+      | (components['schemas']['NotificationCreateGeneric'] & {
+          type_approval_request: components['schemas']['NotificationCreateTypeApprovalRequest'];
+        });
+    NotificationUpdateGeneric: {
+      /** @description Target specifiers for the form */
+      target?: components['schemas']['TargetSpecifier'][];
+    };
+    /** @description マークダウンタイプの通知 */
+    NotificationUpdateTypeMarkdown: {
+      /** @description 通知のタイトル */
+      title?: string;
+      content?: string;
+    };
+    /** @description 承認申請の通知タイプ */
+    NotificationUpdateTypeApprovalRequest: {
+      /**
+       * Format: uuid
+       * @description 承認申請のID
+       */
+      approval_request_id?: string;
+    };
+    NotificationUpdate:
+      | (components['schemas']['NotificationUpdateGeneric'] & {
+          type_markdown: components['schemas']['NotificationUpdateTypeMarkdown'];
+        })
+      | (components['schemas']['NotificationUpdateGeneric'] & {
+          type_approval_request: components['schemas']['NotificationUpdateTypeApprovalRequest'];
+        });
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

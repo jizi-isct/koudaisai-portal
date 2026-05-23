@@ -1,1 +1,5 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:form:create"]}}, "form_name": "New Form", "expected": "ok"}
+{
+  "actor": { "Admin": { "claims": ["koudaisai-portal:admin:form:create"] } },
+  "form_name": "New Form",
+  "expected": "ok"
+}

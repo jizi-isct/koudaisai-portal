@@ -1,10 +1,10 @@
-import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Card, Flex, Form, Input, message, Result, Tag} from "antd";
-import {useEffect, useState} from "react";
-import {$api, $plansInfoApiNoAuth} from "@/features/api/api";
-import {ViewPendingEditExhibitionInfoRequest} from "./ViewPendingEditExhibitionInfoRequest";
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Button, Card, Flex, Form, Input, message, Result, Tag } from 'antd';
+import { useEffect, useState } from 'react';
+import { $api, $plansInfoApiNoAuth } from '@/features/api/api';
+import { ViewPendingEditExhibitionInfoRequest } from './ViewPendingEditExhibitionInfoRequest';
 
 type FormValues = {
   approvalReason: string | null;
@@ -15,7 +15,9 @@ export function ApprovalRequestReviewPage() {
   const [approvalRequestId, setApprovalRequestId] = useState<string | null>();
 
   useEffect(() => {
-    setApprovalRequestId(new URLSearchParams(window.location.search).get("approval_request_id"));
+    setApprovalRequestId(
+      new URLSearchParams(window.location.search).get('approval_request_id'),
+    );
   }, []);
 
   if (approvalRequestId === undefined) {
@@ -44,37 +46,55 @@ export function ApprovalRequestReviewPage() {
   );
 }
 
-function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: string}) {
+function ApprovalRequestReviewForm({
+  approvalRequestId,
+}: {
+  approvalRequestId: string;
+}) {
   const [messageApi, contextHolder] = message.useMessage();
-  const {data: approvalRequest, error, refetch} = $api.useQuery("get", "/approval-requests/{id}", {
+  const {
+    data: approvalRequest,
+    error,
+    refetch,
+  } = $api.useQuery('get', '/approval-requests/{id}', {
     params: {
       path: {
         id: approvalRequestId,
       },
     },
   });
-  const {data: issuer} = $api.useQuery("get", "/users/{user_id}", {
+  const { data: issuer } = $api.useQuery('get', '/users/{user_id}', {
     enabled: !!approvalRequest?.issued_by,
     params: {
       path: {
-        user_id: approvalRequest?.issued_by ?? "",
+        user_id: approvalRequest?.issued_by ?? '',
       },
     },
   });
-  const {data: basePlan, isLoading} = $plansInfoApiNoAuth.useQuery("get", "/plans/{planId}", {
-    params: {
-      path: {
-        planId: issuer?.group_id ?? "",
+  const { data: basePlan, isLoading } = $plansInfoApiNoAuth.useQuery(
+    'get',
+    '/plans/{planId}',
+    {
+      params: {
+        path: {
+          planId: issuer?.group_id ?? '',
+        },
       },
+      enabled: !!issuer?.group_id,
     },
-    enabled: !!issuer?.group_id,
-  });
-  const {mutateAsync: mutateApprove} = $api.useMutation("post", "/approval-requests/{id}/approve");
-  const {mutateAsync: mutateReject} = $api.useMutation("post", "/approval-requests/{id}/reject");
-  const [approvalReason, setApprovalReason] = useState("");
+  );
+  const { mutateAsync: mutateApprove } = $api.useMutation(
+    'post',
+    '/approval-requests/{id}/approve',
+  );
+  const { mutateAsync: mutateReject } = $api.useMutation(
+    'post',
+    '/approval-requests/{id}/reject',
+  );
+  const [approvalReason, setApprovalReason] = useState('');
 
   useEffect(() => {
-    setApprovalReason(approvalRequest?.approval_reason ?? "");
+    setApprovalReason(approvalRequest?.approval_reason ?? '');
   }, [approvalRequest]);
 
   if (isLoading) {
@@ -96,11 +116,12 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
     );
   }
 
-  const getApprovalReason = () => (approvalReason === "" ? null : approvalReason);
+  const getApprovalReason = () =>
+    approvalReason === '' ? null : approvalReason;
 
   const handleApprove = async () => {
     messageApi.loading({
-      content: "処理中...",
+      content: '処理中...',
       duration: 0,
     });
 
@@ -123,12 +144,12 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
 
     await refetch();
     messageApi.destroy();
-    messageApi.success("処理が成功しました");
+    messageApi.success('処理が成功しました');
   };
 
   const handleReject = async () => {
     messageApi.loading({
-      content: "処理中...",
+      content: '処理中...',
       duration: 0,
     });
 
@@ -151,7 +172,7 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
 
     await refetch();
     messageApi.destroy();
-    messageApi.success("処理が成功しました");
+    messageApi.success('処理が成功しました');
   };
 
   return (
@@ -164,13 +185,13 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
         </Form.Item>
 
         <Form.Item label="ステータス">
-          {approvalRequest.status === "pending" ? (
+          {approvalRequest.status === 'pending' ? (
             <Tag color="blue">審査中</Tag>
-          ) : approvalRequest.status === "approved" ? (
+          ) : approvalRequest.status === 'approved' ? (
             <Tag color="green">承認済み</Tag>
-          ) : approvalRequest.status === "rejected" ? (
+          ) : approvalRequest.status === 'rejected' ? (
             <Tag color="red">却下済み</Tag>
-          ) : approvalRequest.status === "closed" ? (
+          ) : approvalRequest.status === 'closed' ? (
             <Tag color="purple">取り下げ済み</Tag>
           ) : (
             <Tag color="gray">不明</Tag>
@@ -178,11 +199,14 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
         </Form.Item>
 
         {approvalRequest.type_edit_exhibition_info && (
-          <Card title="申請内容" style={{margin: "16px 0"}}>
-            <ViewPendingEditExhibitionInfoRequest approvalRequest={approvalRequest} plan={basePlan} />
+          <Card title="申請内容" style={{ margin: '16px 0' }}>
+            <ViewPendingEditExhibitionInfoRequest
+              approvalRequest={approvalRequest}
+              plan={basePlan}
+            />
           </Card>
         )}
-        <Card title="申請事由" style={{margin: "16px 0"}}>
+        <Card title="申請事由" style={{ margin: '16px 0' }}>
           {approvalRequest.issue_reason}
         </Card>
         <Form.Item label="理由(任意)">
@@ -190,7 +214,7 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
             value={approvalReason}
             onChange={(event) => setApprovalReason(event.target.value)}
             placeholder="承認/却下の理由を入力してください"
-            disabled={approvalRequest.status !== "pending"}
+            disabled={approvalRequest.status !== 'pending'}
           />
         </Form.Item>
 
@@ -200,7 +224,7 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
               type="primary"
               htmlType="button"
               onClick={handleApprove}
-              disabled={approvalRequest.status !== "pending"}
+              disabled={approvalRequest.status !== 'pending'}
             >
               <CheckOutlined /> 承認
             </Button>
@@ -209,7 +233,7 @@ function ApprovalRequestReviewForm({approvalRequestId}: {approvalRequestId: stri
               variant="solid"
               htmlType="button"
               onClick={handleReject}
-              disabled={approvalRequest.status !== "pending"}
+              disabled={approvalRequest.status !== 'pending'}
             >
               <CloseOutlined /> 却下
             </Button>

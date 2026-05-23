@@ -6,25 +6,25 @@ import {
   InfoOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-} from "@ant-design/icons";
-import {getTokensAdmin} from "@koudaisai/shared-auth-admin";
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {StyleProvider} from '@ant-design/cssinjs';
-import {Button, ConfigProvider, Flex, Layout, Menu, theme} from "antd";
-import type {ReactNode} from "react";
-import {useEffect, useState} from "react";
-import {authFetchClient} from "@/features/api/api";
+} from '@ant-design/icons';
+import { getTokensAdmin } from '@koudaisai/shared-auth-admin';
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { StyleProvider } from '@ant-design/cssinjs';
+import { Button, ConfigProvider, Flex, Layout, Menu, theme } from 'antd';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+import { authFetchClient } from '@/features/api/api';
 
 type Props = {
   children: ReactNode;
   currentPath: string;
 };
 
-const {Content, Header, Sider} = Layout;
+const { Content, Header, Sider } = Layout;
 
 const antdTheme = {
   token: {
-    colorPrimary: "#0048FF",
+    colorPrimary: '#0048FF',
     borderRadius: 8,
   },
   components: {
@@ -35,14 +35,16 @@ const antdTheme = {
   },
 };
 
-function AdminLayoutContent({children, currentPath}: Props) {
+function AdminLayoutContent({ children, currentPath }: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {
-    token: {colorBgContainer, borderRadiusLG},
+    token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const selectedKeys = [currentPath.endsWith("/") ? currentPath : `${currentPath}/`];
+  const selectedKeys = [
+    currentPath.endsWith('/') ? currentPath : `${currentPath}/`,
+  ];
 
   useEffect(() => {
     (async () => {
@@ -53,17 +55,22 @@ function AdminLayoutContent({children, currentPath}: Props) {
         return;
       }
 
-      window.location.assign("/login");
+      window.location.assign('/login');
     })().catch(() => {
-      window.location.assign("/login");
+      window.location.assign('/login');
     });
   }, []);
 
   return (
     <StyleProvider>
-      <Layout style={{minHeight: "100vh", width: "100vw"}}>
-        <Sider collapsible collapsed={collapsed} trigger={null} style={{margin: 0, padding: 0}}>
-          <a href="/" style={{color: "white", display: "block", padding: 10}}>
+      <Layout style={{ minHeight: '100vh', width: '100vw' }}>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          trigger={null}
+          style={{ margin: 0, padding: 0 }}
+        >
+          <a href="/" style={{ color: 'white', display: 'block', padding: 10 }}>
             <Flex align="center" gap={10} justify="center">
               <img
                 src="/logo.jpg"
@@ -78,48 +85,48 @@ function AdminLayoutContent({children, currentPath}: Props) {
             theme="dark"
             mode="inline"
             selectedKeys={selectedKeys}
-            style={{position: "sticky", top: 0}}
+            style={{ position: 'sticky', top: 0 }}
             items={[
               {
-                type: "group",
-                label: "工大祭ポータル",
-                key: "koudaisai-portal",
+                type: 'group',
+                label: '工大祭ポータル',
+                key: 'koudaisai-portal',
                 children: [
                   {
-                    key: "/",
-                    icon: <HomeOutlined/>,
+                    key: '/',
+                    icon: <HomeOutlined />,
                     label: <a href="/">ホーム</a>,
                   },
                   {
-                    key: "/forms/",
-                    icon: <FormOutlined/>,
+                    key: '/forms/',
+                    icon: <FormOutlined />,
                     label: <a href="/forms/">フォーム</a>,
                   },
                   {
-                    key: "/documents/",
-                    icon: <BookOutlined/>,
+                    key: '/documents/',
+                    icon: <BookOutlined />,
                     label: <a href="/documents/">資料</a>,
                   },
                   {
-                    key: "/notifications/",
-                    icon: <BellOutlined/>,
+                    key: '/notifications/',
+                    icon: <BellOutlined />,
                     label: <a href="/notifications/">通知</a>,
                   },
                   {
-                    key: "/approval_requests/",
-                    icon: <BellOutlined/>,
+                    key: '/approval_requests/',
+                    icon: <BellOutlined />,
                     label: <a href="/approval_requests/">承認申請</a>,
                   },
                 ],
               },
               {
-                type: "group",
-                label: "その他",
-                key: "others",
+                type: 'group',
+                label: 'その他',
+                key: 'others',
                 children: [
                   {
-                    key: "/plans_info/",
-                    icon: <InfoOutlined/>,
+                    key: '/plans_info/',
+                    icon: <InfoOutlined />,
                     label: <a href="/plans_info/">参加団体情報</a>,
                   },
                 ],
@@ -128,14 +135,14 @@ function AdminLayoutContent({children, currentPath}: Props) {
           />
         </Sider>
         <Layout>
-          <Header style={{padding: 0, background: colorBgContainer}}>
+          <Header style={{ padding: 0, background: colorBgContainer }}>
             <Flex>
               <Button
                 type="text"
-                icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
                 style={{
-                  fontSize: "16px",
+                  fontSize: '16px',
                   width: 64,
                   height: 64,
                 }}
@@ -144,11 +151,11 @@ function AdminLayoutContent({children, currentPath}: Props) {
           </Header>
           <Content
             style={{
-              margin: "24px 16px",
+              margin: '24px 16px',
               padding: 24,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              width: "auto",
+              width: 'auto',
             }}
           >
             {isAuthenticated ? children : <LoadingScreen />}
@@ -159,10 +166,12 @@ function AdminLayoutContent({children, currentPath}: Props) {
   );
 }
 
-export function AdminShell({children, currentPath}: Props) {
+export function AdminShell({ children, currentPath }: Props) {
   return (
     <ConfigProvider theme={antdTheme}>
-      <AdminLayoutContent currentPath={currentPath}>{children}</AdminLayoutContent>
+      <AdminLayoutContent currentPath={currentPath}>
+        {children}
+      </AdminLayoutContent>
     </ConfigProvider>
   );
 }

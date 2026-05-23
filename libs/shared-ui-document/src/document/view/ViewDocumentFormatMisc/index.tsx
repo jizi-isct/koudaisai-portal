@@ -1,10 +1,10 @@
-import {DocumentFormatMiscRead} from "@koudaisai/shared-types";
-import {LargeButton} from "@koudaisai/shared-ui";
+import { DocumentFormatMiscRead } from '@koudaisai/shared-types';
+import { LargeButton } from '@koudaisai/shared-ui';
 
 type ViewDocumentFormatMiscProps = {
-  download: () => void,
-  format: DocumentFormatMiscRead
-}
+  download: () => void;
+  format: DocumentFormatMiscRead;
+};
 
 /**
  * その他の資料を表示するコンポーネント
@@ -12,12 +12,15 @@ type ViewDocumentFormatMiscProps = {
  * @param format
  * @constructor
  */
-export function ViewDocumentFormatMisc({download, format}: ViewDocumentFormatMiscProps) {
+export function ViewDocumentFormatMisc({
+  download,
+  format,
+}: ViewDocumentFormatMiscProps) {
   return (
     <div>
       <LargeButton type="secondary" onClick={() => download()}>
         ダウンロード
       </LargeButton>
     </div>
-  )
+  );
 }

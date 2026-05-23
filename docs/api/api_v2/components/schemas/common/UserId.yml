@@ -2,4 +2,4 @@ oneOf:
   - type: string
     format: uuid
   - type: string
-    enum: [ me ]
+    enum: [me]

@@ -27,12 +27,12 @@ get:
               properties:
                 category:
                   allOf:
-                    - $ref: "../../components/schemas/document_category/ReadDocumentCategory.yml"
+                    - $ref: '../../components/schemas/document_category/ReadDocumentCategory.yml'
                   nullable: true
                 documents:
                   type: array
                   items:
-                    $ref: "../../components/schemas/document/ReadDocument.yml"
+                    $ref: '../../components/schemas/document/ReadDocument.yml'
               required:
                 - category
                 - documents
@@ -41,6 +41,6 @@ get:
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
     - admin_oidc:
         - k-portal:admin:all

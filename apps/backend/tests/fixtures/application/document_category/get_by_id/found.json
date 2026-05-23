@@ -1,1 +1,7 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:document-category:read"]}}, "category_exists": true, "expected": "some"}
+{
+  "actor": {
+    "Admin": { "claims": ["koudaisai-portal:admin:document-category:read"] }
+  },
+  "category_exists": true,
+  "expected": "some"
+}

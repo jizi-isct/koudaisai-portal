@@ -2,13 +2,9 @@
   "actor": {
     "User": {
       "group_type": "",
-      "group_ids": [
-        "G-002"
-      ]
+      "group_ids": ["G-002"]
     }
   },
-  "target_group_ids": [
-    "G-001"
-  ],
+  "target_group_ids": ["G-001"],
   "expected": "not_found"
 }

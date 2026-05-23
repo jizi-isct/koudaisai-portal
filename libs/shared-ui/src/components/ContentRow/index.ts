@@ -1,1 +1,1 @@
-export * from "./ContentRow"
+export * from './ContentRow';

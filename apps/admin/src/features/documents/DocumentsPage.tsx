@@ -1,11 +1,14 @@
-import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
-import type {DocumentCategoryRead, DocumentRead} from "@koudaisai/shared-types";
-import {Heading1, LoadingScreen} from "@koudaisai/shared-ui";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Flex, message, Popconfirm, Table, Tag} from "antd";
-import type {TableProps} from "antd";
-import {useMemo, useState} from "react";
-import {$api} from "@/features/api/api";
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import type {
+  DocumentCategoryRead,
+  DocumentRead,
+} from '@koudaisai/shared-types';
+import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Button, Flex, message, Popconfirm, Table, Tag } from 'antd';
+import type { TableProps } from 'antd';
+import { useMemo, useState } from 'react';
+import { $api } from '@/features/api/api';
 
 type RowType = {
   category: DocumentCategoryRead | null;
@@ -23,46 +26,52 @@ export function DocumentsPage() {
 }
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Date(value).toLocaleString('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
 function DocumentsTable() {
   const [messageApi, contextHolder] = message.useMessage();
-  const {data, isLoading, refetch} = $api.useQuery("get", "/documents/by-category", {
-    params: {query: {include_empty_categories: true}},
-  });
-  const {mutateAsync: mutateDocumentCategoryDelete} = $api.useMutation(
-    "delete",
-    "/document-categories/{category_id}",
+  const { data, isLoading, refetch } = $api.useQuery(
+    'get',
+    '/documents/by-category',
+    {
+      params: { query: { include_empty_categories: true } },
+    },
   );
-  const {mutateAsync: mutateDocumentCategoryCreate} = $api.useMutation(
-    "post",
-    "/document-categories",
+  const { mutateAsync: mutateDocumentCategoryDelete } = $api.useMutation(
+    'delete',
+    '/document-categories/{category_id}',
   );
-  const {mutateAsync: mutateDocumentDelete} = $api.useMutation(
-    "delete",
-    "/documents/{document_id}",
+  const { mutateAsync: mutateDocumentCategoryCreate } = $api.useMutation(
+    'post',
+    '/document-categories',
+  );
+  const { mutateAsync: mutateDocumentDelete } = $api.useMutation(
+    'delete',
+    '/documents/{document_id}',
   );
 
   const dataSource = useMemo(() => {
-    return data?.map((item) => ({
-      ...item,
-      key: item.category?.id ?? "なし",
-    })) ?? [];
+    return (
+      data?.map((item) => ({
+        ...item,
+        key: item.category?.id ?? 'なし',
+      })) ?? []
+    );
   }, [data]);
 
   const handleCreateCategory = async () => {
-    messageApi.loading("新規資料カテゴリを作成中...");
+    messageApi.loading('新規資料カテゴリを作成中...');
     try {
       await mutateDocumentCategoryCreate({
         body: {
-          title: "新規資料カテゴリ",
+          title: '新規資料カテゴリ',
           emoji: null,
         },
       });
@@ -74,17 +83,17 @@ function DocumentsTable() {
 
     await refetch();
     messageApi.destroy();
-    messageApi.success("資料カテゴリを作成しました");
+    messageApi.success('資料カテゴリを作成しました');
   };
 
-  const columns: TableProps<RowType>["columns"] = [
+  const columns: TableProps<RowType>['columns'] = [
     {
-      key: "title",
-      title: "資料カテゴリ",
+      key: 'title',
+      title: '資料カテゴリ',
       render: (_value, record) =>
         record.category ? (
           <a
-            style={{textDecoration: "underline"}}
+            style={{ textDecoration: 'underline' }}
             href={`/documents/edit_category?category_id=${record.category.id}`}
           >
             {record.category.emoji} {record.category.title}
@@ -94,21 +103,23 @@ function DocumentsTable() {
         ),
     },
     {
-      key: "created_at",
-      title: "作成日時",
-      rowScope: "row",
-      render: (_value, record) => (record.category ? formatDate(record.category.created_at) : ""),
+      key: 'created_at',
+      title: '作成日時',
+      rowScope: 'row',
+      render: (_value, record) =>
+        record.category ? formatDate(record.category.created_at) : '',
     },
     {
-      key: "updated_at",
-      title: "更新日時",
-      rowScope: "row",
-      render: (_value, record) => (record.category ? formatDate(record.category.updated_at) : ""),
+      key: 'updated_at',
+      title: '更新日時',
+      rowScope: 'row',
+      render: (_value, record) =>
+        record.category ? formatDate(record.category.updated_at) : '',
     },
     {
-      key: "actions",
-      title: "操作",
-      fixed: "right",
+      key: 'actions',
+      title: '操作',
+      fixed: 'right',
       render: (_value, record) => (
         <Flex gap={5}>
           {record.category ? (
@@ -119,7 +130,7 @@ function DocumentsTable() {
                 await mutateDocumentCategoryDelete({
                   params: {
                     path: {
-                      category_id: record.category?.id ?? "",
+                      category_id: record.category?.id ?? '',
                     },
                   },
                 });
@@ -142,34 +153,38 @@ function DocumentsTable() {
     },
   ];
 
-  const expandedColumns: TableProps<DocumentRead>["columns"] = [
+  const expandedColumns: TableProps<DocumentRead>['columns'] = [
     {
-      key: "title",
-      title: "タイトル",
-      dataIndex: "title",
-      rowScope: "row",
+      key: 'title',
+      title: 'タイトル',
+      dataIndex: 'title',
+      rowScope: 'row',
       render: (value, record) => (
-        <a style={{textDecoration: "underline"}} href={`/documents/edit?document_id=${record.id}`}>
+        <a
+          style={{ textDecoration: 'underline' }}
+          href={`/documents/edit?document_id=${record.id}`}
+        >
           {value}
         </a>
       ),
     },
     {
-      key: "format",
-      title: "種類",
+      key: 'format',
+      title: '種類',
       render: (_value, record) => {
-        if ("format_pdf" in record) return <Tag color="orange">PDF</Tag>;
-        if ("format_markdown" in record) return <Tag color="green">Markdown</Tag>;
-        if ("format_misc" in record) return <Tag color="blue">その他</Tag>;
+        if ('format_pdf' in record) return <Tag color="orange">PDF</Tag>;
+        if ('format_markdown' in record)
+          return <Tag color="green">Markdown</Tag>;
+        if ('format_misc' in record) return <Tag color="blue">その他</Tag>;
         return <Tag color="red">不明</Tag>;
       },
     },
     {
-      key: "targets",
-      title: "対象",
-      dataIndex: "targets",
+      key: 'targets',
+      title: '対象',
+      dataIndex: 'targets',
       render: (value: string[]) => (
-        <Flex wrap gap={4} style={{maxWidth: "200px"}}>
+        <Flex wrap gap={4} style={{ maxWidth: '200px' }}>
           {value.map((target) => (
             <Tag key={target}>{target}</Tag>
           ))}
@@ -177,38 +192,38 @@ function DocumentsTable() {
       ),
     },
     {
-      key: "created_at",
-      title: "作成日時",
-      dataIndex: "created_at",
-      rowScope: "row",
+      key: 'created_at',
+      title: '作成日時',
+      dataIndex: 'created_at',
+      rowScope: 'row',
       render: formatDate,
     },
     {
-      key: "updated_at",
-      title: "更新日時",
-      dataIndex: "updated_at",
-      rowScope: "row",
+      key: 'updated_at',
+      title: '更新日時',
+      dataIndex: 'updated_at',
+      rowScope: 'row',
       render: formatDate,
     },
     {
-      key: "created_by",
-      title: "作成者",
-      dataIndex: "created_by",
-      rowScope: "row",
+      key: 'created_by',
+      title: '作成者',
+      dataIndex: 'created_by',
+      rowScope: 'row',
       render: (value: string) => `${value.substring(0, 6)}...`,
     },
     {
-      key: "updated_by",
-      title: "更新者",
-      dataIndex: "updated_by",
-      rowScope: "row",
+      key: 'updated_by',
+      title: '更新者',
+      dataIndex: 'updated_by',
+      rowScope: 'row',
       render: (value: string) => `${value.substring(0, 6)}...`,
     },
     {
-      key: "actions",
-      title: "",
-      dataIndex: "id",
-      fixed: "right",
+      key: 'actions',
+      title: '',
+      dataIndex: 'id',
+      fixed: 'right',
       render: (value: string) => (
         <Flex gap={5}>
           <Popconfirm
@@ -239,11 +254,17 @@ function DocumentsTable() {
   const expandedRowRender = (record: RowType) => (
     <Table<DocumentRead>
       columns={expandedColumns}
-      dataSource={record.documents.map((document) => ({...document, key: document.id}))}
-      scroll={{x: "max-content"}}
+      dataSource={record.documents.map((document) => ({
+        ...document,
+        key: document.id,
+      }))}
+      scroll={{ x: 'max-content' }}
       pagination={false}
       footer={() => (
-        <Button disabled={record.category === null} href={`/documents/new?category_id=${record.category?.id}`}>
+        <Button
+          disabled={record.category === null}
+          href={`/documents/new?category_id=${record.category?.id}`}
+        >
           <PlusOutlined />
           新規資料を作成
         </Button>
@@ -260,7 +281,7 @@ function DocumentsTable() {
       <Table<RowType>
         columns={columns}
         dataSource={dataSource}
-        scroll={{x: "max-content"}}
+        scroll={{ x: 'max-content' }}
         expandable={{
           expandedRowRender,
         }}

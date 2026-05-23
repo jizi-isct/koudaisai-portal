@@ -1,7 +1,5 @@
 {
   "actor": "Nologin",
-  "form_targets": [
-    "press"
-  ],
+  "form_targets": ["press"],
   "expected": false
 }

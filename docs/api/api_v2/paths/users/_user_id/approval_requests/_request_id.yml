@@ -23,7 +23,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../../../components/schemas/approval_request/ReadApprovalRequest.yml"
+            $ref: '../../../../components/schemas/approval_request/ReadApprovalRequest.yml'
     '400':
       description: 不正なrequest bodyの形式
     '401':
@@ -33,4 +33,4 @@ get:
     '500':
       description: サーバーエラー
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []

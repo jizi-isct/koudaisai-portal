@@ -1,1 +1,7 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:document-category:read"]}}, "seed_count": 1, "expected": "ok"}
+{
+  "actor": {
+    "Admin": { "claims": ["koudaisai-portal:admin:document-category:read"] }
+  },
+  "seed_count": 1,
+  "expected": "ok"
+}

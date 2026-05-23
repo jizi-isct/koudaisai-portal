@@ -1,1 +1,7 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:form:update"]}}, "form_exists": true, "new_name": "", "new_summary": null, "expected": "invalid_input"}
+{
+  "actor": { "Admin": { "claims": ["koudaisai-portal:admin:form:update"] } },
+  "form_exists": true,
+  "new_name": "",
+  "new_summary": null,
+  "expected": "invalid_input"
+}

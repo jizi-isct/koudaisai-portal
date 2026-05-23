@@ -34,6 +34,6 @@ get:
     '401':
       description: 資格情報が無効だった場合
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []
     - admin_oidc:
         - k-portal:admin:all

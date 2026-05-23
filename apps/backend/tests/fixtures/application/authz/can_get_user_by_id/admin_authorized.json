@@ -1,9 +1,7 @@
 {
   "actor": {
     "Admin": {
-      "claims": [
-        "koudaisai-portal:admin:user:read"
-      ]
+      "claims": ["koudaisai-portal:admin:user:read"]
     }
   },
   "target_group_ids": [],

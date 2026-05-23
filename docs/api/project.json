@@ -9,10 +9,7 @@
         "command": "bash build.sh",
         "cwd": "docs/api"
       },
-      "outputs": [
-        "{projectRoot}/api_v2.html",
-        "{projectRoot}/auth_v1.html"
-      ]
+      "outputs": ["{projectRoot}/api_v2.html", "{projectRoot}/auth_v1.html"]
     },
     "update-clients": {
       "executor": "nx:run-commands",

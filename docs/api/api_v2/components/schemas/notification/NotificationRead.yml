@@ -1,16 +1,16 @@
 type: object
 oneOf:
   - allOf:
-      - $ref: "./NotificationReadGeneric.yml"
+      - $ref: './NotificationReadGeneric.yml'
       - properties:
           type_markdown:
-            $ref: "./NotificationReadTypeMarkdown.yml"
+            $ref: './NotificationReadTypeMarkdown.yml'
         required:
           - type_markdown
   - allOf:
-      - $ref: "./NotificationReadGeneric.yml"
+      - $ref: './NotificationReadGeneric.yml'
       - properties:
           type_approval_request:
-            $ref: "./NotificationReadTypeApprovalRequest.yml"
+            $ref: './NotificationReadTypeApprovalRequest.yml'
         required:
           - type_approval_request

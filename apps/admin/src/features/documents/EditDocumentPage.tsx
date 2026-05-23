@@ -1,11 +1,26 @@
-import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from "@ant-design/icons";
-import {LoadingScreen} from "@koudaisai/shared-ui";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Button, Flex, Form, Input, message, Result, Select, Space, Tag, Upload} from "antd";
-import type {UploadFile} from "antd";
-import {useEffect, useMemo, useState} from "react";
-import {$api} from "@/features/api/api";
-import {TargetSpecifier} from "./TargetSpecifier";
+import {
+  MinusCircleOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
+import { LoadingScreen } from '@koudaisai/shared-ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  Button,
+  Flex,
+  Form,
+  Input,
+  message,
+  Result,
+  Select,
+  Space,
+  Tag,
+  Upload,
+} from 'antd';
+import type { UploadFile } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { $api } from '@/features/api/api';
+import { TargetSpecifier } from './TargetSpecifier';
 
 type FormValues = {
   title: string;
@@ -21,7 +36,9 @@ export function EditDocumentPage() {
   const [documentId, setDocumentId] = useState<string | null>();
 
   useEffect(() => {
-    setDocumentId(new URLSearchParams(window.location.search).get("document_id"));
+    setDocumentId(
+      new URLSearchParams(window.location.search).get('document_id'),
+    );
   }, []);
 
   if (documentId === undefined) {
@@ -50,27 +67,41 @@ export function EditDocumentPage() {
   );
 }
 
-function EditDocumentForm({documentId}: {documentId: string}) {
+function EditDocumentForm({ documentId }: { documentId: string }) {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const {data: documentRead, isLoading: isLoadingDocuments, error, refetch} = $api.useQuery(
-    "get",
-    "/documents/{document_id}",
-    {
-      params: {
-        path: {
-          document_id: documentId,
-        },
+  const {
+    data: documentRead,
+    isLoading: isLoadingDocuments,
+    error,
+    refetch,
+  } = $api.useQuery('get', '/documents/{document_id}', {
+    params: {
+      path: {
+        document_id: documentId,
       },
     },
+  });
+  const { mutateAsync: mutateUploadFile } = $api.useMutation(
+    'post',
+    '/files/upload',
   );
-  const {mutateAsync: mutateUploadFile} = $api.useMutation("post", "/files/upload");
-  const {data: categories, isLoading: isLoadingCategories} = $api.useQuery("get", "/document-categories");
-  const {mutateAsync: mutateDocumentUpdate} = $api.useMutation("patch", "/documents/{document_id}");
+  const { data: categories, isLoading: isLoadingCategories } = $api.useQuery(
+    'get',
+    '/document-categories',
+  );
+  const { mutateAsync: mutateDocumentUpdate } = $api.useMutation(
+    'patch',
+    '/documents/{document_id}',
+  );
   const [submitting, setSubmitting] = useState(false);
 
   const categoryOptions = useMemo(
-    () => categories?.map((category) => ({value: category.id, label: category.title})) ?? [],
+    () =>
+      categories?.map((category) => ({
+        value: category.id,
+        label: category.title,
+      })) ?? [],
     [categories],
   );
 
@@ -93,13 +124,13 @@ function EditDocumentForm({documentId}: {documentId: string}) {
     );
   }
 
-  let documentFormat = "misc";
+  let documentFormat = 'misc';
   if (documentRead.format_pdf) {
-    documentFormat = "pdf";
+    documentFormat = 'pdf';
   } else if (documentRead.format_markdown) {
-    documentFormat = "markdown";
+    documentFormat = 'markdown';
   } else if (documentRead.format_misc) {
-    documentFormat = "misc";
+    documentFormat = 'misc';
   }
 
   const uploadFile = async (file: UploadFile) => {
@@ -110,7 +141,7 @@ function EditDocumentForm({documentId}: {documentId: string}) {
     });
 
     await fetch(uploaded.presigned_url, {
-      method: "PUT",
+      method: 'PUT',
       body: file.originFileObj,
     });
 
@@ -119,12 +150,12 @@ function EditDocumentForm({documentId}: {documentId: string}) {
 
   const handleSubmit = async (values: FormValues) => {
     setSubmitting(true);
-    messageApi.loading("保存中...");
+    messageApi.loading('保存中...');
     try {
       if (documentRead.format_pdf) {
         let formatPdf = undefined;
-        if (values.pdfFile && values.pdfFile[0].uid !== "default") {
-          const {key} = await uploadFile(values.pdfFile[0]);
+        if (values.pdfFile && values.pdfFile[0].uid !== 'default') {
+          const { key } = await uploadFile(values.pdfFile[0]);
           formatPdf = {
             file_name: values.pdfFile[0].name,
             file_key: key,
@@ -140,7 +171,7 @@ function EditDocumentForm({documentId}: {documentId: string}) {
           body: {
             title: values.title,
             category: values.category,
-            targets: values.targets.map((target) => target.join("/")),
+            targets: values.targets.map((target) => target.join('/')),
             format_pdf: formatPdf,
           },
         });
@@ -154,7 +185,7 @@ function EditDocumentForm({documentId}: {documentId: string}) {
           body: {
             title: values.title,
             category: values.category,
-            targets: values.targets.map((target) => target.join("/")),
+            targets: values.targets.map((target) => target.join('/')),
             format_markdown: values.markdownContent
               ? {
                   content: values.markdownContent,
@@ -164,8 +195,8 @@ function EditDocumentForm({documentId}: {documentId: string}) {
         });
       } else if (documentRead.format_misc) {
         let formatMisc = undefined;
-        if (values.miscFile && values.miscFile[0].uid !== "default") {
-          const {key} = await uploadFile(values.miscFile[0]);
+        if (values.miscFile && values.miscFile[0].uid !== 'default') {
+          const { key } = await uploadFile(values.miscFile[0]);
           formatMisc = {
             file_name: values.miscFile[0].name,
             file_key: key,
@@ -181,7 +212,7 @@ function EditDocumentForm({documentId}: {documentId: string}) {
           body: {
             title: values.title,
             category: values.category,
-            targets: values.targets.map((target) => target.join("/")),
+            targets: values.targets.map((target) => target.join('/')),
             format_misc: formatMisc,
           },
         });
@@ -195,7 +226,7 @@ function EditDocumentForm({documentId}: {documentId: string}) {
 
     setSubmitting(false);
     messageApi.destroy();
-    messageApi.success("保存しました");
+    messageApi.success('保存しました');
     await refetch();
   };
 
@@ -206,22 +237,22 @@ function EditDocumentForm({documentId}: {documentId: string}) {
         initialValues={{
           title: documentRead.title,
           category: documentRead.category,
-          targets: documentRead.targets.map((target) => target.split("/")),
+          targets: documentRead.targets.map((target) => target.split('/')),
           pdfFile: documentRead.format_pdf
             ? [
                 {
-                  uid: "default",
+                  uid: 'default',
                   name: documentRead.format_pdf.file_name,
-                  status: "done",
+                  status: 'done',
                 },
               ]
             : [],
           miscFile: documentRead.format_misc
             ? [
                 {
-                  uid: "default",
+                  uid: 'default',
                   name: documentRead.format_misc.file_name,
-                  status: "done",
+                  status: 'done',
                 },
               ]
             : [],
@@ -239,18 +270,27 @@ function EditDocumentForm({documentId}: {documentId: string}) {
 
         <Form.Item label="対象" required>
           <Form.List name="targets">
-            {(fields, {add, remove}) => (
+            {(fields, { add, remove }) => (
               <Flex gap={16} vertical>
                 {fields.map((field) => (
                   <Space key={field.key}>
-                    <Form.Item name={field.name} noStyle rules={[{required: true}]}>
+                    <Form.Item
+                      name={field.name}
+                      noStyle
+                      rules={[{ required: true }]}
+                    >
                       <TargetSpecifier />
                     </Form.Item>
                     <MinusCircleOutlined onClick={() => remove(field.name)} />
                   </Space>
                 ))}
                 <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
                     追加
                   </Button>
                 </Form.Item>
@@ -265,15 +305,19 @@ function EditDocumentForm({documentId}: {documentId: string}) {
           {documentRead.format_misc && <Tag color="blue">その他</Tag>}
         </Form.Item>
 
-        {documentFormat === "pdf" && (
+        {documentFormat === 'pdf' && (
           <Form.Item
             label="PDFファイル"
-            rules={[{required: true}]}
+            rules={[{ required: true }]}
             name="pdfFile"
             valuePropName="fileList"
             getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
           >
-            <Upload accept="application/pdf" beforeUpload={() => false} maxCount={1}>
+            <Upload
+              accept="application/pdf"
+              beforeUpload={() => false}
+              maxCount={1}
+            >
               <Button>
                 <UploadOutlined />
                 PDFファイルをアップロード
@@ -282,21 +326,24 @@ function EditDocumentForm({documentId}: {documentId: string}) {
           </Form.Item>
         )}
 
-        {documentFormat === "markdown" && (
+        {documentFormat === 'markdown' && (
           <Form.Item
             label="markdown"
             name="markdownContent"
-            rules={[{required: true}]}
-            initialValue={documentRead.format_markdown?.content ?? ""}
+            rules={[{ required: true }]}
+            initialValue={documentRead.format_markdown?.content ?? ''}
           >
-            <Input.TextArea rows={10} placeholder="Markdown形式で資料の内容を入力してください" />
+            <Input.TextArea
+              rows={10}
+              placeholder="Markdown形式で資料の内容を入力してください"
+            />
           </Form.Item>
         )}
 
-        {documentFormat === "misc" && (
+        {documentFormat === 'misc' && (
           <Form.Item
             label="ファイル"
-            rules={[{required: true}]}
+            rules={[{ required: true }]}
             name="miscFile"
             valuePropName="fileList"
             getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}

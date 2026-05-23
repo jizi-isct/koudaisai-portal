@@ -1,1 +1,6 @@
-{"actor": {"User": {"group_ids": []}}, "target_exists": true, "target_group_ids": [], "expected": "none"}
+{
+  "actor": { "User": { "group_ids": [] } },
+  "target_exists": true,
+  "target_group_ids": [],
+  "expected": "none"
+}

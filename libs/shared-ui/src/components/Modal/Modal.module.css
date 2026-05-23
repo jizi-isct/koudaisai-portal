@@ -1,43 +1,43 @@
 .modalWindow {
-    z-index: 1002;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  z-index: 1002;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
-    height: 90vh;
-    width: 90vw;
+  height: 90vh;
+  width: 90vw;
 
-    border: 1px solid var(--darkblue);
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 4px 4px 0 0 var(--darkblue);
-    background: white;
+  border: 1px solid var(--darkblue);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 4px 4px 0 0 var(--darkblue);
+  background: white;
 
-    outline: none;
+  outline: none;
 }
 
 .modalOverlay {
-    z-index: 1002;
+  z-index: 1002;
 
-    transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(8px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(8px);
 }
 
 .children {
-    height: calc(100% - 5em);
-    max-height: calc(100% - 5em);
-    overflow-y: auto;
+  height: calc(100% - 5em);
+  max-height: calc(100% - 5em);
+  overflow-y: auto;
 }
 
 .closeButton {
-    margin-top: 1em;
-    text-align: center;
-    z-index: 1006;
+  margin-top: 1em;
+  text-align: center;
+  z-index: 1006;
 }

@@ -1,10 +1,19 @@
-import {decodeAccessToken} from "@koudaisai/shared-auth";
-import type {NotificationRead, NotificationReadTypeApprovalRequest, NotificationReadTypeMarkdown} from "@koudaisai/shared-types";
-import {ContentList, ContentRow, LoadingScreen, Modal} from "@koudaisai/shared-ui";
-import {useCallback, useEffect, useMemo, useState} from "react";
-import Markdown from "react-markdown";
-import {api} from "@/features/api/api";
-import styles from "./ViewNotifications.module.css";
+import { decodeAccessToken } from '@koudaisai/shared-auth';
+import type {
+  NotificationRead,
+  NotificationReadTypeApprovalRequest,
+  NotificationReadTypeMarkdown,
+} from '@koudaisai/shared-types';
+import {
+  ContentList,
+  ContentRow,
+  LoadingScreen,
+  Modal,
+} from '@koudaisai/shared-ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Markdown from 'react-markdown';
+import { api } from '@/features/api/api';
+import styles from './ViewNotifications.module.css';
 
 type NotificationWithReadState = {
   notification: NotificationRead;
@@ -12,26 +21,34 @@ type NotificationWithReadState = {
 };
 
 const statusMapping = {
-  approved: "承認",
-  rejected: "却下",
-  pending: "error",
-  closed: "error",
+  approved: '承認',
+  rejected: '却下',
+  pending: 'error',
+  closed: 'error',
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString("ja-JP", {year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, ".");
+  return new Date(date)
+    .toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .replace(/\//g, '.');
 };
 
 const getUserIdFromAccessToken = () => {
-  const accessToken = localStorage.getItem("exhibitor_access_token");
+  const accessToken = localStorage.getItem('exhibitor_access_token');
   if (!accessToken) return undefined;
 
   const payload = decodeAccessToken(accessToken);
-  return typeof payload.sub === "string" ? payload.sub : undefined;
+  return typeof payload.sub === 'string' ? payload.sub : undefined;
 };
 
 export function ViewNotifications() {
-  const [notifications, setNotifications] = useState<NotificationWithReadState[] | null>(null);
+  const [notifications, setNotifications] = useState<
+    NotificationWithReadState[] | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,7 +60,7 @@ export function ViewNotifications() {
     }
 
     (async () => {
-      const {data, error} = await api.GET("/users/{user_id}/notifications", {
+      const { data, error } = await api.GET('/users/{user_id}/notifications', {
         params: {
           path: {
             user_id: userId,
@@ -66,7 +83,10 @@ export function ViewNotifications() {
 
   const sortedNotifications = useMemo(() => {
     return [...(notifications ?? [])].sort((a, b) => {
-      return new Date(b.notification.created_at).getTime() - new Date(a.notification.created_at).getTime();
+      return (
+        new Date(b.notification.created_at).getTime() -
+        new Date(a.notification.created_at).getTime()
+      );
     });
   }, [notifications]);
 
@@ -94,19 +114,24 @@ export function ViewNotifications() {
     <ContentList
       pagination
       pageSize={5}
-      contents={sortedNotifications.map(({notification}) => (
+      contents={sortedNotifications.map(({ notification }) => (
         <NotificationRow key={notification.id} notification={notification} />
       ))}
     />
   );
 }
 
-function NotificationRow({notification}: {notification: NotificationRead}) {
-  if ("type_markdown" in notification) {
-    return <MarkdownNotificationRow notification={notification} markdown={notification.type_markdown} />;
+function NotificationRow({ notification }: { notification: NotificationRead }) {
+  if ('type_markdown' in notification) {
+    return (
+      <MarkdownNotificationRow
+        notification={notification}
+        markdown={notification.type_markdown}
+      />
+    );
   }
 
-  if ("type_approval_request" in notification) {
+  if ('type_approval_request' in notification) {
     return (
       <ApprovalRequestNotificationRow
         notification={notification}
@@ -153,7 +178,9 @@ function ApprovalRequestNotificationRow({
   notification: NotificationRead;
   notificationApprovalRequest: NotificationReadTypeApprovalRequest;
 }) {
-  const [approvalStatus, setApprovalStatus] = useState<keyof typeof statusMapping | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState<
+    keyof typeof statusMapping | null
+  >(null);
   const [approvalReason, setApprovalReason] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -161,14 +188,17 @@ function ApprovalRequestNotificationRow({
     const userId = getUserIdFromAccessToken();
     if (!userId) return;
 
-    const {data} = await api.GET("/users/{user_id}/approval_requests/{request_id}", {
-      params: {
-        path: {
-          user_id: userId,
-          request_id: notificationApprovalRequest.approval_request_id,
+    const { data } = await api.GET(
+      '/users/{user_id}/approval_requests/{request_id}',
+      {
+        params: {
+          path: {
+            user_id: userId,
+            request_id: notificationApprovalRequest.approval_request_id,
+          },
         },
       },
-    });
+    );
 
     if (data) {
       setApprovalStatus(data.status);
@@ -180,7 +210,7 @@ function ApprovalRequestNotificationRow({
     fetchApprovalRequest().catch(() => undefined);
   }, [fetchApprovalRequest]);
 
-  const statusLabel = approvalStatus ? statusMapping[approvalStatus] : "";
+  const statusLabel = approvalStatus ? statusMapping[approvalStatus] : '';
 
   return (
     <>
@@ -195,8 +225,10 @@ function ApprovalRequestNotificationRow({
         <div className={styles.modalContent}>
           <h2>企画情報訂正申請の結果</h2>
           <p>企画情報訂正申請が{statusLabel}されました。</p>
-          {approvalStatus === "approved" && (
-            <p>企画情報が完全に反映されるには最大で2日かかる可能性があります。</p>
+          {approvalStatus === 'approved' && (
+            <p>
+              企画情報が完全に反映されるには最大で2日かかる可能性があります。
+            </p>
           )}
           {approvalReason && (
             <>

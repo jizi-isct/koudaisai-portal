@@ -16,7 +16,7 @@ allOf:
         format: uuid
         description: ID of the user who issued the approval request
       status:
-        $ref: "./ApprovalRequestStatus.yml"
+        $ref: './ApprovalRequestStatus.yml'
       approved_by:
         type: string
         format: uuid
@@ -36,4 +36,4 @@ allOf:
       - status
       - issue_reason
       - approval_reason
-  - $ref: "./ApprovalRequestType.yml"
+  - $ref: './ApprovalRequestType.yml'

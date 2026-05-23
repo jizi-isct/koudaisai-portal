@@ -1,9 +1,7 @@
 {
   "actor": {
     "Admin": {
-      "claims": [
-        "koudaisai-portal:admin:approval-request:approve"
-      ]
+      "claims": ["koudaisai-portal:admin:approval-request:approve"]
     }
   },
   "expected": true

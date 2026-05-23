@@ -27,4 +27,4 @@ post:
     '500':
       description: サーバーエラー
   security:
-    - exhibitor_bearer: [ ]
+    - exhibitor_bearer: []

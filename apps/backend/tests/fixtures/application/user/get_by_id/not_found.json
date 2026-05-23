@@ -1,1 +1,6 @@
-{"actor": {"Admin": {"claims": ["koudaisai-portal:admin:user:read"]}}, "target_exists": false, "target_group_ids": [], "expected": "none"}
+{
+  "actor": { "Admin": { "claims": ["koudaisai-portal:admin:user:read"] } },
+  "target_exists": false,
+  "target_group_ids": [],
+  "expected": "none"
+}

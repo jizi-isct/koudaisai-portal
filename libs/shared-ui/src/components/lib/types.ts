@@ -1,6 +1,6 @@
 export type Content = {
-  title: string,
-  date?: string,
-  author?: string,
-  onClick: (() => void | Promise<void>)
-}
+  title: string;
+  date?: string;
+  author?: string;
+  onClick: () => void | Promise<void>;
+};
