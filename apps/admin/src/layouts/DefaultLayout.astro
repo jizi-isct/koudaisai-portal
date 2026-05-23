@@ -1,0 +1,18 @@
+---
+import {AdminShell} from "./AdminShell";
+import BaseLayout from "./BaseLayout.astro";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {title, description} = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout title={title} description={description}>
+  <AdminShell currentPath={currentPath} client:load>
+    <slot />
+  </AdminShell>
+</BaseLayout>

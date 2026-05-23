@@ -1,0 +1,35 @@
+---
+import membersLogo from "./assets/members_logo.svg";
+import "./footer.css";
+
+type Props = {
+  isLoggedIn?: boolean;
+};
+
+const { isLoggedIn } = Astro.props;
+const lineUrl = isLoggedIn ? "https://lin.ee/9Sud7lK" : "https://lin.ee/43ugikz";
+---
+
+<footer class="site-footer">
+  <div class="site-footer-logo-wrapper">
+    <img
+      src={membersLogo.src}
+      alt="Koudaisai Portal Members Site Logo"
+      width="40"
+      height="40"
+    />
+  </div>
+  <nav class="site-footer-nav-wrapper" aria-label="フッターナビゲーション">
+    <a href="/" class="site-footer-nav-item">ホーム</a>
+    <a href="/forms/" class="site-footer-nav-item">フォーム</a>
+    <a href="/documents/" class="site-footer-nav-item">資料</a>
+    <a href="/questions/" class="site-footer-nav-item">よくある質問</a>
+  </nav>
+  <p class="site-footer-contacts">
+    公式LINEアカウント：{
+      isLoggedIn === undefined ? "..." : <a href={lineUrl}>{lineUrl}</a>
+    } <br />
+    メールアドレス([at]を@に置き換えてください)：sanka[at]koudaisai.jp
+  </p>
+  <p class="site-footer-copyright-text">©︎ 2025 JIZI All Rights Reserved.</p>
+</footer>

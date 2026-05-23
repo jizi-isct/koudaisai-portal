@@ -172,4 +172,3 @@ impl ApprovalRequest {
         matches!(&self.status, ApprovalRequestStatus::Pending)
     }
 }
-

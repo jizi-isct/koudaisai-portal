@@ -1,0 +1,94 @@
+.root {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.logoSmall {
+  height: 40px;
+  width: 40px;
+}
+
+.logoBig {
+  width: min(100%, 300px);
+}
+
+.logoSmall img,
+.logoBig img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.title {
+  font-size: 2rem;
+  line-height: 1.3;
+}
+
+.description {
+  margin: 0;
+  max-width: 450px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  width: min(100%, 450px);
+}
+
+.input {
+  background: #ffffff;
+  border: 1px solid var(--darkblue);
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(37, 54, 97, 0.25);
+  height: 48px;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.error {
+  color: red;
+  margin: 0;
+  max-width: 450px;
+}
+
+.button {
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  filter: drop-shadow(0 0 12px rgba(37, 54, 97, 0.25));
+  flex-direction: row;
+  gap: 10px;
+  height: 60px;
+  justify-content: center;
+  width: fit-content;
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.buttonLabel {
+  font-weight: bold;
+}
+
+.buttonIcon {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #0048ff;
+  border-radius: 30px;
+  display: flex;
+  height: 60px;
+  justify-content: center;
+  width: 60px;
+}

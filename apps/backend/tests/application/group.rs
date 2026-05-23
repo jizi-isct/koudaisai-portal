@@ -1,12 +1,14 @@
-use crate::application::common::{build_actor, uid, ActorSpec};
-use koudaisai_portal_backend::application::error::{ApplicationOperationError, ApplicationSequentialOperationError};
+use crate::application::common::{ActorSpec, build_actor, uid};
+use chrono::Utc;
+use koudaisai_portal_backend::application::error::{
+    ApplicationOperationError, ApplicationSequentialOperationError,
+};
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
 use koudaisai_portal_backend::domain::user_id::UserId;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
 use koudaisai_portal_backend::infra::memory::transaction_impl::MemoryTransaction;
-use chrono::Utc;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
@@ -30,7 +32,9 @@ fn admin_read_ctx() -> ActorContext {
 }
 
 async fn seed_group(app: &MemoryApplication, group_id: GroupId, name: String, rep_id: UserId) {
-    let group_type = GroupType::Press { representative: rep_id };
+    let group_type = GroupType::Press {
+        representative: rep_id,
+    };
     app.group()
         .create_group(
             &admin_create_ctx(),
@@ -71,7 +75,10 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
                 assert_eq!(groups.len(), c.seed_group_count);
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -102,7 +109,11 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
 
         if c.group_exists {
             // If seed_actor_membership, use actor_uid as representative so they get a DB membership
-            let rep_id = if c.seed_actor_membership { actor_uid } else { uid() };
+            let rep_id = if c.seed_actor_membership {
+                actor_uid
+            } else {
+                uid()
+            };
             seed_group(&app, group_id, "Test Group".to_string(), rep_id).await;
         }
 
@@ -119,7 +130,10 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
                 assert!(opt.is_none(), "expected None");
             }
             "unauthorized" => {
-                assert!(matches!(result, Err(ApplicationOperationError::Unauthorized)));
+                assert!(matches!(
+                    result,
+                    Err(ApplicationOperationError::Unauthorized)
+                ));
             }
             e => panic!("unknown expected: {e}"),
         }
@@ -144,7 +158,9 @@ pub fn test_create_group(_path: &Path, contents: String) -> datatest_stable::Res
 
         let group_id = GroupId::from_str(&c.group_id).unwrap();
         let rep_id = uid();
-        let group_type = GroupType::Press { representative: rep_id };
+        let group_type = GroupType::Press {
+            representative: rep_id,
+        };
         let tx = MemoryTransaction::new();
 
         let (_, ctx) = build_actor(c.actor);
@@ -165,10 +181,15 @@ pub fn test_create_group(_path: &Path, contents: String) -> datatest_stable::Res
                 let rep_ctx = ActorContext::User {
                     user_id: rep_id,
                     memberships: vec![],
-                    group_type: GroupType::Press { representative: rep_id },
+                    group_type: GroupType::Press {
+                        representative: rep_id,
+                    },
                 };
                 let visible = app.group().get_by_id(&rep_ctx, group_id).await.unwrap();
-                assert!(visible.is_some(), "representative should be able to see their group");
+                assert!(
+                    visible.is_some(),
+                    "representative should be able to see their group"
+                );
             }
             "unauthorized" => {
                 assert!(matches!(

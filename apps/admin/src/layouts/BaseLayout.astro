@@ -1,0 +1,60 @@
+---
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "工大祭管理画面",
+  description = "工大祭実行委員会向けの管理画面です。",
+} = Astro.props;
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --background: #f5f7fb;
+    --foreground: #171717;
+    --brand: #0048ff;
+    --surface: #ffffff;
+    --border: #d8deea;
+    --muted: #687184;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: visible;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+</style>

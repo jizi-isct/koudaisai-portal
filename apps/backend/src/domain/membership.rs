@@ -71,4 +71,3 @@ impl Membership {
         self.group_id
     }
 }
-

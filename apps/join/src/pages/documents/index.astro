@@ -1,0 +1,35 @@
+---
+import {getApiFetchClient} from "@koudaisai/shared-api";
+import ViewDocumentsWrapper from "@/features/documents/ViewDocumentsWrapper";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {Heading1} from "@koudaisai/shared-ui";
+
+const fetchClient = getApiFetchClient("https://portal.koudaisai.jp/api/v2");
+const {data, error} = await fetchClient.GET("/documents/by-category", {cache: "no-store"});
+
+if (error || !data) {
+  throw error;
+}
+---
+
+<DefaultLayout title="資料 | 工大祭参加登録サイト">
+    <section class="documents-page">
+        <Heading1 emoji="📚">資料</Heading1>
+        <div class="documents-page-container">
+            <ViewDocumentsWrapper documents={data} client:load/>
+        </div>
+    </section>
+</DefaultLayout>
+
+<style>
+    .documents-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: calc(100vh - 300px);
+    }
+
+    .documents-page-container {
+        width: 100%;
+    }
+</style>

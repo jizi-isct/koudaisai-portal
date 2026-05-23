@@ -1,6 +1,7 @@
-pub mod common;
 pub mod actor_ctx;
 pub mod approval_request;
+pub mod common;
+pub mod document;
 pub mod document_category;
 pub mod email_address;
 pub mod form;

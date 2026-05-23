@@ -1,5 +1,4 @@
 import styles from "./ButtonIcon.module.css";
-import Image from "next/image";
 
 type IconType = "edit" | "delete" | "download";
 
@@ -14,7 +13,7 @@ export const ButtonIcon = ({iconType, onClick}: ButtonProps) => {
 
   return (
     <button className={styles.root} onClick={onClick}>
-      <Image src={iconSrc} alt={iconType} width={24} height={24}/>
+      <img src={iconSrc} alt={iconType} width={24} height={24}/>
     </button>
   );
 };

@@ -1,0 +1,23 @@
+---
+import membersLogo from "@/features/header/assets/members_logo.png";
+import styles from "@/features/plain-form/PlainForm.module.css";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="パスワードのリセット | 工大祭ポータル">
+  <main class={styles.root}>
+    <div class={styles.logoSmall}>
+      <img src={membersLogo.src} alt="Koudaisai Portal Logo" width="40" height="40" />
+    </div>
+    <h1 class={styles.title}>パスワードのリセット</h1>
+    <p class={styles.description}>パスワードをリセットしました</p>
+    <a class={styles.button} href="/login/">
+      <span class={styles.buttonLabel}>工大祭ポータルに進む</span>
+      <span class={styles.buttonIcon} aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.66667 16H25.3333M25.3333 16L16 6.66666M25.3333 16L16 25.3333" stroke="#253661" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+    </a>
+  </main>
+</BaseLayout>

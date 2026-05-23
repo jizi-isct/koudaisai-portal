@@ -142,5 +142,4 @@ mod tests {
         assert_eq!(document_category.created_at(), created_at);
         assert_eq!(document_category.updated_at(), updated_at);
     }
-
 }

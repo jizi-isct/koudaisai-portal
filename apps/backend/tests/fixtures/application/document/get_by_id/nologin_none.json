@@ -1,0 +1,6 @@
+{
+  "actor": "Nologin",
+  "document_exists": true,
+  "document_targets": ["group/type/project_general"],
+  "expected": "none"
+}

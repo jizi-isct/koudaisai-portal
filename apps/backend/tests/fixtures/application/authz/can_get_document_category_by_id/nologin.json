@@ -1,4 +1,4 @@
 {
   "actor": "Nologin",
-  "expected": "unauthorized"
+  "expected": "ok"
 }

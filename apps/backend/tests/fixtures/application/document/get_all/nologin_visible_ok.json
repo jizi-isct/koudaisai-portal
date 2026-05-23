@@ -1,0 +1,7 @@
+{
+  "actor": "Nologin",
+  "seed_count": 1,
+  "seed_targets": ["user/nologin"],
+  "expected_count": 1,
+  "expected": "ok"
+}

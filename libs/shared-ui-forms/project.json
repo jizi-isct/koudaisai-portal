@@ -1,0 +1,8 @@
+{
+  "name": "@koudaisai-portal/shared-ui-forms",
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}

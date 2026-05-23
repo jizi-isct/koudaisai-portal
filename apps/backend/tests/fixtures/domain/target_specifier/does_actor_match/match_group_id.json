@@ -1,0 +1,8 @@
+{
+  "target": "group/id/G-001",
+  "actor": {
+    "type": "User",
+    "group_ids": ["G-001"]
+  },
+  "expected": true
+}

@@ -17,6 +17,20 @@
         "cwd": "apps/backend"
       }
     },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fmt --all -- --check",
+        "cwd": "apps/backend"
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo check",
+        "cwd": "apps/backend"
+      }
+    },
     "docker-up": {
       "executor": "nx:run-commands",
       "options": {
@@ -28,7 +42,10 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo watch -x run",
-        "cwd": "apps/backend"
+        "cwd": "apps/backend",
+        "env": {
+          "KOUDAISAI_PORTAL_CONFIG_PATH": "./debug/default-config.toml"
+        }
       },
       "dependsOn": [
         "docker-up"

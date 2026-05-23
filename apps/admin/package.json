@@ -2,20 +2,26 @@
   "name": "@koudaisai-portal/admin",
   "version": "0.0.1",
   "private": true,
-  "dependencies": {
-    "@tanstack/react-query": "^5.94.5",
-    "next": "~16.0.1",
-    "next-base64": "^1.1.0",
-    "object-hash": "^3.0.0",
-    "openapi-fetch": "^0.17.0",
-    "openapi-react-query": "^0.5.4",
-    "papaparse": "^5.5.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-markdown": "^10.1.0"
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
-  "devDependencies": {
-    "@types/object-hash": "^3.0.6",
-    "@types/papaparse": "^5.5.2"
+  "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@astrojs/react": "^5.0.5",
+    "@koudaisai/shared-api": "0.0.1",
+    "@koudaisai/shared-auth": "0.0.1",
+    "@koudaisai/shared-auth-admin": "0.0.1",
+    "@koudaisai/shared-types": "0.0.1",
+    "@koudaisai/shared-ui": "0.0.1",
+    "@koudaisai/shared-utils": "0.0.1",
+    "@tanstack/react-query": "^5.94.5",
+    "antd": "^6.2.2",
+    "astro": "^6.2.1",
+    "object-hash": "^3.0.0",
+    "papaparse": "^5.5.3",
+    "react-markdown": "^10.1.0"
   }
 }

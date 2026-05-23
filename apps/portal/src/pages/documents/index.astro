@@ -1,0 +1,10 @@
+---
+import {ViewDocumentsWrapper} from "@/features/documents/ViewDocumentsWrapper";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import {Heading1} from "@koudaisai/shared-ui";
+---
+
+<DefaultLayout title="資料一覧 | 工大祭ポータル">
+  <Heading1 emoji="📚">資料一覧</Heading1>
+  <ViewDocumentsWrapper client:load />
+</DefaultLayout>

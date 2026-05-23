@@ -1,0 +1,105 @@
+@media screen and (min-width: 768px) {
+  .site-header {
+    z-index: 1000;
+    position: relative;
+    height: 100px;
+    text-align: center;
+  }
+
+  .site-header-logo-wrapper {
+    position: fixed;
+    top: 32px;
+    left: 40px;
+    display: flex;
+    align-items: center;
+    color: black;
+    text-decoration: none;
+  }
+
+  .site-header-logo-text-wrapper {
+    display: inline-block;
+    margin-left: 8px;
+    height: 50px;
+  }
+
+  .site-header-logo-text {
+    display: inline-flex;
+    align-items: center;
+    height: 50px;
+    font-size: 20px;
+    font-weight: 700;
+    transition: color 500ms ease-in;
+  }
+
+  .site-header-logo-text-white {
+    color: white;
+  }
+
+  .site-header-menu-wrapper {
+    position: fixed;
+    top: 30px;
+    left: 50vw;
+    transform: translateX(-50%);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .site-header-nav {
+    align-items: center;
+    border-radius: 100vw;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    width: 120px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    border: 1px solid;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    margin: 0 10px;
+    box-shadow: 0 0 12px 0 rgba(37, 54, 97, 0.25);
+    background-color: white;
+  }
+
+  .site-header-mobile-text {
+    display: none;
+  }
+
+  .site-header-members .site-header-active-nav {
+    background-color: #0048ff;
+    color: white;
+    border-color: #0048ff;
+  }
+
+  .site-header-members .site-header-inactive-nav {
+    background-color: white;
+    color: black;
+    border-color: #0048ff;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .site-header {
+    position: absolute;
+    height: 100px;
+  }
+
+  .site-header-logo-wrapper {
+    z-index: 1000;
+    position: fixed;
+    top: 30px;
+    left: 50vw;
+    transform: translateX(-50%);
+    color: black;
+    text-decoration: none;
+  }
+
+  .site-header-logo-text-wrapper,
+  .site-header-menu-wrapper {
+    display: none;
+  }
+}

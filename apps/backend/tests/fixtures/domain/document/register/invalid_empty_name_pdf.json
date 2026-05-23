@@ -1,0 +1,6 @@
+{
+  "title": "Test Document",
+  "format": { "type": "pdf", "file_key": "key", "file_name": "" },
+  "targets": ["user/nologin"],
+  "ok": false
+}
