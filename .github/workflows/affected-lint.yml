@@ -1,4 +1,4 @@
-name: Backend Check
+name: Affected Lint
 
 on:
   pull_request:
@@ -7,11 +7,13 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: nx check backend
+  lint:
+    name: nx affected -t lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run backend check
-        run: npx nx check backend
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run affected lint
+        run: npx nx affected -t lint
