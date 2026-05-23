@@ -1,4 +1,4 @@
-name = "koudaisai-portal/join"
+name = "koudaisai-portal/portal"
 compatibility_date = "2025-09-05"
 preview_urls = true
 
@@ -9,5 +9,5 @@ directory = "dist"
 enabled = true
 
 [[routes]]
-pattern = "join.koudaisai.jp"
+pattern = "portal.koudaisai.jp"
 custom_domain = true
