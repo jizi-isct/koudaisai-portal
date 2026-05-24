@@ -127,7 +127,7 @@ function EditForm({ formId }: { formId: string }) {
           targets: form.targets.map((target) => target.split('/')),
           url: 'type_external' in form ? form.type_external.form_url : '',
           dueDate: form.due_date
-            ? timeZoneOffset({ ServerDate: new Date(form.due_date) })
+            ? timeZoneOffset({ serverDate: new Date(form.due_date) })
             : undefined,
         }}
       >
