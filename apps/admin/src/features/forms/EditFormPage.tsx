@@ -5,7 +5,7 @@ import { Button, Flex, Form, Input, message, Radio, Result, Space } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { $api } from '@/features/api/api';
 import { TargetSpecifier } from '@/features/documents/TargetSpecifier';
-import { TimeZoneOffset } from './TimeZoneOffset/TimeZoneOffset';
+import { TimeZoneOffset } from './TimeZoneOffset/TimeZoneOffset.ts';
 
 type FormValues = {
   formName: string | undefined;
