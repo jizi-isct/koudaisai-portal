@@ -3,6 +3,7 @@ import Hero from "@/features/hero/Hero.astro";
 import { TopPageTabs } from "@/features/top-page/TopPageTabs";
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
 import { Heading2 } from "@koudaisai/shared-ui";
+import ShowUsingAnalytics from "./showUsingAnalytics/ShowUsingAnalytics.astro"
 ---
 
 <DefaultLayout title="工大祭参加登録サイト" titleColor="white">
@@ -16,6 +17,7 @@ import { Heading2 } from "@koudaisai/shared-ui";
     一緒に工大祭を創りあげましょう！
   </p>
   <TopPageTabs client:load />
+  <ShowUsingAnalytics />
 </DefaultLayout>
 
 <script>
