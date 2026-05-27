@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 export default defineConfig({
   integrations: [react()],
   output: 'static',
+  site: "https://join.koudaisai.jp",
   env: {
     schema: {
       API_URL: envField.string({ context: 'client', access: 'public' }),
