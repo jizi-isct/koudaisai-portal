@@ -5,6 +5,7 @@ import { Button, Flex, Form, Input, message, Radio, Result, Space } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { $api } from '@/features/api/api';
 import { TargetSpecifier } from '@/features/documents/TargetSpecifier';
+import { timeZoneOffset } from './TimeZoneOffset/timeZoneOffset.ts';
 
 type FormValues = {
   formName: string | undefined;
@@ -126,7 +127,7 @@ function EditForm({ formId }: { formId: string }) {
           targets: form.targets.map((target) => target.split('/')),
           url: 'type_external' in form ? form.type_external.form_url : '',
           dueDate: form.due_date
-            ? new Date(form.due_date).toISOString().slice(0, 16)
+            ? timeZoneOffset({ serverDate: new Date(form.due_date) })
             : undefined,
         }}
       >
