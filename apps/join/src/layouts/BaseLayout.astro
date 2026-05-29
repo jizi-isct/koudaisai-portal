@@ -8,6 +8,8 @@ const {
   title = "工大祭ポータル",
   description = "このサイトは工大祭実行委員会公式の参加団体向けポータルサイトです。",
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, "https://join.koudaisai.jp").toString();
 ---
 
 <html lang="ja">
@@ -16,7 +18,7 @@ const {
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <title>{title}</title>
-    <link rel="canonical" href="https://join.koudaisai.jp" />
+    <link rel="canonical" href={canonical} />
   </head>
   <body>
     <slot />
