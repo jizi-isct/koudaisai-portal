@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, name, type,\n                      representative1, representative2, representative3, operator\n               FROM groups WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "type",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "representative1",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "representative2",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "representative3",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "operator",
+        "ordinal": 8,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "fae2cc5c111e633a462e18d202ac8c28bc0a015fc8fa787b8d5c4de3a8885f22"
+}

@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, created_by, updated_by, targets,\n                      type, approval_request_id, title, content\n               FROM notifications WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_by",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_by",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "targets",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "type",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "approval_request_id",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "content",
+        "ordinal": 9,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "cbc7364b143bedd838a702ec40f52e685e9b15a9476085ebaf733479a6e4f499"
+}

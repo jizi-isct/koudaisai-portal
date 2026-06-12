@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, created_by, updated_by, targets,\n                      name, summary, due_date, type, form_url\n               FROM forms",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_by",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_by",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "targets",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "summary",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "due_date",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "type",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "form_url",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "3c1a85e4dd6f4bfc1bc551bbd10de4e6811677fcbce2a5e3187de93145dfd087"
+}

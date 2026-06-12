@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO approval_requests (id, issued_at, issued_by, type, status, description, icon_key, issue_reason, approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 15
+    },
+    "nullable": []
+  },
+  "hash": "26696a9c8239d49724f83415460946eae5de6520637b6b0bfe1ca65fa6e540db"
+}
