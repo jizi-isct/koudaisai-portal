@@ -210,8 +210,123 @@ impl Group {
 mod tests {
     use super::*;
     use crate::domain::group_id::GroupId;
+    use crate::domain::membership::Membership;
     use crate::domain::user_id::UserId;
     use uuid::Uuid;
+
+    struct MockClock {
+        now: DateTime<Utc>,
+    }
+
+    impl Clock for MockClock {
+        fn now(&self) -> DateTime<Utc> {
+            self.now
+        }
+    }
+
+    // --- GroupType バリデーション ---
+
+    #[test]
+    fn test_general_project_all_unique_reps_succeeds() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let group_type = GroupType::GeneralProject {
+            representative1: UserId::new(Uuid::new_v4()),
+            representative2: UserId::new(Uuid::new_v4()),
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_general_project_duplicate_reps_fails() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let shared = UserId::new(Uuid::new_v4());
+        let group_type = GroupType::GeneralProject {
+            representative1: shared,
+            representative2: shared,
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+    }
+
+    #[test]
+    fn test_booth_project_duplicate_reps_fails() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let shared = UserId::new(Uuid::new_v4());
+        let group_type = GroupType::BoothProject {
+            representative1: shared,
+            representative2: shared,
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+    }
+
+    #[test]
+    fn test_stage_project_duplicate_reps_fails() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let shared = UserId::new(Uuid::new_v4());
+        let group_type = GroupType::StageProject {
+            representative1: shared,
+            representative2: shared,
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+    }
+
+    #[test]
+    fn test_lab_project_same_representative_and_operator_succeeds() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let shared = UserId::new(Uuid::new_v4());
+        let group_type = GroupType::LabProject {
+            representative: shared,
+            operator: shared,
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_lab_project_different_representative_and_operator_succeeds() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let group_type = GroupType::LabProject {
+            representative: UserId::new(Uuid::new_v4()),
+            operator: UserId::new(Uuid::new_v4()),
+        };
+        let result = Group::register(group_id, "G".to_string(), group_type, &clock);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_update_roles_validates_duplicate_reps() {
+        let clock = MockClock { now: Utc::now() };
+        let group_id = GroupId::new('A', 1).unwrap();
+        let group_type = GroupType::GeneralProject {
+            representative1: UserId::new(Uuid::new_v4()),
+            representative2: UserId::new(Uuid::new_v4()),
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let mut group = Group::register(group_id, "G".to_string(), group_type, &clock).unwrap();
+
+        let shared = UserId::new(Uuid::new_v4());
+        let invalid_type = GroupType::GeneralProject {
+            representative1: shared,
+            representative2: shared,
+            representative3: UserId::new(Uuid::new_v4()),
+        };
+        let membership = Membership::new(group_id, UserId::new(Uuid::new_v4()), &clock);
+        let result = group.update_roles(invalid_type, &clock, &membership);
+        assert!(matches!(result, Err(UpdateRolesError::InvalidInput(_))));
+    }
 
     #[test]
     fn test_restore_success() {
