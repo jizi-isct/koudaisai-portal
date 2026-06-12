@@ -1,4 +1,5 @@
 use crate::application::ports::clock::Clock;
+use crate::domain::admin_id::AdminId;
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
 use crate::domain::user_id::UserId;
@@ -20,13 +21,13 @@ pub enum ApprovalRequestStatus {
     Pending,
     /// 承認済み
     Approved {
-        approved_by: UserId,
+        approved_by: AdminId,
         approved_at: DateTime<Utc>,
         approval_reason: Option<String>,
     },
     /// 却下済み
     Rejected {
-        rejected_by: UserId,
+        rejected_by: AdminId,
         rejected_at: DateTime<Utc>,
         rejection_reason: Option<String>,
     },
@@ -117,7 +118,7 @@ impl ApprovalRequest {
     /// 承認する（Pending → Approved）
     pub fn approve<C: Clock>(
         &mut self,
-        approved_by: UserId,
+        approved_by: AdminId,
         approval_reason: Option<String>,
         clock: &C,
     ) -> Result<(), InvalidTransitionError> {
@@ -137,7 +138,7 @@ impl ApprovalRequest {
     /// 却下する（Pending → Rejected）
     pub fn reject<C: Clock>(
         &mut self,
-        rejected_by: UserId,
+        rejected_by: AdminId,
         rejection_reason: Option<String>,
         clock: &C,
     ) -> Result<(), InvalidTransitionError> {

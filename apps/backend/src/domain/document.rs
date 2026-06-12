@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+use crate::domain::admin_id::AdminId;
 use crate::domain::target_specifier::TargetSpecifier;
-use crate::domain::user_id::UserId;
 
 use crate::{application::ports::clock::Clock, domain::error::FactoryError};
 
@@ -11,8 +11,8 @@ pub struct Document {
     id: Uuid,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
-    created_by: UserId,
-    updated_by: UserId,
+    created_by: AdminId,
+    updated_by: AdminId,
     title: String,
     category: Option<Uuid>,
     targets: Vec<TargetSpecifier>,
@@ -33,7 +33,7 @@ impl Document {
         category: Option<Uuid>,
         format: DocumentFormat,
         targets: Vec<TargetSpecifier>,
-        created_by: UserId,
+        created_by: AdminId,
         clock: &C,
     ) -> Result<Self, FactoryError> {
         if title.trim().is_empty() {
@@ -69,8 +69,8 @@ impl Document {
         id: Uuid,
         created_at: DateTime<Utc>,
         updated_at: DateTime<Utc>,
-        created_by: UserId,
-        updated_by: UserId,
+        created_by: AdminId,
+        updated_by: AdminId,
         title: String,
         category: Option<Uuid>,
         format: DocumentFormat,
@@ -142,11 +142,11 @@ impl Document {
         self.updated_at
     }
 
-    pub fn created_by(&self) -> UserId {
+    pub fn created_by(&self) -> AdminId {
         self.created_by
     }
 
-    pub fn updated_by(&self) -> UserId {
+    pub fn updated_by(&self) -> AdminId {
         self.updated_by
     }
 
@@ -169,7 +169,7 @@ impl Document {
     pub fn change_title<C: Clock>(
         &mut self,
         new_title: String,
-        updated_by: UserId,
+        updated_by: AdminId,
         clock: &C,
     ) -> Result<(), FactoryError> {
         if new_title.trim().is_empty() {
@@ -184,7 +184,7 @@ impl Document {
     pub fn change_category<C: Clock>(
         &mut self,
         new_category: Option<Uuid>,
-        updated_by: UserId,
+        updated_by: AdminId,
         clock: &C,
     ) -> Result<(), FactoryError> {
         self.category = new_category;
@@ -197,7 +197,7 @@ impl Document {
     pub fn change_format<C: Clock>(
         &mut self,
         new_format: DocumentFormat,
-        updated_by: UserId,
+        updated_by: AdminId,
         clock: &C,
     ) -> Result<(), FactoryError> {
         Self::validate_format(&new_format)?; // 参照渡し
@@ -210,7 +210,7 @@ impl Document {
     pub fn change_targets<C: Clock>(
         &mut self,
         new_targets: Vec<TargetSpecifier>,
-        updated_by: UserId,
+        updated_by: AdminId,
         clock: &C,
     ) -> Result<(), FactoryError> {
         if new_targets.is_empty() {

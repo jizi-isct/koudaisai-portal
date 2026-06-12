@@ -1,9 +1,9 @@
 use crate::application::ports::clock::Clock;
+use crate::domain::admin_id::AdminId;
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
 use crate::domain::notification_id::NotificationId;
 use crate::domain::target_specifier::TargetSpecifier;
-use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -45,8 +45,8 @@ pub struct Notification {
     id: NotificationId,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
-    created_by: Option<UserId>,
-    updated_by: Option<UserId>,
+    created_by: Option<AdminId>,
+    updated_by: Option<AdminId>,
     targets: Vec<TargetSpecifier>,
     notification_type: NotificationType,
 }
@@ -56,7 +56,7 @@ impl Notification {
         id: NotificationId,
         targets: Vec<TargetSpecifier>,
         notification_type: NotificationType,
-        created_by: Option<UserId>,
+        created_by: Option<AdminId>,
         clock: &C,
     ) -> Result<Self, FactoryError> {
         let now = clock.now();
@@ -76,8 +76,8 @@ impl Notification {
         id: NotificationId,
         created_at: DateTime<Utc>,
         updated_at: DateTime<Utc>,
-        created_by: Option<UserId>,
-        updated_by: Option<UserId>,
+        created_by: Option<AdminId>,
+        updated_by: Option<AdminId>,
         targets: Vec<TargetSpecifier>,
         notification_type: NotificationType,
     ) -> Result<Self, FactoryError> {
@@ -104,11 +104,11 @@ impl Notification {
         &self.updated_at
     }
 
-    pub fn created_by(&self) -> Option<UserId> {
+    pub fn created_by(&self) -> Option<AdminId> {
         self.created_by
     }
 
-    pub fn updated_by(&self) -> Option<UserId> {
+    pub fn updated_by(&self) -> Option<AdminId> {
         self.updated_by
     }
 
@@ -123,7 +123,7 @@ impl Notification {
     pub fn update_target<C: Clock>(
         &mut self,
         targets: Vec<TargetSpecifier>,
-        updated_by: Option<UserId>,
+        updated_by: Option<AdminId>,
         clock: &C,
     ) -> Result<(), FactoryError> {
         self.targets = targets;
@@ -136,7 +136,7 @@ impl Notification {
         &mut self,
         title: String,
         content: String,
-        updated_by: Option<UserId>,
+        updated_by: Option<AdminId>,
         clock: &C,
     ) -> Result<(), InvalidTransitionError> {
         match self.notification_type {
@@ -189,7 +189,7 @@ mod tests {
     fn create_with_non_empty_target_sets_fields() {
         let now = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
         let clock = MockClock { now };
-        let created_by = Some(UserId::new(Uuid::new_v4()));
+        let created_by = Some(AdminId::new(Uuid::new_v4()));
         let notification_type =
             NotificationType::markdown("title".to_string(), "body".to_string()).unwrap();
 
@@ -290,7 +290,7 @@ mod tests {
         let updated_at = Utc.with_ymd_and_hms(2026, 1, 2, 0, 0, 0).unwrap();
         let create_clock = MockClock { now: created_at };
         let update_clock = MockClock { now: updated_at };
-        let updater = Some(UserId::new(Uuid::new_v4()));
+        let updater = Some(AdminId::new(Uuid::new_v4()));
 
         let mut notification = Notification::create(
             NotificationId::generate(),
@@ -316,7 +316,7 @@ mod tests {
         let updated_at = Utc.with_ymd_and_hms(2026, 1, 2, 0, 0, 0).unwrap();
         let create_clock = MockClock { now: created_at };
         let update_clock = MockClock { now: updated_at };
-        let updater = Some(UserId::new(Uuid::new_v4()));
+        let updater = Some(AdminId::new(Uuid::new_v4()));
 
         let mut notification = Notification::create(
             NotificationId::generate(),

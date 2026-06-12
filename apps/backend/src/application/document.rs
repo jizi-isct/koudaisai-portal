@@ -12,6 +12,7 @@ use crate::application::error::{
 };
 use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::admin_id::AdminId;
 use crate::domain::document::Document;
 use crate::domain::document::DocumentFormat;
 use crate::domain::group::GroupType;
@@ -77,9 +78,12 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             return Err(ApplicationOperationError::Unauthorized);
         }
 
-        let created_by = actor_ctx
-            .user_id()
-            .ok_or_else(|| ApplicationOperationError::Unauthorized)?;
+        let created_by = AdminId::new(
+            actor_ctx
+                .user_id()
+                .ok_or_else(|| ApplicationOperationError::Unauthorized)?
+                .into(),
+        );
 
         let document = Document::register(title, category, format, targets, created_by, self.clock)
             .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
@@ -158,9 +162,14 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             ));
         };
 
-        let updated_by = actor_ctx.user_id().ok_or_else(|| {
-            ApplicationOperationError::InternalError(anyhow::anyhow!("missing user_id"))
-        })?;
+        let updated_by = AdminId::new(
+            actor_ctx
+                .user_id()
+                .ok_or_else(|| {
+                    ApplicationOperationError::InternalError(anyhow::anyhow!("missing user_id"))
+                })?
+                .into(),
+        );
 
         if let Some(title) = title {
             document

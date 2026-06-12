@@ -9,6 +9,7 @@ use crate::application::ports::repositories::approval_request_repo::ApprovalRequ
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::admin_id::AdminId;
 use crate::domain::approval_request::{ApprovalRequest, ApprovalRequestType};
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::user_id::UserId;
@@ -136,7 +137,7 @@ impl<'a, Tx: Transaction, AR: ApprovalRequestRepo<Tx>, MR: MembershipRepo<Tx>, C
         }
 
         let approver_id = match actor_ctx {
-            ActorContext::Admin { user_id, .. } => *user_id,
+            ActorContext::Admin { user_id, .. } => AdminId::new((*user_id).into()),
             _ => return Err(ApplicationOperationError::Unauthorized),
         };
 
@@ -173,7 +174,7 @@ impl<'a, Tx: Transaction, AR: ApprovalRequestRepo<Tx>, MR: MembershipRepo<Tx>, C
         }
 
         let rejector_id = match actor_ctx {
-            ActorContext::Admin { user_id, .. } => *user_id,
+            ActorContext::Admin { user_id, .. } => AdminId::new((*user_id).into()),
             _ => return Err(ApplicationOperationError::Unauthorized),
         };
 

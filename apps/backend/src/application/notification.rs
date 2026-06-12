@@ -8,6 +8,7 @@ use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::admin_id::AdminId;
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
 use crate::domain::target_specifier::TargetSpecifier;
@@ -66,7 +67,7 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         }
 
         let created_by = match actor_ctx {
-            ActorContext::Admin { user_id, .. } => Some(*user_id),
+            ActorContext::Admin { user_id, .. } => Some(AdminId::new((*user_id).into())),
             _ => return Err(ApplicationOperationError::Unauthorized),
         };
 
@@ -91,7 +92,7 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         }
 
         let updated_by = match actor_ctx {
-            ActorContext::Admin { user_id, .. } => Some(*user_id),
+            ActorContext::Admin { user_id, .. } => Some(AdminId::new((*user_id).into())),
             _ => return Err(ApplicationOperationError::Unauthorized),
         };
 
