@@ -85,6 +85,7 @@ fn parse_group_type(s: &str) -> GroupType {
         },
         "labo" => GroupType::LabProject {
             representative: u(),
+            operator: u(),
         },
         _ => GroupType::Press {
             representative: u(),

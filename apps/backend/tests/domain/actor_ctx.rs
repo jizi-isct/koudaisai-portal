@@ -52,6 +52,7 @@ fn parse_actor(s: &str) -> ActorContext {
         "user_labo" => {
             user_ctx(GroupType::LabProject {
                 representative: u(),
+                operator: u(),
             })
             .1
         }

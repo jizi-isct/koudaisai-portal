@@ -37,6 +37,7 @@ fn parse_group_type(s: &str) -> GroupType {
         },
         "lab_project" => GroupType::LabProject {
             representative: u(),
+            operator: u(),
         },
         "stage_project" => GroupType::StageProject {
             representative1: u(),

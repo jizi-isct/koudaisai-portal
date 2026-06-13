@@ -54,6 +54,7 @@ pub fn parse_group_type(s: &str) -> GroupType {
         },
         "labo" => GroupType::LabProject {
             representative: uid(),
+            operator: uid(),
         },
         s => panic!("unknown group_type: {s}"),
     }
