@@ -1,11 +1,13 @@
 mod password;
 
 use crate::routes::{AppState, AuthSession};
-use crate::sea_orm_entities::prelude::Users;
-use crate::sea_orm_entities::{revoked_refresh_tokens, users};
+// TODO(sqlx移行): users / revoked_refresh_tokens のDBアクセスは application 層(sqlx)へ再配線
+// use crate::sea_orm_entities::prelude::Users;
+// use crate::sea_orm_entities::{revoked_refresh_tokens, users};
 use crate::util::jwt;
 use crate::util::oidc::OIDCClient;
-use crate::util::sha::{digest, stretch_with_salt};
+// TODO(sqlx移行): digest/stretch_with_salt はパスワード検証を application 層へ再配線する際に復活させる
+// use crate::util::sha::{digest, stretch_with_salt};
 use anyhow::Result;
 use axum::extract::{ConnectInfo, State};
 use axum::http::{HeaderMap, StatusCode};
@@ -22,10 +24,11 @@ use oauth2::{
 use openidconnect::Nonce;
 use openidconnect::core::CoreAuthenticationFlow;
 use reqwest::Client;
-use sea_orm::ActiveValue::Set;
-use sea_orm::ColumnTrait;
-use sea_orm::QueryFilter;
-use sea_orm::{ActiveModelTrait, EntityTrait};
+// TODO(sqlx移行): sea-orm のクエリ用 trait はsqlx移行で撤去
+// use sea_orm::ActiveValue::Set;
+// use sea_orm::ColumnTrait;
+// use sea_orm::QueryFilter;
+// use sea_orm::{ActiveModelTrait, EntityTrait};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
@@ -79,59 +82,61 @@ async fn activate(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ActivatePayload>,
 ) -> StatusCode {
-    let right_token = stretch_with_salt(
-        payload.m_address.to_string().as_str(),
-        state.web.auth.activation_salt.as_str(),
-        2_i32.pow(state.web.auth.stretch_cost as u32),
-    );
-
-    if digest(&*payload.token) == digest(&*right_token) {
-        //文字列比較の計算時間からトークンを推測されないようにdigestしてから比較
-        let user = match Users::find()
-            .filter(users::Column::MAddress.eq(payload.m_address.to_string()))
-            .one(&state.db_conn)
-            .await
-        {
-            Ok(Some(user)) => user,
-            Ok(None) => {
-                debug!("404 Not Found");
-                return StatusCode::NOT_FOUND;
-            }
-            Err(err) => {
-                warn!("internal server error occurred while finding user: {}", err);
-                return StatusCode::INTERNAL_SERVER_ERROR;
-            }
-        };
-
-        //すでに有効化されているかどうかを確認
-        if user.password_hash.is_some() {
-            debug!("409 Conflict");
-            return StatusCode::CONFLICT;
-        }
-
-        let password_salt = (&user.password_salt).to_string();
-
-        let mut user: users::ActiveModel = user.into();
-
-        user.password_hash = Set(Some(stretch_with_salt(
-            payload.password.to_string().as_str(),
-            &*password_salt,
-            2_i32.pow(state.web.auth.stretch_cost as u32),
-        )));
-        match user.update(&state.db_conn).await {
-            Ok(_) => StatusCode::OK,
-            Err(err) => {
-                warn!(
-                    "internal server error occurred while updating user: {}",
-                    err
-                );
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-        }
-    } else {
-        debug!("401 Unauthorized");
-        StatusCode::UNAUTHORIZED
-    }
+    // TODO(sqlx移行): users の検索・有効化(password_hash 更新)を application 層(sqlx)へ再配線する
+    // let right_token = stretch_with_salt(
+    //     payload.m_address.to_string().as_str(),
+    //     state.web.auth.activation_salt.as_str(),
+    //     2_i32.pow(state.web.auth.stretch_cost as u32),
+    // );
+    //
+    // if digest(&*payload.token) == digest(&*right_token) {
+    //     //文字列比較の計算時間からトークンを推測されないようにdigestしてから比較
+    //     let user = match Users::find()
+    //         .filter(users::Column::MAddress.eq(payload.m_address.to_string()))
+    //         .one(&state.db_conn)
+    //         .await
+    //     {
+    //         Ok(Some(user)) => user,
+    //         Ok(None) => {
+    //             debug!("404 Not Found");
+    //             return StatusCode::NOT_FOUND;
+    //         }
+    //         Err(err) => {
+    //             warn!("internal server error occurred while finding user: {}", err);
+    //             return StatusCode::INTERNAL_SERVER_ERROR;
+    //         }
+    //     };
+    //
+    //     //すでに有効化されているかどうかを確認
+    //     if user.password_hash.is_some() {
+    //         debug!("409 Conflict");
+    //         return StatusCode::CONFLICT;
+    //     }
+    //
+    //     let password_salt = (&user.password_salt).to_string();
+    //
+    //     let mut user: users::ActiveModel = user.into();
+    //
+    //     user.password_hash = Set(Some(stretch_with_salt(
+    //         payload.password.to_string().as_str(),
+    //         &*password_salt,
+    //         2_i32.pow(state.web.auth.stretch_cost as u32),
+    //     )));
+    //     match user.update(&state.db_conn).await {
+    //         Ok(_) => StatusCode::OK,
+    //         Err(err) => {
+    //             warn!(
+    //                 "internal server error occurred while updating user: {}",
+    //                 err
+    //             );
+    //             StatusCode::INTERNAL_SERVER_ERROR
+    //         }
+    //     }
+    // } else {
+    //     debug!("401 Unauthorized");
+    //     StatusCode::UNAUTHORIZED
+    // }
+    todo!("sqlx移行: application層へ再配線")
 }
 
 #[derive(Serialize, Deserialize)]
@@ -146,47 +151,50 @@ async fn login(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<LoginPayload>,
 ) -> Result<Json<jwt::Tokens>, StatusCode> {
-    let user = match Users::find()
-        .filter(users::Column::MAddress.eq(payload.m_address))
-        .one(&state.db_conn)
-        .await
-    {
-        Ok(Some(user)) => user,
-        Ok(None) => {
-            debug!("401 Unauthorized(user)");
-            return Err(StatusCode::UNAUTHORIZED);
-        }
-        Err(err) => {
-            warn!("internal server error occurred while finding user: {}", err);
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    };
-
-    let prompted_hash = state.sha_manager.stretch_with_salt(
-        payload.password.to_string().as_str(),
-        user.password_salt.as_str(),
-    );
-
-    let password_hash = match user.password_hash {
-        Some(hash) => hash,
-        None => {
-            debug!("401 Unauthorized(not activated)");
-            return Err(StatusCode::UNAUTHORIZED);
-        }
-    };
-
-    if digest(&*prompted_hash) == digest(&*password_hash) {
-        match state.jwt_manager.issue_tokens(user.id) {
-            Ok(tokens) => Ok(Json(tokens)),
-            Err(err) => {
-                warn!("internal server error while generating tokens: {}", err);
-                Err(StatusCode::INTERNAL_SERVER_ERROR)
-            }
-        }
-    } else {
-        debug!("401 Unauthorized(password)");
-        Err(StatusCode::UNAUTHORIZED)
-    }
+    // TODO(sqlx移行): users の検索・パスワード検証を application 層(sqlx)へ再配線する。
+    // 検証成功後の jwt_manager.issue_tokens(user.id) によるトークン発行も再配線時に復活させる。
+    // let user = match Users::find()
+    //     .filter(users::Column::MAddress.eq(payload.m_address))
+    //     .one(&state.db_conn)
+    //     .await
+    // {
+    //     Ok(Some(user)) => user,
+    //     Ok(None) => {
+    //         debug!("401 Unauthorized(user)");
+    //         return Err(StatusCode::UNAUTHORIZED);
+    //     }
+    //     Err(err) => {
+    //         warn!("internal server error occurred while finding user: {}", err);
+    //         return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    //     }
+    // };
+    //
+    // let prompted_hash = state.sha_manager.stretch_with_salt(
+    //     payload.password.to_string().as_str(),
+    //     user.password_salt.as_str(),
+    // );
+    //
+    // let password_hash = match user.password_hash {
+    //     Some(hash) => hash,
+    //     None => {
+    //         debug!("401 Unauthorized(not activated)");
+    //         return Err(StatusCode::UNAUTHORIZED);
+    //     }
+    // };
+    //
+    // if digest(&*prompted_hash) == digest(&*password_hash) {
+    //     match state.jwt_manager.issue_tokens(user.id) {
+    //         Ok(tokens) => Ok(Json(tokens)),
+    //         Err(err) => {
+    //             warn!("internal server error while generating tokens: {}", err);
+    //             Err(StatusCode::INTERNAL_SERVER_ERROR)
+    //         }
+    //     }
+    // } else {
+    //     debug!("401 Unauthorized(password)");
+    //     Err(StatusCode::UNAUTHORIZED)
+    // }
+    todo!("sqlx移行: application層へ再配線")
 }
 
 #[derive(Serialize, Deserialize)]
@@ -269,20 +277,22 @@ async fn revoke(
     }
 
     // refresh_tokenの失効
-    let model = revoked_refresh_tokens::ActiveModel {
-        refresh_token: Set(payload.refresh_token),
-        exp: Set(refresh_token.claims.exp as i32),
-    };
-    match revoked_refresh_tokens::Entity::insert(model)
-        .exec(&state.db_conn)
-        .await
-    {
-        Ok(_) => StatusCode::CREATED,
-        Err(err) => {
-            warn!("Internal server error occurred: {:?}", err);
-            StatusCode::INTERNAL_SERVER_ERROR
-        }
-    }
+    // TODO(sqlx移行): revoked_refresh_tokens への挿入(失効処理)を application 層(sqlx)へ再配線する
+    // let model = revoked_refresh_tokens::ActiveModel {
+    //     refresh_token: Set(payload.refresh_token),
+    //     exp: Set(refresh_token.claims.exp as i32),
+    // };
+    // match revoked_refresh_tokens::Entity::insert(model)
+    //     .exec(&state.db_conn)
+    //     .await
+    // {
+    //     Ok(_) => StatusCode::CREATED,
+    //     Err(err) => {
+    //         warn!("Internal server error occurred: {:?}", err);
+    //         StatusCode::INTERNAL_SERVER_ERROR
+    //     }
+    // }
+    todo!("sqlx移行: application層へ再配線")
 }
 
 #[instrument(name = "/auth/v1/admin/login", skip(state))]

@@ -1,6 +1,7 @@
 mod user;
 
-use crate::entities::user::UserRead;
+// TODO(sqlx移行): UserRead は旧 entities 層。application 層へ再配線する
+// use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
 use crate::routes::AppState;
 use crate::util::AppResponse;
@@ -26,11 +27,14 @@ async fn get_users(
     State(state): State<Arc<AppState>>,
     Extension(current_user): Extension<CurrentUser>,
 ) -> AppResponse {
-    match current_user {
-        CurrentUser::Admin(_) => {
-            let users = UserRead::get_all(&state.db_conn).await?;
-            Ok((StatusCode::OK, Json(users).into_response()))
-        }
-        _ => Ok((StatusCode::FORBIDDEN, ().into_response())),
-    }
+    let _ = (&state, &current_user);
+    // TODO(sqlx移行): 下記の admin 判定 + DBアクセスを application 層へ再配線する
+    // match current_user {
+    //     CurrentUser::Admin(_) => {
+    //         let users = UserRead::get_all(&state.db_conn).await?;
+    //         Ok((StatusCode::OK, Json(users).into_response()))
+    //     }
+    //     _ => Ok((StatusCode::FORBIDDEN, ().into_response())),
+    // }
+    todo!("sqlx移行: application層へ再配線")
 }

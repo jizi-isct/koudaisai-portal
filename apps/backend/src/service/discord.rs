@@ -1,20 +1,15 @@
-use crate::entities::approval_request::{
-    ApprovalRequestStatus, ApprovalRequestType, CreateApprovalRequest, ReadApprovalRequest,
-};
-use crate::entities::user::UserRead;
-use aws_sdk_s3::Client as S3Client;
+// TODO(sqlx移行): 削除された entities 型 (ApprovalRequest* / UserRead) を参照していたため
+// Discord 通知メソッドをコメントアウトしてスタブ化。application 層へ再配線したら復元する。
+// use crate::entities::approval_request::{
+//     ApprovalRequestStatus, ApprovalRequestType, CreateApprovalRequest, ReadApprovalRequest,
+// };
+// use crate::entities::user::UserRead;
 use aws_sdk_s3::config::http::HttpResponse;
 use aws_sdk_s3::error::SdkError;
 use aws_sdk_s3::operation::get_object::GetObjectError;
-use openidconnect::core::CoreUserInfoClaims;
 use reqwest::Url;
-use serenity::all::CreateAttachment;
-use serenity::builder::{CreateEmbed, ExecuteWebhook};
-use serenity::http::Http;
-use serenity::model::webhook::Webhook;
 use serenity::prelude::SerenityError;
 use thiserror::Error;
-use uuid::Uuid;
 
 #[derive(Clone, Debug, Default)]
 pub struct Discord {
@@ -48,6 +43,7 @@ impl Discord {
         }
     }
 
+    /* TODO(sqlx移行): 削除された entities 型に依存していたためコメントアウト。
     /// 承認申請が発行された旨の通知をDiscordに送信する
     pub async fn send_approval_request_issue_message(
         &self,
@@ -185,4 +181,5 @@ impl Discord {
         }
         Ok(())
     }
+    */
 }
