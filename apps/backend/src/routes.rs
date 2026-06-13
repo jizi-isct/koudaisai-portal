@@ -14,7 +14,8 @@ use jsonwebtoken::Algorithm;
 use oauth2::PkceCodeVerifier;
 use openidconnect::Nonce;
 use reqwest::Client;
-use sea_orm::DatabaseConnection;
+// TODO(sqlx移行): DBコネクションは application 層(sqlx)へ移すため import 削除
+// use sea_orm::DatabaseConnection;
 use sendgrid::v3::{Email, Sender};
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -25,10 +26,10 @@ use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
 
+// TODO(sqlx移行): db_conn 引数は撤去。DBアクセスは application 層(sqlx)へ再配線する
 #[instrument(skip(
     web,
     sendgrid,
-    db_conn,
     oidc_client,
     s3_client,
     s3_bucket,
@@ -38,7 +39,6 @@ use tracing::{debug, instrument};
 pub fn init_routes(
     web: &Web,
     sendgrid: Sendgrid,
-    db_conn: DatabaseConnection,
     oidc_client: OIDCClient,
     s3_client: aws_sdk_s3::Client,
     s3_bucket: String,
@@ -50,7 +50,8 @@ pub fn init_routes(
         web: web.clone(),
         sendgrid_sender_email: Email::new(sendgrid.sender_address.clone()),
         sendgrid_sender: Sender::new(sendgrid.api_key, None),
-        db_conn: db_conn.clone(),
+        // TODO(sqlx移行): db_conn は AppState から撤去。DBアクセスは application 層へ
+        // db_conn: db_conn.clone(),
         oidc_client,
         auth_sessions: Default::default(),
         http_client: Client::new(),
@@ -62,7 +63,8 @@ pub fn init_routes(
             "https://portal.koudaisai.jp",
             web.auth.get_jwt_encoding_key().unwrap(),
             web.auth.get_jwt_decoding_key().unwrap(),
-            db_conn,
+            // TODO(sqlx移行): JWTManager の db_conn 引数は撤去
+            // db_conn,
         ),
         sha_manager: SHAManager {
             stretch_cost: 2_i32.pow(web.auth.stretch_cost as u32),
@@ -93,7 +95,8 @@ pub struct AppState {
     pub web: Web,
     pub sendgrid_sender_email: Email,
     pub sendgrid_sender: Sender,
-    pub db_conn: DatabaseConnection,
+    // TODO(sqlx移行): db_conn フィールドは撤去。DBアクセスは application 層(sqlx)へ
+    // pub db_conn: DatabaseConnection,
     pub oidc_client: OIDCClient,
     pub auth_sessions: Mutex<HashMap<String, AuthSession>>,
     pub http_client: Client,

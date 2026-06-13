@@ -1,9 +1,10 @@
-use crate::entities::user::UserRead;
-use crate::sea_orm_entities::revoked_refresh_tokens;
+// TODO(sqlx移行): UserRead / revoked_refresh_tokens は application 層(sqlx)へ再配線
+// use crate::entities::user::UserRead;
+// use crate::sea_orm_entities::revoked_refresh_tokens;
 use anyhow::Result;
 use chrono::Utc;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use sea_orm::{DatabaseConnection, EntityTrait};
+// use sea_orm::{DatabaseConnection, EntityTrait};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use uuid::Uuid;
@@ -56,7 +57,8 @@ pub struct JWTManager {
     pub iss: String,
     encoding_key: EncodingKey,
     decoding_key: DecodingKey,
-    db_conn: DatabaseConnection,
+    // TODO(sqlx移行): revoke検証用 DB コネクションは application 層(sqlx)へ移すため撤去
+    // db_conn: DatabaseConnection,
 }
 
 impl JWTManager {
@@ -68,7 +70,8 @@ impl JWTManager {
         iss: impl ToString,
         encoding_key: EncodingKey,
         decoding_key: DecodingKey,
-        db_conn: DatabaseConnection,
+        // TODO(sqlx移行): db_conn 引数は撤去
+        // db_conn: DatabaseConnection,
     ) -> Self {
         Self {
             algorithm,
@@ -78,7 +81,7 @@ impl JWTManager {
             iss: iss.to_string(),
             encoding_key,
             decoding_key,
-            db_conn,
+            // db_conn,
         }
     }
 
@@ -144,13 +147,16 @@ impl JWTManager {
         }
 
         // revoke検証
-        if revoked_refresh_tokens::Entity::find_by_id(token)
-            .one(&self.db_conn)
-            .await?
-            != None
-        {
-            return Ok(false);
-        }
+        // TODO(sqlx移行): revoked_refresh_tokens の検索は application 層(sqlx)へ再配線する。
+        // 現状はスタブとして未失効(revokeされていない)扱いとする。
+        let _ = &token;
+        // if revoked_refresh_tokens::Entity::find_by_id(token)
+        //     .one(&self.db_conn)
+        //     .await?
+        //     != None
+        // {
+        //     return Ok(false);
+        // }
 
         Ok(true)
     }
@@ -158,7 +164,9 @@ impl JWTManager {
     /// 以下の条件がすべて満たされる場合true、それ以外はfalse
     /// - `claims.typ`が`Access_token`である。
     /// - 有効期限が切れていない
-    pub fn is_access_token_valid(&self, claims: &Claims, user: &UserRead) -> bool {
+    // TODO(sqlx移行): user(UserRead) は application 層(sqlx)で取得して渡す。
+    // password_updated_at を用いた iat 検証は再配線時に復活させる。
+    pub fn is_access_token_valid(&self, claims: &Claims /*, user: &UserRead */) -> bool {
         // typ検証
         if claims.typ != Type::AccessToken {
             return false;
@@ -170,9 +178,10 @@ impl JWTManager {
         }
 
         // iat検証
-        if claims.iat < user.password_updated_at.timestamp() {
-            return false;
-        }
+        // TODO(sqlx移行): user.password_updated_at の取得を application 層へ再配線する
+        // if claims.iat < user.password_updated_at.timestamp() {
+        //     return false;
+        // }
 
         true
     }
@@ -203,10 +212,12 @@ impl JWTManager {
         )
     }
 
+    // TODO(sqlx移行): user(UserRead) は application 層(sqlx)で取得して渡す。
+    // password_updated_at を用いた iat 検証は再配線時に復活させる。
     pub async fn is_password_reset_token_valid(
         &self,
         claims: &PasswordResetTokenClaims,
-        user: UserRead,
+        // user: UserRead,
     ) -> bool {
         // exp検証
         if claims.exp < Utc::now().timestamp() {
@@ -214,9 +225,10 @@ impl JWTManager {
         }
 
         // iat検証
-        if claims.iat < user.password_updated_at.timestamp() {
-            return false;
-        }
+        // TODO(sqlx移行): user.password_updated_at の取得を application 層へ再配線する
+        // if claims.iat < user.password_updated_at.timestamp() {
+        //     return false;
+        // }
 
         true
     }
