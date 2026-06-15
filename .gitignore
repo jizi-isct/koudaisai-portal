@@ -57,6 +57,9 @@ out
 .astro
 astro.config.d.mts
 
+# Generated declaration files
+apps/*/src/**/*.d.ts
+
 # Generated docs
 /docs/api_v2.html
 /docs/auth_v1.html
@@ -66,3 +69,7 @@ astro.config.d.mts
 storybook-static
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing
