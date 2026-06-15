@@ -1,0 +1,13 @@
+name = "portal"
+compatibility_date = "2026-06-19"
+preview_urls = true
+
+[assets]
+directory = "dist"
+
+[observability]
+enabled = true
+
+[[routes]]
+pattern = "portal.koudaisai.jp"
+custom_domain = false
