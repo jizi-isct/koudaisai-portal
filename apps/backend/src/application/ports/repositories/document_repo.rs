@@ -4,7 +4,6 @@ use crate::application::transaction::Transaction;
 
 use uuid::Uuid;
 
-use crate::domain::target_specifier::TargetSpecifier;
 
 use crate::domain::document::Document;
 

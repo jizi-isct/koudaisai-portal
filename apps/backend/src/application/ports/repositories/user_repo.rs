@@ -3,7 +3,6 @@ use crate::application::transaction::Transaction;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
-use uuid::Uuid;
 
 #[async_trait::async_trait]
 pub trait UserRepo<Tx: Transaction> {

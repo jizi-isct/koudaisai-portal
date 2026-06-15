@@ -1,5 +1,4 @@
 use crate::application::transaction::TransactionError;
-use anyhow::anyhow;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

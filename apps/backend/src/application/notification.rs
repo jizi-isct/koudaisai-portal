@@ -1,4 +1,3 @@
-use tracing_subscriber::filter::targets;
 
 use crate::application::authz;
 use crate::application::error::{

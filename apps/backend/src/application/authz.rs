@@ -1,12 +1,10 @@
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::document::Document;
 use crate::domain::form::Form;
-use crate::domain::group::Group;
 use crate::domain::membership::Membership;
 use crate::domain::notification::Notification;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
-use uuid::Uuid;
 
 pub fn can_get_all_users(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
@@ -50,7 +48,7 @@ pub fn can_get_user_by_id(
     }
 }
 
-pub fn can_update_user(actor_ctx: &ActorContext, user: &User) -> bool {
+pub fn can_update_user(actor_ctx: &ActorContext, _user: &User) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:update".to_string())
@@ -59,7 +57,7 @@ pub fn can_update_user(actor_ctx: &ActorContext, user: &User) -> bool {
     }
 }
 
-pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, user_id: UserId) -> bool {
+pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, _user_id: UserId) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:change-email".to_string())
@@ -180,7 +178,7 @@ pub fn can_get_group_approval_requests(actor_ctx: &ActorContext, group_id: Group
 /// 特定の承認申請を取得できるか
 pub fn can_get_approval_request(
     actor_ctx: &ActorContext,
-    request: &ApprovalRequest,
+    _request: &ApprovalRequest,
     memberships_of_issuer: &[Membership],
 ) -> bool {
     match actor_ctx {
