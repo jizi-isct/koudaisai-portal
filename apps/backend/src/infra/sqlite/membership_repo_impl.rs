@@ -116,7 +116,9 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
     }
 
     async fn insert(&self, membership: Membership) -> Result<(), InsertError> {
-        exec_insert(&self.pool, &membership).await.map_err(to_insert_error)
+        exec_insert(&self.pool, &membership)
+            .await
+            .map_err(to_insert_error)
     }
 
     async fn insert_in(
@@ -125,7 +127,9 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
         membership: Membership,
     ) -> Result<(), InsertError> {
         let conn = tx.conn().map_err(InsertError::InternalError)?;
-        exec_insert(conn, &membership).await.map_err(to_insert_error)
+        exec_insert(conn, &membership)
+            .await
+            .map_err(to_insert_error)
     }
 
     async fn update(&self, membership: Membership) -> Result<(), UpdateError> {

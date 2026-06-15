@@ -86,10 +86,10 @@ fn user_status_from_cols(
         "deactivated" => {
             let phc = password_phc
                 .ok_or_else(|| anyhow::anyhow!("deactivated user missing password_phc"))?;
-            let changed_at = ms_to_dt(
-                password_changed_at
-                    .ok_or_else(|| anyhow::anyhow!("deactivated user missing password_changed_at"))?,
-            )?;
+            let changed_at =
+                ms_to_dt(password_changed_at.ok_or_else(|| {
+                    anyhow::anyhow!("deactivated user missing password_changed_at")
+                })?)?;
             let deactivated_at = ms_to_dt(
                 deactivated_at
                     .ok_or_else(|| anyhow::anyhow!("deactivated user missing deactivated_at"))?,
@@ -277,7 +277,11 @@ impl UserRepo<SqliteTransaction> for SqliteUserRepo {
         exec_insert(&self.pool, user).await.map_err(to_insert_error)
     }
 
-    async fn insert_in(&self, tx: &mut SqliteTransaction, user: &User) -> Result<(), anyhow::Error> {
+    async fn insert_in(
+        &self,
+        tx: &mut SqliteTransaction,
+        user: &User,
+    ) -> Result<(), anyhow::Error> {
         exec_insert(tx.conn()?, user).await.map_err(Into::into)
     }
 
@@ -291,7 +295,11 @@ impl UserRepo<SqliteTransaction> for SqliteUserRepo {
         Ok(())
     }
 
-    async fn update_in(&self, tx: &mut SqliteTransaction, user: &User) -> Result<(), anyhow::Error> {
+    async fn update_in(
+        &self,
+        tx: &mut SqliteTransaction,
+        user: &User,
+    ) -> Result<(), anyhow::Error> {
         let affected = exec_update(tx.conn()?, user).await?;
         if affected == 0 {
             return Err(anyhow::anyhow!("user not found: {}", user.id()));

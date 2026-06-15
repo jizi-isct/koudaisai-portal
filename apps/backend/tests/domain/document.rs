@@ -1,9 +1,9 @@
 use crate::domain::common::FixedClock;
+use koudaisai_portal_backend::domain::admin_id::AdminId;
 use koudaisai_portal_backend::domain::document::Document;
 use koudaisai_portal_backend::domain::document::DocumentFormat;
 use koudaisai_portal_backend::domain::document_category::DocumentCategory;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
-use koudaisai_portal_backend::domain::admin_id::AdminId;
 
 use serde::Deserialize;
 use std::path::Path;

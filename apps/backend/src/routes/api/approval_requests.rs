@@ -103,7 +103,14 @@ async fn approve_approval_request(
     Json(approve_request): Json<ApproveRequest>,
 ) -> AppResponse {
     // TODO(sqlx移行): application層へ再配線（承認処理・通知・Discord webhook）
-    let _ = (&host, &header_map, &state, &current_user, &request_id, &approve_request);
+    let _ = (
+        &host,
+        &header_map,
+        &state,
+        &current_user,
+        &request_id,
+        &approve_request,
+    );
     // match current_user {
     //     CurrentUser::Admin(claims) => {
     //         let uuid = Uuid::from_str(claims.subject())?;

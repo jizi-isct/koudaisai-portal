@@ -1,4 +1,3 @@
-
 use crate::application::ports::clock::Clock;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::error::{FactoryError, InvalidTransitionError};

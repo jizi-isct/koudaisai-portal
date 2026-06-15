@@ -128,19 +128,23 @@ fn request_status_from_cols(
         "pending" => ApprovalRequestStatus::Pending,
         "approved" => ApprovalRequestStatus::Approved {
             approved_by: AdminId::new(Uuid::parse_str(
-                &approved_by.ok_or_else(|| anyhow::anyhow!("approved request missing approved_by"))?,
+                &approved_by
+                    .ok_or_else(|| anyhow::anyhow!("approved request missing approved_by"))?,
             )?),
             approved_at: ms_to_dt(
-                approved_at.ok_or_else(|| anyhow::anyhow!("approved request missing approved_at"))?,
+                approved_at
+                    .ok_or_else(|| anyhow::anyhow!("approved request missing approved_at"))?,
             )?,
             approval_reason,
         },
         "rejected" => ApprovalRequestStatus::Rejected {
             rejected_by: AdminId::new(Uuid::parse_str(
-                &rejected_by.ok_or_else(|| anyhow::anyhow!("rejected request missing rejected_by"))?,
+                &rejected_by
+                    .ok_or_else(|| anyhow::anyhow!("rejected request missing rejected_by"))?,
             )?),
             rejected_at: ms_to_dt(
-                rejected_at.ok_or_else(|| anyhow::anyhow!("rejected request missing rejected_at"))?,
+                rejected_at
+                    .ok_or_else(|| anyhow::anyhow!("rejected request missing rejected_at"))?,
             )?,
             rejection_reason,
         },
@@ -149,7 +153,12 @@ fn request_status_from_cols(
                 closed_at.ok_or_else(|| anyhow::anyhow!("closed request missing closed_at"))?,
             )?,
         },
-        other => return Err(anyhow::anyhow!("unknown approval request status: {}", other)),
+        other => {
+            return Err(anyhow::anyhow!(
+                "unknown approval request status: {}",
+                other
+            ));
+        }
     })
 }
 
@@ -316,8 +325,12 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
             return Ok(Vec::new());
         }
         // 可変長 IN を静的クエリで表現するため，uuid の JSON 配列を json_each で展開する。
-        let ids: Vec<String> = user_ids.iter().map(|u| Uuid::from(*u).to_string()).collect();
-        let ids_json = serde_json::to_string(&ids).map_err(|e| FindError::InternalError(e.into()))?;
+        let ids: Vec<String> = user_ids
+            .iter()
+            .map(|u| Uuid::from(*u).to_string())
+            .collect();
+        let ids_json =
+            serde_json::to_string(&ids).map_err(|e| FindError::InternalError(e.into()))?;
         let rows = sqlx::query!(
             r#"SELECT id, issued_at, issued_by, type, status, description, icon_key, issue_reason,
                       approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at
@@ -353,7 +366,9 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
     }
 
     async fn insert(&self, request: &ApprovalRequest) -> Result<(), InsertError> {
-        exec_insert(&self.pool, request).await.map_err(to_insert_error)
+        exec_insert(&self.pool, request)
+            .await
+            .map_err(to_insert_error)
     }
 
     async fn insert_in(
@@ -381,7 +396,10 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
     ) -> Result<(), anyhow::Error> {
         let affected = exec_update(tx.conn()?, request).await?;
         if affected == 0 {
-            return Err(anyhow::anyhow!("approval request not found: {}", request.id()));
+            return Err(anyhow::anyhow!(
+                "approval request not found: {}",
+                request.id()
+            ));
         }
         Ok(())
     }

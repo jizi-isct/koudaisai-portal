@@ -27,15 +27,7 @@ use tower_http::services::ServeDir;
 use tracing::{debug, instrument};
 
 // TODO(sqlx移行): db_conn 引数は撤去。DBアクセスは application 層(sqlx)へ再配線する
-#[instrument(skip(
-    web,
-    sendgrid,
-    oidc_client,
-    s3_client,
-    s3_bucket,
-    discord,
-    secrets
-))]
+#[instrument(skip(web, sendgrid, oidc_client, s3_client, s3_bucket, discord, secrets))]
 pub fn init_routes(
     web: &Web,
     sendgrid: Sendgrid,

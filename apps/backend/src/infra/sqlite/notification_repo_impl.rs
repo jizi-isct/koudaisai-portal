@@ -5,7 +5,9 @@ use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use crate::infra::sqlite::util::{dt_to_ms, ms_to_dt, targets_from_json, targets_to_json, to_insert_error};
+use crate::infra::sqlite::util::{
+    dt_to_ms, ms_to_dt, targets_from_json, targets_to_json, to_insert_error,
+};
 use async_trait::async_trait;
 use sqlx::{Sqlite, SqlitePool};
 use uuid::Uuid;
@@ -199,7 +201,12 @@ impl NotificationRepo<SqliteTransaction> for SqliteNotificationRepo {
                     opt_admin_id(r.created_by)?,
                     opt_admin_id(r.updated_by)?,
                     targets_from_json(&r.targets)?,
-                    notification_type_from_cols(r.r#type, r.approval_request_id, r.title, r.content)?,
+                    notification_type_from_cols(
+                        r.r#type,
+                        r.approval_request_id,
+                        r.title,
+                        r.content,
+                    )?,
                 )
                 .map_err(|e| anyhow::anyhow!(e.to_string()))
             })
@@ -218,7 +225,9 @@ impl NotificationRepo<SqliteTransaction> for SqliteNotificationRepo {
         tx: &mut SqliteTransaction,
         notification: &Notification,
     ) -> Result<(), anyhow::Error> {
-        exec_insert(tx.conn()?, notification).await.map_err(Into::into)
+        exec_insert(tx.conn()?, notification)
+            .await
+            .map_err(Into::into)
     }
 
     async fn update(&self, notification: &Notification) -> Result<(), UpdateError> {
@@ -238,7 +247,10 @@ impl NotificationRepo<SqliteTransaction> for SqliteNotificationRepo {
     ) -> Result<(), anyhow::Error> {
         let affected = exec_update(tx.conn()?, notification).await?;
         if affected == 0 {
-            return Err(anyhow::anyhow!("notification not found: {}", notification.id()));
+            return Err(anyhow::anyhow!(
+                "notification not found: {}",
+                notification.id()
+            ));
         }
         Ok(())
     }

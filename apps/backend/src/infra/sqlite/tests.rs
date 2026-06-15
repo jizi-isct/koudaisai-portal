@@ -7,24 +7,26 @@ use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::ports::repositories::document_repo::DocumentRepo;
-use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
+use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::admin_id::AdminId;
-use crate::domain::approval_request::{ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType};
+use crate::domain::approval_request::{
+    ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType,
+};
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::document::{Document, DocumentFormat};
 use crate::domain::document_category::DocumentCategory;
 use crate::domain::email_address::EmailAddress;
-use crate::domain::notification::{Notification, NotificationType};
-use crate::domain::notification_id::NotificationId;
 use crate::domain::form::{Form, FormType};
 use crate::domain::group::{Group, GroupType};
 use crate::domain::group_id::GroupId;
 use crate::domain::membership::Membership;
+use crate::domain::notification::{Notification, NotificationType};
+use crate::domain::notification_id::NotificationId;
 use crate::domain::password_credentials::PasswordCredentials;
 use crate::domain::target_specifier::TargetSpecifier;
 use crate::domain::user::{User, UserStatus};
@@ -32,10 +34,10 @@ use crate::domain::user_id::UserId;
 use crate::infra::sqlite::approval_request_repo_impl::SqliteApprovalRequestRepo;
 use crate::infra::sqlite::document_category_repo_impl::SqliteDocumentCategoryRepo;
 use crate::infra::sqlite::document_repo_impl::SqliteDocumentRepo;
-use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::form_repo_impl::SqliteFormRepo;
 use crate::infra::sqlite::group_repo_impl::SqliteGroupRepo;
 use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
+use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
 use chrono::{DateTime, TimeZone, Utc};
@@ -181,7 +183,9 @@ async fn group_insert_in_rolls_back_on_uncommitted_transaction() {
     let group = Group::register(
         group_id,
         "Press".to_string(),
-        GroupType::Press { representative: rep },
+        GroupType::Press {
+            representative: rep,
+        },
         &c,
     )
     .unwrap();
@@ -385,7 +389,10 @@ async fn approval_request_rejected_and_closed_round_trip() {
     closed.close(&c).unwrap();
     repo.insert(&closed).await.unwrap();
     let restored = repo.find_by_id(cid).await.unwrap().unwrap();
-    assert!(matches!(restored.status(), ApprovalRequestStatus::Closed { .. }));
+    assert!(matches!(
+        restored.status(),
+        ApprovalRequestStatus::Closed { .. }
+    ));
 }
 
 #[tokio::test]
@@ -463,11 +470,15 @@ async fn document_category_round_trip_and_update() {
     let repo = SqliteDocumentCategoryRepo::new(pool);
     let c = clock();
 
-    let mut category = DocumentCategory::register("カテゴリ".to_string(), Some("📁".to_string()), &c).unwrap();
+    let mut category =
+        DocumentCategory::register("カテゴリ".to_string(), Some("📁".to_string()), &c).unwrap();
     let id = category.id();
 
     repo.insert(&category).await.unwrap();
-    assert_eq!(repo.find_by_id(id).await.unwrap().unwrap().title(), "カテゴリ");
+    assert_eq!(
+        repo.find_by_id(id).await.unwrap().unwrap().title(),
+        "カテゴリ"
+    );
 
     category.change_title("新カテゴリ".to_string(), &c).unwrap();
     category.change_emoji(None, &c).unwrap();

@@ -4,7 +4,6 @@ use crate::application::transaction::Transaction;
 
 use uuid::Uuid;
 
-
 use crate::domain::document::Document;
 
 #[async_trait::async_trait]

@@ -21,9 +21,7 @@ pub enum UpdateRolesError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum GroupType {
     /// 学内取材団体．一人の代表者を持つ．
-    Press {
-        representative: UserId,
-    },
+    Press { representative: UserId },
     /// 一般企画団体．第一責任者から第三責任者まで計３名のメンバーを持つ．
     /// 第一責任者から第三責任者には別のメンバーが割り当てられる必要がある．
     GeneralProject {

@@ -45,7 +45,10 @@ impl Membership {
                     Membership::new(group_id, *representative3, clock),
                 ]
             }
-            GroupType::LabProject { representative, operator} => {
+            GroupType::LabProject {
+                representative,
+                operator,
+            } => {
                 if operator == representative {
                     vec![Membership::new(group_id, *operator, clock)]
                 } else {

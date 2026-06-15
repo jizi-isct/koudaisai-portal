@@ -3,7 +3,9 @@ use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::domain::admin_id::AdminId;
 use crate::domain::document::{Document, DocumentFormat};
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use crate::infra::sqlite::util::{dt_to_ms, ms_to_dt, targets_from_json, targets_to_json, to_insert_error};
+use crate::infra::sqlite::util::{
+    dt_to_ms, ms_to_dt, targets_from_json, targets_to_json, to_insert_error,
+};
 use async_trait::async_trait;
 use sqlx::{Sqlite, SqlitePool};
 use uuid::Uuid;
@@ -68,11 +70,13 @@ fn document_format_from_cols(
         },
         "pdf" => DocumentFormat::Pdf {
             file_key: file_key.ok_or_else(|| anyhow::anyhow!("pdf document missing file_key"))?,
-            file_name: file_name.ok_or_else(|| anyhow::anyhow!("pdf document missing file_name"))?,
+            file_name: file_name
+                .ok_or_else(|| anyhow::anyhow!("pdf document missing file_name"))?,
         },
         "misc" => DocumentFormat::Misc {
             file_key: file_key.ok_or_else(|| anyhow::anyhow!("misc document missing file_key"))?,
-            file_name: file_name.ok_or_else(|| anyhow::anyhow!("misc document missing file_name"))?,
+            file_name: file_name
+                .ok_or_else(|| anyhow::anyhow!("misc document missing file_name"))?,
         },
         other => return Err(anyhow::anyhow!("unknown document format: {}", other)),
     })
@@ -228,7 +232,9 @@ impl DocumentRepo<SqliteTransaction> for SqliteDocumentRepo {
     }
 
     async fn insert(&self, document: &Document) -> Result<(), InsertError> {
-        exec_insert(&self.pool, document).await.map_err(to_insert_error)
+        exec_insert(&self.pool, document)
+            .await
+            .map_err(to_insert_error)
     }
 
     async fn insert_in(

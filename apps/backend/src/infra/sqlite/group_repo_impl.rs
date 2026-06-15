@@ -263,7 +263,9 @@ impl GroupRepo<SqliteTransaction> for SqliteGroupRepo {
     }
 
     async fn insert(&self, group: Group) -> Result<(), InsertError> {
-        exec_insert(&self.pool, &group).await.map_err(to_insert_error)
+        exec_insert(&self.pool, &group)
+            .await
+            .map_err(to_insert_error)
     }
 
     async fn insert_in(&self, tx: &mut SqliteTransaction, group: Group) -> Result<(), InsertError> {
