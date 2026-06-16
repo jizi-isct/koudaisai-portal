@@ -57,9 +57,6 @@ out
 .astro
 astro.config.d.mts
 
-# Generated declaration files
-apps/*/src/**/*.d.ts
-
 # Generated docs
 /docs/api_v2.html
 /docs/auth_v1.html
