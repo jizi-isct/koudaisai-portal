@@ -5,6 +5,7 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "declarationDir": "dist",
+    "customConditions": ["development"],
     "paths": {
       "@/*": ["./src/*"]
     }

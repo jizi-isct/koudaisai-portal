@@ -1,10 +1,5 @@
-import { components as apiComponents } from './api_v3';
-import { components as plansInfoComponents } from './plans_info_api_v1';
-
-export type Item = apiComponents['schemas']['Item'];
-export type Form = apiComponents['schemas']['Form'];
-export type FormResponse = apiComponents['schemas']['FormResponse'];
-export type Info = apiComponents['schemas']['Info'];
+import type { components as apiComponents } from './api_v3';
+import type { components as plansInfoComponents } from './plans_info_api_v1';
 
 export type FormItemType =
   | 'question_text'
