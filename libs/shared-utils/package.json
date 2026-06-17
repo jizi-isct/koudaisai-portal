@@ -21,6 +21,11 @@
       "default": "./src/index.ts"
     }
   },
+  "dependencies": {
+    "@koudaisai/shared-api": "0.0.1",
+    "@koudaisai/shared-types": "0.0.1",
+    "react": "^19.0.0"
+  },
   "devDependencies": {
     "vite-plugin-dts": "^4.5.4"
   }
