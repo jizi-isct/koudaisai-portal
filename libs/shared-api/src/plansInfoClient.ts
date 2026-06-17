@@ -1,6 +1,6 @@
-import createClient, { OpenapiQueryClient } from 'openapi-react-query';
+import createClient, { type OpenapiQueryClient } from 'openapi-react-query';
 import { type plansInfoPaths } from '@koudaisai/shared-types';
-import createFetchClient, { Client, type Middleware } from 'openapi-fetch';
+import createFetchClient, { type Client, type Middleware } from 'openapi-fetch';
 
 export type PlansInfoFetchClient = Client<
   plansInfoPaths,
