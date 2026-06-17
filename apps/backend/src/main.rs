@@ -22,8 +22,8 @@ pub(crate) mod domain;
 // pub mod entities;
 mod infra;
 pub mod middlewares;
-mod routes;
-// pub mod sea_orm_entities;
+pub mod routes;
+mod routes_legacy;
 mod service;
 pub mod util;
 
