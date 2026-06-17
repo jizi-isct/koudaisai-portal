@@ -3,7 +3,7 @@ mod user;
 // TODO(sqlx移行): UserRead は旧 entities 層。application 層へ再配線する
 // use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, State};
 use axum::response::IntoResponse;

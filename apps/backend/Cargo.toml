@@ -44,6 +44,9 @@ hyper = "1.6.0"
 futures-util = "0.3.31"
 regex = "1.11.1"
 async-trait = "0.1.89"
+utoipa = { version = "5.5.0", features = ["uuid", "chrono"] }
+utoipa-axum = "0.2.0"
+utoipa-axum-auto-into-response = "0.1.0"
 
 [lib]
 name = "koudaisai_portal_backend"

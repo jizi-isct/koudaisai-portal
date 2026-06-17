@@ -5,7 +5,7 @@
 // use crate::entities::target_specifier::TargetSpecifier;
 // use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use anyhow::anyhow;
 use axum::extract::{ConnectInfo, Path, Query, State};

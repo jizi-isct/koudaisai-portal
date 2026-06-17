@@ -10,7 +10,7 @@ mod users;
 mod util;
 
 use crate::config::Secrets;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use axum::Router;
 use std::sync::Arc;
 use tracing::instrument;

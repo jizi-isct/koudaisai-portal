@@ -3,7 +3,7 @@
 // use crate::entities::notification::{NotificationCreate, NotificationRead, NotificationUpdate};
 // use crate::entities::user::UserRead;
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;

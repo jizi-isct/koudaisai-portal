@@ -2,7 +2,7 @@
 // use crate::entities::document_category;
 // use crate::entities::document_category::{DocumentCategoryRead, DocumentCategoryWrite};
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;

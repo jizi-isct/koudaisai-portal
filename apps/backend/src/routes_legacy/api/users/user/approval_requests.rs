@@ -3,7 +3,7 @@
 // use crate::entities::user::UserRead;
 // use crate::entities::user_id::UserId;
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;

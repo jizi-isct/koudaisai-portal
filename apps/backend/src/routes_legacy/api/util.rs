@@ -1,5 +1,5 @@
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Query};
 use axum::http::StatusCode;

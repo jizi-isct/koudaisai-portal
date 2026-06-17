@@ -4,7 +4,7 @@ mod plan_details;
 // use crate::entities::group;
 // use crate::entities::group::{GroupCreate, GroupRead, GroupUpdate};
 use crate::middlewares::CurrentUser;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::AppResponse;
 use axum::extract::{ConnectInfo, Path, State};
 use axum::response::IntoResponse;
