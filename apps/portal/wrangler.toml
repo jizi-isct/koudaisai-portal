@@ -10,4 +10,4 @@ enabled = true
 
 [[routes]]
 pattern = "portal.koudaisai.jp"
-custom_domain = false
+custom_domain = true
