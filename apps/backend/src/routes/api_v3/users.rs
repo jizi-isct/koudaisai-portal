@@ -10,6 +10,8 @@ pub fn router() -> OpenApiRouter {
         handlers::put_user,
         handlers::get_user,
         handlers::patch_user,
-        handlers::delete_user
+        handlers::delete_user,
+        handlers::get_user_notifications,
+        handlers::post_user_m_address
     ))
 }

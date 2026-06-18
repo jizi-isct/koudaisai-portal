@@ -1,3 +1,4 @@
+use super::super::notifications::NotificationRead;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -39,6 +40,25 @@ pub struct UserCreated {
     #[serde(flatten)]
     pub user: UserRead,
     pub activation_token: String,
+}
+
+/// `GET /users/{id}/notifications` の 1 件分のエントリ（既読状態付き）。
+#[derive(ToSchema, Serialize)]
+pub struct UserNotificationRead {
+    is_read: bool,
+    notification: NotificationRead,
+}
+
+/// `POST /users/{id}/m_address` のリクエストボディ。
+#[derive(ToSchema, Deserialize)]
+pub struct MAddressUpdate {
+    m_address: String,
+}
+
+/// m アドレス変更時に再発行される activation token を含むレスポンス。
+#[derive(ToSchema, Serialize)]
+pub struct MAddressUpdated {
+    activation_token: String,
 }
 
 #[derive(ToSchema, Deserialize)]

@@ -1,4 +1,7 @@
-use super::dto::{UserCreate, UserCreated, UserRead, UserUpdate};
+use super::dto::{
+    MAddressUpdate, MAddressUpdated, UserCreate, UserCreated, UserNotificationRead, UserRead,
+    UserUpdate,
+};
 use axum::Json;
 use axum::extract::Path;
 use serde::Deserialize;
@@ -133,5 +136,57 @@ pub enum DeleteUserResponse {
     tag = super::super::USERS_TAG
 )]
 pub async fn delete_user(Path(path): Path<UserPath>) -> DeleteUserResponse {
+    todo!()
+}
+
+#[http_response]
+pub enum GetUserNotificationsResponse {
+    #[response(status = OK)]
+    Ok(Vec<UserNotificationRead>),
+    #[response(status = NOT_FOUND, description = "User not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    get,
+    description = "Get a user's notifications with per-user read state.",
+    path = "/{id}/notifications",
+    params(UserPath),
+    responses(GetUserNotificationsResponse),
+    tag = super::super::USERS_TAG
+)]
+pub async fn get_user_notifications(Path(path): Path<UserPath>) -> GetUserNotificationsResponse {
+    todo!()
+}
+
+#[http_response]
+pub enum PostUserMAddressResponse {
+    #[response(status = OK, description = "m_address changed; returns a new activation token")]
+    Ok(MAddressUpdated),
+    #[response(status = NOT_FOUND, description = "User not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    post,
+    description = "Change a user's m_address and re-issue an activation token.",
+    path = "/{id}/m_address",
+    params(UserPath),
+    responses(PostUserMAddressResponse),
+    request_body = MAddressUpdate,
+    tag = super::super::USERS_TAG
+)]
+pub async fn post_user_m_address(
+    Path(path): Path<UserPath>,
+    Json(body): Json<MAddressUpdate>,
+) -> PostUserMAddressResponse {
     todo!()
 }
