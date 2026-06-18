@@ -68,6 +68,15 @@ fn read_cookie(headers: &HeaderMap, name: &str) -> Option<String> {
     })
 }
 
+/// CSRF 対策(SameSite=Strict の多重防御)。Origin が来た場合は許可リストと厳密一致を要求。
+/// Origin が無い(同一オリジン/非ブラウザ)場合は許可する。
+fn origin_allowed(headers: &HeaderMap, allowed: &[String]) -> bool {
+    match headers.get(header::ORIGIN).and_then(|v| v.to_str().ok()) {
+        Some(origin) => allowed.iter().any(|a| a == origin),
+        None => true,
+    }
+}
+
 fn with_set_cookie(mut resp: Response, cookie: String) -> Response {
     if let Ok(value) = header::HeaderValue::from_str(&cookie) {
         resp.headers_mut().append(header::SET_COOKIE, value);
@@ -160,6 +169,9 @@ pub async fn login(State(st): State<AuthV2State>, Json(body): Json<LoginRequest>
     ),
 )]
 pub async fn refresh(State(st): State<AuthV2State>, headers: HeaderMap) -> Response {
+    if !origin_allowed(&headers, &st.allowed_origins) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
     let Some(refresh_token) = read_cookie(&headers, &st.cookie.name) else {
         return StatusCode::UNAUTHORIZED.into_response();
     };
@@ -187,6 +199,9 @@ pub async fn refresh(State(st): State<AuthV2State>, headers: HeaderMap) -> Respo
     responses((status = NO_CONTENT, description = "ログアウト(冪等)。Cookie をクリア")),
 )]
 pub async fn logout(State(st): State<AuthV2State>, headers: HeaderMap) -> Response {
+    if !origin_allowed(&headers, &st.allowed_origins) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
     if let Some(refresh_token) = read_cookie(&headers, &st.cookie.name) {
         let tx = SqliteTransaction::new(st.pool.clone());
         let auth = st.app.auth(st.auth_config.clone(), (*st.dummy_phc).clone());

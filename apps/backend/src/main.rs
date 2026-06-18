@@ -143,6 +143,7 @@ async fn main() {
         reset_link_base: v3.reset_link_base.clone(),
         access_decoding_key: Arc::new(config.web.auth.get_jwt_decoding_key().unwrap()),
         access_iss: v3.access_token_iss.clone(),
+        allowed_origins: Arc::new(v3.cors_allowed_origins.clone()),
     };
 
     // credentials 付き CORS(`*` は使えないため origin は許可リスト)。

@@ -51,6 +51,8 @@ pub struct AuthV2State {
     pub access_decoding_key: Arc<DecodingKey>,
     /// アクセストークンの期待 iss。
     pub access_iss: String,
+    /// CSRF 対策: cookie 認証エンドポイント(refresh/logout)の Origin 許可リスト。
+    pub allowed_origins: Arc<Vec<String>>,
 }
 
 /// OpenAPI 上の auth タグ。
