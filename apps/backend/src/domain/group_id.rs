@@ -1,4 +1,6 @@
 use crate::domain::error::FactoryError;
+use serde::de::Error as _;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Display;
 use std::str::FromStr;
 
@@ -6,6 +8,20 @@ use std::str::FromStr;
 pub struct GroupId {
     prefix: char,
     index: u16,
+}
+
+// `"G-001"` 形式の文字列として serde 表現する（FromStr の検証を通すため derive せず手実装）．
+impl Serialize for GroupId {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for GroupId {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        GroupId::from_str(&s).map_err(D::Error::custom)
+    }
 }
 
 impl GroupId {
