@@ -1,6 +1,8 @@
 pub mod argon2_password_hasher;
 pub mod clock_impl;
 pub mod discord_webhook;
+pub mod jwt_access_token_issuer;
 pub mod memory;
+pub mod random_secret_generator;
 pub mod s3_object_storage;
 pub mod sqlite;
