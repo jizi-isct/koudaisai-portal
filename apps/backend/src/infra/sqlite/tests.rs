@@ -40,7 +40,16 @@ use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
 use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
-use chrono::{DateTime, TimeZone, Utc};
+use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
+use crate::application::ports::repositories::session_repo::SessionRepo;
+use crate::domain::one_time_token::{OneTimeToken, OneTimeTokenPurpose};
+use crate::domain::one_time_token_id::OneTimeTokenId;
+use crate::domain::session::{RevocationReason, Session, TokenStatus};
+use crate::domain::session_id::SessionId;
+use crate::domain::token_id::TokenId;
+use crate::infra::sqlite::one_time_token_repo_impl::SqliteOneTimeTokenRepo;
+use crate::infra::sqlite::session_repo_impl::SqliteSessionRepo;
+use chrono::{DateTime, Duration, TimeZone, Utc};
 use sqlx::SqlitePool;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
@@ -50,11 +59,6 @@ struct FixedClock {
     now: DateTime<Utc>,
 }
 impl Clock for FixedClock {
-    fn now(&self) -> DateTime<Utc> {
-        self.now
-    }
-}
-impl Clock for &FixedClock {
     fn now(&self) -> DateTime<Utc> {
         self.now
     }
@@ -470,4 +474,121 @@ async fn document_category_round_trip_and_update() {
         repo.update(&ghost).await,
         Err(crate::application::error::UpdateError::NotFound)
     ));
+}
+
+#[tokio::test]
+async fn one_time_token_round_trip_and_single_use() {
+    let pool = test_pool().await;
+    let c = clock();
+    let user_id = seed_user(&SqliteUserRepo::new(pool.clone()), "ott@example.com", &c).await;
+
+    let repo = SqliteOneTimeTokenRepo::new(pool.clone());
+    let ott_id = OneTimeTokenId::new(Uuid::new_v4());
+    let token = OneTimeToken::issue(
+        ott_id,
+        user_id,
+        OneTimeTokenPurpose::Activation,
+        "thash".to_string(),
+        Some(EmailAddress::new("ott@example.com".to_string()).unwrap()),
+        Duration::hours(48),
+        &c,
+    );
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    repo.insert_in(&mut tx, &token).await.unwrap();
+    tx.commit().await.unwrap();
+
+    let got = repo.find_by_id(ott_id).await.unwrap().unwrap();
+    assert_eq!(got.token_hash(), "thash");
+    assert_eq!(got.purpose(), OneTimeTokenPurpose::Activation);
+    assert_eq!(got.m_address().unwrap().address, "ott@example.com");
+    assert!(got.consumed_at().is_none());
+
+    // 単一使用: 1 回目は 1、2 回目は 0(同一 tx で自分の書込が見える)。
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    assert_eq!(repo.consume_in(&mut tx, ott_id, c.now()).await.unwrap(), 1);
+    assert_eq!(repo.consume_in(&mut tx, ott_id, c.now()).await.unwrap(), 0);
+    tx.commit().await.unwrap();
+}
+
+#[tokio::test]
+async fn session_round_trip_rotate_cas_and_revoke_family() {
+    let pool = test_pool().await;
+    let c = clock();
+    let user_id = seed_user(&SqliteUserRepo::new(pool.clone()), "sess@example.com", &c).await;
+
+    let repo = SqliteSessionRepo::new(pool.clone());
+    let (session, token0) = Session::start(
+        SessionId::new(Uuid::new_v4()),
+        TokenId::new(Uuid::new_v4()),
+        user_id,
+        "hash0".to_string(),
+        Duration::days(180),
+        Duration::days(14),
+        &c,
+    );
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    repo.insert_session_in(&mut tx, &session, &token0)
+        .await
+        .unwrap();
+    tx.commit().await.unwrap();
+
+    // ラウンドトリップ。
+    let got = repo.find_token_by_id(token0.id()).await.unwrap().unwrap();
+    assert_eq!(got.status(), TokenStatus::Issued);
+    assert_eq!(got.secret_hash(), "hash0");
+    assert_eq!(got.generation(), 0);
+    assert_eq!(
+        repo.find_active_sessions_by_user(user_id).await.unwrap().len(),
+        1
+    );
+
+    // 回転 CAS: 1 回目は 1。
+    let next = token0.rotate(
+        TokenId::new(Uuid::new_v4()),
+        "hash1".to_string(),
+        Duration::days(14),
+        *session.absolute_expires_at(),
+        &c,
+    );
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    assert_eq!(repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap(), 1);
+    tx.commit().await.unwrap();
+    // 同じ旧世代での再回転は 0(既に rotated)。
+    let next2 = token0.rotate(
+        TokenId::new(Uuid::new_v4()),
+        "hash2".to_string(),
+        Duration::days(14),
+        *session.absolute_expires_at(),
+        &c,
+    );
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    assert_eq!(repo.rotate_in(&mut tx, token0.id(), &next2).await.unwrap(), 0);
+    tx.commit().await.unwrap();
+
+    // ファミリ失効 → セッションも全世代トークンも revoked。
+    let mut tx = SqliteTransaction::new(pool.clone());
+    tx.begin().await.unwrap();
+    repo.revoke_family_in(&mut tx, session.id(), RevocationReason::ReuseDetected, c.now())
+        .await
+        .unwrap();
+    tx.commit().await.unwrap();
+    assert_eq!(
+        repo.find_active_sessions_by_user(user_id).await.unwrap().len(),
+        0
+    );
+    assert!(!repo.find_session_by_id(session.id()).await.unwrap().unwrap().is_active());
+    assert_eq!(
+        repo.find_token_by_id(next.id()).await.unwrap().unwrap().status(),
+        TokenStatus::Revoked
+    );
+
+    // 失効済みファミリは掃除で削除され，配下トークンも CASCADE で消える。
+    assert_eq!(repo.delete_expired(c.now()).await.unwrap(), 1);
+    assert!(repo.find_token_by_id(next.id()).await.unwrap().is_none());
+    assert!(repo.find_session_by_id(session.id()).await.unwrap().is_none());
 }

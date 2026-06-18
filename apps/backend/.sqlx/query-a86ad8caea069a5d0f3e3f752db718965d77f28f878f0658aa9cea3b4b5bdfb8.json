@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE session_tokens SET status = 'rotated' WHERE id = ? AND status = 'issued'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "a86ad8caea069a5d0f3e3f752db718965d77f28f878f0658aa9cea3b4b5bdfb8"
+}

@@ -1,3 +1,4 @@
+pub mod argon2_password_hasher;
 pub mod clock_impl;
 pub mod discord_webhook;
 pub mod memory;

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO one_time_tokens (id, user_id, purpose, token_hash, created_at, expires_at, consumed_at, m_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "ff2f082eb8877401daa1e7954f3684c7ae1eb559ccce124287b0d3258db871e2"
+}

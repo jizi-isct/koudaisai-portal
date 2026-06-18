@@ -1,3 +1,4 @@
+pub mod access_token_issuer_impl;
 pub mod approval_request_repo_impl;
 pub mod clock_impl;
 pub mod discord_impl;
@@ -9,6 +10,10 @@ pub mod group_repo_impl;
 pub mod membership_repo_impl;
 pub mod notification_repo_impl;
 pub mod object_storage_impl;
+pub mod one_time_token_repo_impl;
+pub mod password_hasher_impl;
+pub mod secret_generator_impl;
+pub mod session_repo_impl;
 pub mod transaction_impl;
 pub mod user_repo_impl;
 

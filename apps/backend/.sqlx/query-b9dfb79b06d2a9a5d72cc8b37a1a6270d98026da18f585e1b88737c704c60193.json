@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM one_time_tokens WHERE expires_at <= ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "b9dfb79b06d2a9a5d72cc8b37a1a6270d98026da18f585e1b88737c704c60193"
+}

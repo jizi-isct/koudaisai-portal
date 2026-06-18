@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE one_time_tokens SET consumed_at = ? WHERE id = ? AND consumed_at IS NULL AND expires_at > ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "60098bebdaa8084a28421aa16e4a33389bbe7b5d5cb93003104566e6d237d5fb"
+}

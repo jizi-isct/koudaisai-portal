@@ -13,6 +13,7 @@ use crate::application::transaction::Transaction;
 use crate::application::user::UserApp;
 
 pub mod approval_request;
+pub mod auth;
 pub mod authz;
 pub mod document;
 pub mod document_category;
