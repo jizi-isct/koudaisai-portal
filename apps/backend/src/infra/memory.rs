@@ -18,6 +18,7 @@ pub mod transaction_impl;
 pub mod user_repo_impl;
 
 use crate::application::Application;
+use crate::infra::memory::access_token_issuer_impl::MemoryAccessTokenIssuer;
 use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
 use crate::infra::memory::clock_impl::MemoryClock;
 use crate::infra::memory::discord_impl::MemoryDiscord;
@@ -28,6 +29,10 @@ use crate::infra::memory::form_repo_impl::MemoryFormRepo;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;
 use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
 use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
+use crate::infra::memory::one_time_token_repo_impl::MemoryOneTimeTokenRepo;
+use crate::infra::memory::password_hasher_impl::MemoryPasswordHasher;
+use crate::infra::memory::secret_generator_impl::MemorySecretGenerator;
+use crate::infra::memory::session_repo_impl::MemorySessionRepo;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use crate::infra::memory::user_repo_impl::MemoryUserRepo;
 
@@ -44,6 +49,11 @@ pub type MemoryApplication = Application<
     MemoryEmail,
     MemoryObjectStorage,
     MemoryDiscord,
+    MemorySessionRepo,
+    MemoryOneTimeTokenRepo,
+    MemoryPasswordHasher,
+    MemorySecretGenerator,
+    MemoryAccessTokenIssuer,
 >;
 
 impl MemoryApplication {
@@ -63,6 +73,11 @@ impl MemoryApplication {
             MemoryEmail::new(),
             MemoryObjectStorage::new(),
             MemoryDiscord::new(),
+            MemorySessionRepo::new(),
+            MemoryOneTimeTokenRepo::new(),
+            MemoryPasswordHasher::new(),
+            MemorySecretGenerator::new(),
+            MemoryAccessTokenIssuer::new(),
             "http://localhost".to_string(),
         )
     }

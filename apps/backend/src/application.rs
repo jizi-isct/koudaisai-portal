@@ -1,5 +1,8 @@
+use crate::application::ports::access_token_issuer::AccessTokenIssuer;
 use crate::application::ports::clock::Clock;
 use crate::application::ports::discord::Discord;
+use crate::application::ports::password_hasher::PasswordHasher;
+use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::ports::email::Email;
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
@@ -8,6 +11,8 @@ use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
+use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
+use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::application::user::UserApp;
@@ -39,6 +44,11 @@ pub struct Application<
     E: Email,
     OS: ObjectStorage,
     D: Discord,
+    SR: SessionRepo<Tx>,
+    OTR: OneTimeTokenRepo<Tx>,
+    PH: PasswordHasher,
+    SG: SecretGenerator,
+    ATI: AccessTokenIssuer,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -52,24 +62,34 @@ pub struct Application<
     email: E,
     object_storage: OS,
     discord: D,
+    session_repo: SR,
+    one_time_token_repo: OTR,
+    password_hasher: PH,
+    secret_generator: SG,
+    access_token_issuer: ATI,
     /// 通知の本文などで使う公開ベース URL(例: `https://portal.koudaisai.jp`)。
     base_url: String,
 }
 
 impl<
-    Tx: Transaction,
+    Tx: Transaction + Send,
     AR: ApprovalRequestRepo<Tx>,
     GR: GroupRepo<Tx>,
     MR: MembershipRepo<Tx>,
-    UR: UserRepo<Tx>,
+    UR: UserRepo<Tx> + Send + Sync,
     DR: DocumentRepo<Tx>,
     DCR: DocumentCategoryRepo<Tx>,
     FR: FormRepo,
-    C: Clock,
+    C: Clock + Send + Sync,
     E: Email,
     OS: ObjectStorage,
     D: Discord,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D>
+    SR: SessionRepo<Tx> + Send + Sync,
+    OTR: OneTimeTokenRepo<Tx> + Send + Sync,
+    PH: PasswordHasher,
+    SG: SecretGenerator,
+    ATI: AccessTokenIssuer,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI>
 {
     pub fn new(
         approval_request_repo: AR,
@@ -83,6 +103,11 @@ impl<
         email: E,
         object_storage: OS,
         discord: D,
+        session_repo: SR,
+        one_time_token_repo: OTR,
+        password_hasher: PH,
+        secret_generator: SG,
+        access_token_issuer: ATI,
         base_url: String,
     ) -> Self {
         Self {
@@ -98,6 +123,11 @@ impl<
             email,
             object_storage,
             discord,
+            session_repo,
+            one_time_token_repo,
+            password_hasher,
+            secret_generator,
+            access_token_issuer,
             base_url,
         }
     }
@@ -143,5 +173,25 @@ impl<
 
     pub fn file(&'_ self) -> file::FileApp<'_, OS> {
         file::FileApp::new(&self.object_storage)
+    }
+
+    /// 認証ユースケース。`config` と定数時間ログイン用ダミー PHC は
+    /// 呼び出し側(State)が現行設定から渡す。
+    pub fn auth(
+        &'_ self,
+        config: auth::AuthConfig,
+        dummy_phc: String,
+    ) -> auth::AuthApp<'_, Tx, C> {
+        auth::AuthApp::new(
+            &self.user_repo,
+            &self.one_time_token_repo,
+            &self.session_repo,
+            &self.password_hasher,
+            &self.secret_generator,
+            &self.access_token_issuer,
+            &self.clock,
+            config,
+            dummy_phc,
+        )
     }
 }
