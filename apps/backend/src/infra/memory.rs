@@ -1,5 +1,6 @@
 pub mod approval_request_repo_impl;
 pub mod clock_impl;
+pub mod discord_impl;
 pub mod document_category_repo_impl;
 pub mod document_repo_impl;
 pub mod email_impl;
@@ -14,6 +15,7 @@ pub mod user_repo_impl;
 use crate::application::Application;
 use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
 use crate::infra::memory::clock_impl::MemoryClock;
+use crate::infra::memory::discord_impl::MemoryDiscord;
 use crate::infra::memory::document_category_repo_impl::MemoryDocumentCategoryRepo;
 use crate::infra::memory::document_repo_impl::MemoryDocumentRepo;
 use crate::infra::memory::email_impl::MemoryEmail;
@@ -36,6 +38,7 @@ pub type MemoryApplication = Application<
     MemoryClock,
     MemoryEmail,
     MemoryObjectStorage,
+    MemoryDiscord,
 >;
 
 impl MemoryApplication {
@@ -54,6 +57,7 @@ impl MemoryApplication {
             MemoryClock::new(now),
             MemoryEmail::new(),
             MemoryObjectStorage::new(),
+            MemoryDiscord::new(),
         )
     }
 }

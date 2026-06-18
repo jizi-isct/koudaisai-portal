@@ -1,4 +1,5 @@
 use crate::application::ports::clock::Clock;
+use crate::application::ports::discord::Discord;
 use crate::application::ports::email::Email;
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
@@ -36,6 +37,7 @@ pub struct Application<
     C: Clock,
     E: Email,
     OS: ObjectStorage,
+    D: Discord,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -48,6 +50,7 @@ pub struct Application<
     clock: C,
     email: E,
     object_storage: OS,
+    discord: D,
 }
 
 impl<
@@ -62,7 +65,8 @@ impl<
     C: Clock,
     E: Email,
     OS: ObjectStorage,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS>
+    D: Discord,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D>
 {
     pub fn new(
         approval_request_repo: AR,
@@ -75,6 +79,7 @@ impl<
         clock: C,
         email: E,
         object_storage: OS,
+        discord: D,
     ) -> Self {
         Self {
             _phantom: std::marker::PhantomData,
@@ -88,6 +93,7 @@ impl<
             clock,
             email,
             object_storage,
+            discord,
         }
     }
 
