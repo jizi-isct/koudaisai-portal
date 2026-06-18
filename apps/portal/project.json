@@ -50,6 +50,7 @@
     },
     "deploy:preview": {
       "executor": "nx:run-commands",
+      "cache": false,
       "options": {
         "command": "wrangler deploy --env preview",
         "cwd": "apps/portal"
