@@ -15,10 +15,48 @@ use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum::http::{HeaderMap, StatusCode, header};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
+use oauth2::AccessToken;
+use openidconnect::core::CoreUserInfoClaims;
 use serde_json::Value;
+use uuid::Uuid;
 
 /// 認証コンテキストの抽出子。
 pub struct Actor(pub ActorContext);
+
+/// legacy 踏襲: Keycloak 認証済み admin に付与する全権限 claim。
+/// (legacy は `matches!(current_user, CurrentUser::Admin(_))` で細粒度判定をしていなかった)
+fn admin_claims() -> Vec<String> {
+    [
+        "koudaisai-portal:admin:user:read",
+        "koudaisai-portal:admin:user:update",
+        "koudaisai-portal:admin:user:change-email",
+        "koudaisai-portal:admin:group:read",
+        "koudaisai-portal:admin:group:create",
+        "koudaisai-portal:admin:group:update",
+        "koudaisai-portal:admin:form:read",
+        "koudaisai-portal:admin:form:create",
+        "koudaisai-portal:admin:form:update",
+        "koudaisai-portal:admin:form:delete",
+        "koudaisai-portal:admin:document:read",
+        "koudaisai-portal:admin:document:create",
+        "koudaisai-portal:admin:document:update",
+        "koudaisai-portal:admin:document:delete",
+        "koudaisai-portal:admin:document-category:read",
+        "koudaisai-portal:admin:document-category:create",
+        "koudaisai-portal:admin:document-category:update",
+        "koudaisai-portal:admin:document-category:delete",
+        "koudaisai-portal:admin:notification:read",
+        "koudaisai-portal:admin:notification:create",
+        "koudaisai-portal:admin:notification:update",
+        "koudaisai-portal:admin:notification:delete",
+        "koudaisai-portal:admin:approval-request:read",
+        "koudaisai-portal:admin:approval-request:approve",
+        "koudaisai-portal:admin:approval-request:delete",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect()
+}
 
 /// `Authorization: Bearer <token>` を取り出す。
 pub(crate) fn bearer(headers: &HeaderMap) -> Option<String> {
@@ -92,11 +130,30 @@ impl FromRequestParts<AuthV2State> for Actor {
                 .ok_or(StatusCode::UNAUTHORIZED)?;
             Ok(Actor(actor))
         } else {
-            // TODO(admin): Keycloak access token の realm_access.roles から
-            // ActorContext::Admin の claims を組み立てる(JWKS 検証 + role→claim マッピング)。
-            // 現行 OIDC は EmptyAdditionalClaims で userinfo から role を取れないため設計が要る。
-            // 確定まで admin の api_v3 アクセスは 401。
-            Err(StatusCode::UNAUTHORIZED)
+            // Keycloak admin。legacy は「Keycloak 認証成功＝フル管理者」(細粒度 claim 判定なし)
+            // だったため踏襲し、userinfo で正当性を確認した上で全 admin claim を付与する。
+            // (将来 Keycloak realm_access.roles → 個別 claim の細粒度マッピングに差し替え可能)
+            let access_token = AccessToken::new(token);
+            let user_info_req = st
+                .oidc_client
+                .user_info(access_token, None)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+            let user_info: CoreUserInfoClaims = user_info_req
+                .request_async(&st.http_client)
+                .await
+                .map_err(|_| StatusCode::UNAUTHORIZED)?;
+            let subject = user_info.subject().as_str();
+            let user_id =
+                UserId::new(Uuid::parse_str(subject).map_err(|_| StatusCode::UNAUTHORIZED)?);
+            let name = user_info
+                .preferred_username()
+                .map(|u| u.as_str().to_string())
+                .unwrap_or_else(|| subject.to_string());
+            Ok(Actor(ActorContext::Admin {
+                user_id,
+                name,
+                claims: admin_claims(),
+            }))
         }
     }
 }
