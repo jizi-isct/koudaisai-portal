@@ -6,7 +6,8 @@ use async_trait::async_trait;
 use std::sync::{Arc, RwLock};
 
 pub struct MemoryEmail {
-    sent_emails: Arc<RwLock<Vec<(EmailAddress, String)>>>,
+    /// (宛先, 件名, 本文)
+    sent_emails: Arc<RwLock<Vec<(EmailAddress, String, String)>>>,
 }
 
 impl MemoryEmail {
@@ -16,19 +17,24 @@ impl MemoryEmail {
         }
     }
 
-    pub fn sent_emails(&self) -> Vec<(EmailAddress, String)> {
+    pub fn sent_emails(&self) -> Vec<(EmailAddress, String, String)> {
         self.sent_emails.read().unwrap().clone()
     }
 }
 
 #[async_trait]
 impl Email for MemoryEmail {
-    async fn send(&self, address: &EmailAddress, body: &str) -> Result<(), ApplicationError> {
+    async fn send(
+        &self,
+        address: &EmailAddress,
+        subject: &str,
+        body: &str,
+    ) -> Result<(), ApplicationError> {
         let mut sent_emails = self
             .sent_emails
             .write()
             .map_err(|e| ApplicationError::InternalError(anyhow!(e.to_string())))?;
-        sent_emails.push((address.clone(), body.to_string()));
+        sent_emails.push((address.clone(), subject.to_string(), body.to_string()));
         Ok(())
     }
 }
