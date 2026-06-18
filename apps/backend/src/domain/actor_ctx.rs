@@ -10,11 +10,15 @@ use crate::domain::user_id::UserId;
 pub enum ActorContext {
     User {
         user_id: UserId,
+        /// 表示名(通知の送信者名などに用いる)。
+        name: String,
         memberships: Vec<Membership>,
         group_type: GroupType,
     },
     Admin {
         user_id: UserId,
+        /// 表示名(通知の送信者名などに用いる)。
+        name: String,
         claims: Vec<String>,
     },
     NoLogin,

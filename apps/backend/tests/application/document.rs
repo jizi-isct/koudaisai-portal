@@ -19,6 +19,7 @@ fn make_app() -> MemoryApplication {
 
 fn admin_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec![
             "koudaisai-portal:admin:document:read".to_string(),

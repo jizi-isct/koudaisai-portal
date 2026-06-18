@@ -335,6 +335,7 @@ pub fn test_can_close_approval_request(
                 (
                     issuer_uid,
                     ActorContext::User {
+                        name: "テストユーザー".to_string(),
                         user_id: issuer_uid,
                         memberships,
                         group_type: gt,

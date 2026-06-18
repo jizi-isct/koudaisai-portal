@@ -101,7 +101,9 @@ impl<
         }
     }
 
-    pub fn approval_request(&'_ self) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, C, D> {
+    pub fn approval_request(
+        &'_ self,
+    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, C, D> {
         approval_request::ApprovalRequestApp::new(
             &self.approval_request_repo,
             &self.membership_repo,

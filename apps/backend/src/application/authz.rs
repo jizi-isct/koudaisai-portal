@@ -470,18 +470,21 @@ mod tests {
     #[test]
     fn test_can_get_all_users() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:read".to_string()],
         };
         assert!(can_get_all_users(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
         assert!(!can_get_all_users(&unauthorized_admin_ctx));
 
         let user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             memberships: vec![],
             group_type: GroupType::Press,
@@ -500,6 +503,7 @@ mod tests {
 
         // Admin with permission
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:read".to_string()],
         };
@@ -507,6 +511,7 @@ mod tests {
 
         // Admin without permission
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -518,6 +523,7 @@ mod tests {
         // User in the same group
         let other_user_id = create_user_id();
         let same_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![create_membership(group_id, other_user_id)],
             group_type: GroupType::Press,
@@ -527,6 +533,7 @@ mod tests {
         // User in a different group
         let diff_group_id = GroupId::new('G', 2).unwrap();
         let diff_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![create_membership(diff_group_id, other_user_id)],
             group_type: GroupType::Press,
@@ -558,12 +565,14 @@ mod tests {
         .unwrap();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:update".to_string()],
         };
         assert!(can_update_user(&admin_ctx, &user));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -577,12 +586,14 @@ mod tests {
         let user_id = create_user_id();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:change-email".to_string()],
         };
         assert!(can_change_m_address_of_the_user(&admin_ctx, user_id));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -600,12 +611,14 @@ mod tests {
     #[test]
     fn test_can_get_all_groups() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:read".to_string()],
         };
         assert!(can_get_all_groups(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -622,6 +635,7 @@ mod tests {
 
         // Admin with permission
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:read".to_string()],
         };
@@ -629,6 +643,7 @@ mod tests {
 
         // Admin without permission
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -639,6 +654,7 @@ mod tests {
 
         // User who is a member
         let member_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
             group_type: GroupType::Press,
@@ -648,6 +664,7 @@ mod tests {
         // User who is not a member
         let other_user_id = create_user_id();
         let non_member_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![],
             group_type: GroupType::Press,
@@ -667,12 +684,14 @@ mod tests {
     #[test]
     fn test_can_create_group() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:create".to_string()],
         };
         assert!(can_create_group(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -687,12 +706,14 @@ mod tests {
         let user_id = create_user_id();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:read".to_string()],
         };
         assert!(can_get_group_approval_requests(&admin_ctx, group_id));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -702,6 +723,7 @@ mod tests {
         ));
 
         let user_ctx_same_group = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
             group_type: GroupType::Press,
@@ -713,6 +735,7 @@ mod tests {
 
         let other_group = GroupId::new('G', 2).unwrap();
         let user_ctx_other_group = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(other_group, user_id)],
             group_type: GroupType::Press,
@@ -736,6 +759,7 @@ mod tests {
         let request = create_pending_approval_request(issuer_id);
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:read".to_string()],
         };
@@ -746,6 +770,7 @@ mod tests {
         ));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -757,6 +782,7 @@ mod tests {
 
         let viewer_id = create_user_id();
         let same_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: viewer_id,
             memberships: vec![create_membership(issuer_group, viewer_id)],
             group_type: GroupType::Press,
@@ -769,6 +795,7 @@ mod tests {
 
         let other_group = GroupId::new('G', 2).unwrap();
         let other_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: viewer_id,
             memberships: vec![create_membership(other_group, viewer_id)],
             group_type: GroupType::Press,
@@ -792,6 +819,7 @@ mod tests {
         let request = create_pending_approval_request(issuer_id);
 
         let issuer_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: issuer_id,
             memberships: vec![],
             group_type: GroupType::Press,
@@ -800,6 +828,7 @@ mod tests {
 
         let other_user_id = create_user_id();
         let other_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![],
             group_type: GroupType::Press,
@@ -807,6 +836,7 @@ mod tests {
         assert!(!can_close_approval_request(&other_user_ctx, &request));
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:approve".to_string()],
         };

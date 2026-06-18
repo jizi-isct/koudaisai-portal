@@ -91,6 +91,7 @@ mod tests {
 
     fn admin_ctx() -> ActorContext {
         ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: UserId::new(Uuid::new_v4()),
             claims: vec![],
         }

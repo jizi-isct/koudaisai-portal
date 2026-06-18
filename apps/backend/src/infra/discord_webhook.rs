@@ -53,7 +53,8 @@ impl Discord for WebhookDiscord {
                     builder = builder.color(color);
                 }
                 for field in &embed.fields {
-                    builder = builder.field(field.name.as_str(), field.value.as_str(), field.inline);
+                    builder =
+                        builder.field(field.name.as_str(), field.value.as_str(), field.inline);
                 }
                 builder
             })
@@ -88,8 +89,7 @@ mod tests {
 
     #[test]
     fn new_parses_thread_id_from_url_query() {
-        let discord =
-            WebhookDiscord::new("https://discord.com/api/webhooks/1/token?thread_id=42");
+        let discord = WebhookDiscord::new("https://discord.com/api/webhooks/1/token?thread_id=42");
         assert_eq!(discord.thread_id, Some(42));
     }
 

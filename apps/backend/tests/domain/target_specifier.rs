@@ -97,12 +97,14 @@ pub fn test_does_actor_match(_path: &Path, contents: String) -> datatest_stable:
                 })
                 .collect();
             ActorContext::User {
+                name: "テストユーザー".to_string(),
                 user_id,
                 memberships,
                 group_type: parse_group_type(group_type),
             }
         }
         ActorSpec::Admin { user_id } => ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: uid(user_id.as_ref()),
             claims: vec![],
         },

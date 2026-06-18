@@ -5,7 +5,9 @@ use crate::application::error::{
     ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
 };
 use crate::application::ports::clock::Clock;
-use crate::application::ports::discord::{Discord, DiscordEmbed, DiscordEmbedField, DiscordMessage};
+use crate::application::ports::discord::{
+    Discord, DiscordEmbed, DiscordEmbedField, DiscordMessage,
+};
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::transaction::Transaction;
@@ -33,14 +35,8 @@ pub struct ApprovalRequestApp<
     base_url: &'a str,
 }
 
-impl<
-    'a,
-    Tx: Transaction,
-    AR: ApprovalRequestRepo<Tx>,
-    MR: MembershipRepo<Tx>,
-    C: Clock,
-    D: Discord,
-> ApprovalRequestApp<'a, Tx, AR, MR, C, D>
+impl<'a, Tx: Transaction, AR: ApprovalRequestRepo<Tx>, MR: MembershipRepo<Tx>, C: Clock, D: Discord>
+    ApprovalRequestApp<'a, Tx, AR, MR, C, D>
 {
     pub fn new(
         approval_request_repo: &'a AR,
@@ -416,6 +412,7 @@ mod tests {
     fn user_ctx() -> ActorContext {
         ActorContext::User {
             user_id: UserId::new(Uuid::new_v4()),
+            name: "山田太郎".to_string(),
             memberships: vec![],
             group_type: GroupType::GeneralProject,
         }
@@ -424,6 +421,7 @@ mod tests {
     fn admin_ctx() -> ActorContext {
         ActorContext::Admin {
             user_id: UserId::new(Uuid::new_v4()),
+            name: "承認担当".to_string(),
             claims: vec!["koudaisai-portal:admin:approval-request:approve".to_string()],
         }
     }

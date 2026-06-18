@@ -23,6 +23,7 @@ fn user_ctx(group_type: GroupType) -> (UserId, ActorContext) {
     (
         user_id,
         ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships,
             group_type,
@@ -40,6 +41,7 @@ fn parse_actor(s: &str) -> ActorContext {
         "user_press" => user_ctx(GroupType::Press).1,
         "user" => user_ctx(GroupType::Press).1,
         "admin" => ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: u(),
             claims: vec![],
         },
@@ -99,6 +101,7 @@ pub fn test_is_group_id(_path: &Path, contents: String) -> datatest_stable::Resu
                 &FixedClock,
             )];
             ActorContext::User {
+                name: "テストユーザー".to_string(),
                 user_id,
                 memberships,
                 group_type: GroupType::Press,
@@ -139,11 +142,13 @@ pub fn test_is_user_id(_path: &Path, contents: String) -> datatest_stable::Resul
 
     let ctx = match c.actor.as_str() {
         "user" => ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: actor_user_id,
             memberships: vec![],
             group_type: GroupType::Press,
         },
         "admin" => ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: actor_user_id,
             claims: vec![],
         },

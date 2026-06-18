@@ -24,6 +24,7 @@ pub fn mem(group_id: GroupId, user_id: UserId) -> Membership {
 fn seed_admin_ctx() -> ActorContext {
     ActorContext::Admin {
         user_id: uid(),
+        name: "Seed Admin".to_string(),
         claims: vec![
             "koudaisai-portal:admin:group:create".to_string(),
             "koudaisai-portal:admin:group:update".to_string(),
@@ -95,7 +96,14 @@ pub fn parse_target(s: &str) -> TargetSpecifier {
 pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
     let user_id = uid();
     match spec {
-        ActorSpec::Admin { claims } => (user_id, ActorContext::Admin { user_id, claims }),
+        ActorSpec::Admin { claims } => (
+            user_id,
+            ActorContext::Admin {
+                user_id,
+                name: "Test Admin".to_string(),
+                claims,
+            },
+        ),
         ActorSpec::User {
             group_type,
             group_ids,
@@ -109,6 +117,7 @@ pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
                 user_id,
                 ActorContext::User {
                     user_id,
+                    name: "Test User".to_string(),
                     memberships,
                     group_type: gt,
                 },

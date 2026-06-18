@@ -19,6 +19,7 @@ fn make_app() -> MemoryApplication {
 
 fn admin_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:user:read".to_string()],
     }
@@ -102,6 +103,7 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
             let gid = GroupId::from_str(gid_str).unwrap();
             let group_type = GroupType::Press;
             let admin = ActorContext::Admin {
+                name: "テストユーザー".to_string(),
                 user_id: uid(),
                 claims: vec!["koudaisai-portal:admin:group:create".to_string()],
             };

@@ -18,6 +18,7 @@ fn make_app() -> MemoryApplication {
 
 fn admin_create_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:group:create".to_string()],
     }
@@ -25,6 +26,7 @@ fn admin_create_ctx() -> ActorContext {
 
 fn admin_read_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:group:read".to_string()],
     }

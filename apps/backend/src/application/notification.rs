@@ -153,6 +153,7 @@ mod tests {
 
     fn admin_ctx() -> ActorContext {
         ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: UserId::new(Uuid::new_v4()),
             claims: vec![
                 "koudaisai-portal:admin:notification:read".to_string(),
@@ -232,6 +233,7 @@ mod tests {
         .unwrap();
 
         let user_ctx = |user_id| ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![],
             group_type: GroupType::Press,
@@ -258,6 +260,7 @@ mod tests {
 
         // 管理者(read クレームなし): 0 件
         let admin_noclaim = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: UserId::new(Uuid::new_v4()),
             claims: vec![],
         };
