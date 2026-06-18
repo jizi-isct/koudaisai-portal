@@ -27,15 +27,19 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
         }
     }
 
+    /// アクターが閲覧可能な Notification をすべて返す。
+    /// 管理者(notification:read クレーム)は全件、参加団体/未ログインは
+    /// 自身が対象(targets)に含まれる通知のみを取得する（判定は `get_by_id` と同じ
+    /// `authz::can_get_notification`）。
     pub async fn get_all(
         &self,
         actor_ctx: &ActorContext,
     ) -> Result<Vec<Notification>, ApplicationOperationError<FindError>> {
-        if !authz::can_get_all_notifications(actor_ctx) {
-            return Err(ApplicationOperationError::Unauthorized);
-        }
-
-        Ok(self.notification_repo.find_all().await?)
+        let notifications = self.notification_repo.find_all().await?;
+        Ok(notifications
+            .into_iter()
+            .filter(|notification| authz::can_get_notification(actor_ctx, notification))
+            .collect())
     }
 
     pub async fn get_by_id(
@@ -197,6 +201,67 @@ mod tests {
 
         app.delete(&ctx, id).await.unwrap();
         assert!(repo.find_by_id(id).await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn test_get_all_filters_by_target() {
+        use crate::domain::group::GroupType;
+
+        let repo = MemoryNotificationRepo::new();
+        let clock = MemoryClock::new(Utc::now());
+        let app = NotificationApp::new(&repo, &clock);
+        let admin = admin_ctx();
+
+        // A: 全員向け(UserNologin は誰にでもマッチ)
+        let a = app
+            .create(
+                &admin,
+                vec![TargetSpecifier::UserNologin],
+                NotificationType::markdown("a".to_string(), "a".to_string()).unwrap(),
+            )
+            .await
+            .unwrap();
+        // B: 特定ユーザー向け
+        let target_user = UserId::new(Uuid::new_v4());
+        app.create(
+            &admin,
+            vec![TargetSpecifier::UserId(target_user)],
+            NotificationType::markdown("b".to_string(), "b".to_string()).unwrap(),
+        )
+        .await
+        .unwrap();
+
+        let user_ctx = |user_id| ActorContext::User {
+            user_id,
+            memberships: vec![],
+            group_type: GroupType::Press,
+        };
+
+        // 管理者(read クレームあり): 全件
+        assert_eq!(app.get_all(&admin).await.unwrap().len(), 2);
+
+        // 未ログイン: 全員向けの A のみ
+        let nologin = app.get_all(&ActorContext::NoLogin).await.unwrap();
+        assert_eq!(nologin.len(), 1);
+        assert_eq!(nologin[0].id(), a);
+
+        // 対象ユーザー本人: A + B
+        assert_eq!(app.get_all(&user_ctx(target_user)).await.unwrap().len(), 2);
+
+        // 別ユーザー: A のみ
+        let other = app
+            .get_all(&user_ctx(UserId::new(Uuid::new_v4())))
+            .await
+            .unwrap();
+        assert_eq!(other.len(), 1);
+        assert_eq!(other[0].id(), a);
+
+        // 管理者(read クレームなし): 0 件
+        let admin_noclaim = ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            claims: vec![],
+        };
+        assert!(app.get_all(&admin_noclaim).await.unwrap().is_empty());
     }
 
     #[tokio::test]
