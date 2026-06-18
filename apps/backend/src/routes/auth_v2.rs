@@ -4,6 +4,7 @@
 //! 中身は [`crate::application::auth::AuthApp`](回転セッション + argon2)。
 //! `__Host-` Cookie でリフレッシュトークンを配送する(設計は [`CookieConfig`])。
 
+mod admin;
 mod dto;
 mod handlers;
 
@@ -12,9 +13,12 @@ use crate::infra::discord_webhook::WebhookDiscord;
 use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::SqliteApplication;
+use crate::util::oidc::OIDCClient;
 use jsonwebtoken::DecodingKey;
 use sqlx::SqlitePool;
+use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
@@ -53,6 +57,12 @@ pub struct AuthV2State {
     pub access_iss: String,
     /// CSRF 対策: cookie 認証エンドポイント(refresh/logout)の Origin 許可リスト。
     pub allowed_origins: Arc<Vec<String>>,
+    /// 管理者 Keycloak OIDC クライアント。
+    pub oidc_client: Arc<OIDCClient>,
+    /// admin OIDC のリダイレクト前セッション(CSRF state → PKCE/nonce)。
+    pub auth_sessions: Arc<Mutex<HashMap<String, admin::AdminAuthSession>>>,
+    /// OIDC トークン交換用 HTTP クライアント。
+    pub http_client: reqwest::Client,
 }
 
 /// OpenAPI 上の auth タグ。
@@ -69,5 +79,7 @@ pub fn router() -> OpenApiRouter<AuthV2State> {
         handlers::password_change,
         handlers::password_reset,
         handlers::password_reset_confirm,
+        admin::admin_login,
+        admin::admin_redirect,
     ))
 }

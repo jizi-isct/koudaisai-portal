@@ -144,6 +144,9 @@ async fn main() {
         access_decoding_key: Arc::new(config.web.auth.get_jwt_decoding_key().unwrap()),
         access_iss: v3.access_token_iss.clone(),
         allowed_origins: Arc::new(v3.cors_allowed_origins.clone()),
+        oidc_client: Arc::new(oidc_client.clone()),
+        auth_sessions: Arc::new(tokio::sync::Mutex::new(std::collections::HashMap::new())),
+        http_client: reqwest::Client::new(),
     };
 
     // credentials 付き CORS(`*` は使えないため origin は許可リスト)。
