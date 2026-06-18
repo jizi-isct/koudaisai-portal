@@ -10,6 +10,9 @@ pub fn router() -> OpenApiRouter {
         handlers::put_group,
         handlers::get_group,
         handlers::patch_group,
-        handlers::delete_group
+        handlers::delete_group,
+        handlers::get_members,
+        handlers::put_member,
+        handlers::delete_member
     ))
 }

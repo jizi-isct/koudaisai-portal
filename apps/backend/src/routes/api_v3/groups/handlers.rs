@@ -1,4 +1,4 @@
-use super::dto::{GroupCreate, GroupRead, GroupUpdate};
+use super::dto::{GroupCreate, GroupRead, GroupUpdate, MemberCreate, MemberRead, Role};
 use axum::Json;
 use axum::extract::Path;
 use serde::Deserialize;
@@ -134,5 +134,91 @@ pub enum DeleteGroupResponse {
     tag = super::super::GROUPS_TAG
 )]
 pub async fn delete_group(Path(path): Path<GroupPath>) -> DeleteGroupResponse {
+    todo!()
+}
+
+#[derive(Deserialize, IntoParams)]
+pub struct MemberPath {
+    id: String,
+    role: Role,
+}
+
+#[http_response]
+pub enum GetMembersResponse {
+    #[response(status = OK)]
+    Ok(Vec<MemberRead>),
+    #[response(status = NOT_FOUND, description = "Group not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    get,
+    description = "Get all members of a group.",
+    params(GroupPath),
+    path = "/{id}/members",
+    responses(GetMembersResponse),
+    tag = super::super::GROUPS_TAG
+)]
+pub async fn get_members(Path(path): Path<GroupPath>) -> GetMembersResponse {
+    todo!()
+}
+
+#[http_response]
+pub enum PutMemberResponse {
+    #[response(status = CREATED)]
+    Created(MemberRead),
+    #[response(status = OK, description = "Member replaced")]
+    Ok(MemberRead),
+    #[response(status = NOT_FOUND, description = "Group not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid for group type")]
+    UnprocessableEntity,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    put,
+    description = "Assign a member to a role in a group or replace an existing one.",
+    params(MemberPath),
+    path = "/{id}/members/{role}",
+    responses(PutMemberResponse),
+    request_body = MemberCreate,
+    tag = super::super::GROUPS_TAG
+)]
+pub async fn put_member(
+    Path(path): Path<MemberPath>,
+    Json(body): Json<MemberCreate>,
+) -> PutMemberResponse {
+    todo!()
+}
+
+#[http_response]
+pub enum DeleteMemberResponse {
+    #[response(status = NO_CONTENT, description = "Member deleted")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Group not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    delete,
+    description = "Remove a member from a role in a group.",
+    params(MemberPath),
+    path = "/{id}/members/{role}",
+    responses(DeleteMemberResponse),
+    tag = super::super::GROUPS_TAG
+)]
+pub async fn delete_member(Path(path): Path<MemberPath>) -> DeleteMemberResponse {
     todo!()
 }
