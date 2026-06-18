@@ -1,6 +1,6 @@
 // TODO(sqlx移行): UserRead の取得は application 層(sqlx)へ再配線する
 // use crate::entities::user::UserRead;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 use crate::util::jwt;
 use axum::extract::{Request, State};
 use axum::http;

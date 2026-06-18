@@ -1,6 +1,6 @@
 // TODO(sqlx移行): Db 設定型は init_db 復活時に再度 import する
 use crate::config::{Logging, init_config};
-use crate::routes::init_routes;
+use crate::routes_legacy::init_routes;
 use crate::service::discord::Discord;
 use crate::util::oidc::OIDCClient;
 use aws_config::BehaviorVersion;

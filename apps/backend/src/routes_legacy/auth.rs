@@ -1,6 +1,6 @@
 mod password;
 
-use crate::routes::{AppState, AuthSession};
+use crate::routes_legacy::{AppState, AuthSession};
 // TODO(sqlx移行): users / revoked_refresh_tokens のDBアクセスは application 層(sqlx)へ再配線
 // use crate::sea_orm_entities::prelude::Users;
 // use crate::sea_orm_entities::{revoked_refresh_tokens, users};

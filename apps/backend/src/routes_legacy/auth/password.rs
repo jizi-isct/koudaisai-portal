@@ -1,6 +1,6 @@
 // TODO(sqlx移行): UserRead / users のDBアクセスは application 層(sqlx)へ再配線する
 // use crate::entities::user::UserRead;
-use crate::routes::AppState;
+use crate::routes_legacy::AppState;
 // use crate::sea_orm_entities::users;
 use crate::util::AppResponse;
 // TODO(sqlx移行): digest はパスワード検証を application 層へ再配線する際に復活させる
