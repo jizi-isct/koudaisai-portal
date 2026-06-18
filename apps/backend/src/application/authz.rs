@@ -108,6 +108,17 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+/// グループのメンバー（所属・役職）を追加・削除できるか．
+// TODO: 現状は管理者(group:update クレーム)のみ許可．団体メンバー自身による管理を許す場合はここを拡張する．
+pub fn can_manage_group_members(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:update".to_string())
+        }
+        _ => false,
+    }
+}
+
 pub fn can_get_form(actor_ctx: &ActorContext, form: &Form) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -404,7 +415,7 @@ mod tests {
     use crate::domain::approval_request_id::ApprovalRequestId;
     use crate::domain::group::GroupType;
     use crate::domain::group_id::GroupId;
-    use crate::domain::membership::Membership;
+    use crate::domain::membership::{Membership, Role};
     use crate::domain::user_id::UserId;
     use chrono::{DateTime, Utc};
     use uuid::Uuid;
@@ -425,7 +436,7 @@ mod tests {
     }
 
     fn create_membership(group_id: GroupId, user_id: UserId) -> Membership {
-        Membership::new(group_id, user_id, &MockClock)
+        Membership::new(group_id, user_id, Role::Representative, &MockClock)
     }
 
     fn create_pending_approval_request(issued_by: UserId) -> ApprovalRequest {
@@ -459,9 +470,7 @@ mod tests {
         let user_ctx = ActorContext::User {
             user_id: create_user_id(),
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: create_user_id(),
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_all_users(&user_ctx));
 
@@ -497,9 +506,7 @@ mod tests {
         let same_group_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![create_membership(group_id, other_user_id)],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_user_by_id(&same_group_user_ctx, memberships_of_the_user.clone()).is_ok());
 
@@ -508,9 +515,7 @@ mod tests {
         let diff_group_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![create_membership(diff_group_id, other_user_id)],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(matches!(
             can_get_user_by_id(&diff_group_user_ctx, memberships_of_the_user.clone()),
@@ -622,9 +627,7 @@ mod tests {
         let member_user_ctx = ActorContext::User {
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_group_by_id(&member_user_ctx, &members).is_ok());
 
@@ -633,9 +636,7 @@ mod tests {
         let non_member_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(matches!(
             can_get_group_by_id(&non_member_user_ctx, &members),
@@ -689,9 +690,7 @@ mod tests {
         let user_ctx_same_group = ActorContext::User {
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_group_approval_requests(
             &user_ctx_same_group,
@@ -702,9 +701,7 @@ mod tests {
         let user_ctx_other_group = ActorContext::User {
             user_id,
             memberships: vec![create_membership(other_group, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_group_approval_requests(
             &user_ctx_other_group,
@@ -748,9 +745,7 @@ mod tests {
         let same_group_user_ctx = ActorContext::User {
             user_id: viewer_id,
             memberships: vec![create_membership(issuer_group, viewer_id)],
-            group_type: GroupType::Press {
-                representative: viewer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_approval_request(
             &same_group_user_ctx,
@@ -762,9 +757,7 @@ mod tests {
         let other_group_user_ctx = ActorContext::User {
             user_id: viewer_id,
             memberships: vec![create_membership(other_group, viewer_id)],
-            group_type: GroupType::Press {
-                representative: viewer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_approval_request(
             &other_group_user_ctx,
@@ -787,9 +780,7 @@ mod tests {
         let issuer_ctx = ActorContext::User {
             user_id: issuer_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: issuer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_close_approval_request(&issuer_ctx, &request));
 
@@ -797,9 +788,7 @@ mod tests {
         let other_user_ctx = ActorContext::User {
             user_id: other_user_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_close_approval_request(&other_user_ctx, &request));
 
