@@ -6,6 +6,7 @@ mod forms;
 mod groups;
 mod notifications;
 mod users;
+mod util;
 
 use utoipa_axum::router::OpenApiRouter;
 
@@ -17,6 +18,7 @@ const FORMS_TAG: &str = "forms";
 const GROUPS_TAG: &str = "groups";
 const NOTIFICATIONS_TAG: &str = "notifications";
 const USERS_TAG: &str = "users";
+const UTIL_TAG: &str = "util";
 
 pub fn router() -> OpenApiRouter {
     OpenApiRouter::new()
@@ -28,4 +30,5 @@ pub fn router() -> OpenApiRouter {
         .nest("/documents", documents::router())
         .nest("/approval-requests", approval_requests::router())
         .nest("/files", files::router())
+        .nest("/util", util::router())
 }
