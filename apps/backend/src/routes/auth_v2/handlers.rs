@@ -16,15 +16,14 @@ use crate::application::auth::{AuthError, IssuedTokens};
 use crate::application::ports::email::Email;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::UserStatus;
+use super::extract::{bearer, verify_access};
 use crate::domain::user_id::UserId;
-use crate::infra::jwt_access_token_issuer::{ACCESS_TOKEN_TYP, AccessClaims};
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use axum::Json;
 use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use chrono::Utc;
-use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use tracing::warn;
 
 fn auth_status(e: &AuthError) -> StatusCode {
@@ -93,26 +92,6 @@ fn issued_response(st: &AuthV2State, tokens: IssuedTokens) -> Response {
         expires_in: tokens.access_ttl.num_seconds(),
     });
     with_set_cookie((StatusCode::OK, body).into_response(), cookie)
-}
-
-fn bearer(headers: &HeaderMap) -> Option<String> {
-    let raw = headers.get(header::AUTHORIZATION)?.to_str().ok()?;
-    raw.strip_prefix("Bearer ").map(|t| t.to_string())
-}
-
-/// 自前アクセストークン(RS256)を厳格に検証する。
-/// alg=RS256 固定、iss/exp を必須検証、typ=="access_token" を要求する。
-fn verify_access(token: &str, key: &DecodingKey, iss: &str) -> Result<AccessClaims, StatusCode> {
-    let mut validation = Validation::new(Algorithm::RS256);
-    validation.set_issuer(&[iss]);
-    validation.set_required_spec_claims(&["exp", "iss"]);
-    validation.validate_exp = true;
-    validation.validate_aud = false; // aud は未使用
-    let data = decode::<AccessClaims>(token, key, &validation).map_err(|_| StatusCode::UNAUTHORIZED)?;
-    if data.claims.typ != ACCESS_TOKEN_TYP {
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-    Ok(data.claims)
 }
 
 /// アクセストークンを検証し，状態ゲート(Active かつ iat>=password_changed_at)を

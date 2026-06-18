@@ -6,6 +6,7 @@
 
 mod admin;
 mod dto;
+pub mod extract;
 mod handlers;
 
 use crate::application::auth::AuthConfig;
