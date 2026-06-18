@@ -123,13 +123,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn request_download_as_nologin_is_unauthorized() {
+    async fn request_download_is_open_to_nologin() {
         let storage = FakeObjectStorage;
         let app = FileApp::new(&storage);
 
+        // ダウンロードは無認証で許可される。
         let result = app
             .request_download(&ActorContext::NoLogin, "some-key", "example.pdf")
             .await;
-        assert!(matches!(result, Err(ApplicationError::Unauthorized)));
+        assert!(result.is_ok());
     }
 }

@@ -415,12 +415,9 @@ pub fn can_upload_file(actor_ctx: &ActorContext) -> bool {
 }
 
 /// ファイルのダウンロード用URLを要求できるか。
-// NOTE: レガシーの download は無認証だったが、安全側の既定としてログイン必須にする(要否は要検討)。
-pub fn can_download_file(actor_ctx: &ActorContext) -> bool {
-    matches!(
-        actor_ctx,
-        ActorContext::Admin { .. } | ActorContext::User { .. }
-    )
+/// ダウンロードは（レガシー同様）無認証で誰でも要求できる。鍵(key)を知っていることを前提とする。
+pub fn can_download_file(_actor_ctx: &ActorContext) -> bool {
+    true
 }
 
 #[cfg(test)]
