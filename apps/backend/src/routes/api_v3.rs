@@ -1,4 +1,5 @@
 mod document_categories;
+mod documents;
 mod forms;
 mod groups;
 mod notifications;
@@ -6,6 +7,7 @@ mod users;
 
 use utoipa_axum::router::OpenApiRouter;
 
+const DOCUMENTS_TAG: &str = "documents";
 const DOCUMENT_CATEGORIES_TAG: &str = "document-categories";
 const FORMS_TAG: &str = "forms";
 const GROUPS_TAG: &str = "groups";
@@ -19,4 +21,5 @@ pub fn router() -> OpenApiRouter {
         .nest("/notifications", notifications::router())
         .nest("/forms", forms::router())
         .nest("/document-categories", document_categories::router())
+        .nest("/documents", documents::router())
 }
