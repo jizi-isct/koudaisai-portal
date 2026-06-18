@@ -1,4 +1,4 @@
-use super::dto::{UserCreate, UserRead, UserUpdate};
+use super::dto::{UserCreate, UserCreated, UserRead, UserUpdate};
 use axum::Json;
 use axum::extract::Path;
 use serde::Deserialize;
@@ -35,8 +35,8 @@ pub struct UserPath {
 
 #[http_response]
 pub enum PutUserResponse {
-    #[response(status = CREATED)]
-    Created(UserRead),
+    #[response(status = CREATED, description = "User created; returns the activation token")]
+    Created(UserCreated),
     #[response(status = OK, description = "User replaced")]
     Ok(UserRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]

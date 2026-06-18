@@ -31,6 +31,16 @@ pub struct UserRead {
     pub status: UserReadStatus,
 }
 
+/// `PUT /users/{id}` でユーザーを新規作成したときのレスポンス。
+/// 作成された(`Registered`)ユーザーが初回ログインで有効化するための
+/// activation token を含む（このトークンは作成時にのみ返却される）。
+#[derive(ToSchema, Serialize)]
+pub struct UserCreated {
+    #[serde(flatten)]
+    pub user: UserRead,
+    pub activation_token: String,
+}
+
 #[derive(ToSchema, Deserialize)]
 pub struct UserUpdate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
