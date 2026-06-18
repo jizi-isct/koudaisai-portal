@@ -307,6 +307,26 @@ impl UserRepo<SqliteTransaction> for SqliteUserRepo {
         Ok(())
     }
 
+    async fn rehash_password_in(
+        &self,
+        tx: &mut SqliteTransaction,
+        id: UserId,
+        expected_old_phc: &str,
+        new_phc: &str,
+    ) -> Result<u64, anyhow::Error> {
+        let id = Uuid::from(id).to_string();
+        let res = sqlx::query!(
+            "UPDATE users SET password_phc = ? \
+             WHERE id = ? AND status = 'active' AND password_phc = ?",
+            new_phc,
+            id,
+            expected_old_phc,
+        )
+        .execute(tx.conn()?)
+        .await?;
+        Ok(res.rows_affected())
+    }
+
     async fn delete(&self, id: UserId) -> Result<(), DeleteError> {
         let affected = exec_delete(&self.pool, id)
             .await

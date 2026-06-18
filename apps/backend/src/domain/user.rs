@@ -117,7 +117,8 @@ impl User {
     /// `Registered` 状態のユーザーのみアクティベート可能
     /// それ以外の状態の場合、`InvalidTransitionError` を返す
     ///
-    /// `Deactivated` からの復帰はパスワードリセット経路で扱う。
+    /// `Deactivated` は終端状態で，本ドメインに再活性化経路は無い
+    /// (パスワードリセットも `change_password` も Active 限定のため Deactivated は復帰しない)。
     /// (旧実装は `Deactivated` アームで引数 `password_credentials` をパターン束縛で
     ///  握り潰し，古い creds を clone する不具合があったため `Registered` 限定にした。)
     pub fn activate<C: Clock>(

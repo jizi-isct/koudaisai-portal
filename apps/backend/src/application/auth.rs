@@ -218,6 +218,14 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
 
+        // トークンが宛先に束縛されている場合、現在の m_address と一致しなければ拒否する
+        // (email 変更後に旧宛先宛のトークンでアカウントを乗っ取られるのを防ぐ)。
+        if let Some(bound) = token.m_address() {
+            if bound != user.m_address() {
+                return Err(AuthError::InvalidToken);
+            }
+        }
+
         let plaintext = PlaintextPassword::new(password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;
         let phc = self.password_hasher.hash(&plaintext).await?;
@@ -262,19 +270,15 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
         };
         let outcome = self.password_hasher.verify(password, &phc).await?;
 
-        let Some(mut user) = active_user else {
+        let Some(user) = active_user else {
             return Err(AuthError::InvalidCredentials);
         };
-        let mut needs_persist = false;
-        match outcome {
+        // 旧パラメータのハッシュは透過昇格する(下のトランザクション内で楽観的に永続化)。
+        let rehash_to: Option<String> = match outcome {
             VerifyOutcome::Mismatch => return Err(AuthError::InvalidCredentials),
-            VerifyOutcome::Verified => {}
-            VerifyOutcome::VerifiedNeedsRehash { new_phc } => {
-                user.rehash_password(new_phc, self.clock)
-                    .map_err(|_| AuthError::Internal(anyhow::anyhow!("rehash on non-active user")))?;
-                needs_persist = true;
-            }
-        }
+            VerifyOutcome::Verified => None,
+            VerifyOutcome::VerifiedNeedsRehash { new_phc } => Some(new_phc),
+        };
         let user_id = user.id();
         let now = self.clock.now();
 
@@ -307,8 +311,12 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
                     .await?;
             }
         }
-        if needs_persist {
-            self.user_repo.update_in(&mut tx, &user).await?;
+        if let Some(new_phc) = &rehash_to {
+            // 並行パスワード変更を巻き戻さないため楽観的に rehash する
+            // (password_phc が検証時のままの Active ユーザにだけ適用。不一致なら no-op)。
+            self.user_repo
+                .rehash_password_in(&mut tx, user_id, &phc, new_phc)
+                .await?;
         }
         self.session_repo
             .insert_session_in(&mut tx, &session, &token)
@@ -524,6 +532,12 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .await
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
+        // 宛先束縛の検証(email 変更後の旧宛先トークンを拒否)。
+        if let Some(bound) = token.m_address() {
+            if bound != user.m_address() {
+                return Err(AuthError::InvalidToken);
+            }
+        }
         let user_id = user.id();
         let plaintext = PlaintextPassword::new(new_password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;
@@ -883,6 +897,48 @@ mod tests {
         // トークンは単一使用 → 2 回目は失敗。
         assert!(matches!(
             app.activate(MemoryTransaction::new(), &token_str, PW)
+                .await
+                .unwrap_err(),
+            AuthError::InvalidToken
+        ));
+    }
+
+    #[tokio::test]
+    async fn activate_rejects_token_bound_to_stale_address() {
+        let fx = Fixture::new(Utc.with_ymd_and_hms(2026, 6, 1, 0, 0, 0).unwrap());
+        let id = UserId::new(Uuid::new_v4());
+        let addr_a = EmailAddress::new("a@example.com".to_string()).unwrap();
+        let mut user = User::register(id, "U".to_string(), addr_a.clone(), &fx.clock).unwrap();
+        fx.user_repo.insert(&user).await.unwrap();
+
+        // activation トークンは旧アドレス A に束縛して発行。
+        let secret = fx.secret_gen.generate_secret();
+        let token_hash = fx.secret_gen.hash_secret(&secret);
+        let ott_id = OneTimeTokenId::new(fx.secret_gen.new_id());
+        let token = OneTimeToken::issue(
+            ott_id,
+            id,
+            OneTimeTokenPurpose::Activation,
+            token_hash,
+            Some(addr_a),
+            Duration::hours(48),
+            &fx.clock,
+        );
+        {
+            let mut tx = MemoryTransaction::new();
+            fx.ott_repo.insert_in(&mut tx, &token).await.unwrap();
+        }
+
+        // 管理者が email を B に変更。
+        let addr_b = EmailAddress::new("b@example.com".to_string()).unwrap();
+        user.change_m_address(addr_b, &fx.clock);
+        fx.user_repo.update(&user).await.unwrap();
+
+        // 旧 A 宛トークンでの有効化は拒否される。
+        let token_str = format!("{ott_id}.{secret}");
+        assert!(matches!(
+            fx.app()
+                .activate(MemoryTransaction::new(), &token_str, PW)
                 .await
                 .unwrap_err(),
             AuthError::InvalidToken

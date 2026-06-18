@@ -65,7 +65,7 @@ impl Argon2PasswordHasher {
 }
 
 /// 照合に成功した PHC が，現行アルゴリズム・現行パラメータ未満なら再ハッシュが必要。
-fn needs_rehash(parsed: &PasswordHash, cur_m: u32, cur_t: u32, cur_p: u32) -> bool {
+fn needs_rehash(parsed: &PasswordHash, cur_m: u32, cur_t: u32, cur_p: u32, cur_out: usize) -> bool {
     if parsed.algorithm != Algorithm::Argon2id.ident() {
         return true;
     }
@@ -73,7 +73,13 @@ fn needs_rehash(parsed: &PasswordHash, cur_m: u32, cur_t: u32, cur_p: u32) -> bo
         return true;
     }
     match Params::try_from(parsed) {
-        Ok(p) => p.m_cost() < cur_m || p.t_cost() < cur_t || p.p_cost() < cur_p,
+        Ok(p) => {
+            p.m_cost() < cur_m
+                || p.t_cost() < cur_t
+                || p.p_cost() < cur_p
+                // 出力長が未指定/現行未満なら再ハッシュ対象。
+                || p.output_len().is_none_or(|o| o < cur_out)
+        }
         Err(_) => true,
     }
 }
@@ -99,7 +105,8 @@ impl PasswordHasher for Argon2PasswordHasher {
         let params = self.params()?;
         let bytes = Zeroizing::new(attempt.as_bytes().to_vec());
         let phc = phc.to_string();
-        let (cur_m, cur_t, cur_p) = (self.m_cost_kib, self.t_cost, self.p_cost);
+        let (cur_m, cur_t, cur_p, cur_out) =
+            (self.m_cost_kib, self.t_cost, self.p_cost, self.output_len);
         let _permit = self
             .semaphore
             .acquire()
@@ -113,7 +120,7 @@ impl PasswordHasher for Argon2PasswordHasher {
             };
             match Self::argon2(params.clone()).verify_password(bytes.as_slice(), &parsed) {
                 Ok(()) => {
-                    if needs_rehash(&parsed, cur_m, cur_t, cur_p) {
+                    if needs_rehash(&parsed, cur_m, cur_t, cur_p, cur_out) {
                         // 照合は成功済み。再ハッシュ失敗は致命ではないので Verified に落とす。
                         match Self::hash_bytes(params, bytes.as_slice()) {
                             Ok(new_phc) => VerifyOutcome::VerifiedNeedsRehash { new_phc },
@@ -163,6 +170,19 @@ mod tests {
     async fn test_verify_malformed_phc_is_mismatch_not_error() {
         let h = fast_hasher();
         assert_eq!(h.verify("whatever", "not-a-phc-string").await.unwrap(), VerifyOutcome::Mismatch);
+    }
+
+    #[tokio::test]
+    async fn test_verify_flags_rehash_for_shorter_output_len() {
+        // out=16 でハッシュ → 現行 out=32 で照合すると再ハッシュ要求。
+        let short = Argon2PasswordHasher::new(256, 1, 1, 16, 2);
+        let pw = PlaintextPassword::new("correct horse battery".to_string()).unwrap();
+        let phc = short.hash(&pw).await.unwrap();
+        let cur = Argon2PasswordHasher::new(256, 1, 1, 32, 2);
+        match cur.verify("correct horse battery", &phc).await.unwrap() {
+            VerifyOutcome::VerifiedNeedsRehash { .. } => {}
+            other => panic!("expected VerifiedNeedsRehash, got {other:?}"),
+        }
     }
 
     #[tokio::test]

@@ -169,28 +169,36 @@ impl SessionRepo<MemoryTransaction> for MemorySessionRepo {
         reason: RevocationReason,
         at: DateTime<Utc>,
     ) -> Result<u64, anyhow::Error> {
-        let target_sessions: HashSet<SessionId>;
+        // トークン失効のスコープは「そのユーザの全セッション」(sqlite の副問い合わせと等価)。
+        // 返り値は active→revoked にしたセッション数(sqlite の rows_affected と等価)。
+        let all_user_sessions: HashSet<SessionId>;
+        let flipped: usize;
         {
             let mut sessions = self.sessions.write().map_err(|e| anyhow!(e.to_string()))?;
-            let ids: Vec<SessionId> = sessions
+            all_user_sessions = sessions
+                .values()
+                .filter(|s| s.user_id() == user_id)
+                .map(|s| s.id())
+                .collect();
+            let active_ids: Vec<SessionId> = sessions
                 .values()
                 .filter(|s| s.user_id() == user_id && s.is_active())
                 .map(|s| s.id())
                 .collect();
-            for id in &ids {
+            for id in &active_ids {
                 if let Some(s) = sessions.get(id) {
                     let revoked = revoked_session(s, reason, at);
                     sessions.insert(*id, revoked);
                 }
             }
-            target_sessions = ids.into_iter().collect();
+            flipped = active_ids.len();
         }
         {
             let mut tokens = self.tokens.write().map_err(|e| anyhow!(e.to_string()))?;
             let ids: Vec<TokenId> = tokens
                 .values()
                 .filter(|t| {
-                    target_sessions.contains(&t.session_id())
+                    all_user_sessions.contains(&t.session_id())
                         && t.status() != TokenStatus::Revoked
                 })
                 .map(|t| t.id())
@@ -202,7 +210,7 @@ impl SessionRepo<MemoryTransaction> for MemorySessionRepo {
                 }
             }
         }
-        Ok(target_sessions.len() as u64)
+        Ok(flipped as u64)
     }
 
     async fn delete_expired(&self, now: DateTime<Utc>) -> Result<u64, anyhow::Error> {
