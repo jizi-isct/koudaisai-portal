@@ -1,3 +1,4 @@
+mod approval_requests;
 mod document_categories;
 mod documents;
 mod forms;
@@ -7,6 +8,7 @@ mod users;
 
 use utoipa_axum::router::OpenApiRouter;
 
+const APPROVAL_REQUESTS_TAG: &str = "approval-requests";
 const DOCUMENTS_TAG: &str = "documents";
 const DOCUMENT_CATEGORIES_TAG: &str = "document-categories";
 const FORMS_TAG: &str = "forms";
@@ -22,4 +24,5 @@ pub fn router() -> OpenApiRouter {
         .nest("/forms", forms::router())
         .nest("/document-categories", document_categories::router())
         .nest("/documents", documents::router())
+        .nest("/approval-requests", approval_requests::router())
 }
