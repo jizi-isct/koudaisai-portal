@@ -20,7 +20,11 @@ const NOTIFICATIONS_TAG: &str = "notifications";
 const USERS_TAG: &str = "users";
 const UTIL_TAG: &str = "util";
 
-pub fn router() -> OpenApiRouter {
+/// api_v3 全体で共有する State。auth_v2 と同じ `AuthV2State` を使う
+/// (`Actor` 抽出子が `FromRequestParts<AuthV2State>` のため)。
+pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
+
+pub fn router() -> OpenApiRouter<V3State> {
     OpenApiRouter::new()
         .nest("/users", users::router())
         .nest("/groups", groups::router())

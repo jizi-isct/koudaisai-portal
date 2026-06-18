@@ -6,7 +6,7 @@ pub(super) use dto::DocumentCategoryRead;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
-pub fn router() -> OpenApiRouter {
+pub fn router() -> OpenApiRouter<super::V3State> {
     OpenApiRouter::new().routes(routes!(
         handlers::get_document_categories,
         handlers::get_document_category,
