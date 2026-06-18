@@ -1,4 +1,4 @@
-use super::dto::{DocumentCreate, DocumentRead, DocumentUpdate};
+use super::dto::{DocumentCreate, DocumentRead, DocumentUpdate, DocumentsByCategoryEntry};
 use axum::Json;
 use axum::extract::{Path, Query};
 use serde::Deserialize;
@@ -33,6 +33,35 @@ pub enum GetDocumentsResponse {
     tag = super::super::DOCUMENTS_TAG
 )]
 pub async fn get_documents(Query(query): Query<DocumentQuery>) -> GetDocumentsResponse {
+    todo!()
+}
+
+/// by-category のクエリパラメーター。
+#[derive(Deserialize, IntoParams)]
+pub struct DocumentsByCategoryQuery {
+    /// 真のとき、ドキュメントが無いカテゴリも空リストで含める。
+    include_empty_categories: Option<bool>,
+}
+
+#[http_response]
+pub enum GetDocumentsByCategoryResponse {
+    #[response(status = OK)]
+    Ok(Vec<DocumentsByCategoryEntry>),
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    get,
+    description = "Get documents visible to the caller, grouped by category.",
+    params(DocumentsByCategoryQuery),
+    path = "/by-category",
+    responses(GetDocumentsByCategoryResponse),
+    tag = super::super::DOCUMENTS_TAG
+)]
+pub async fn get_documents_by_category(
+    Query(query): Query<DocumentsByCategoryQuery>,
+) -> GetDocumentsByCategoryResponse {
     todo!()
 }
 

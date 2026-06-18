@@ -1,3 +1,4 @@
+use super::super::document_categories::DocumentCategoryRead;
 use crate::domain::target_specifier::TargetSpecifier;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -24,6 +25,14 @@ pub struct DocumentRead {
     targets: Vec<TargetSpecifier>,
     #[serde(flatten)]
     format: DocumentFormat,
+}
+
+/// `GET /documents/by-category` の 1 カテゴリ分のエントリ。
+/// `category` が `None` のときは未分類ドキュメントを表す。
+#[derive(Serialize, ToSchema)]
+pub struct DocumentsByCategoryEntry {
+    category: Option<DocumentCategoryRead>,
+    documents: Vec<DocumentRead>,
 }
 
 #[derive(Deserialize, ToSchema)]
