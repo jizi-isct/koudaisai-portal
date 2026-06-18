@@ -155,8 +155,9 @@ async fn main() {
         .allow_methods([http::Method::POST])
         .allow_headers([http::header::CONTENT_TYPE]);
 
+    let (auth_v2_router, _auth_openapi) = routes::auth_v2::router().split_for_parts();
     let auth_v2_app = axum::Router::new()
-        .nest("/auth/v2", routes::auth_v2::router())
+        .nest("/auth/v2", auth_v2_router)
         .with_state(auth_v2_state)
         .layer(auth_cors);
 

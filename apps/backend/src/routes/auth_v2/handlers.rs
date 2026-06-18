@@ -3,6 +3,9 @@
 //! リフレッシュトークンは `__Host-` Cookie(HttpOnly/Secure/SameSite=Strict/Path=/)で
 //! やり取りし，アクセストークンは本文で返す(フロントはメモリ保持 + Authorization ヘッダ)。
 //! 認証が必要な logout-all / password change はミドルウェア導入時に追加する。
+//!
+//! Cookie/カスタムヘッダを返すため戻り値は [`Response`]。OpenAPI は `#[utoipa::path]` の
+//! `responses(...)` で記述する。
 
 use super::dto::{
     ActivateRequest, LoginRequest, PasswordResetConfirmRequest, PasswordResetRequest, TokenResponse,
@@ -72,13 +75,22 @@ fn issued_response(st: &AuthV2State, tokens: IssuedTokens) -> Response {
     let cookie = set_cookie_value(&st.cookie, &tokens.refresh_token, max_age);
     let body = Json(TokenResponse {
         access_token: tokens.access_token,
-        token_type: "Bearer",
+        token_type: "Bearer".to_string(),
         expires_in: tokens.access_ttl.num_seconds(),
     });
     with_set_cookie((StatusCode::OK, body).into_response(), cookie)
 }
 
-#[tracing::instrument(name = "POST /auth/v2/login", skip(st, body))]
+#[utoipa::path(
+    post,
+    path = "/login",
+    tag = super::AUTH_TAG,
+    request_body = LoginRequest,
+    responses(
+        (status = OK, description = "ログイン成功。リフレッシュトークンは Set-Cookie で配送", body = TokenResponse),
+        (status = UNAUTHORIZED, description = "認証失敗(存在/状態を区別しない汎用)"),
+    ),
+)]
 pub async fn login(State(st): State<AuthV2State>, Json(body): Json<LoginRequest>) -> Response {
     // メール形式不正も列挙を避けて汎用 401。
     let Ok(m_address) = EmailAddress::new(body.m_address) else {
@@ -92,7 +104,15 @@ pub async fn login(State(st): State<AuthV2State>, Json(body): Json<LoginRequest>
     }
 }
 
-#[tracing::instrument(name = "POST /auth/v2/refresh", skip(st, headers))]
+#[utoipa::path(
+    post,
+    path = "/refresh",
+    tag = super::AUTH_TAG,
+    responses(
+        (status = OK, description = "回転成功。新リフレッシュトークンを Set-Cookie", body = TokenResponse),
+        (status = UNAUTHORIZED, description = "トークン無効 / reuse 検知 / Cookie 無し"),
+    ),
+)]
 pub async fn refresh(State(st): State<AuthV2State>, headers: HeaderMap) -> Response {
     let Some(refresh_token) = read_cookie(&headers, &st.cookie.name) else {
         return StatusCode::UNAUTHORIZED.into_response();
@@ -114,7 +134,12 @@ pub async fn refresh(State(st): State<AuthV2State>, headers: HeaderMap) -> Respo
     }
 }
 
-#[tracing::instrument(name = "POST /auth/v2/logout", skip(st, headers))]
+#[utoipa::path(
+    post,
+    path = "/logout",
+    tag = super::AUTH_TAG,
+    responses((status = NO_CONTENT, description = "ログアウト(冪等)。Cookie をクリア")),
+)]
 pub async fn logout(State(st): State<AuthV2State>, headers: HeaderMap) -> Response {
     if let Some(refresh_token) = read_cookie(&headers, &st.cookie.name) {
         let tx = SqliteTransaction::new(st.pool.clone());
@@ -127,7 +152,18 @@ pub async fn logout(State(st): State<AuthV2State>, headers: HeaderMap) -> Respon
     )
 }
 
-#[tracing::instrument(name = "POST /auth/v2/activate", skip(st, body))]
+#[utoipa::path(
+    post,
+    path = "/activate",
+    tag = super::AUTH_TAG,
+    request_body = ActivateRequest,
+    responses(
+        (status = NO_CONTENT, description = "有効化成功(初回パスワード設定)"),
+        (status = UNAUTHORIZED, description = "トークン無効/失効/消費済み"),
+        (status = BAD_REQUEST, description = "パスワードポリシー違反"),
+        (status = CONFLICT, description = "既に有効化済み"),
+    ),
+)]
 pub async fn activate(State(st): State<AuthV2State>, Json(body): Json<ActivateRequest>) -> Response {
     let tx = SqliteTransaction::new(st.pool.clone());
     let auth = st.app.auth(st.auth_config.clone(), (*st.dummy_phc).clone());
@@ -137,7 +173,13 @@ pub async fn activate(State(st): State<AuthV2State>, Json(body): Json<ActivateRe
     }
 }
 
-#[tracing::instrument(name = "POST /auth/v2/password/reset", skip(st, body))]
+#[utoipa::path(
+    post,
+    path = "/password/reset",
+    tag = super::AUTH_TAG,
+    request_body = PasswordResetRequest,
+    responses((status = ACCEPTED, description = "常に 202(存在/不在を漏らさない)")),
+)]
 pub async fn password_reset(
     State(st): State<AuthV2State>,
     Json(body): Json<PasswordResetRequest>,
@@ -162,11 +204,20 @@ pub async fn password_reset(
             });
         }
     }
-    // 存在/不在・形式不正に関わらず常に 202。
     StatusCode::ACCEPTED.into_response()
 }
 
-#[tracing::instrument(name = "POST /auth/v2/password/reset/confirm", skip(st, body))]
+#[utoipa::path(
+    post,
+    path = "/password/reset/confirm",
+    tag = super::AUTH_TAG,
+    request_body = PasswordResetConfirmRequest,
+    responses(
+        (status = NO_CONTENT, description = "リセット成功。全セッション失効・Cookie クリア"),
+        (status = UNAUTHORIZED, description = "トークン無効/失効/消費済み"),
+        (status = BAD_REQUEST, description = "パスワードポリシー違反"),
+    ),
+)]
 pub async fn password_reset_confirm(
     State(st): State<AuthV2State>,
     Json(body): Json<PasswordResetConfirmRequest>,

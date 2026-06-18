@@ -12,10 +12,10 @@ use crate::infra::discord_webhook::WebhookDiscord;
 use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::SqliteApplication;
-use axum::Router;
-use axum::routing::post;
 use sqlx::SqlitePool;
 use std::sync::Arc;
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::routes;
 
 /// 本番構成の具体 [`Application`](crate::application::Application)。
 /// auth 関連ポートは [`SqliteApplication`] が argon2 / HMAC / JWT 実装で固定する。
@@ -48,16 +48,17 @@ pub struct AuthV2State {
     pub reset_link_base: String,
 }
 
-/// `/auth/v2` 配下にマウントするルータ。
-pub fn router() -> Router<AuthV2State> {
-    Router::new()
-        .route("/login", post(handlers::login))
-        .route("/refresh", post(handlers::refresh))
-        .route("/logout", post(handlers::logout))
-        .route("/activate", post(handlers::activate))
-        .route("/password/reset", post(handlers::password_reset))
-        .route(
-            "/password/reset/confirm",
-            post(handlers::password_reset_confirm),
-        )
+/// OpenAPI 上の auth タグ。
+pub(crate) const AUTH_TAG: &str = "auth";
+
+/// `/auth/v2` 配下にマウントするルータ(utoipa-axum)。
+pub fn router() -> OpenApiRouter<AuthV2State> {
+    OpenApiRouter::new().routes(routes!(
+        handlers::login,
+        handlers::refresh,
+        handlers::logout,
+        handlers::activate,
+        handlers::password_reset,
+        handlers::password_reset_confirm,
+    ))
 }
