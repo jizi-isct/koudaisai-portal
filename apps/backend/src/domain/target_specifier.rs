@@ -2,6 +2,8 @@ use crate::domain::actor_ctx::ActorContext;
 use crate::domain::error::FactoryError;
 use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
+use serde::de::Error as _;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -64,6 +66,22 @@ impl Into<String> for &TargetSpecifier {
             TargetSpecifier::UserId(user_id) => format!("user/id/{}", user_id),
             TargetSpecifier::UserNologin => "user/nologin".to_string(),
         }
+    }
+}
+
+// 正規の文字列表現("group/type/press" / "user/id/{uuid}" など)で serde する。
+// FromStr の検証を通すため derive せず手実装する(GroupId と同様)。
+impl Serialize for TargetSpecifier {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let s: String = self.into();
+        serializer.serialize_str(&s)
+    }
+}
+
+impl<'de> Deserialize<'de> for TargetSpecifier {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        TargetSpecifier::from_str(&s).map_err(D::Error::custom)
     }
 }
 
