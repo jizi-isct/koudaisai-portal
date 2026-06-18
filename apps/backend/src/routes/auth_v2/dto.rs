@@ -35,3 +35,9 @@ pub struct PasswordResetConfirmRequest {
     pub token: String,
     pub new_password: String,
 }
+
+#[derive(Deserialize, ToSchema)]
+pub struct ChangePasswordRequest {
+    pub old_password: String,
+    pub new_password: String,
+}

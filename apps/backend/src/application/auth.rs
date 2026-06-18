@@ -16,7 +16,6 @@ use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::transaction::Transaction;
-use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::one_time_token::{OneTimeToken, OneTimeTokenPurpose};
 use crate::domain::one_time_token_id::OneTimeTokenId;
@@ -26,6 +25,7 @@ use crate::domain::session::{RevocationReason, Session, TokenStatus};
 use crate::domain::session_id::SessionId;
 use crate::domain::token_id::TokenId;
 use crate::domain::user::{User, UserStatus};
+use crate::domain::user_id::UserId;
 use chrono::{DateTime, Duration, Utc};
 use std::marker::PhantomData;
 use uuid::Uuid;
@@ -422,11 +422,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
     pub async fn change_password(
         &self,
         mut tx: Tx,
-        actor: &ActorContext,
+        user_id: UserId,
         old_password: &str,
         new_password: &str,
     ) -> Result<(), AuthError> {
-        let user_id = actor.user_id().ok_or(AuthError::Unauthorized)?;
         let mut user = self
             .user_repo
             .find_by_id(user_id)
@@ -585,8 +584,7 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
     }
 
     /// 全デバイスからのログアウト(当該ユーザーの全セッション失効)。
-    pub async fn logout_all(&self, mut tx: Tx, actor: &ActorContext) -> Result<(), AuthError> {
-        let user_id = actor.user_id().ok_or(AuthError::Unauthorized)?;
+    pub async fn logout_all(&self, mut tx: Tx, user_id: UserId) -> Result<(), AuthError> {
         let now = self.clock.now();
         tx.begin().await.map_err(internal)?;
         self.session_repo
@@ -825,12 +823,7 @@ mod tests {
             .await
             .unwrap();
 
-        let actor = ActorContext::Admin {
-            user_id,
-            name: "U".to_string(),
-            claims: vec![],
-        };
-        app.change_password(MemoryTransaction::new(), &actor, PW, NEW_PW)
+        app.change_password(MemoryTransaction::new(), user_id, PW, NEW_PW)
             .await
             .unwrap();
 

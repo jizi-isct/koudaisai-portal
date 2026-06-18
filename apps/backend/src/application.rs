@@ -14,8 +14,11 @@ use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
+use crate::application::error::FindError;
 use crate::application::transaction::Transaction;
 use crate::application::user::UserApp;
+use crate::domain::user::User;
+use crate::domain::user_id::UserId;
 
 pub mod approval_request;
 pub mod auth;
@@ -193,5 +196,11 @@ impl<
             config,
             dummy_phc,
         )
+    }
+
+    /// 認証(authn)のためにユーザを直接ロードする。authz は行わない
+    /// (アクセストークンのゲート判定や ActorContext 構築に用いる)。
+    pub async fn find_user_for_auth(&self, user_id: UserId) -> Result<Option<User>, FindError> {
+        self.user_repo.find_by_id(user_id).await
     }
 }

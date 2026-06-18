@@ -12,6 +12,7 @@ use crate::infra::discord_webhook::WebhookDiscord;
 use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::SqliteApplication;
+use jsonwebtoken::DecodingKey;
 use sqlx::SqlitePool;
 use std::sync::Arc;
 use utoipa_axum::router::OpenApiRouter;
@@ -46,6 +47,10 @@ pub struct AuthV2State {
     pub email: Arc<SendgridEmail>,
     /// リセットリンクのベース URL(例: `https://portal.koudaisai.jp/password/reset`)。
     pub reset_link_base: String,
+    /// 自前アクセストークン(RS256)の検証鍵。認証必須エンドポイントで使う。
+    pub access_decoding_key: Arc<DecodingKey>,
+    /// アクセストークンの期待 iss。
+    pub access_iss: String,
 }
 
 /// OpenAPI 上の auth タグ。
@@ -57,7 +62,9 @@ pub fn router() -> OpenApiRouter<AuthV2State> {
         handlers::login,
         handlers::refresh,
         handlers::logout,
+        handlers::logout_all,
         handlers::activate,
+        handlers::password_change,
         handlers::password_reset,
         handlers::password_reset_confirm,
     ))

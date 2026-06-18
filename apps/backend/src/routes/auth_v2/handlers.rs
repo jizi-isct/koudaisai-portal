@@ -8,18 +8,23 @@
 //! `responses(...)` で記述する。
 
 use super::dto::{
-    ActivateRequest, LoginRequest, PasswordResetConfirmRequest, PasswordResetRequest, TokenResponse,
+    ActivateRequest, ChangePasswordRequest, LoginRequest, PasswordResetConfirmRequest,
+    PasswordResetRequest, TokenResponse,
 };
 use super::{AuthV2State, CookieConfig};
 use crate::application::auth::{AuthError, IssuedTokens};
 use crate::application::ports::email::Email;
 use crate::domain::email_address::EmailAddress;
+use crate::domain::user::UserStatus;
+use crate::domain::user_id::UserId;
+use crate::infra::jwt_access_token_issuer::{ACCESS_TOKEN_TYP, AccessClaims};
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use axum::Json;
 use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use chrono::Utc;
+use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use tracing::warn;
 
 fn auth_status(e: &AuthError) -> StatusCode {
@@ -79,6 +84,47 @@ fn issued_response(st: &AuthV2State, tokens: IssuedTokens) -> Response {
         expires_in: tokens.access_ttl.num_seconds(),
     });
     with_set_cookie((StatusCode::OK, body).into_response(), cookie)
+}
+
+fn bearer(headers: &HeaderMap) -> Option<String> {
+    let raw = headers.get(header::AUTHORIZATION)?.to_str().ok()?;
+    raw.strip_prefix("Bearer ").map(|t| t.to_string())
+}
+
+/// 自前アクセストークン(RS256)を厳格に検証する。
+/// alg=RS256 固定、iss/exp を必須検証、typ=="access_token" を要求する。
+fn verify_access(token: &str, key: &DecodingKey, iss: &str) -> Result<AccessClaims, StatusCode> {
+    let mut validation = Validation::new(Algorithm::RS256);
+    validation.set_issuer(&[iss]);
+    validation.set_required_spec_claims(&["exp", "iss"]);
+    validation.validate_exp = true;
+    validation.validate_aud = false; // aud は未使用
+    let data = decode::<AccessClaims>(token, key, &validation).map_err(|_| StatusCode::UNAUTHORIZED)?;
+    if data.claims.typ != ACCESS_TOKEN_TYP {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    Ok(data.claims)
+}
+
+/// アクセストークンを検証し，状態ゲート(Active かつ iat>=password_changed_at)を
+/// 通ったユーザ ID を返す。失敗は 401。
+async fn authenticate(headers: &HeaderMap, st: &AuthV2State) -> Result<UserId, StatusCode> {
+    let token = bearer(headers).ok_or(StatusCode::UNAUTHORIZED)?;
+    let claims = verify_access(&token, &st.access_decoding_key, &st.access_iss)?;
+    let user_id = UserId::new(claims.sub);
+    let user = st
+        .app
+        .find_user_for_auth(user_id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .ok_or(StatusCode::UNAUTHORIZED)?;
+    // パスワード変更後に発行前トークンが残るのを弾く + 無効化済みユーザを弾く。
+    match user.status() {
+        UserStatus::Active {
+            password_credentials,
+        } if claims.iat >= password_credentials.changed_at().timestamp() => Ok(user_id),
+        _ => Err(StatusCode::UNAUTHORIZED),
+    }
 }
 
 #[utoipa::path(
@@ -229,6 +275,65 @@ pub async fn password_reset_confirm(
         .await
     {
         // 全セッション失効済みなので Cookie もクリアして再ログインさせる。
+        Ok(()) => with_set_cookie(
+            StatusCode::NO_CONTENT.into_response(),
+            cleared_cookie(&st.cookie),
+        ),
+        Err(e) => auth_status(&e).into_response(),
+    }
+}
+
+#[utoipa::path(
+    post,
+    path = "/logout-all",
+    tag = super::AUTH_TAG,
+    responses(
+        (status = NO_CONTENT, description = "全デバイスのセッションを失効。Cookie クリア"),
+        (status = UNAUTHORIZED, description = "アクセストークン無効"),
+    ),
+)]
+pub async fn logout_all(State(st): State<AuthV2State>, headers: HeaderMap) -> Response {
+    let user_id = match authenticate(&headers, &st).await {
+        Ok(u) => u,
+        Err(s) => return s.into_response(),
+    };
+    let tx = SqliteTransaction::new(st.pool.clone());
+    let auth = st.app.auth(st.auth_config.clone(), (*st.dummy_phc).clone());
+    match auth.logout_all(tx, user_id).await {
+        Ok(()) => with_set_cookie(
+            StatusCode::NO_CONTENT.into_response(),
+            cleared_cookie(&st.cookie),
+        ),
+        Err(e) => auth_status(&e).into_response(),
+    }
+}
+
+#[utoipa::path(
+    post,
+    path = "/password/change",
+    tag = super::AUTH_TAG,
+    request_body = ChangePasswordRequest,
+    responses(
+        (status = NO_CONTENT, description = "変更成功。全セッション失効・Cookie クリア"),
+        (status = UNAUTHORIZED, description = "アクセストークン無効 / 旧パスワード不一致"),
+        (status = BAD_REQUEST, description = "新パスワードがポリシー違反"),
+    ),
+)]
+pub async fn password_change(
+    State(st): State<AuthV2State>,
+    headers: HeaderMap,
+    Json(body): Json<ChangePasswordRequest>,
+) -> Response {
+    let user_id = match authenticate(&headers, &st).await {
+        Ok(u) => u,
+        Err(s) => return s.into_response(),
+    };
+    let tx = SqliteTransaction::new(st.pool.clone());
+    let auth = st.app.auth(st.auth_config.clone(), (*st.dummy_phc).clone());
+    match auth
+        .change_password(tx, user_id, &body.old_password, &body.new_password)
+        .await
+    {
         Ok(()) => with_set_cookie(
             StatusCode::NO_CONTENT.into_response(),
             cleared_cookie(&st.cookie),
