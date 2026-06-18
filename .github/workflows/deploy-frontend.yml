@@ -1,10 +1,8 @@
 name: Deploy Frontend
 
 on:
-  push:
-    branches:
-      - main
-      - develop
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -34,16 +32,24 @@ jobs:
           key: ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-
+      - name: Decide tags
+        id: tags
+        run: |
+          TAG="preview"
+          if [[ "${{ github.event.release.prerelease }}" == "false" ]]; then
+            TAG="production"
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
 
       - name: Deploy to production
-        if: github.ref == 'refs/heads/main'
+        if: env.TAG == "production"
         run: npx nx run-many -t deploy:production -p portal,admin
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to preview
-        if: github.ref == 'refs/heads/develop'
+        if: env.TAG == "preview"
         run: npx nx run-many -t deploy:preview -p portal,admin
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
