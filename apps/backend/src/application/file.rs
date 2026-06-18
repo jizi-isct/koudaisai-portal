@@ -87,6 +87,10 @@ mod tests {
         ) -> Result<String, ApplicationError> {
             Ok(format!("https://fake/{key}"))
         }
+
+        async fn get_object(&self, key: &str) -> Result<Vec<u8>, ApplicationError> {
+            Ok(key.as_bytes().to_vec())
+        }
     }
 
     fn admin_ctx() -> ActorContext {

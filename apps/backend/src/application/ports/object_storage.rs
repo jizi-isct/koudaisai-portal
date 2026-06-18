@@ -21,4 +21,8 @@ pub trait ObjectStorage {
         file_name: &str,
         expires_in: Duration,
     ) -> Result<String, ApplicationError>;
+
+    /// 指定キーのオブジェクト本体(バイト列)をサーバーサイドで取得する。
+    /// Discord への添付など、URL ではなく実体が必要な場合に用いる。
+    async fn get_object(&self, key: &str) -> Result<Vec<u8>, ApplicationError>;
 }

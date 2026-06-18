@@ -103,13 +103,14 @@ impl<
 
     pub fn approval_request(
         &'_ self,
-    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D> {
+    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS> {
         approval_request::ApprovalRequestApp::new(
             &self.approval_request_repo,
             &self.membership_repo,
             &self.user_repo,
             &self.clock,
             &self.discord,
+            &self.object_storage,
             &self.base_url,
         )
     }

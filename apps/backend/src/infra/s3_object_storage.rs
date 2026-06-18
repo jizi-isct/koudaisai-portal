@@ -63,4 +63,24 @@ impl ObjectStorage for S3ObjectStorage {
 
         Ok(presigned.uri().to_string())
     }
+
+    async fn get_object(&self, key: &str) -> Result<Vec<u8>, ApplicationError> {
+        let output = self
+            .client
+            .get_object()
+            .bucket(&self.bucket)
+            .key(key)
+            .send()
+            .await
+            .map_err(|e| ApplicationError::InternalError(anyhow::anyhow!(e.to_string())))?;
+
+        let bytes = output
+            .body
+            .collect()
+            .await
+            .map_err(|e| ApplicationError::InternalError(anyhow::anyhow!(e.to_string())))?
+            .into_bytes();
+
+        Ok(bytes.to_vec())
+    }
 }

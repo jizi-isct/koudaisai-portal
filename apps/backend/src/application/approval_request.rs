@@ -6,8 +6,9 @@ use crate::application::error::{
 };
 use crate::application::ports::clock::Clock;
 use crate::application::ports::discord::{
-    Discord, DiscordEmbed, DiscordEmbedField, DiscordMessage,
+    Discord, DiscordAttachment, DiscordEmbed, DiscordEmbedField, DiscordMessage,
 };
+use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
@@ -28,6 +29,7 @@ pub struct ApprovalRequestApp<
     UR: UserRepo<Tx>,
     C: Clock,
     D: Discord,
+    OS: ObjectStorage,
 > {
     _phantom: PhantomData<&'a Tx>,
     approval_request_repo: &'a AR,
@@ -35,6 +37,7 @@ pub struct ApprovalRequestApp<
     user_repo: &'a UR,
     clock: &'a C,
     discord: &'a D,
+    object_storage: &'a OS,
     base_url: &'a str,
 }
 
@@ -46,7 +49,8 @@ impl<
     UR: UserRepo<Tx>,
     C: Clock,
     D: Discord,
-> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D>
+    OS: ObjectStorage,
+> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS>
 {
     pub fn new(
         approval_request_repo: &'a AR,
@@ -54,6 +58,7 @@ impl<
         user_repo: &'a UR,
         clock: &'a C,
         discord: &'a D,
+        object_storage: &'a OS,
         base_url: &'a str,
     ) -> Self {
         Self {
@@ -63,6 +68,7 @@ impl<
             user_repo,
             clock,
             discord,
+            object_storage,
             base_url,
         }
     }
@@ -173,7 +179,25 @@ impl<
 
         // 作成では操作者＝申請者なので ActorContext から氏名・グループを得る。
         let issuer_label = issuer_label_from_actor(actor_ctx);
-        let message = build_issue_message(self.base_url, &request, &issuer_label);
+        let mut message = build_issue_message(self.base_url, &request, &issuer_label);
+
+        // アイコンが指定されていれば本体を取得して添付する(best-effort)。
+        if let ApprovalRequestType::EditExhibitionInfo {
+            icon_key: Some(key),
+            ..
+        } = request.request_type()
+        {
+            match self.object_storage.get_object(key).await {
+                Ok(bytes) => message.attachments.push(DiscordAttachment {
+                    file_name: key.clone(),
+                    bytes,
+                }),
+                Err(error) => {
+                    tracing::error!(%error, "承認申請アイコンの取得に失敗しました(添付をスキップ)")
+                }
+            }
+        }
+
         // 通知は best-effort: 送信失敗で作成自体は失敗させず、ログに残すのみ。
         if let Err(error) = self.discord.send(&message).await {
             tracing::error!(%error, "承認申請(発行)の Discord 通知送信に失敗しました");
@@ -460,6 +484,7 @@ mod tests {
     use crate::infra::memory::clock_impl::MemoryClock;
     use crate::infra::memory::discord_impl::MemoryDiscord;
     use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
+    use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
     use crate::infra::memory::user_repo_impl::MemoryUserRepo;
     use chrono::{TimeZone, Utc};
     use uuid::Uuid;
@@ -491,7 +516,8 @@ mod tests {
         let ur = MemoryUserRepo::new();
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, BASE_URL);
+        let os = MemoryObjectStorage::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -536,7 +562,8 @@ mod tests {
         let ur = MemoryUserRepo::new();
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, BASE_URL);
+        let os = MemoryObjectStorage::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
 
         // 承認通知の申請者名は user_repo から解決されるので、申請者を登録しておく。
         let issuer_id = UserId::new(Uuid::new_v4());
@@ -595,5 +622,63 @@ mod tests {
                 .iter()
                 .any(|f| f.name == "承認/却下理由" && f.value == "問題ありません")
         );
+    }
+
+    #[tokio::test]
+    async fn create_with_icon_attaches_it() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        // アイコン本体をオブジェクトストレージに用意しておく。
+        os.put("icon-key.png", vec![1, 2, 3, 4]);
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+
+        app.create(
+            &user_ctx(),
+            ApprovalRequestType::EditExhibitionInfo {
+                description: None,
+                icon_key: Some("icon-key.png".to_string()),
+            },
+            "理由".to_string(),
+        )
+        .await
+        .expect("create should succeed");
+
+        let messages = discord.sent_messages();
+        assert_eq!(messages.len(), 1);
+        // 取得したアイコン本体が添付されている。
+        assert_eq!(messages[0].attachments.len(), 1);
+        assert_eq!(messages[0].attachments[0].file_name, "icon-key.png");
+        assert_eq!(messages[0].attachments[0].bytes, vec![1, 2, 3, 4]);
+    }
+
+    #[tokio::test]
+    async fn create_without_icon_has_no_attachment() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+
+        app.create(
+            &user_ctx(),
+            ApprovalRequestType::EditExhibitionInfo {
+                description: None,
+                icon_key: None,
+            },
+            "理由".to_string(),
+        )
+        .await
+        .expect("create should succeed");
+
+        let messages = discord.sent_messages();
+        assert!(messages[0].attachments.is_empty());
     }
 }
