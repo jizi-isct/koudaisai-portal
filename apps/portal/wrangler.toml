@@ -11,3 +11,10 @@ enabled = true
 [[routes]]
 pattern = "portal.koudaisai.jp"
 custom_domain = true
+
+[env.preview]
+name = "portal-preview"
+
+[[env.preview.routes]]
+pattern = "portal-preview.koudaisai.jp"
+custom_domain = true
