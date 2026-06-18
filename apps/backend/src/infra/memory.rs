@@ -7,6 +7,7 @@ pub mod form_repo_impl;
 pub mod group_repo_impl;
 pub mod membership_repo_impl;
 pub mod notification_repo_impl;
+pub mod object_storage_impl;
 pub mod transaction_impl;
 pub mod user_repo_impl;
 
@@ -19,6 +20,7 @@ use crate::infra::memory::email_impl::MemoryEmail;
 use crate::infra::memory::form_repo_impl::MemoryFormRepo;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;
 use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
+use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use crate::infra::memory::user_repo_impl::MemoryUserRepo;
 
@@ -33,6 +35,7 @@ pub type MemoryApplication = Application<
     MemoryFormRepo,
     MemoryClock,
     MemoryEmail,
+    MemoryObjectStorage,
 >;
 
 impl MemoryApplication {
@@ -50,6 +53,7 @@ impl MemoryApplication {
             MemoryFormRepo::new(),
             MemoryClock::new(now),
             MemoryEmail::new(),
+            MemoryObjectStorage::new(),
         )
     }
 }

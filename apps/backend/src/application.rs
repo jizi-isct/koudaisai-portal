@@ -1,5 +1,6 @@
 use crate::application::ports::clock::Clock;
 use crate::application::ports::email::Email;
+use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::ports::repositories::document_repo::DocumentRepo;
@@ -15,6 +16,7 @@ pub mod authz;
 pub mod document;
 pub mod document_category;
 pub mod error;
+pub mod file;
 pub mod form;
 pub mod group;
 pub mod notification;
@@ -33,6 +35,7 @@ pub struct Application<
     FR: FormRepo,
     C: Clock,
     E: Email,
+    OS: ObjectStorage,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -44,6 +47,7 @@ pub struct Application<
     form_repo: FR,
     clock: C,
     email: E,
+    object_storage: OS,
 }
 
 impl<
@@ -57,7 +61,8 @@ impl<
     FR: FormRepo,
     C: Clock,
     E: Email,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E>
+    OS: ObjectStorage,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS>
 {
     pub fn new(
         approval_request_repo: AR,
@@ -69,6 +74,7 @@ impl<
         form_repo: FR,
         clock: C,
         email: E,
+        object_storage: OS,
     ) -> Self {
         Self {
             _phantom: std::marker::PhantomData,
@@ -81,6 +87,7 @@ impl<
             form_repo,
             clock,
             email,
+            object_storage,
         }
     }
 
@@ -115,5 +122,9 @@ impl<
 
     pub fn form(&'_ self) -> form::FormApp<'_, FR, C> {
         form::FormApp::new(&self.form_repo, &self.clock)
+    }
+
+    pub fn file(&'_ self) -> file::FileApp<'_, OS> {
+        file::FileApp::new(&self.object_storage)
     }
 }

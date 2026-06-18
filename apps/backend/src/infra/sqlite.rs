@@ -21,6 +21,7 @@ mod tests;
 
 use crate::application::Application;
 use crate::application::ports::email::Email;
+use crate::application::ports::object_storage::ObjectStorage;
 use crate::infra::clock_impl::ClockImpl;
 use crate::infra::sqlite::approval_request_repo_impl::SqliteApprovalRequestRepo;
 use crate::infra::sqlite::document_category_repo_impl::SqliteDocumentCategoryRepo;
@@ -36,7 +37,7 @@ use std::str::FromStr;
 
 /// SQLite バックエンドで構成した [`Application`]。
 /// メール送信ポート `E` は外部サービス実装(SendGrid 等)を注入する。
-pub type SqliteApplication<E> = Application<
+pub type SqliteApplication<E, OS> = Application<
     SqliteTransaction,
     SqliteApprovalRequestRepo,
     SqliteGroupRepo,
@@ -47,6 +48,7 @@ pub type SqliteApplication<E> = Application<
     SqliteFormRepo,
     ClockImpl,
     E,
+    OS,
 >;
 
 /// SQLite プールを生成し，マイグレーションを適用する。
@@ -62,7 +64,11 @@ pub async fn connect_and_migrate(database_url: &str) -> anyhow::Result<SqlitePoo
 }
 
 /// プールとメール実装から [`SqliteApplication`] を組み立てる。
-pub fn new_sqlite_application<E: Email>(pool: SqlitePool, email: E) -> SqliteApplication<E> {
+pub fn new_sqlite_application<E: Email, OS: ObjectStorage>(
+    pool: SqlitePool,
+    email: E,
+    object_storage: OS,
+) -> SqliteApplication<E, OS> {
     Application::new(
         SqliteApprovalRequestRepo::new(pool.clone()),
         SqliteGroupRepo::new(pool.clone()),
@@ -73,5 +79,6 @@ pub fn new_sqlite_application<E: Email>(pool: SqlitePool, email: E) -> SqliteApp
         SqliteFormRepo::new(pool.clone()),
         ClockImpl,
         email,
+        object_storage,
     )
 }
