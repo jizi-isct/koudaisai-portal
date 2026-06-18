@@ -66,12 +66,14 @@ pub async fn connect_and_migrate(database_url: &str) -> anyhow::Result<SqlitePoo
     Ok(pool)
 }
 
-/// プールと外部サービス実装(メール・Discord)から [`SqliteApplication`] を組み立てる。
+/// プールと外部サービス実装(メール・Discord)、公開ベース URL から
+/// [`SqliteApplication`] を組み立てる。
 pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
     pool: SqlitePool,
     email: E,
     object_storage: OS,
     discord: D,
+    base_url: String,
 ) -> SqliteApplication<E, OS, D> {
     Application::new(
         SqliteApprovalRequestRepo::new(pool.clone()),
@@ -85,5 +87,6 @@ pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
         email,
         object_storage,
         discord,
+        base_url,
     )
 }

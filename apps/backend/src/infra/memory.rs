@@ -58,6 +58,7 @@ impl MemoryApplication {
             MemoryEmail::new(),
             MemoryObjectStorage::new(),
             MemoryDiscord::new(),
+            "http://localhost".to_string(),
         )
     }
 }

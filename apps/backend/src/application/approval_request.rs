@@ -30,6 +30,7 @@ pub struct ApprovalRequestApp<
     membership_repo: &'a MR,
     clock: &'a C,
     discord: &'a D,
+    base_url: &'a str,
 }
 
 impl<
@@ -46,6 +47,7 @@ impl<
         membership_repo: &'a MR,
         clock: &'a C,
         discord: &'a D,
+        base_url: &'a str,
     ) -> Self {
         Self {
             _phantom: PhantomData,
@@ -53,6 +55,7 @@ impl<
             membership_repo,
             clock,
             discord,
+            base_url,
         }
     }
 
@@ -153,11 +156,11 @@ impl<
         self.approval_request_repo.insert(&request).await?;
 
         let issuer_label = self.issuer_label(request.issued_by()).await;
-        let message = build_issue_message(&request, &issuer_label);
-        self.discord
-            .send(&message)
-            .await
-            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?;
+        let message = build_issue_message(self.base_url, &request, &issuer_label);
+        // 通知は best-effort: 送信失敗で作成自体は失敗させず、ログに残すのみ。
+        if let Err(error) = self.discord.send(&message).await {
+            tracing::error!(%error, "承認申請(発行)の Discord 通知送信に失敗しました");
+        }
 
         Ok(id)
     }
@@ -198,11 +201,11 @@ impl<
         self.approval_request_repo.update(&request).await?;
 
         let issuer_label = self.issuer_label(request.issued_by()).await;
-        let message = build_decision_message(&request, &issuer_label);
-        self.discord
-            .send(&message)
-            .await
-            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?;
+        let message = build_decision_message(self.base_url, &request, &issuer_label);
+        // 通知は best-effort: 送信失敗で承認自体は失敗させず、ログに残すのみ。
+        if let Err(error) = self.discord.send(&message).await {
+            tracing::error!(%error, "承認申請(承認)の Discord 通知送信に失敗しました");
+        }
 
         Ok(request)
     }
@@ -243,11 +246,11 @@ impl<
         self.approval_request_repo.update(&request).await?;
 
         let issuer_label = self.issuer_label(request.issued_by()).await;
-        let message = build_decision_message(&request, &issuer_label);
-        self.discord
-            .send(&message)
-            .await
-            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?;
+        let message = build_decision_message(self.base_url, &request, &issuer_label);
+        // 通知は best-effort: 送信失敗で却下自体は失敗させず、ログに残すのみ。
+        if let Err(error) = self.discord.send(&message).await {
+            tracing::error!(%error, "承認申請(却下)の Discord 通知送信に失敗しました");
+        }
 
         Ok(request)
     }
@@ -295,7 +298,11 @@ impl<
 }
 
 /// 承認申請発行時の Discord メッセージを組み立てる。
-fn build_issue_message(request: &ApprovalRequest, issuer_label: &str) -> DiscordMessage {
+fn build_issue_message(
+    base_url: &str,
+    request: &ApprovalRequest,
+    issuer_label: &str,
+) -> DiscordMessage {
     match request.request_type() {
         ApprovalRequestType::EditExhibitionInfo {
             description,
@@ -312,7 +319,7 @@ fn build_issue_message(request: &ApprovalRequest, issuer_label: &str) -> Discord
                 username: Some(issuer_label.to_string()),
                 embeds: vec![DiscordEmbed {
                     title: Some("企画内容訂正申請が出されました".to_string()),
-                    description: Some(review_link(request.id())),
+                    description: Some(review_link(base_url, request.id())),
                     color: Some(0x0a9fd6),
                     fields: vec![
                         DiscordEmbedField {
@@ -344,7 +351,11 @@ fn build_issue_message(request: &ApprovalRequest, issuer_label: &str) -> Discord
 }
 
 /// 承認/却下時の Discord メッセージを組み立てる。
-fn build_decision_message(request: &ApprovalRequest, issuer_label: &str) -> DiscordMessage {
+fn build_decision_message(
+    base_url: &str,
+    request: &ApprovalRequest,
+    issuer_label: &str,
+) -> DiscordMessage {
     let (status_text, color, reason) = match request.status() {
         ApprovalRequestStatus::Approved {
             approval_reason, ..
@@ -372,7 +383,7 @@ fn build_decision_message(request: &ApprovalRequest, issuer_label: &str) -> Disc
         username: Some("管理者".to_string()),
         embeds: vec![DiscordEmbed {
             title: Some(format!("企画内容訂正申請が{}", status_text)),
-            description: Some(review_link(request.id())),
+            description: Some(review_link(base_url, request.id())),
             color: Some(color),
             fields,
         }],
@@ -380,11 +391,11 @@ fn build_decision_message(request: &ApprovalRequest, issuer_label: &str) -> Disc
     }
 }
 
-/// 管理画面のレビューページへのリンク文字列(Markdown)。
-/// `base_url` は application 層に存在しないため相対パスで表現する(本番配線時に補完する)。
-fn review_link(id: ApprovalRequestId) -> String {
+/// 管理画面のレビューページへの絶対リンク文字列(Markdown)。
+fn review_link(base_url: &str, id: ApprovalRequestId) -> String {
     format!(
-        "[詳細を閲覧](/admin/approval_requests/review?approval_request_id={})",
+        "[詳細を閲覧]({}/admin/approval_requests/review?approval_request_id={})",
+        base_url.trim_end_matches('/'),
         id
     )
 }
@@ -399,6 +410,8 @@ mod tests {
     use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
     use chrono::{TimeZone, Utc};
     use uuid::Uuid;
+
+    const BASE_URL: &str = "https://portal.koudaisai.jp";
 
     fn user_ctx() -> ActorContext {
         ActorContext::User {
@@ -422,7 +435,7 @@ mod tests {
         let mr = MemoryMembershipRepo::new();
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &clock, &discord);
+        let app = ApprovalRequestApp::new(&ar, &mr, &clock, &discord, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -441,6 +454,14 @@ mod tests {
             messages[0].embeds[0].title.as_deref(),
             Some("企画内容訂正申請が出されました")
         );
+        // 詳細リンクが base_url 由来の絶対 URL になっている。
+        assert!(
+            messages[0].embeds[0]
+                .description
+                .as_deref()
+                .unwrap()
+                .contains("https://portal.koudaisai.jp/admin/approval_requests/review")
+        );
     }
 
     #[tokio::test]
@@ -450,7 +471,7 @@ mod tests {
         let mr = MemoryMembershipRepo::new();
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &clock, &discord);
+        let app = ApprovalRequestApp::new(&ar, &mr, &clock, &discord, BASE_URL);
 
         let id = app
             .create(

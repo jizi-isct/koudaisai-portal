@@ -51,6 +51,8 @@ pub struct Application<
     email: E,
     object_storage: OS,
     discord: D,
+    /// 通知の本文などで使う公開ベース URL(例: `https://portal.koudaisai.jp`)。
+    base_url: String,
 }
 
 impl<
@@ -80,6 +82,7 @@ impl<
         email: E,
         object_storage: OS,
         discord: D,
+        base_url: String,
     ) -> Self {
         Self {
             _phantom: std::marker::PhantomData,
@@ -94,6 +97,7 @@ impl<
             email,
             object_storage,
             discord,
+            base_url,
         }
     }
 
@@ -103,6 +107,7 @@ impl<
             &self.membership_repo,
             &self.clock,
             &self.discord,
+            &self.base_url,
         )
     }
 
