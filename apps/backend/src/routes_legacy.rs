@@ -33,7 +33,7 @@ pub fn init_routes(
     s3_bucket: String,
     discord: Discord,
     secrets: Secrets,
-) -> IntoMakeServiceWithConnectInfo<Router, SocketAddr> {
+) -> Router {
     debug!("Initializing routes");
     let state = Arc::new(AppState {
         web: web.clone(),
@@ -66,14 +66,14 @@ pub fn init_routes(
     //     ServeDir::new(&web.static_files.admin_path).append_index_html_on_directories(true);
 
     Router::new()
-        .nest("/auth", auth::init_router())
+        // NOTE: legacy の /auth(独自 SHA + ステートレス refresh JWT)は auth_v2 へ移行済み。
+        // admin OIDC(/auth/v1/admin/*)は未移行(TODO: auth_v2 へ移管する)。
         .nest("/api", api::init_router(secrets))
         .fallback_service(get_service(serve_dir))
         // .nest_service("/admin", get_service(admin_serve_dir))
         .route_layer(from_fn_with_state(state.clone(), middlewares::auth))
         .layer(CorsLayer::permissive())
         .with_state(state)
-        .into_make_service_with_connect_info::<SocketAddr>()
 }
 
 pub struct AppState {
