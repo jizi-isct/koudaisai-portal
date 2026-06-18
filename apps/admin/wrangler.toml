@@ -11,3 +11,10 @@ enabled = true
 [[routes]]
 pattern = "admin.koudaisai.jp"
 custom_domain = true
+
+[env.preview]
+name = "admin-preview"
+
+[[env.preview.routes]]
+pattern = "admin-preview.koudaisai.jp"
+custom_domain = true
