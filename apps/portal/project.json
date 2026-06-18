@@ -45,6 +45,7 @@
         "command": "wrangler deploy",
         "cwd": "apps/portal"
       },
+      "cache": false,
       "dependsOn": ["build:production"]
     },
     "deploy:preview": {
