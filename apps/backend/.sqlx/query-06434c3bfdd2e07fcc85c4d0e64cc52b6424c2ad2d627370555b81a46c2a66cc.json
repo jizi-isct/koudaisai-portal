@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE groups SET created_at = ?, updated_at = ?, name = ?, type = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "06434c3bfdd2e07fcc85c4d0e64cc52b6424c2ad2d627370555b81a46c2a66cc"
+}

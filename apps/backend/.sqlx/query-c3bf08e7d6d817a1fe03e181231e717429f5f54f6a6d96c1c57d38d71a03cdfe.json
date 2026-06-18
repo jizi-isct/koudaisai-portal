@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT user_id FROM memberships WHERE user_id = ? AND group_id = ?",
+  "query": "SELECT group_id FROM memberships WHERE group_id = ? AND role = ?",
   "describe": {
     "columns": [
       {
-        "name": "user_id",
+        "name": "group_id",
         "ordinal": 0,
         "type_info": "Text"
       }
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "86302861479765ec14f522dc4ac01512e29c571c94d2c9a91c0e573ea5d5e5f0"
+  "hash": "c3bf08e7d6d817a1fe03e181231e717429f5f54f6a6d96c1c57d38d71a03cdfe"
 }

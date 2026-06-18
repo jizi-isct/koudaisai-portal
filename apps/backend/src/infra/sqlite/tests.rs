@@ -24,7 +24,7 @@ use crate::domain::email_address::EmailAddress;
 use crate::domain::form::{Form, FormType};
 use crate::domain::group::{Group, GroupType};
 use crate::domain::group_id::GroupId;
-use crate::domain::membership::Membership;
+use crate::domain::membership::{Membership, Role};
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
 use crate::domain::password_credentials::PasswordCredentials;
@@ -134,12 +134,11 @@ async fn group_lab_with_operator_via_transaction() {
     }
 
     let group_id = GroupId::new('L', 1).unwrap();
-    let group_type = GroupType::LabProject {
-        representative: rep,
-        operator: op,
-    };
-    let group = Group::register(group_id, "Lab".to_string(), group_type.clone(), &c).unwrap();
-    let memberships = Membership::from_group_type(group_id, group.r#type(), &c);
+    let group = Group::register(group_id, "Lab".to_string(), GroupType::LabProject, &c).unwrap();
+    let memberships = vec![
+        Membership::new(group_id, rep, Role::Representative, &c),
+        Membership::new(group_id, op, Role::Operator, &c),
+    ];
 
     // create_group 相当: 1 トランザクションで group + memberships を保存
     let mut tx = SqliteTransaction::new(pool.clone());
@@ -151,7 +150,7 @@ async fn group_lab_with_operator_via_transaction() {
     tx.commit().await.unwrap();
 
     let restored = group_repo.find_by_id(group_id).await.unwrap().unwrap();
-    assert_eq!(restored.r#type(), &group_type);
+    assert_eq!(restored.r#type(), &GroupType::LabProject);
 
     let members = membership_repo.find_by_group_id(group_id).await.unwrap();
     assert_eq!(members.len(), 2);
@@ -160,35 +159,11 @@ async fn group_lab_with_operator_via_transaction() {
 #[tokio::test]
 async fn group_insert_in_rolls_back_on_uncommitted_transaction() {
     let pool = test_pool().await;
-    let user_repo = SqliteUserRepo::new(pool.clone());
     let group_repo = SqliteGroupRepo::new(pool.clone());
     let c = clock();
 
-    // FK を満たす代表者を先にコミット済みで作る
-    let rep = UserId::new(Uuid::new_v4());
-    user_repo
-        .insert(
-            &User::register(
-                rep,
-                "U".to_string(),
-                EmailAddress::new("rollback-rep@example.com".to_string()).unwrap(),
-                &c,
-            )
-            .unwrap(),
-        )
-        .await
-        .unwrap();
-
     let group_id = GroupId::new('P', 7).unwrap();
-    let group = Group::register(
-        group_id,
-        "Press".to_string(),
-        GroupType::Press {
-            representative: rep,
-        },
-        &c,
-    )
-    .unwrap();
+    let group = Group::register(group_id, "Press".to_string(), GroupType::Press, &c).unwrap();
 
     // begin したが commit しない → ドロップでロールバックされる
     {
