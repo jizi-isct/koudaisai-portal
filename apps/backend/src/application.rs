@@ -17,6 +17,7 @@ use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::error::FindError;
 use crate::application::transaction::Transaction;
 use crate::application::user::UserApp;
+use crate::domain::actor_ctx::ActorContext;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
 
@@ -202,5 +203,140 @@ impl<
     /// (アクセストークンのゲート判定や ActorContext 構築に用いる)。
     pub async fn find_user_for_auth(&self, user_id: UserId) -> Result<Option<User>, FindError> {
         self.user_repo.find_by_id(user_id).await
+    }
+
+    /// 認証済みユーザの `ActorContext::User` を組み立てる(authn→authz のブリッジ)。
+    /// グループ種別は最初の所属グループから解決する(approval_request 等と同じ慣習)。
+    /// ユーザ不在 / 所属グループ無し / グループ不整合の場合は `None`。
+    pub async fn build_actor_context(
+        &self,
+        user_id: UserId,
+    ) -> Result<Option<ActorContext>, FindError> {
+        let Some(user) = self.user_repo.find_by_id(user_id).await? else {
+            return Ok(None);
+        };
+        let memberships = self.membership_repo.find_by_user_id(user_id).await?;
+        let Some(first) = memberships.first() else {
+            return Ok(None);
+        };
+        let Some(group) = self.group_repo.find_by_id(first.group_id()).await? else {
+            return Ok(None);
+        };
+        let group_type = *group.r#type();
+        Ok(Some(ActorContext::User {
+            user_id,
+            name: user.name().to_string(),
+            memberships,
+            group_type,
+        }))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::domain::email_address::EmailAddress;
+    use crate::domain::group::GroupType;
+    use crate::domain::group_id::GroupId;
+    use crate::domain::membership::Role;
+    use crate::infra::memory::MemoryApplication;
+    use crate::infra::memory::transaction_impl::MemoryTransaction;
+    use chrono::{TimeZone, Utc};
+    use uuid::Uuid;
+
+    fn admin() -> ActorContext {
+        ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            name: "admin".to_string(),
+            claims: vec![
+                "koudaisai-portal:admin:user:read".to_string(),
+                "koudaisai-portal:admin:group:create".to_string(),
+                "koudaisai-portal:admin:group:update".to_string(),
+            ],
+        }
+    }
+
+    #[tokio::test]
+    async fn build_actor_context_resolves_user_and_group_type() {
+        let app =
+            MemoryApplication::new_memory_app(Utc.with_ymd_and_hms(2026, 6, 1, 0, 0, 0).unwrap());
+        let admin = admin();
+        let user_id = UserId::new(Uuid::new_v4());
+        app.user()
+            .register(
+                &admin,
+                user_id,
+                "User".to_string(),
+                EmailAddress::new("g@example.com".to_string()).unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let group_id = GroupId::new('P', 7).unwrap();
+        app.group()
+            .create_group(
+                &admin,
+                MemoryTransaction::new(),
+                group_id,
+                "Press".to_string(),
+                GroupType::Press,
+            )
+            .await
+            .unwrap();
+        app.group()
+            .add_member(
+                &admin,
+                MemoryTransaction::new(),
+                group_id,
+                user_id,
+                Role::Representative,
+            )
+            .await
+            .unwrap();
+
+        let actor = app
+            .build_actor_context(user_id)
+            .await
+            .unwrap()
+            .expect("user with a group resolves to a User actor");
+        match actor {
+            ActorContext::User {
+                user_id: uid,
+                group_type,
+                memberships,
+                ..
+            } => {
+                assert_eq!(uid, user_id);
+                assert_eq!(group_type, GroupType::Press);
+                assert_eq!(memberships.len(), 1);
+            }
+            _ => panic!("expected ActorContext::User"),
+        }
+    }
+
+    #[tokio::test]
+    async fn build_actor_context_none_for_groupless_or_missing_user() {
+        let app =
+            MemoryApplication::new_memory_app(Utc.with_ymd_and_hms(2026, 6, 1, 0, 0, 0).unwrap());
+        let admin = admin();
+        let user_id = UserId::new(Uuid::new_v4());
+        app.user()
+            .register(
+                &admin,
+                user_id,
+                "U".to_string(),
+                EmailAddress::new("x@example.com".to_string()).unwrap(),
+            )
+            .await
+            .unwrap();
+        // 所属グループ無し。
+        assert!(app.build_actor_context(user_id).await.unwrap().is_none());
+        // 不在ユーザ。
+        assert!(
+            app.build_actor_context(UserId::new(Uuid::new_v4()))
+                .await
+                .unwrap()
+                .is_none()
+        );
     }
 }
