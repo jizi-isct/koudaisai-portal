@@ -1,0 +1,7 @@
+{
+  "group_type": "booth_project",
+  "ok": false,
+  "memberships": [
+    { "group_id": "M-001", "user_id": "11111111-1111-1111-1111-111111111111", "role": "Representative", "created_at": "2026-01-01T00:00:00Z" }
+  ]
+}

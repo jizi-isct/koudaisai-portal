@@ -1,6 +1,9 @@
 use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::{
-    actor_ctx::ActorContext, group::GroupType, group_id::GroupId, membership::Membership,
+    actor_ctx::ActorContext,
+    group::GroupType,
+    group_id::GroupId,
+    membership::{Membership, Role},
     user_id::UserId,
 };
 use serde::Deserialize;
@@ -11,7 +14,12 @@ use uuid::Uuid;
 fn user_ctx(group_type: GroupType) -> (UserId, ActorContext) {
     let user_id = UserId::new(Uuid::new_v4());
     let group_id = GroupId::new('G', 1).unwrap();
-    let memberships = vec![Membership::new(group_id, user_id, &FixedClock)];
+    let memberships = vec![Membership::new(
+        group_id,
+        user_id,
+        Role::Representative,
+        &FixedClock,
+    )];
     (
         user_id,
         ActorContext::User {
@@ -25,49 +33,12 @@ fn user_ctx(group_type: GroupType) -> (UserId, ActorContext) {
 fn parse_actor(s: &str) -> ActorContext {
     let u = || UserId::new(Uuid::new_v4());
     match s {
-        "user_general" => {
-            user_ctx(GroupType::GeneralProject {
-                representative1: u(),
-                representative2: u(),
-                representative3: u(),
-            })
-            .1
-        }
-        "user_booth" => {
-            user_ctx(GroupType::BoothProject {
-                representative1: u(),
-                representative2: u(),
-                representative3: u(),
-            })
-            .1
-        }
-        "user_stage" => {
-            user_ctx(GroupType::StageProject {
-                representative1: u(),
-                representative2: u(),
-                representative3: u(),
-            })
-            .1
-        }
-        "user_labo" => {
-            user_ctx(GroupType::LabProject {
-                representative: u(),
-                operator: u(),
-            })
-            .1
-        }
-        "user_press" => {
-            user_ctx(GroupType::Press {
-                representative: u(),
-            })
-            .1
-        }
-        "user" => {
-            user_ctx(GroupType::Press {
-                representative: u(),
-            })
-            .1
-        }
+        "user_general" => user_ctx(GroupType::GeneralProject).1,
+        "user_booth" => user_ctx(GroupType::BoothProject).1,
+        "user_stage" => user_ctx(GroupType::StageProject).1,
+        "user_labo" => user_ctx(GroupType::LabProject).1,
+        "user_press" => user_ctx(GroupType::Press).1,
+        "user" => user_ctx(GroupType::Press).1,
         "admin" => ActorContext::Admin {
             user_id: u(),
             claims: vec![],
@@ -121,13 +92,16 @@ pub fn test_is_group_id(_path: &Path, contents: String) -> datatest_stable::Resu
         "user" => {
             let user_id = UserId::new(Uuid::new_v4());
             let group_id = GroupId::from_str(c.actor_group_id.as_deref().unwrap()).unwrap();
-            let memberships = vec![Membership::new(group_id, user_id, &FixedClock)];
+            let memberships = vec![Membership::new(
+                group_id,
+                user_id,
+                Role::Representative,
+                &FixedClock,
+            )];
             ActorContext::User {
                 user_id,
                 memberships,
-                group_type: GroupType::Press {
-                    representative: user_id,
-                },
+                group_type: GroupType::Press,
             }
         }
         "nologin" => ActorContext::NoLogin,
@@ -167,9 +141,7 @@ pub fn test_is_user_id(_path: &Path, contents: String) -> datatest_stable::Resul
         "user" => ActorContext::User {
             user_id: actor_user_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: actor_user_id,
-            },
+            group_type: GroupType::Press,
         },
         "admin" => ActorContext::Admin {
             user_id: actor_user_id,

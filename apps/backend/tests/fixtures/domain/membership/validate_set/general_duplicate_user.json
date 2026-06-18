@@ -1,0 +1,8 @@
+{
+  "group_type": "general_project",
+  "ok": false,
+  "memberships": [
+    { "group_id": "I-001", "user_id": "11111111-1111-1111-1111-111111111111", "role": "FirstResponsible", "created_at": "2026-01-01T00:00:00Z" },
+    { "group_id": "I-001", "user_id": "11111111-1111-1111-1111-111111111111", "role": "SecondResponsible", "created_at": "2026-01-01T00:00:00Z" }
+  ]
+}

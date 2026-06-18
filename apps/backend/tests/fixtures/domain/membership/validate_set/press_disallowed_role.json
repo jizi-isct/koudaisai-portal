@@ -1,0 +1,7 @@
+{
+  "group_type": "press",
+  "ok": false,
+  "memberships": [
+    { "group_id": "P-001", "user_id": "11111111-1111-1111-1111-111111111111", "role": "Operator", "created_at": "2026-01-01T00:00:00Z" }
+  ]
+}
