@@ -12,7 +12,7 @@ mod handlers;
 use crate::application::auth::AuthConfig;
 use crate::infra::discord_webhook::WebhookDiscord;
 use crate::infra::s3_object_storage::S3ObjectStorage;
-use crate::infra::sendgrid_email::SendgridEmail;
+use crate::infra::ses_email::SesEmail;
 use crate::infra::sqlite::SqliteApplication;
 use crate::util::oidc::OIDCClient;
 use axum::http::Method;
@@ -28,7 +28,7 @@ use utoipa_axum::routes;
 
 /// 本番構成の具体 [`Application`](crate::application::Application)。
 /// auth 関連ポートは [`SqliteApplication`] が argon2 / HMAC / JWT 実装で固定する。
-pub type ProdApplication = SqliteApplication<SendgridEmail, S3ObjectStorage, WebhookDiscord>;
+pub type ProdApplication = SqliteApplication<SesEmail, S3ObjectStorage, WebhookDiscord>;
 
 /// リフレッシュトークン Cookie の属性。`__Host-` 前提(Secure・Domain なし・Path=/)。
 #[derive(Clone)]
@@ -52,7 +52,7 @@ pub struct AuthV2State {
     pub dummy_phc: Arc<String>,
     pub cookie: CookieConfig,
     /// パスワードリセットメール送信用(リクエストパス外で spawn して使う)。
-    pub email: Arc<SendgridEmail>,
+    pub email: Arc<SesEmail>,
     /// リセットリンクのベース URL(例: `https://portal.koudaisai.jp/password/reset`)。
     pub reset_link_base: String,
     /// 自前アクセストークン(RS256)の検証鍵。認証必須エンドポイントで使う。

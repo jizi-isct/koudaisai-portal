@@ -9,7 +9,7 @@ use crate::infra::discord_webhook::WebhookDiscord;
 use crate::infra::jwt_access_token_issuer::JwtAccessTokenIssuer;
 use crate::infra::random_secret_generator::RandomSecretGenerator;
 use crate::infra::s3_object_storage::S3ObjectStorage;
-use crate::infra::sendgrid_email::SendgridEmail;
+use crate::infra::ses_email::SesEmail;
 use crate::infra::sqlite::{connect_and_migrate, new_sqlite_application};
 use crate::routes::auth_v2::{AuthV2State, CookieConfig};
 use chrono::Duration;
@@ -95,7 +95,7 @@ async fn main() {
 
     let prod_app = new_sqlite_application(
         pool.clone(),
-        SendgridEmail::from_config(&config.sendgrid),
+        SesEmail::from_config(&config.ses).await,
         S3ObjectStorage::from_config(&config.s3).await,
         WebhookDiscord::from_config(&config.discord),
         config.web.server.base_url.clone(),
@@ -121,7 +121,7 @@ async fn main() {
             secure: v3.refresh_cookie_secure,
             same_site: v3.refresh_cookie_same_site.clone(),
         },
-        email: Arc::new(SendgridEmail::from_config(&config.sendgrid)),
+        email: Arc::new(SesEmail::from_config(&config.ses).await),
         reset_link_base: v3.reset_link_base.clone(),
         access_decoding_key: Arc::new(config.web.auth.get_jwt_decoding_key().unwrap()),
         access_iss: v3.access_token_iss.clone(),

@@ -35,9 +35,9 @@ tower-http = { version = "0.6.2", features = ["fs", "cors", "set-header"] }
 base64url = "0.1.0"
 aws-config = "1.6.2"
 aws-sdk-s3 = "1.83.0"
+aws-sdk-sesv2 = "1.84.0"
 linked-hash-map = "0.5.6"
 scraper = "0.23.1"
-sendgrid = "0.24.0"
 axum-proxy = { version = "0.5.1", features = ["https", "http1", "axum"] }
 tower = "0.5.2"
 serenity = { version = "0.12.4", features = ["http", "model", "builder"] }
