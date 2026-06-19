@@ -130,10 +130,9 @@ function NewDocumentForm({ categoryId }: { categoryId: string }) {
               title: values.title,
               category: values.category,
               targets: values.targets.map((target) => target.join('/')),
-              format_pdf: {
-                file_name: values.pdfFile[0].name,
-                file_key: key,
-              },
+              format: 'pdf',
+              file_name: values.pdfFile[0].name,
+              file_key: key,
             },
           });
           break;
@@ -144,9 +143,8 @@ function NewDocumentForm({ categoryId }: { categoryId: string }) {
               title: values.title,
               category: values.category,
               targets: values.targets.map((target) => target.join('/')),
-              format_markdown: {
-                content: values.markdownContent,
-              },
+              format: 'markdown',
+              content: values.markdownContent,
             },
           });
           break;
@@ -157,10 +155,9 @@ function NewDocumentForm({ categoryId }: { categoryId: string }) {
               title: values.title,
               category: values.category,
               targets: values.targets.map((target) => target.join('/')),
-              format_misc: {
-                file_name: values.miscFile[0].name,
-                file_key: key,
-              },
+              format: 'misc',
+              file_name: values.miscFile[0].name,
+              file_key: key,
             },
           });
           break;

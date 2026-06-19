@@ -14,57 +14,44 @@ export type FormItemType =
   | 'question_check_box';
 export type SaveStatus = 'saving' | 'saved' | 'unsaved';
 
-export type DocumentCreate = apiComponents['schemas']['CreateDocument'];
-export type DocumentRead = apiComponents['schemas']['ReadDocument'];
-export type DocumentUpdate = apiComponents['schemas']['UpdateDocument'];
-export type DocumentFormatPdfCreate =
-  apiComponents['schemas']['CreateDocumentFormatPdf'];
-export type DocumentFormatPdfRead =
-  apiComponents['schemas']['ReadDocumentFormatPdf'];
-export type DocumentFormatPdfUpdate =
-  apiComponents['schemas']['UpdateDocumentFormatPdf'];
-export type DocumentFormatMarkdownCreate =
-  apiComponents['schemas']['CreateDocumentFormatMarkdown'];
-export type DocumentFormatMarkdownRead =
-  apiComponents['schemas']['ReadDocumentFormatMarkdown'];
-export type DocumentFormatMarkdownUpdate =
-  apiComponents['schemas']['UpdateDocumentFormatMarkdown'];
-export type DocumentFormatMiscCreate =
-  apiComponents['schemas']['CreateDocumentFormatMisc'];
-export type DocumentFormatMiscRead =
-  apiComponents['schemas']['ReadDocumentFormatMisc'];
-export type DocumentFormatMiscUpdate =
-  apiComponents['schemas']['UpdateDocumentFormatMisc'];
+export type DocumentCreate = apiComponents['schemas']['DocumentCreate'];
+export type DocumentRead = apiComponents['schemas']['DocumentRead'];
+export type DocumentUpdate = apiComponents['schemas']['DocumentUpdate'];
+// 旧 format_pdf/markdown/misc のネスト型は廃止され、単一の DocumentFormat
+// 判別 union(format で識別、ドキュメントに平坦化)へ統合された。
+export type DocumentFormat = apiComponents['schemas']['DocumentFormat'];
+export type DocumentFormatPdfRead = Extract<DocumentFormat, { format: 'pdf' }>;
+export type DocumentFormatMarkdownRead = Extract<
+  DocumentFormat,
+  { format: 'markdown' }
+>;
+export type DocumentFormatMiscRead = Extract<DocumentFormat, { format: 'misc' }>;
 export type DocumentCategoryCreate =
-  apiComponents['schemas']['CreateDocumentCategory'];
+  apiComponents['schemas']['DocumentCategoryCreate'];
 export type DocumentCategoryRead =
-  apiComponents['schemas']['ReadDocumentCategory'];
+  apiComponents['schemas']['DocumentCategoryRead'];
 export type DocumentCategoryUpdate =
-  apiComponents['schemas']['UpdateDocumentCategory'];
+  apiComponents['schemas']['DocumentCategoryUpdate'];
 export type NotificationCreate = apiComponents['schemas']['NotificationCreate'];
 export type NotificationRead = apiComponents['schemas']['NotificationRead'];
 export type NotificationUpdate = apiComponents['schemas']['NotificationUpdate'];
-export type NotificationCreateTypeMarkdown =
-  apiComponents['schemas']['NotificationCreateTypeMarkdown'];
-export type NotificationReadTypeMarkdown =
-  apiComponents['schemas']['NotificationReadTypeMarkdown'];
-export type NotificationUpdateTypeMarkdown =
-  apiComponents['schemas']['NotificationUpdateTypeMarkdown'];
-export type NotificationCreateTypeApprovalRequest =
-  apiComponents['schemas']['NotificationCreateTypeApprovalRequest'];
-export type NotificationReadTypeApprovalRequest =
-  apiComponents['schemas']['NotificationReadTypeApprovalRequest'];
-export type NotificationUpdateTypeApprovalRequest =
-  apiComponents['schemas']['NotificationUpdateTypeApprovalRequest'];
+// 旧 type_markdown/type_approval_request のネスト型は NotificationType 判別 union へ統合。
+export type NotificationType = apiComponents['schemas']['NotificationType'];
+export type NotificationReadTypeMarkdown = Extract<
+  NotificationType,
+  { type: 'markdown' }
+>;
+export type NotificationReadTypeApprovalRequest = Extract<
+  NotificationType,
+  { type: 'approval_request' }
+>;
 export type FormCreate = apiComponents['schemas']['FormCreate'];
 export type FormRead = apiComponents['schemas']['FormRead'];
 export type FormUpdate = apiComponents['schemas']['FormUpdate'];
 export type ApprovalRequestCreate =
-  apiComponents['schemas']['CreateApprovalRequest'];
+  apiComponents['schemas']['ApprovalRequestCreate'];
 export type ApprovalRequestRead =
-  apiComponents['schemas']['ReadApprovalRequest'];
-export type ApprovalRequestUpdate =
-  apiComponents['schemas']['UpdateApprovalRequest'];
+  apiComponents['schemas']['ApprovalRequestRead'];
 export type GroupCreate = apiComponents['schemas']['GroupCreate'];
 export type GroupRead = apiComponents['schemas']['GroupRead'];
 export type GroupUpdate = apiComponents['schemas']['GroupUpdate'];
