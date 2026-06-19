@@ -52,18 +52,18 @@ function EditNotification({ notificationId }: { notificationId: string }) {
   const [messageApi, contextHolder] = message.useMessage();
   const { data, isLoading, error } = $api.useQuery(
     'get',
-    '/notifications/{notification_id}',
+    '/notifications/{id}',
     {
       params: {
         path: {
-          notification_id: notificationId,
+          id: notificationId,
         },
       },
     },
   );
   const { mutateAsync: mutateNotificationUpdate } = $api.useMutation(
     'patch',
-    '/notifications/{notification_id}',
+    '/notifications/{id}',
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,7 +86,7 @@ function EditNotification({ notificationId }: { notificationId: string }) {
     );
   }
 
-  if (!('type_markdown' in data)) {
+  if (data.type !== 'markdown') {
     return (
       <Result
         status="error"
@@ -107,15 +107,13 @@ function EditNotification({ notificationId }: { notificationId: string }) {
       await mutateNotificationUpdate({
         params: {
           path: {
-            notification_id: notificationId,
+            id: notificationId,
           },
         },
         body: {
-          target: target?.map((item) => item.join('/')),
-          type_markdown: {
-            title,
-            content: markdown,
-          },
+          targets: target?.map((item) => item.join('/')),
+          title,
+          content: markdown,
         },
       });
       messageApi.success('保存しました');
@@ -131,9 +129,9 @@ function EditNotification({ notificationId }: { notificationId: string }) {
       <Form
         onFinish={handleSubmit}
         initialValues={{
-          title: data.type_markdown.title,
-          target: data.target.map((item) => item.split('/')),
-          markdown: data.type_markdown.content,
+          title: data.title,
+          target: data.targets.map((item) => item.split('/')),
+          markdown: data.content,
         }}
       >
         <h1>通知を編集</h1>

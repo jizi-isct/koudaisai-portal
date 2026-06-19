@@ -31,14 +31,14 @@ function NotificationsTable() {
   const { data, isLoading, refetch } = $api.useQuery('get', '/notifications');
   const { mutateAsync: mutateNotificationDelete } = $api.useMutation(
     'delete',
-    '/notifications/{notification_id}',
+    '/notifications/{id}',
   );
 
   const handleDelete = (id: string) => async () => {
     await mutateNotificationDelete({
       params: {
         path: {
-          notification_id: id,
+          id,
         },
       },
     });
@@ -51,22 +51,22 @@ function NotificationsTable() {
       title: 'タイトル',
       rowScope: 'row',
       render: (_value, record) => {
-        if ('type_markdown' in record) {
+        if (record.type === 'markdown') {
           return (
             <a
               style={{ textDecoration: 'underline' }}
               href={`/notifications/edit?notification_id=${record.id}`}
             >
-              {record.type_markdown.title}
+              {record.title}
             </a>
           );
         }
 
-        if ('type_approval_request' in record) {
+        if (record.type === 'approval_request') {
           return (
             <a
               style={{ textDecoration: 'underline' }}
-              href={`/approval_requests/review?approval_request_id=${record.type_approval_request.approval_request_id}`}
+              href={`/approval_requests/review?approval_request_id=${record.approval_request_id}`}
             >
               承認申請結果
             </a>
@@ -80,8 +80,8 @@ function NotificationsTable() {
       key: 'type',
       title: '種類',
       render: (_value, record) => {
-        if ('type_markdown' in record) return <Tag color="green">MD</Tag>;
-        if ('type_approval_request' in record)
+        if (record.type === 'markdown') return <Tag color="green">MD</Tag>;
+        if (record.type === 'approval_request')
           return <Tag color="blue">承認申請結果</Tag>;
         return <Tag color="red">不明</Tag>;
       },

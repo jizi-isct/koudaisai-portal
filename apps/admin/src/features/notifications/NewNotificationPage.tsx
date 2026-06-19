@@ -35,11 +35,10 @@ function NewNotification() {
     try {
       await mutateNotificationCreate({
         body: {
-          target: target.map((item) => item.join('/')),
-          type_markdown: {
-            title,
-            content: markdown,
-          },
+          targets: target.map((item) => item.join('/')),
+          type: 'markdown',
+          title,
+          content: markdown,
         },
       });
     } catch (e) {
