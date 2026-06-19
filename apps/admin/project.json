@@ -36,7 +36,8 @@
         "command": "astro build --mode preview",
         "cwd": "apps/admin"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "skipNxCache": true
     },
     "deploy:production": {
       "executor": "nx:run-commands",
