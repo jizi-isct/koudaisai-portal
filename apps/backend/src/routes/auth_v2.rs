@@ -90,8 +90,14 @@ pub fn router() -> OpenApiRouter<AuthV2State> {
         .route_layer(
             RateLimitLayer::<RealIp>::builder()
                 .with_routes([
-                    ((Method::POST, "/login"), Quota::simple(Duration::from_secs(3))),
-                    ((Method::POST, "/activate"), Quota::simple(Duration::from_secs(3))),
+                    (
+                        (Method::POST, "/login"),
+                        Quota::simple(Duration::from_secs(3)),
+                    ),
+                    (
+                        (Method::POST, "/activate"),
+                        Quota::simple(Duration::from_secs(3)),
+                    ),
                     (
                         (Method::POST, "/password/reset"),
                         Quota::simple(Duration::from_secs(10)),
