@@ -2,7 +2,7 @@
  * パスワードの強度をチェック
  */
 const PASSWORD_PATTERN =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()_+-={}[|;:'",<.>/?])(?=.{8,})/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()_+-={}[|;:'",<.>/?])(?=.{12,})/;
 
 export function validatePassword(password: string) {
   return PASSWORD_PATTERN.test(password);

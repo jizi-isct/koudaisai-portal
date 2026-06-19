@@ -8,6 +8,10 @@
     "build": "astro build",
     "preview": "astro preview"
   },
+  "devDependencies": {
+    "@types/object-hash": "^3.0.6",
+    "@types/papaparse": "^5.5.2"
+  },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@astrojs/react": "^5.0.5",

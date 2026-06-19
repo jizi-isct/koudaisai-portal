@@ -3,9 +3,11 @@
   "compilerOptions": {
     "composite": true,
     "noEmit": false,
-    "baseUrl": ".",
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
+    "customConditions": ["development"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "references": [

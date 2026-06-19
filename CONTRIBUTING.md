@@ -104,3 +104,13 @@ Docker と Docker Compose は開発用 DB・Keycloak の起動に使います．
   - `feature/#1-add-login-page`
   - `fix/#2-fix-bug-in-login-page`
   - `hotfix/#3-fix-critical-bug`
+
+### Pull Request を出す前に
+
+変更を push する前に，以下のコマンドをすべて実行して問題が無いことを確認してください．
+
+```shell
+npm run format                 # コード整形
+npx nx run-many -t lint        # Lint（ESLint + cargo clippy）
+npx nx run-many -t typecheck   # 型チェック
+```
