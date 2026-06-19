@@ -19,7 +19,7 @@ import {
 } from 'antd';
 import type { UploadFile } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
-import { $api } from '@/features/api/api';
+import { $api, api } from '@/features/api/api';
 import { TargetSpecifier } from './TargetSpecifier';
 
 type FormValues = {
@@ -82,10 +82,6 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
       },
     },
   });
-  const { mutateAsync: mutateUploadFile } = $api.useMutation(
-    'post',
-    '/files/upload',
-  );
   const { data: categories, isLoading: isLoadingCategories } = $api.useQuery(
     'get',
     '/document-categories',
@@ -128,18 +124,32 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
   const documentFormat = documentRead.format;
 
   const uploadFile = async (file: UploadFile) => {
-    const uploaded = await mutateUploadFile({
+    // 生の fetch client を使う。openapi-react-query の mutateAsync は、エラー
+    // レスポンスのボディが空(バックエンドの 403/500 は本文なし)の場合に throw
+    // せず undefined を返してしまうため、HTTP ステータスを直接確認する。
+    const { data, response } = await api.POST('/files/upload', {
       body: {
         file_name: file.name,
       },
     });
 
-    await fetch(uploaded.presigned_url, {
+    if (!data) {
+      throw new Error(
+        `アップロードURLの取得に失敗しました (HTTP ${response.status})`,
+      );
+    }
+
+    const uploadResponse = await fetch(data.presigned_url, {
       method: 'PUT',
       body: file.originFileObj,
     });
+    if (!uploadResponse.ok) {
+      throw new Error(
+        `ファイルのアップロードに失敗しました (HTTP ${uploadResponse.status})`,
+      );
+    }
 
-    return uploaded;
+    return data;
   };
 
   const handleSubmit = async (values: FormValues) => {
