@@ -16,19 +16,19 @@ export function ViewPendingEditExhibitionInfoRequest({
   return (
     <div>
       <h2>企画内容紹介文</h2>
-      {approvalRequest.type_edit_exhibition_info.description ? (
+      {approvalRequest.description ? (
         <div>
           <h3>変更前</h3>
           {plan.description}
           <h3>変更後</h3>
-          {approvalRequest.type_edit_exhibition_info.description}
+          {approvalRequest.description}
         </div>
       ) : (
         <div>変更なし</div>
       )}
 
       <h2>企画アイコン</h2>
-      {approvalRequest.type_edit_exhibition_info.icon_key ? (
+      {approvalRequest.icon_key ? (
         <div>
           <h3>変更前</h3>
           <img
@@ -40,7 +40,7 @@ export function ViewPendingEditExhibitionInfoRequest({
           <h3>変更後</h3>
           <img
             src={getFilesRedirectUrl(
-              approvalRequest.type_edit_exhibition_info.icon_key,
+              approvalRequest.icon_key,
             )}
             alt="新しい企画アイコン"
             width={128}
