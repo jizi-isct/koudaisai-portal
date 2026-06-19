@@ -1,16 +1,13 @@
 import type { Middleware } from 'openapi-fetch';
 import { decodeJwtPayload } from '@koudaisai/shared-auth';
-import type { AuthFetchClient, Tokens } from '@koudaisai/shared-auth';
+import type { Tokens } from '@koudaisai/shared-auth';
 
-export function getAuthMiddleware(
-  fetchClient: AuthFetchClient,
-  loginPath = '/admin/login',
-): Middleware {
+export function getAuthMiddleware(loginPath = '/admin/login'): Middleware {
   return {
     async onRequest({ request }) {
-      const tokens = await getTokensAdmin(fetchClient);
+      const tokens = getTokensAdmin();
 
-      //ログインされてない->ログイン画面へ
+      //ログインされてない/期限切れ -> ログイン画面(Keycloak)へ
       if (!tokens) {
         window.location.assign(loginPath);
         return;
@@ -21,13 +18,21 @@ export function getAuthMiddleware(
     },
   };
 }
+
 /**
- * admin_refresh_tokenとadmin_access_tokenの取得を試みる．
- * @returns トークンがlocalStorageに存在する場合はTokensを返します．トークンが期限切れだった場合はrefreshを試み，成功した場合はTokensを返します．
+ * admin_refresh_token と admin_access_token を localStorage から取得する。
+ *
+ * 管理者(JIZI)は Keycloak OIDC のトークンを保持する。新バックエンドには団体向けの
+ * 回転セッション `/refresh`(Cookie ベース)しか無く、Keycloak トークンを更新する
+ * エンドポイントは存在しない。さらに団体向け `/refresh` を admin から叩くと、別タブ等で
+ * 団体セッション Cookie が存在した場合に団体トークンを取り込んでしまう恐れがあるため呼ばない。
+ *
+ * よってアクセストークンが期限切れの場合は undefined を返し、Keycloak へ再ログイン
+ * させる(Keycloak の SSO セッションが生きていればリダイレクトは透過的に完了する)。
+ *
+ * @returns 有効なトークンがあれば Tokens、無ければ undefined。
  */
-export async function getTokensAdmin(
-  fetchClient: AuthFetchClient,
-): Promise<Tokens | undefined> {
+export function getTokensAdmin(): Tokens | undefined {
   const refresh_token = localStorage.getItem('admin_refresh_token');
   const access_token = localStorage.getItem('admin_access_token');
 
@@ -37,38 +42,14 @@ export async function getTokensAdmin(
   }
 
   // アクセストークン有効期限チェック
-  // TODO: decodeAccessToken() と重複している
-  const access_token_payload = decodeJwtPayload(access_token);
-  const access_token_exp = access_token_payload.exp as number;
+  const access_token_exp = decodeJwtPayload(access_token).exp as number;
   if (access_token_exp * 1000 >= Date.now()) {
     //有効期限OK
     return { refresh_token, access_token };
   }
 
-  //リフレッシュトークンのexp確認
-  const refresh_token_payload = decodeJwtPayload(refresh_token);
-  const refresh_token_exp = refresh_token_payload.exp as number;
-  if (refresh_token_exp * 1000 < Date.now()) {
-    //有効期限ダメ
-    return undefined;
-  }
-
-  //TODO: トークンのリフレッシュを試みる
-
-  const { data } = await fetchClient.POST('/refresh', {
-    body: {
-      refresh_token: refresh_token,
-    },
-  });
-
-  // トークンが有効だった場合，トークンを保存する
-  if (data) {
-    setAdminTokens(data);
-    return data;
-  } else {
-    // refresh tokenが無効
-    return undefined;
-  }
+  //期限切れ -> Keycloak へ再ログイン(サーバ側に admin 用 refresh が無いため)。
+  return undefined;
 }
 
 /**

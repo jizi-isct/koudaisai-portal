@@ -1,8 +1,9 @@
 import { LargePulldown } from '@koudaisai/shared-ui/LargePulldown';
 import { logout } from '@koudaisai/shared-auth-members';
+import { authFetchClient } from '../api/api';
 
-const handleLogout = () => {
-  logout();
+const handleLogout = async () => {
+  await logout(authFetchClient);
   window.location.assign('/login/');
 };
 
