@@ -29,7 +29,7 @@ admin_path = "/var/www/html/admin"
 refresh_cookie_name = "refresh_token"
 refresh_cookie_secure = false
 refresh_cookie_same_site = "Lax"
-reset_link_base = "http://portal.koudaisai.localhost/password/reset"
+reset_link_base = "http://portal.koudaisai.localhost/reset-password/confirm"
 access_token_iss = "http://api.koudaisai.localhost"
 cors_allowed_origins = [
     "http://portal.koudaisai.localhost",
