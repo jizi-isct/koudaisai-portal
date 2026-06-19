@@ -15,10 +15,13 @@ use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::SqliteApplication;
 use crate::util::oidc::OIDCClient;
+use axum::http::Method;
+use axum_gcra::{RateLimitLayer, gcra::Quota, real_ip::RealIp};
 use jsonwebtoken::DecodingKey;
 use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::Mutex;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
@@ -84,4 +87,20 @@ pub fn router() -> OpenApiRouter<AuthV2State> {
         .routes(routes!(handlers::password_reset_confirm))
         .routes(routes!(admin::admin_login))
         .routes(routes!(admin::admin_redirect))
+        .route_layer(
+            RateLimitLayer::<RealIp>::builder()
+                .with_routes([
+                    ((Method::POST, "/login"), Quota::simple(Duration::from_secs(3))),
+                    ((Method::POST, "/activate"), Quota::simple(Duration::from_secs(3))),
+                    (
+                        (Method::POST, "/password/reset"),
+                        Quota::simple(Duration::from_secs(10)),
+                    ),
+                    (
+                        (Method::POST, "/password/reset/confirm"),
+                        Quota::simple(Duration::from_secs(3)),
+                    ),
+                ])
+                .default_handle_error(),
+        )
 }

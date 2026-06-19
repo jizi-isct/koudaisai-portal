@@ -2,6 +2,7 @@ import { AuthFetchClient, decodeAccessToken } from '@koudaisai/shared-auth';
 import type { Middleware } from 'openapi-fetch';
 
 const ACCESS_TOKEN_KEY = 'exhibitor_access_token';
+let refreshPromise: Promise<{ access_token: string } | undefined> | undefined;
 // リフレッシュトークンは HttpOnly Cookie(dev: `refresh_token` / prod: `__Host-refresh_token`)で
 // 配送される。JS からは読めないため localStorage には一切保持しない。
 
@@ -37,6 +38,17 @@ export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
   //期限切れ or 不在 -> リフレッシュトークン Cookie で再発行を試みる。
   //Cookie は HttpOnly のため明示送信できない。client の credentials:'include' で自動送出される。
   //サーバはリクエストボディを取らず、Cookie のみから回転する。
+  //リフレッシュトークンは回転式で再利用を検知するとセッションファミリが失効するため、
+  //同時に複数の API リクエストが期限切れを検知しても 1 回だけ /refresh する。
+  refreshPromise ??= refreshTokensMembers(fetchClient);
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = undefined;
+  }
+};
+
+const refreshTokensMembers = async (fetchClient: AuthFetchClient) => {
   const { data } = await fetchClient.POST('/refresh', {});
 
   if (data) {
