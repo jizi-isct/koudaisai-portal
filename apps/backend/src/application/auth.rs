@@ -10,7 +10,9 @@
 
 use crate::application::ports::access_token_issuer::AccessTokenIssuer;
 use crate::application::ports::clock::Clock;
-use crate::application::ports::password_hasher::{PasswordHashError, PasswordHasher, VerifyOutcome};
+use crate::application::ports::password_hasher::{
+    PasswordHashError, PasswordHasher, VerifyOutcome,
+};
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
@@ -165,9 +167,9 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
         secret: String,
         refresh_expires_at: DateTime<Utc>,
     ) -> Result<IssuedTokens, AuthError> {
-        let access_token = self
-            .access_token_issuer
-            .issue(user_id, session_id, self.config.access_ttl)?;
+        let access_token =
+            self.access_token_issuer
+                .issue(user_id, session_id, self.config.access_ttl)?;
         Ok(IssuedTokens {
             access_token,
             refresh_token: format!("{token_id}.{secret}"),
@@ -194,7 +196,12 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
     }
 
     /// 有効化(activation)。ワンタイムトークンを検証し，初回パスワードを設定する。
-    pub async fn activate(&self, mut tx: Tx, token_str: &str, password: &str) -> Result<(), AuthError> {
+    pub async fn activate(
+        &self,
+        mut tx: Tx,
+        token_str: &str,
+        password: &str,
+    ) -> Result<(), AuthError> {
         let (ott_id, secret) = parse_opaque(token_str).ok_or(AuthError::InvalidToken)?;
         let ott_id = OneTimeTokenId::new(ott_id);
         let token = self
@@ -204,7 +211,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
         // 秘密を定数時間照合(id は秘密ではなくルックアップキー)。
-        if !self.secret_generator.verify_secret(secret, token.token_hash()) {
+        if !self
+            .secret_generator
+            .verify_secret(secret, token.token_hash())
+        {
             return Err(AuthError::InvalidToken);
         }
         if token.purpose() != OneTimeTokenPurpose::Activation || !token.is_consumable(self.clock) {
@@ -221,9 +231,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
         // トークンが宛先に束縛されている場合、現在の m_address と一致しなければ拒否する
         // (email 変更後に旧宛先宛のトークンでアカウントを乗っ取られるのを防ぐ)。
         if let Some(bound) = token.m_address()
-            && bound != user.m_address() {
-                return Err(AuthError::InvalidToken);
-            }
+            && bound != user.m_address()
+        {
+            return Err(AuthError::InvalidToken);
+        }
 
         let plaintext = PlaintextPassword::new(password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;
@@ -236,7 +247,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
 
         let now = self.clock.now();
         tx.begin().await.map_err(internal)?;
-        let consumed = self.one_time_token_repo.consume_in(&mut tx, ott_id, now).await?;
+        let consumed = self
+            .one_time_token_repo
+            .consume_in(&mut tx, ott_id, now)
+            .await?;
         if consumed == 0 {
             tx.commit().await.map_err(internal)?;
             return Err(AuthError::InvalidToken);
@@ -304,11 +318,12 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
 
         tx.begin().await.map_err(internal)?;
         if actives.len() >= self.config.max_sessions_per_user
-            && let Some(oldest) = actives.iter().min_by_key(|s| *s.created_at()) {
-                self.session_repo
-                    .revoke_family_in(&mut tx, oldest.id(), RevocationReason::EvictedLru, now)
-                    .await?;
-            }
+            && let Some(oldest) = actives.iter().min_by_key(|s| *s.created_at())
+        {
+            self.session_repo
+                .revoke_family_in(&mut tx, oldest.id(), RevocationReason::EvictedLru, now)
+                .await?;
+        }
         if let Some(new_phc) = &rehash_to {
             // 並行パスワード変更を巻き戻さないため楽観的に rehash する
             // (password_phc が検証時のままの Active ユーザにだけ適用。不一致なら no-op)。
@@ -331,7 +346,11 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
     }
 
     /// リフレッシュ。回転 + reuse(盗難)検知。
-    pub async fn refresh(&self, mut tx: Tx, refresh_token: &str) -> Result<IssuedTokens, AuthError> {
+    pub async fn refresh(
+        &self,
+        mut tx: Tx,
+        refresh_token: &str,
+    ) -> Result<IssuedTokens, AuthError> {
         let (token_id, secret) = parse_opaque(refresh_token).ok_or(AuthError::InvalidToken)?;
         let token_id = TokenId::new(token_id);
         let token = self
@@ -341,7 +360,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
         // 秘密不一致 → 401。ファミリは触らない(token_id を当てる DoS を防ぐ)。
-        if !self.secret_generator.verify_secret(secret, token.secret_hash()) {
+        if !self
+            .secret_generator
+            .verify_secret(secret, token.secret_hash())
+        {
             return Err(AuthError::InvalidToken);
         }
         let session = self
@@ -552,7 +574,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .await
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
-        if !self.secret_generator.verify_secret(secret, token.token_hash()) {
+        if !self
+            .secret_generator
+            .verify_secret(secret, token.token_hash())
+        {
             return Err(AuthError::InvalidToken);
         }
         if token.purpose() != OneTimeTokenPurpose::PasswordReset || !token.is_consumable(self.clock)
@@ -567,9 +592,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .ok_or(AuthError::InvalidToken)?;
         // 宛先束縛の検証(email 変更後の旧宛先トークンを拒否)。
         if let Some(bound) = token.m_address()
-            && bound != user.m_address() {
-                return Err(AuthError::InvalidToken);
-            }
+            && bound != user.m_address()
+        {
+            return Err(AuthError::InvalidToken);
+        }
         let user_id = user.id();
         let plaintext = PlaintextPassword::new(new_password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;
@@ -579,7 +605,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
 
         let now = self.clock.now();
         tx.begin().await.map_err(internal)?;
-        let consumed = self.one_time_token_repo.consume_in(&mut tx, ott_id, now).await?;
+        let consumed = self
+            .one_time_token_repo
+            .consume_in(&mut tx, ott_id, now)
+            .await?;
         if consumed == 0 {
             tx.commit().await.map_err(internal)?;
             return Err(AuthError::InvalidToken);
@@ -607,7 +636,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             return Ok(());
         };
         // 秘密が一致しなければ何もしない(冪等・他人のファミリを壊さない)。
-        if !self.secret_generator.verify_secret(secret, token.secret_hash()) {
+        if !self
+            .secret_generator
+            .verify_secret(secret, token.secret_hash())
+        {
             return Ok(());
         }
         let now = self.clock.now();
@@ -739,7 +771,11 @@ mod tests {
         seed_active_user(&fx).await;
         let err = fx
             .app()
-            .login(MemoryTransaction::new(), &email(), "wrong wrong wrong wrong")
+            .login(
+                MemoryTransaction::new(),
+                &email(),
+                "wrong wrong wrong wrong",
+            )
             .await
             .unwrap_err();
         assert!(matches!(err, AuthError::InvalidCredentials));

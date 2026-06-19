@@ -123,8 +123,6 @@ impl Form {
         }
 
         self.updated_at = clock.now();
-
-        
     }
 
     pub fn name(&self) -> &str {

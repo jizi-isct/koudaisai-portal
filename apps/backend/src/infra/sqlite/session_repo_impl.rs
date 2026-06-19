@@ -1,8 +1,6 @@
 use crate::application::error::FindError;
 use crate::application::ports::repositories::session_repo::SessionRepo;
-use crate::domain::session::{
-    RevocationReason, Session, SessionState, SessionToken, TokenStatus,
-};
+use crate::domain::session::{RevocationReason, Session, SessionState, SessionToken, TokenStatus};
 use crate::domain::session_id::SessionId;
 use crate::domain::token_id::TokenId;
 use crate::domain::user_id::UserId;

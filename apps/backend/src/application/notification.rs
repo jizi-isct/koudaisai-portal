@@ -200,10 +200,10 @@ fn target_matches(
 ) -> bool {
     match target_ctx {
         Some(ctx) => target.does_actor_match(ctx),
-        None => matches!(
-            target,
-            TargetSpecifier::UserNologin
-        ) || matches!(target, TargetSpecifier::UserId(u) if *u == target_user_id),
+        None => {
+            matches!(target, TargetSpecifier::UserNologin)
+                || matches!(target, TargetSpecifier::UserId(u) if *u == target_user_id)
+        }
     }
 }
 

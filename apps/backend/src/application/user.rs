@@ -3,13 +3,13 @@ use crate::application::authz::CanGetByIdError;
 use crate::application::error::{
     ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
 };
-use crate::domain::error::FactoryError;
 use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
+use crate::domain::error::FactoryError;
 use crate::domain::group_id::GroupId;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;

@@ -20,11 +20,17 @@ impl From<&DomainDocumentFormat> for DocumentFormat {
             DomainDocumentFormat::Markdown { content } => DocumentFormat::Markdown {
                 content: content.clone(),
             },
-            DomainDocumentFormat::Pdf { file_key, file_name } => DocumentFormat::Pdf {
+            DomainDocumentFormat::Pdf {
+                file_key,
+                file_name,
+            } => DocumentFormat::Pdf {
                 file_key: file_key.clone(),
                 file_name: file_name.clone(),
             },
-            DomainDocumentFormat::Misc { file_key, file_name } => DocumentFormat::Misc {
+            DomainDocumentFormat::Misc {
+                file_key,
+                file_name,
+            } => DocumentFormat::Misc {
                 file_key: file_key.clone(),
                 file_name: file_name.clone(),
             },
@@ -36,12 +42,20 @@ impl From<DocumentFormat> for DomainDocumentFormat {
     fn from(f: DocumentFormat) -> Self {
         match f {
             DocumentFormat::Markdown { content } => DomainDocumentFormat::Markdown { content },
-            DocumentFormat::Pdf { file_key, file_name } => {
-                DomainDocumentFormat::Pdf { file_key, file_name }
-            }
-            DocumentFormat::Misc { file_key, file_name } => {
-                DomainDocumentFormat::Misc { file_key, file_name }
-            }
+            DocumentFormat::Pdf {
+                file_key,
+                file_name,
+            } => DomainDocumentFormat::Pdf {
+                file_key,
+                file_name,
+            },
+            DocumentFormat::Misc {
+                file_key,
+                file_name,
+            } => DomainDocumentFormat::Misc {
+                file_key,
+                file_name,
+            },
         }
     }
 }

@@ -96,7 +96,14 @@ pub async fn admin_redirect(
     let Some(auth_session) = st.auth_sessions.lock().await.remove(&payload.state) else {
         return StatusCode::BAD_REQUEST.into_response();
     };
-    match request_token(auth_session, &st.http_client, &st.oidc_client, &payload.code).await {
+    match request_token(
+        auth_session,
+        &st.http_client,
+        &st.oidc_client,
+        &payload.code,
+    )
+    .await
+    {
         Ok((refresh_token, access_token)) => Json(AdminTokenResponse {
             refresh_token: refresh_token.into_secret(),
             access_token: access_token.into_secret(),

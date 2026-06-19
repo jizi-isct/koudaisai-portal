@@ -90,8 +90,8 @@ mod tests {
 
         let mut v = Validation::new(Algorithm::HS256);
         v.validate_aud = false;
-        let data =
-            jsonwebtoken::decode::<AccessClaims>(&token, &DecodingKey::from_secret(key), &v).unwrap();
+        let data = jsonwebtoken::decode::<AccessClaims>(&token, &DecodingKey::from_secret(key), &v)
+            .unwrap();
         assert_eq!(data.claims.sub, Uuid::from(uid));
         assert_eq!(data.claims.sid, Uuid::from(sid));
         assert_eq!(data.claims.typ, ACCESS_TOKEN_TYP);

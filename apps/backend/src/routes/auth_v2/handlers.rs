@@ -11,12 +11,12 @@ use super::dto::{
     ActivateRequest, ChangePasswordRequest, LoginRequest, PasswordResetConfirmRequest,
     PasswordResetRequest, TokenResponse,
 };
+use super::extract::{bearer, verify_access};
 use super::{AuthV2State, CookieConfig};
 use crate::application::auth::{AuthError, IssuedTokens};
 use crate::application::ports::email::Email;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::UserStatus;
-use super::extract::{bearer, verify_access};
 use crate::domain::user_id::UserId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use axum::Json;
@@ -84,7 +84,9 @@ fn with_set_cookie(mut resp: Response, cookie: String) -> Response {
 }
 
 fn issued_response(st: &AuthV2State, tokens: IssuedTokens) -> Response {
-    let max_age = (tokens.refresh_expires_at - Utc::now()).num_seconds().max(0);
+    let max_age = (tokens.refresh_expires_at - Utc::now())
+        .num_seconds()
+        .max(0);
     let cookie = set_cookie_value(&st.cookie, &tokens.refresh_token, max_age);
     let body = Json(TokenResponse {
         access_token: tokens.access_token,
@@ -204,7 +206,10 @@ pub async fn logout(State(st): State<AuthV2State>, headers: HeaderMap) -> Respon
         (status = CONFLICT, description = "既に有効化済み"),
     ),
 )]
-pub async fn activate(State(st): State<AuthV2State>, Json(body): Json<ActivateRequest>) -> Response {
+pub async fn activate(
+    State(st): State<AuthV2State>,
+    Json(body): Json<ActivateRequest>,
+) -> Response {
     let tx = SqliteTransaction::new(st.pool.clone());
     let auth = st.app.auth(st.auth_config.clone(), (*st.dummy_phc).clone());
     match auth.activate(tx, &body.token, &body.password).await {

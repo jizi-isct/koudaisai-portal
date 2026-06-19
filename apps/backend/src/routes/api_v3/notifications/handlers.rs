@@ -1,8 +1,8 @@
 use super::super::V3State;
 use super::dto::{NotificationCreate, NotificationRead, NotificationUpdate};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
-use crate::domain::notification_id::NotificationId;
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::notification_id::NotificationId;
 use axum::Json;
 use axum::extract::{Path, State};
 use serde::Deserialize;

@@ -11,6 +11,8 @@ use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
+use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
+use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::admin_id::AdminId;
@@ -27,8 +29,13 @@ use crate::domain::group_id::GroupId;
 use crate::domain::membership::{Membership, Role};
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
+use crate::domain::one_time_token::{OneTimeToken, OneTimeTokenPurpose};
+use crate::domain::one_time_token_id::OneTimeTokenId;
 use crate::domain::password_credentials::PasswordCredentials;
+use crate::domain::session::{RevocationReason, Session, TokenStatus};
+use crate::domain::session_id::SessionId;
 use crate::domain::target_specifier::TargetSpecifier;
+use crate::domain::token_id::TokenId;
 use crate::domain::user::{User, UserStatus};
 use crate::domain::user_id::UserId;
 use crate::infra::sqlite::approval_request_repo_impl::SqliteApprovalRequestRepo;
@@ -38,17 +45,10 @@ use crate::infra::sqlite::form_repo_impl::SqliteFormRepo;
 use crate::infra::sqlite::group_repo_impl::SqliteGroupRepo;
 use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
 use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
-use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
-use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
-use crate::application::ports::repositories::session_repo::SessionRepo;
-use crate::domain::one_time_token::{OneTimeToken, OneTimeTokenPurpose};
-use crate::domain::one_time_token_id::OneTimeTokenId;
-use crate::domain::session::{RevocationReason, Session, TokenStatus};
-use crate::domain::session_id::SessionId;
-use crate::domain::token_id::TokenId;
 use crate::infra::sqlite::one_time_token_repo_impl::SqliteOneTimeTokenRepo;
 use crate::infra::sqlite::session_repo_impl::SqliteSessionRepo;
+use crate::infra::sqlite::transaction_impl::SqliteTransaction;
+use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use sqlx::SqlitePool;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
@@ -541,7 +541,10 @@ async fn session_round_trip_rotate_cas_and_revoke_family() {
     assert_eq!(got.secret_hash(), "hash0");
     assert_eq!(got.generation(), 0);
     assert_eq!(
-        repo.find_active_sessions_by_user(user_id).await.unwrap().len(),
+        repo.find_active_sessions_by_user(user_id)
+            .await
+            .unwrap()
+            .len(),
         1
     );
 
@@ -555,7 +558,10 @@ async fn session_round_trip_rotate_cas_and_revoke_family() {
     );
     let mut tx = SqliteTransaction::new(pool.clone());
     tx.begin().await.unwrap();
-    assert_eq!(repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap(), 1);
+    assert_eq!(
+        repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap(),
+        1
+    );
     tx.commit().await.unwrap();
     // 同じ旧世代での再回転は 0(既に rotated)。
     let next2 = token0.rotate(
@@ -567,28 +573,55 @@ async fn session_round_trip_rotate_cas_and_revoke_family() {
     );
     let mut tx = SqliteTransaction::new(pool.clone());
     tx.begin().await.unwrap();
-    assert_eq!(repo.rotate_in(&mut tx, token0.id(), &next2).await.unwrap(), 0);
+    assert_eq!(
+        repo.rotate_in(&mut tx, token0.id(), &next2).await.unwrap(),
+        0
+    );
     tx.commit().await.unwrap();
 
     // ファミリ失効 → セッションも全世代トークンも revoked。
     let mut tx = SqliteTransaction::new(pool.clone());
     tx.begin().await.unwrap();
-    repo.revoke_family_in(&mut tx, session.id(), RevocationReason::ReuseDetected, c.now())
-        .await
-        .unwrap();
+    repo.revoke_family_in(
+        &mut tx,
+        session.id(),
+        RevocationReason::ReuseDetected,
+        c.now(),
+    )
+    .await
+    .unwrap();
     tx.commit().await.unwrap();
     assert_eq!(
-        repo.find_active_sessions_by_user(user_id).await.unwrap().len(),
+        repo.find_active_sessions_by_user(user_id)
+            .await
+            .unwrap()
+            .len(),
         0
     );
-    assert!(!repo.find_session_by_id(session.id()).await.unwrap().unwrap().is_active());
+    assert!(
+        !repo
+            .find_session_by_id(session.id())
+            .await
+            .unwrap()
+            .unwrap()
+            .is_active()
+    );
     assert_eq!(
-        repo.find_token_by_id(next.id()).await.unwrap().unwrap().status(),
+        repo.find_token_by_id(next.id())
+            .await
+            .unwrap()
+            .unwrap()
+            .status(),
         TokenStatus::Revoked
     );
 
     // 失効済みファミリは掃除で削除され，配下トークンも CASCADE で消える。
     assert_eq!(repo.delete_expired(c.now()).await.unwrap(), 1);
     assert!(repo.find_token_by_id(next.id()).await.unwrap().is_none());
-    assert!(repo.find_session_by_id(session.id()).await.unwrap().is_none());
+    assert!(
+        repo.find_session_by_id(session.id())
+            .await
+            .unwrap()
+            .is_none()
+    );
 }

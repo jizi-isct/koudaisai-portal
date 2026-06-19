@@ -321,10 +321,7 @@ mod tests {
     }
 
     fn ids() -> (SessionId, TokenId) {
-        (
-            SessionId::new(Uuid::new_v4()),
-            TokenId::new(Uuid::new_v4()),
-        )
+        (SessionId::new(Uuid::new_v4()), TokenId::new(Uuid::new_v4()))
     }
 
     #[test]

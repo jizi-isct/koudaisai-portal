@@ -5,9 +5,7 @@
 
 use crate::application::error::FindError;
 use crate::application::ports::repositories::session_repo::SessionRepo;
-use crate::domain::session::{
-    RevocationReason, Session, SessionState, SessionToken, TokenStatus,
-};
+use crate::domain::session::{RevocationReason, Session, SessionState, SessionToken, TokenStatus};
 use crate::domain::session_id::SessionId;
 use crate::domain::token_id::TokenId;
 use crate::domain::user_id::UserId;
@@ -139,10 +137,11 @@ impl SessionRepo<MemoryTransaction> for MemorySessionRepo {
         {
             let mut sessions = self.sessions.write().map_err(|e| anyhow!(e.to_string()))?;
             if let Some(s) = sessions.get(&session_id)
-                && s.is_active() {
-                    let revoked = revoked_session(s, reason, at);
-                    sessions.insert(session_id, revoked);
-                }
+                && s.is_active()
+            {
+                let revoked = revoked_session(s, reason, at);
+                sessions.insert(session_id, revoked);
+            }
         }
         {
             let mut tokens = self.tokens.write().map_err(|e| anyhow!(e.to_string()))?;
@@ -283,7 +282,10 @@ mod tests {
             },
         );
         // 1 回目の回転は成功(1)。
-        assert_eq!(repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap(), 1);
+        assert_eq!(
+            repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap(),
+            1
+        );
         // 同じ旧世代での再回転は CAS により 0(並行回転/reuse)。
         let next2 = token0.rotate(
             TokenId::new(Uuid::new_v4()),
@@ -314,7 +316,11 @@ mod tests {
             .await
             .unwrap();
 
-        let s = repo.find_session_by_id(session.id()).await.unwrap().unwrap();
+        let s = repo
+            .find_session_by_id(session.id())
+            .await
+            .unwrap()
+            .unwrap();
         assert!(!s.is_active());
         let t = repo.find_token_by_id(token0.id()).await.unwrap().unwrap();
         assert_eq!(t.status(), TokenStatus::Revoked);
@@ -342,7 +348,10 @@ mod tests {
         repo.rotate_in(&mut tx, token0.id(), &next).await.unwrap();
 
         // 絶対期限内の掃除では Active ファミリの Rotated 行は消えない。
-        assert_eq!(repo.delete_expired(t0 + Duration::days(1)).await.unwrap(), 0);
+        assert_eq!(
+            repo.delete_expired(t0 + Duration::days(1)).await.unwrap(),
+            0
+        );
         assert!(repo.find_token_by_id(token0.id()).await.unwrap().is_some());
 
         // 絶対期限を過ぎたら丸ごと掃除される。
@@ -351,6 +360,11 @@ mod tests {
             1
         );
         assert!(repo.find_token_by_id(token0.id()).await.unwrap().is_none());
-        assert!(repo.find_session_by_id(session.id()).await.unwrap().is_none());
+        assert!(
+            repo.find_session_by_id(session.id())
+                .await
+                .unwrap()
+                .is_none()
+        );
     }
 }

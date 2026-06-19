@@ -4,11 +4,11 @@ use crate::application::error::{
     ApplicationOperationError, ApplicationSequentialOperationError, DeleteError, InsertError,
     UpdateError,
 };
+use crate::domain::actor_ctx::ActorContext;
 use crate::domain::group_id::GroupId;
 use crate::domain::membership::Role as DomainRole;
 use crate::domain::user_id::UserId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
 use axum::extract::{Path, State};
 use serde::Deserialize;
@@ -92,7 +92,12 @@ pub async fn put_group(
         },
         // 既存グループ → 名称を置換する(種別は変更不可)。
         Err(ApplicationSequentialOperationError::OperationFailed(InsertError::Conflict)) => {
-            match st.app.group().rename_group(&actor, group_id, group.name).await {
+            match st
+                .app
+                .group()
+                .rename_group(&actor, group_id, group.name)
+                .await
+            {
                 Ok(g) => PutGroupResponse::Ok(GroupRead::from(&g)),
                 Err(ApplicationOperationError::Unauthorized) => PutGroupResponse::Forbidden,
                 Err(ApplicationOperationError::InvalidInput(_)) => PutGroupResponse::BadRequest,

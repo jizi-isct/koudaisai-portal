@@ -252,10 +252,9 @@ pub fn test_change_targets(_path: &Path, contents: String) -> datatest_stable::R
     // パース失敗の可能性もある
     let parsed_targets = parse_targets(c.new_targets.clone());
 
-    if !c.ok
-        && parsed_targets.is_err() {
-            return Ok(()); // 失敗ケースはparse失敗でも良い
-        }
+    if !c.ok && parsed_targets.is_err() {
+        return Ok(()); // 失敗ケースはparse失敗でも良い
+    }
 
     let targets = parsed_targets?;
 

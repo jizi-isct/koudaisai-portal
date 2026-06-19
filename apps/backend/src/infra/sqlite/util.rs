@@ -35,8 +35,9 @@ pub(crate) fn targets_from_json(s: &str) -> anyhow::Result<Vec<TargetSpecifier>>
 /// sqlx のエラーを `InsertError` へ。UNIQUE/PK 制約違反は `Conflict` に振り分ける。
 pub(crate) fn to_insert_error(e: sqlx::Error) -> InsertError {
     if let sqlx::Error::Database(db) = &e
-        && db.is_unique_violation() {
-            return InsertError::Conflict;
-        }
+        && db.is_unique_violation()
+    {
+        return InsertError::Conflict;
+    }
     InsertError::InternalError(e.into())
 }

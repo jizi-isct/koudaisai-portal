@@ -1,13 +1,13 @@
-use super::super::notifications::NotificationRead;
 use super::super::V3State;
+use super::super::notifications::NotificationRead;
 use super::dto::{MAddressUpdate, MAddressUpdated, UserCreate, UserCreated, UserRead, UserUpdate};
 use crate::application::error::{ApplicationOperationError, DeleteError, InsertError, UpdateError};
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user_id::UserId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use axum::extract::{Path, State};
 use axum::Json;
+use axum::extract::{Path, State};
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;

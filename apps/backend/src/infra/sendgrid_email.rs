@@ -46,11 +46,10 @@ impl Email for SendgridEmail {
             )
             .add_personalization(Personalization::new(SgEmail::new(address.address.clone())));
 
-        let response = self
-            .sender
-            .send(&message)
-            .await
-            .map_err(|e| ApplicationError::InternalError(anyhow!("sendgrid send failed: {e}")))?;
+        let response =
+            self.sender.send(&message).await.map_err(|e| {
+                ApplicationError::InternalError(anyhow!("sendgrid send failed: {e}"))
+            })?;
 
         if !response.status().is_success() {
             return Err(ApplicationError::InternalError(anyhow!(

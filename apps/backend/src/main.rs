@@ -40,8 +40,14 @@ async fn main() {
     let args: Vec<String> = std::env::args().collect();
     if let Some(which) = args.iter().find_map(|a| a.strip_prefix("--dump-openapi=")) {
         let (title, mut openapi) = match which {
-            "api_v3" => ("Koudaisai Portal API v3", routes::api_v3::router().split_for_parts().1),
-            "auth_v2" => ("Koudaisai Portal Auth v2", routes::auth_v2::router().split_for_parts().1),
+            "api_v3" => (
+                "Koudaisai Portal API v3",
+                routes::api_v3::router().split_for_parts().1,
+            ),
+            "auth_v2" => (
+                "Koudaisai Portal Auth v2",
+                routes::auth_v2::router().split_for_parts().1,
+            ),
             other => {
                 eprintln!("unknown schema '{other}' (expected api_v3 | auth_v2)");
                 std::process::exit(2);

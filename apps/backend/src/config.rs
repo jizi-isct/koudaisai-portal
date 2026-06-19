@@ -41,8 +41,7 @@ impl Default for Logging {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[derive(Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub enum LogLevel {
     Trace,
     Debug,
@@ -51,7 +50,6 @@ pub enum LogLevel {
     Warn,
     Error,
 }
-
 
 impl LogLevel {
     pub fn to_level_filter(&self) -> LevelFilter {

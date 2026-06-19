@@ -1,11 +1,11 @@
+use crate::application::error::FindError;
 use crate::application::ports::access_token_issuer::AccessTokenIssuer;
 use crate::application::ports::clock::Clock;
 use crate::application::ports::discord::Discord;
-use crate::application::ports::password_hasher::PasswordHasher;
-use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::ports::email::Email;
 use crate::application::ports::meta_fetcher::MetaFetcher;
 use crate::application::ports::object_storage::ObjectStorage;
+use crate::application::ports::password_hasher::PasswordHasher;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
 use crate::application::ports::repositories::document_repo::DocumentRepo;
@@ -16,7 +16,7 @@ use crate::application::ports::repositories::notification_repo::NotificationRepo
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
-use crate::application::error::FindError;
+use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::transaction::Transaction;
 use crate::application::user::UserApp;
 use crate::domain::actor_ctx::ActorContext;
@@ -206,11 +206,7 @@ impl<
 
     /// 認証ユースケース。`config` と定数時間ログイン用ダミー PHC は
     /// 呼び出し側(State)が現行設定から渡す。
-    pub fn auth(
-        &'_ self,
-        config: auth::AuthConfig,
-        dummy_phc: String,
-    ) -> auth::AuthApp<'_, Tx, C> {
+    pub fn auth(&'_ self, config: auth::AuthConfig, dummy_phc: String) -> auth::AuthApp<'_, Tx, C> {
         auth::AuthApp::new(
             &self.user_repo,
             &self.one_time_token_repo,

@@ -99,8 +99,12 @@ pub async fn get_documents_by_category(
         .await
         .unwrap_or_default();
     let mut ordered_category_ids: Vec<Uuid> = categories.iter().map(|c| c.id()).collect();
-    ordered_category_ids
-        .sort_by_key(|id| categories.iter().find(|c| c.id() == *id).map(|c| c.created_at()));
+    ordered_category_ids.sort_by_key(|id| {
+        categories
+            .iter()
+            .find(|c| c.id() == *id)
+            .map(|c| c.created_at())
+    });
     let lookup: HashMap<Uuid, DocumentCategoryRead> = categories
         .iter()
         .map(|c| (c.id(), DocumentCategoryRead::from(c)))
@@ -126,12 +130,13 @@ pub async fn get_documents_by_category(
     // lookup に無い id を持つカテゴリ付きドキュメント(権限で解決できなかった等)。
     for (cat_id_opt, docs) in &by_category {
         if let Some(cat_id) = cat_id_opt
-            && !lookup.contains_key(cat_id) {
-                entries.push(DocumentsByCategoryEntry {
-                    category: None,
-                    documents: docs.iter().map(DocumentRead::from).collect(),
-                });
-            }
+            && !lookup.contains_key(cat_id)
+        {
+            entries.push(DocumentsByCategoryEntry {
+                category: None,
+                documents: docs.iter().map(DocumentRead::from).collect(),
+            });
+        }
     }
 
     // 未分類(None)は最後に。
@@ -184,7 +189,9 @@ pub async fn post_document(
     {
         Ok(doc) => PostDocumentResponse::Created(DocumentRead::from(&doc)),
         Err(ApplicationOperationError::Unauthorized) => PostDocumentResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => PostDocumentResponse::UnprocessableEntity,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostDocumentResponse::UnprocessableEntity
+        }
         Err(_) => PostDocumentResponse::InternalServerError,
     }
 }

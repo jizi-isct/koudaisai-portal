@@ -61,8 +61,13 @@ impl Argon2PasswordHasher {
     }
 
     fn params(&self) -> Result<Params, PasswordHashError> {
-        Params::new(self.m_cost_kib, self.t_cost, self.p_cost, Some(self.output_len))
-            .map_err(|e| PasswordHashError::Internal(anyhow!("invalid argon2 params: {e}")))
+        Params::new(
+            self.m_cost_kib,
+            self.t_cost,
+            self.p_cost,
+            Some(self.output_len),
+        )
+        .map_err(|e| PasswordHashError::Internal(anyhow!("invalid argon2 params: {e}")))
     }
 
     fn argon2(params: Params) -> Argon2<'static> {
@@ -71,7 +76,9 @@ impl Argon2PasswordHasher {
 
     fn hash_bytes(params: Params, bytes: &[u8]) -> Result<String, argon2::password_hash::Error> {
         let salt = SaltString::generate(&mut OsRng);
-        Ok(Self::argon2(params).hash_password(bytes, &salt)?.to_string())
+        Ok(Self::argon2(params)
+            .hash_password(bytes, &salt)?
+            .to_string())
     }
 }
 
@@ -166,7 +173,10 @@ mod tests {
         let pw = PlaintextPassword::new("correct horse battery".to_string()).unwrap();
         let phc = h.hash(&pw).await.unwrap();
         assert!(phc.starts_with("$argon2id$"));
-        assert_eq!(h.verify("correct horse battery", &phc).await.unwrap(), VerifyOutcome::Verified);
+        assert_eq!(
+            h.verify("correct horse battery", &phc).await.unwrap(),
+            VerifyOutcome::Verified
+        );
     }
 
     #[tokio::test]
@@ -174,13 +184,19 @@ mod tests {
         let h = fast_hasher();
         let pw = PlaintextPassword::new("correct horse battery".to_string()).unwrap();
         let phc = h.hash(&pw).await.unwrap();
-        assert_eq!(h.verify("wrong password here", &phc).await.unwrap(), VerifyOutcome::Mismatch);
+        assert_eq!(
+            h.verify("wrong password here", &phc).await.unwrap(),
+            VerifyOutcome::Mismatch
+        );
     }
 
     #[tokio::test]
     async fn test_verify_malformed_phc_is_mismatch_not_error() {
         let h = fast_hasher();
-        assert_eq!(h.verify("whatever", "not-a-phc-string").await.unwrap(), VerifyOutcome::Mismatch);
+        assert_eq!(
+            h.verify("whatever", "not-a-phc-string").await.unwrap(),
+            VerifyOutcome::Mismatch
+        );
     }
 
     #[tokio::test]

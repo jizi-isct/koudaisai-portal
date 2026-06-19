@@ -1,8 +1,8 @@
 use super::super::V3State;
 use super::dto::{ApprovalActionBody, ApprovalRequestCreate, ApprovalRequestRead};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
-use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::actor_ctx::ActorContext;
+use crate::domain::approval_request_id::ApprovalRequestId;
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use serde::Deserialize;
@@ -48,10 +48,7 @@ pub async fn get_approval_requests(
 ) -> GetApprovalRequestsResponse {
     // app に group_id 指定の use-case が無いため、group_id クエリは受理するが
     // グループ範囲は呼び出し元の所属に限定する。
-    let result = if matches!(
-        actor,
-        crate::domain::actor_ctx::ActorContext::Admin { .. }
-    ) {
+    let result = if matches!(actor, crate::domain::actor_ctx::ActorContext::Admin { .. }) {
         st.app.approval_request().get_all(&actor).await
     } else if let Some(uid) = actor.user_id() {
         st.app

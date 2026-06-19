@@ -54,15 +54,9 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             crate::domain::group::GroupType::GeneralProject => {
                 TargetSpecifier::GroupTypeProjectGeneral
             }
-            crate::domain::group::GroupType::BoothProject => {
-                TargetSpecifier::GroupTypeProjectBooth
-            }
-            crate::domain::group::GroupType::StageProject => {
-                TargetSpecifier::GroupTypeProjectStage
-            }
-            crate::domain::group::GroupType::LabProject => {
-                TargetSpecifier::GroupTypeProjectLabo
-            }
+            crate::domain::group::GroupType::BoothProject => TargetSpecifier::GroupTypeProjectBooth,
+            crate::domain::group::GroupType::StageProject => TargetSpecifier::GroupTypeProjectStage,
+            crate::domain::group::GroupType::LabProject => TargetSpecifier::GroupTypeProjectLabo,
             crate::domain::group::GroupType::Press => TargetSpecifier::GroupTypePress,
         });
 
@@ -119,9 +113,7 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             .into_iter()
             .filter(|doc| can_get_document(actor_ctx, doc).is_ok())
             .fold(HashMap::new(), |mut acc, doc| {
-                acc.entry(doc.category())
-                    .or_insert_with(Vec::new)
-                    .push(doc);
+                acc.entry(doc.category()).or_insert_with(Vec::new).push(doc);
                 acc
             });
         Ok(documents)

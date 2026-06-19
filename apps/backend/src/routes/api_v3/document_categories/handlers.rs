@@ -38,9 +38,7 @@ pub async fn get_document_categories(
     match st.app.document_category().get_all(&actor).await {
         Ok(mut cats) => {
             cats.sort_by_key(|c| c.created_at());
-            GetDocumentCategoriesResponse::Ok(
-                cats.iter().map(DocumentCategoryRead::from).collect(),
-            )
+            GetDocumentCategoriesResponse::Ok(cats.iter().map(DocumentCategoryRead::from).collect())
         }
         Err(ApplicationOperationError::Unauthorized) => GetDocumentCategoriesResponse::Forbidden,
         Err(_) => GetDocumentCategoriesResponse::InternalServerError,
