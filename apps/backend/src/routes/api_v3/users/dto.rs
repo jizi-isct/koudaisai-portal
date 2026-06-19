@@ -10,12 +10,15 @@ pub struct UserCreate {
     pub m_address: String,
 }
 
+/// `status` フィールドを判別子に持つ internally-tagged enum。
+/// flatten 時に `{"status": "registered", ..}` のように展開される
+/// (兄弟の `FormType` / `ApprovalRequestStatus` 等と同じ表現)。
 #[derive(ToSchema, Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(tag = "status", rename_all = "snake_case")]
 pub enum UserReadStatus {
-    StatusRegistered,
-    StatusActive,
-    StatusDeactivated {
+    Registered,
+    Active,
+    Deactivated {
         deactivated_at: DateTime<Utc>,
         reason: String,
     },
@@ -24,13 +27,13 @@ pub enum UserReadStatus {
 impl From<&UserStatus> for UserReadStatus {
     fn from(s: &UserStatus) -> Self {
         match s {
-            UserStatus::Registered => UserReadStatus::StatusRegistered,
-            UserStatus::Active { .. } => UserReadStatus::StatusActive,
+            UserStatus::Registered => UserReadStatus::Registered,
+            UserStatus::Active { .. } => UserReadStatus::Active,
             UserStatus::Deactivated {
                 deactivated_at,
                 reason,
                 ..
-            } => UserReadStatus::StatusDeactivated {
+            } => UserReadStatus::Deactivated {
                 deactivated_at: *deactivated_at,
                 reason: reason.clone(),
             },

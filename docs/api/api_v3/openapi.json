@@ -2927,42 +2927,58 @@
       "UserReadStatus": {
         "oneOf": [
           {
-            "type": "string",
-            "enum": [
-              "status_registered"
-            ]
-          },
-          {
-            "type": "string",
-            "enum": [
-              "status_active"
-            ]
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "registered"
+                ]
+              }
+            }
           },
           {
             "type": "object",
             "required": [
-              "status_deactivated"
+              "status"
             ],
             "properties": {
-              "status_deactivated": {
-                "type": "object",
-                "required": [
-                  "deactivated_at",
-                  "reason"
-                ],
-                "properties": {
-                  "deactivated_at": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "reason": {
-                    "type": "string"
-                  }
-                }
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "deactivated_at",
+              "reason",
+              "status"
+            ],
+            "properties": {
+              "deactivated_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "deactivated"
+                ]
               }
             }
           }
-        ]
+        ],
+        "description": "`status` フィールドを判別子に持つ internally-tagged enum。\nflatten 時に `{\"status\": \"registered\", ..}` のように展開される\n(兄弟の `FormType` / `ApprovalRequestStatus` 等と同じ表現)。"
       },
       "UserUpdate": {
         "type": "object",

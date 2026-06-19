@@ -731,15 +731,26 @@ export interface components {
       /** Format: date-time */
       updated_at: string;
     };
+    /**
+     * @description `status` フィールドを判別子に持つ internally-tagged enum。
+     *     flatten 時に `{"status": "registered", ..}` のように展開される
+     *     (兄弟の `FormType` / `ApprovalRequestStatus` 等と同じ表現)。
+     */
     UserReadStatus:
-      | 'status_registered'
-      | 'status_active'
       | {
-          status_deactivated: {
-            /** Format: date-time */
-            deactivated_at: string;
-            reason: string;
-          };
+          /** @enum {string} */
+          status: 'registered';
+        }
+      | {
+          /** @enum {string} */
+          status: 'active';
+        }
+      | {
+          /** Format: date-time */
+          deactivated_at: string;
+          reason: string;
+          /** @enum {string} */
+          status: 'deactivated';
         };
     /**
      * @description `PATCH /users/{id}` のリクエストボディ。氏名のみ変更可能
