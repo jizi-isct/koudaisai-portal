@@ -211,14 +211,7 @@ function DocumentsTable() {
       title: '作成者',
       dataIndex: 'created_by',
       rowScope: 'row',
-      render: (value: string) => `${value.substring(0, 6)}...`,
-    },
-    {
-      key: 'updated_by',
-      title: '更新者',
-      dataIndex: 'updated_by',
-      rowScope: 'row',
-      render: (value: string) => `${value.substring(0, 6)}...`,
+      render: (value?: string) => (value ? `${value.substring(0, 6)}...` : ''),
     },
     {
       key: 'actions',
