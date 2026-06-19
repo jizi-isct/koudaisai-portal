@@ -1,8 +1,8 @@
-import { validatePassword } from '@koudaisai/shared-utils';
-import { useCallback, useEffect, useState } from 'react';
-import { authFetchClient } from '../api/api';
+import {validatePassword} from '@koudaisai/shared-utils';
+import {useCallback, useEffect, useState} from 'react';
+import {authFetchClient} from '../api/api';
 import membersLogo from '@/features/header/assets/members_logo.png';
-import { NextPhaseButton } from '@/features/plain-form/NextPhaseButton';
+import {NextPhaseButton} from '@/features/plain-form/NextPhaseButton';
 import styles from '@/features/plain-form/PlainForm.module.css';
 
 export function ResetPasswordConfirmForm() {
@@ -36,7 +36,7 @@ export function ResetPasswordConfirmForm() {
 
       if (!validatePassword(password)) {
         setError(
-          'パスワードは8文字以上、英大文字、英小文字、数字、記号を含む必要があります。',
+          'パスワードは12文字以上、英大文字、英小文字、数字、記号を含む必要があります。',
         );
         return;
       }
