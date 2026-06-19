@@ -1,6 +1,9 @@
+use super::super::V3State;
 use super::dto::{DocumentCategoryCreate, DocumentCategoryRead, DocumentCategoryUpdate};
+use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
@@ -15,6 +18,8 @@ pub struct DocumentCategoryPath {
 pub enum GetDocumentCategoriesResponse {
     #[response(status = OK)]
     Ok(Vec<DocumentCategoryRead>),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
     InternalServerError,
 }
@@ -26,8 +31,20 @@ pub enum GetDocumentCategoriesResponse {
     responses(GetDocumentCategoriesResponse),
     tag = super::super::DOCUMENT_CATEGORIES_TAG
 )]
-pub async fn get_document_categories() -> GetDocumentCategoriesResponse {
-    todo!()
+pub async fn get_document_categories(
+    State(st): State<V3State>,
+    actor: ActorContext,
+) -> GetDocumentCategoriesResponse {
+    match st.app.document_category().get_all(&actor).await {
+        Ok(mut cats) => {
+            cats.sort_by_key(|c| c.created_at());
+            GetDocumentCategoriesResponse::Ok(
+                cats.iter().map(DocumentCategoryRead::from).collect(),
+            )
+        }
+        Err(ApplicationOperationError::Unauthorized) => GetDocumentCategoriesResponse::Forbidden,
+        Err(_) => GetDocumentCategoriesResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -36,6 +53,8 @@ pub enum GetDocumentCategoryResponse {
     Ok(DocumentCategoryRead),
     #[response(status = NOT_FOUND, description = "Document category not found")]
     NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
     InternalServerError,
 }
@@ -49,9 +68,16 @@ pub enum GetDocumentCategoryResponse {
     tag = super::super::DOCUMENT_CATEGORIES_TAG
 )]
 pub async fn get_document_category(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<DocumentCategoryPath>,
 ) -> GetDocumentCategoryResponse {
-    todo!()
+    match st.app.document_category().get_by_id(&actor, path.id).await {
+        Ok(Some(cat)) => GetDocumentCategoryResponse::Ok(DocumentCategoryRead::from(&cat)),
+        Ok(None) => GetDocumentCategoryResponse::NotFound,
+        Err(ApplicationOperationError::Unauthorized) => GetDocumentCategoryResponse::Forbidden,
+        Err(_) => GetDocumentCategoryResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -75,9 +101,23 @@ pub enum PostDocumentCategoryResponse {
     tag = super::super::DOCUMENT_CATEGORIES_TAG
 )]
 pub async fn post_document_category(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Json(body): Json<DocumentCategoryCreate>,
 ) -> PostDocumentCategoryResponse {
-    todo!()
+    match st
+        .app
+        .document_category()
+        .create(&actor, body.title, body.emoji)
+        .await
+    {
+        Ok(cat) => PostDocumentCategoryResponse::Created(DocumentCategoryRead::from(&cat)),
+        Err(ApplicationOperationError::Unauthorized) => PostDocumentCategoryResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostDocumentCategoryResponse::UnprocessableEntity
+        }
+        Err(_) => PostDocumentCategoryResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -104,10 +144,31 @@ pub enum PatchDocumentCategoryResponse {
     tag = super::super::DOCUMENT_CATEGORIES_TAG
 )]
 pub async fn patch_document_category(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<DocumentCategoryPath>,
     Json(body): Json<DocumentCategoryUpdate>,
 ) -> PatchDocumentCategoryResponse {
-    todo!()
+    match st
+        .app
+        .document_category()
+        .update_document_category(&actor, path.id, body.title, body.emoji.map(Some))
+        .await
+    {
+        Ok(()) => match st.app.document_category().get_by_id(&actor, path.id).await {
+            Ok(Some(cat)) => PatchDocumentCategoryResponse::Ok(DocumentCategoryRead::from(&cat)),
+            Ok(None) => PatchDocumentCategoryResponse::NotFound,
+            _ => PatchDocumentCategoryResponse::InternalServerError,
+        },
+        Err(ApplicationOperationError::Unauthorized) => PatchDocumentCategoryResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchDocumentCategoryResponse::UnprocessableEntity
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchDocumentCategoryResponse::NotFound
+        }
+        Err(_) => PatchDocumentCategoryResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -131,7 +192,21 @@ pub enum DeleteDocumentCategoryResponse {
     tag = super::super::DOCUMENT_CATEGORIES_TAG
 )]
 pub async fn delete_document_category(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<DocumentCategoryPath>,
 ) -> DeleteDocumentCategoryResponse {
-    todo!()
+    match st
+        .app
+        .document_category()
+        .delete_document_category(&actor, path.id)
+        .await
+    {
+        Ok(()) => DeleteDocumentCategoryResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteDocumentCategoryResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteDocumentCategoryResponse::NotFound
+        }
+        Err(_) => DeleteDocumentCategoryResponse::InternalServerError,
+    }
 }

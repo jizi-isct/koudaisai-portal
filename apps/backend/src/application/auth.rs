@@ -503,6 +503,42 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
         }))
     }
 
+    /// 有効化(activation)トークンを発行する。ユーザー作成時・m アドレス変更時に
+    /// 呼び、初回ログイン用の不透明トークン `"{id}.{secret}"` を返す。
+    /// 既存の未消費 activation トークンは無効化し、現在の m_address に束縛する。
+    pub async fn issue_activation_token(
+        &self,
+        mut tx: Tx,
+        user_id: UserId,
+    ) -> Result<String, AuthError> {
+        let user = self
+            .user_repo
+            .find_by_id(user_id)
+            .await
+            .map_err(internal)?
+            .ok_or_else(|| AuthError::InvalidInput("user not found".to_string()))?;
+        let secret = self.secret_generator.generate_secret();
+        let token_hash = self.secret_generator.hash_secret(&secret);
+        let ott_id = OneTimeTokenId::new(self.secret_generator.new_id());
+        let token = OneTimeToken::issue(
+            ott_id,
+            user_id,
+            OneTimeTokenPurpose::Activation,
+            token_hash,
+            Some(user.m_address().clone()),
+            self.config.activation_ttl,
+            self.clock,
+        );
+        let now = self.clock.now();
+        tx.begin().await.map_err(internal)?;
+        self.one_time_token_repo
+            .invalidate_existing_for_in(&mut tx, user_id, OneTimeTokenPurpose::Activation, now)
+            .await?;
+        self.one_time_token_repo.insert_in(&mut tx, &token).await?;
+        tx.commit().await.map_err(internal)?;
+        Ok(format!("{ott_id}.{secret}"))
+    }
+
     /// パスワードリセット確定。トークン検証 → 新パスワード設定 → 全セッション失効。
     pub async fn confirm_password_reset(
         &self,

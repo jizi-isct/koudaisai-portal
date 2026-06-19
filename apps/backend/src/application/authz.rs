@@ -66,6 +66,15 @@ pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, _user_id: User
     }
 }
 
+pub fn can_delete_user(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:user:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
 pub fn can_get_all_groups(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -103,6 +112,24 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:group:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_group(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_group(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:delete".to_string())
         }
         _ => false,
     }
@@ -379,6 +406,18 @@ pub fn can_get_notification(actor_ctx: &ActorContext, notification: &Notificatio
     }
 }
 
+/// 対象ユーザーの通知一覧(既読状態付き)を閲覧できるか。
+/// 管理者(notification:read)または本人のみ。
+pub fn can_get_user_notifications(actor_ctx: &ActorContext, target_user_id: UserId) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:read".to_string())
+        }
+        ActorContext::User { user_id, .. } => *user_id == target_user_id,
+        ActorContext::NoLogin => false,
+    }
+}
+
 pub fn can_create_notification(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -418,6 +457,11 @@ pub fn can_upload_file(actor_ctx: &ActorContext) -> bool {
 /// ダウンロードは（レガシー同様）無認証で誰でも要求できる。鍵(key)を知っていることを前提とする。
 pub fn can_download_file(_actor_ctx: &ActorContext) -> bool {
     true
+}
+
+/// 外部 URL のメタ情報(OGP)を取得できるか。legacy 同様に管理者専用。
+pub fn can_fetch_meta(actor_ctx: &ActorContext) -> bool {
+    matches!(actor_ctx, ActorContext::Admin { .. })
 }
 
 #[cfg(test)]

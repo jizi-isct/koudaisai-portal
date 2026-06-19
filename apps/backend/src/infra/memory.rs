@@ -8,6 +8,7 @@ pub mod email_impl;
 pub mod form_repo_impl;
 pub mod group_repo_impl;
 pub mod membership_repo_impl;
+pub mod meta_fetcher_impl;
 pub mod notification_repo_impl;
 pub mod object_storage_impl;
 pub mod one_time_token_repo_impl;
@@ -28,6 +29,8 @@ use crate::infra::memory::email_impl::MemoryEmail;
 use crate::infra::memory::form_repo_impl::MemoryFormRepo;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;
 use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
+use crate::infra::memory::meta_fetcher_impl::MemoryMetaFetcher;
+use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
 use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
 use crate::infra::memory::one_time_token_repo_impl::MemoryOneTimeTokenRepo;
 use crate::infra::memory::password_hasher_impl::MemoryPasswordHasher;
@@ -54,6 +57,8 @@ pub type MemoryApplication = Application<
     MemoryPasswordHasher,
     MemorySecretGenerator,
     MemoryAccessTokenIssuer,
+    MemoryNotificationRepo,
+    MemoryMetaFetcher,
 >;
 
 impl MemoryApplication {
@@ -78,6 +83,8 @@ impl MemoryApplication {
             MemoryPasswordHasher::new(),
             MemorySecretGenerator::new(),
             MemoryAccessTokenIssuer::new(),
+            MemoryNotificationRepo::new(),
+            MemoryMetaFetcher::new(),
             "http://localhost".to_string(),
         )
     }

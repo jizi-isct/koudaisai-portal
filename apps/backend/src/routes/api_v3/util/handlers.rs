@@ -1,5 +1,7 @@
 use super::dto::MetaInfo;
-use axum::extract::Query;
+use crate::application::error::ApplicationError;
+use crate::domain::actor_ctx::ActorContext;
+use axum::extract::{Query, State};
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
@@ -29,6 +31,14 @@ pub enum GetMetaResponse {
     responses(GetMetaResponse),
     tag = super::super::UTIL_TAG
 )]
-pub async fn get_meta(Query(query): Query<MetaQuery>) -> GetMetaResponse {
-    todo!()
+pub async fn get_meta(
+    State(st): State<super::super::V3State>,
+    actor: ActorContext,
+    Query(query): Query<MetaQuery>,
+) -> GetMetaResponse {
+    match st.app.meta().get_meta(&actor, &query.url).await {
+        Ok(pm) => GetMetaResponse::Ok(MetaInfo::from(pm)),
+        Err(ApplicationError::Unauthorized) => GetMetaResponse::Forbidden,
+        Err(_) => GetMetaResponse::InternalServerError,
+    }
 }

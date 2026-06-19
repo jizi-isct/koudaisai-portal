@@ -20,19 +20,19 @@ use openidconnect::core::CoreUserInfoClaims;
 use serde_json::Value;
 use uuid::Uuid;
 
-/// 認証コンテキストの抽出子。
-pub struct Actor(pub ActorContext);
-
 /// legacy 踏襲: Keycloak 認証済み admin に付与する全権限 claim。
 /// (legacy は `matches!(current_user, CurrentUser::Admin(_))` で細粒度判定をしていなかった)
 fn admin_claims() -> Vec<String> {
     [
         "koudaisai-portal:admin:user:read",
+        "koudaisai-portal:admin:user:create",
         "koudaisai-portal:admin:user:update",
         "koudaisai-portal:admin:user:change-email",
+        "koudaisai-portal:admin:user:delete",
         "koudaisai-portal:admin:group:read",
         "koudaisai-portal:admin:group:create",
         "koudaisai-portal:admin:group:update",
+        "koudaisai-portal:admin:group:delete",
         "koudaisai-portal:admin:form:read",
         "koudaisai-portal:admin:form:create",
         "koudaisai-portal:admin:form:update",
@@ -92,7 +92,7 @@ pub(crate) fn verify_access(
     Ok(data.claims)
 }
 
-impl FromRequestParts<AuthV2State> for Actor {
+impl FromRequestParts<AuthV2State> for ActorContext {
     type Rejection = StatusCode;
 
     async fn from_request_parts(
@@ -101,7 +101,7 @@ impl FromRequestParts<AuthV2State> for Actor {
     ) -> Result<Self, Self::Rejection> {
         let Some(token) = bearer(&parts.headers) else {
             // トークン無しは未ログインとして通す(authz 側で弾く)。
-            return Ok(Actor(ActorContext::NoLogin));
+            return Ok(ActorContext::NoLogin);
         };
         let iss = peek_iss(&token).ok_or(StatusCode::UNAUTHORIZED)?;
 
@@ -128,7 +128,7 @@ impl FromRequestParts<AuthV2State> for Actor {
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
                 .ok_or(StatusCode::UNAUTHORIZED)?;
-            Ok(Actor(actor))
+            Ok(actor)
         } else {
             // Keycloak admin。legacy は「Keycloak 認証成功＝フル管理者」(細粒度 claim 判定なし)
             // だったため踏襲し、userinfo で正当性を確認した上で全 admin claim を付与する。
@@ -149,11 +149,11 @@ impl FromRequestParts<AuthV2State> for Actor {
                 .preferred_username()
                 .map(|u| u.as_str().to_string())
                 .unwrap_or_else(|| subject.to_string());
-            Ok(Actor(ActorContext::Admin {
+            Ok(ActorContext::Admin {
                 user_id,
                 name,
                 claims: admin_claims(),
-            }))
+            })
         }
     }
 }

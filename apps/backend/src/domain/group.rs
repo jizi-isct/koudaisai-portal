@@ -21,6 +21,7 @@ pub enum GroupType {
     StageProject,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Group {
     id: GroupId,
     created_at: DateTime<Utc>,

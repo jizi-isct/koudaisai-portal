@@ -36,3 +36,17 @@ pub fn router() -> OpenApiRouter<V3State> {
         .nest("/files", files::router())
         .nest("/util", util::router())
 }
+
+#[cfg(test)]
+mod tests {
+    /// 全 api_v3 サブルータ + auth_v2 を main.rs と同じ形で nest し、
+    /// ルート/nest の衝突(axum はビルド時に panic する)が無いことを確認する。
+    #[test]
+    fn v3_routers_nest_without_conflict() {
+        let (auth_v2, _) = crate::routes::auth_v2::router().split_for_parts();
+        let (api_v3, _) = super::router().split_for_parts();
+        let _app: axum::Router<crate::routes::auth_v2::AuthV2State> = axum::Router::new()
+            .nest("/auth/v2", auth_v2)
+            .nest("/api/v3", api_v3);
+    }
+}

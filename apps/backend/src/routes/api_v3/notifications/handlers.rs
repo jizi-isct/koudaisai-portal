@@ -1,6 +1,10 @@
+use super::super::V3State;
 use super::dto::{NotificationCreate, NotificationRead, NotificationUpdate};
+use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::domain::notification_id::NotificationId;
+use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
@@ -26,8 +30,16 @@ pub enum GetNotificationsResponse {
     responses(GetNotificationsResponse),
     tag = super::super::NOTIFICATIONS_TAG
 )]
-pub async fn get_notifications() -> GetNotificationsResponse {
-    todo!()
+pub async fn get_notifications(
+    State(st): State<V3State>,
+    actor: ActorContext,
+) -> GetNotificationsResponse {
+    match st.app.notification().get_all(&actor).await {
+        Ok(notifications) => {
+            GetNotificationsResponse::Ok(notifications.iter().map(NotificationRead::from).collect())
+        }
+        Err(_) => GetNotificationsResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -50,8 +62,31 @@ pub enum PostNotificationResponse {
     request_body = NotificationCreate,
     tag = super::super::NOTIFICATIONS_TAG
 )]
-pub async fn post_notification(Json(body): Json<NotificationCreate>) -> PostNotificationResponse {
-    todo!()
+pub async fn post_notification(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Json(body): Json<NotificationCreate>,
+) -> PostNotificationResponse {
+    let ntype = match body.r#type.to_domain() {
+        Ok(t) => t,
+        Err(_) => return PostNotificationResponse::UnprocessableEntity,
+    };
+    match st
+        .app
+        .notification()
+        .create(&actor, body.targets, ntype)
+        .await
+    {
+        Ok(id) => match st.app.notification().get_by_id(&actor, id).await {
+            Ok(Some(n)) => PostNotificationResponse::Created(NotificationRead::from(&n)),
+            _ => PostNotificationResponse::InternalServerError,
+        },
+        Err(ApplicationOperationError::Unauthorized) => PostNotificationResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostNotificationResponse::UnprocessableEntity
+        }
+        Err(_) => PostNotificationResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -72,8 +107,21 @@ pub enum GetNotificationResponse {
     responses(GetNotificationResponse),
     tag = super::super::NOTIFICATIONS_TAG
 )]
-pub async fn get_notification(Path(path): Path<NotificationPath>) -> GetNotificationResponse {
-    todo!()
+pub async fn get_notification(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<NotificationPath>,
+) -> GetNotificationResponse {
+    match st
+        .app
+        .notification()
+        .get_by_id(&actor, NotificationId::new(path.id))
+        .await
+    {
+        Ok(Some(n)) => GetNotificationResponse::Ok(NotificationRead::from(&n)),
+        Ok(None) => GetNotificationResponse::NotFound,
+        Err(_) => GetNotificationResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -100,10 +148,31 @@ pub enum PatchNotificationResponse {
     tag = super::super::NOTIFICATIONS_TAG
 )]
 pub async fn patch_notification(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<NotificationPath>,
     Json(body): Json<NotificationUpdate>,
 ) -> PatchNotificationResponse {
-    todo!()
+    let markdown = match (body.title, body.content) {
+        (Some(t), Some(c)) => Some((t, c)),
+        _ => None,
+    };
+    match st
+        .app
+        .notification()
+        .update(&actor, NotificationId::new(path.id), body.targets, markdown)
+        .await
+    {
+        Ok(n) => PatchNotificationResponse::Ok(NotificationRead::from(&n)),
+        Err(ApplicationOperationError::Unauthorized) => PatchNotificationResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchNotificationResponse::NotFound
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchNotificationResponse::UnprocessableEntity
+        }
+        Err(_) => PatchNotificationResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -126,6 +195,22 @@ pub enum DeleteNotificationResponse {
     responses(DeleteNotificationResponse),
     tag = super::super::NOTIFICATIONS_TAG
 )]
-pub async fn delete_notification(Path(path): Path<NotificationPath>) -> DeleteNotificationResponse {
-    todo!()
+pub async fn delete_notification(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<NotificationPath>,
+) -> DeleteNotificationResponse {
+    match st
+        .app
+        .notification()
+        .delete(&actor, NotificationId::new(path.id))
+        .await
+    {
+        Ok(()) => DeleteNotificationResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteNotificationResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteNotificationResponse::NotFound
+        }
+        Err(_) => DeleteNotificationResponse::InternalServerError,
+    }
 }

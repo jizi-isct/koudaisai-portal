@@ -35,7 +35,9 @@ use crate::infra::sqlite::document_repo_impl::SqliteDocumentRepo;
 use crate::infra::sqlite::form_repo_impl::SqliteFormRepo;
 use crate::infra::sqlite::group_repo_impl::SqliteGroupRepo;
 use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
+use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::one_time_token_repo_impl::SqliteOneTimeTokenRepo;
+use crate::infra::reqwest_meta_fetcher::ReqwestMetaFetcher;
 use crate::infra::sqlite::session_repo_impl::SqliteSessionRepo;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
@@ -64,6 +66,8 @@ pub type SqliteApplication<E, OS, D> = Application<
     Argon2PasswordHasher,
     RandomSecretGenerator,
     JwtAccessTokenIssuer,
+    SqliteNotificationRepo,
+    ReqwestMetaFetcher,
 >;
 
 /// SQLite プールを生成し，マイグレーションを適用する。
@@ -108,6 +112,8 @@ pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
         password_hasher,
         secret_generator,
         access_token_issuer,
+        SqliteNotificationRepo::new(pool.clone()),
+        ReqwestMetaFetcher::new(reqwest::Client::new()),
         base_url,
     )
 }

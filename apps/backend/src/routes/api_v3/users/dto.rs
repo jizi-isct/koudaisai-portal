@@ -1,4 +1,4 @@
-use super::super::notifications::NotificationRead;
+use crate::domain::user::{User, UserStatus};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -21,6 +21,23 @@ pub enum UserReadStatus {
     },
 }
 
+impl From<&UserStatus> for UserReadStatus {
+    fn from(s: &UserStatus) -> Self {
+        match s {
+            UserStatus::Registered => UserReadStatus::StatusRegistered,
+            UserStatus::Active { .. } => UserReadStatus::StatusActive,
+            UserStatus::Deactivated {
+                deactivated_at,
+                reason,
+                ..
+            } => UserReadStatus::StatusDeactivated {
+                deactivated_at: *deactivated_at,
+                reason: reason.clone(),
+            },
+        }
+    }
+}
+
 #[derive(ToSchema, Serialize)]
 pub struct UserRead {
     pub id: Uuid,
@@ -32,7 +49,20 @@ pub struct UserRead {
     pub status: UserReadStatus,
 }
 
-/// `PUT /users/{id}` でユーザーを新規作成したときのレスポンス。
+impl From<&User> for UserRead {
+    fn from(u: &User) -> Self {
+        UserRead {
+            id: u.id().into(),
+            created_at: *u.created_at(),
+            updated_at: *u.updated_at(),
+            name: u.name().to_string(),
+            m_address: u.m_address().address.clone(),
+            status: u.status().into(),
+        }
+    }
+}
+
+/// `POST /users` でユーザーを新規作成したときのレスポンス。
 /// 作成された(`Registered`)ユーザーが初回ログインで有効化するための
 /// activation token を含む（このトークンは作成時にのみ返却される）。
 #[derive(ToSchema, Serialize)]
@@ -42,29 +72,22 @@ pub struct UserCreated {
     pub activation_token: String,
 }
 
-/// `GET /users/{id}/notifications` の 1 件分のエントリ（既読状態付き）。
-#[derive(ToSchema, Serialize)]
-pub struct UserNotificationRead {
-    is_read: bool,
-    notification: NotificationRead,
-}
-
 /// `POST /users/{id}/m_address` のリクエストボディ。
 #[derive(ToSchema, Deserialize)]
 pub struct MAddressUpdate {
-    m_address: String,
+    pub m_address: String,
 }
 
 /// m アドレス変更時に再発行される activation token を含むレスポンス。
 #[derive(ToSchema, Serialize)]
 pub struct MAddressUpdated {
-    activation_token: String,
+    pub activation_token: String,
 }
 
+/// `PATCH /users/{id}` のリクエストボディ。氏名のみ変更可能
+/// (m アドレス変更は専用エンドポイント `POST /users/{id}/m_address`)。
 #[derive(ToSchema, Deserialize)]
 pub struct UserUpdate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub m_address: Option<String>,
 }

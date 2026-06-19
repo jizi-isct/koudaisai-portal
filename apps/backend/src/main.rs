@@ -13,7 +13,6 @@ use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::{connect_and_migrate, new_sqlite_application};
 use crate::routes::auth_v2::{AuthV2State, CookieConfig};
 use crate::routes_legacy::init_routes;
-use crate::service::discord::Discord;
 use crate::util::oidc::OIDCClient;
 use chrono::Duration;
 use jsonwebtoken::Algorithm;
@@ -40,7 +39,6 @@ mod infra;
 pub mod middlewares;
 pub mod routes;
 mod routes_legacy;
-mod service;
 pub mod util;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();
@@ -158,28 +156,31 @@ async fn main() {
     let auth_cors = tower_http::cors::CorsLayer::new()
         .allow_origin(tower_http::cors::AllowOrigin::list(cors_origins))
         .allow_credentials(true)
-        .allow_methods([http::Method::POST])
-        .allow_headers([http::header::CONTENT_TYPE]);
+        .allow_methods([
+            http::Method::GET,
+            http::Method::POST,
+            http::Method::PUT,
+            http::Method::PATCH,
+            http::Method::DELETE,
+            http::Method::OPTIONS,
+        ])
+        .allow_headers([http::header::CONTENT_TYPE, http::header::AUTHORIZATION]);
 
+    // auth_v2(事前認証) と api_v3(リソース系)は同じ `AuthV2State` を共有する
+    // (`V3State = AuthV2State`)。State は 1 度だけ注入する。
     let (auth_v2_router, _auth_openapi) = routes::auth_v2::router().split_for_parts();
-    let auth_v2_app = axum::Router::new()
+    let (api_v3_router, _api_v3_openapi) = routes::api_v3::router().split_for_parts();
+    let v3_app = axum::Router::new()
         .nest("/auth/v2", auth_v2_router)
+        .nest("/api/v3", api_v3_router)
         .with_state(auth_v2_state)
         .layer(auth_cors);
 
-    // ===== legacy(/api + 静的配信)。legacy /auth は auth_v2 へ移行済み(admin OIDC は未移行 TODO) =====
-    let discord = Discord::new(&config.discord.approval_request_url);
-    let legacy = init_routes(
-        &config.web,
-        config.sendgrid,
-        oidc_client,
-        s3_client,
-        config.s3.bucket.clone(),
-        discord,
-        config.secrets,
-    );
+    // ===== legacy(静的配信 + /api/plans_info プロキシのみ)。
+    // legacy /auth と /api/v2/* は auth_v2 / api_v3 へ移行済みのため撤去。 =====
+    let legacy = init_routes(&config.web, oidc_client, config.secrets);
 
-    let app = legacy.merge(auth_v2_app);
+    let app = legacy.merge(v3_app);
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",

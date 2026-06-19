@@ -1,6 +1,9 @@
 use crate::application::authz;
 use crate::application::authz::CanGetByIdError;
-use crate::application::error::{ApplicationOperationError, FindError, InsertError, UpdateError};
+use crate::application::error::{
+    ApplicationOperationError, DeleteError, FindError, InsertError, UpdateError,
+};
+use crate::domain::error::FactoryError;
 use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
@@ -127,6 +130,61 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
 
         // save user
         self.user_repo.update(&user).await?;
+        Ok(())
+    }
+
+    /// ユーザーの氏名・m アドレスを部分更新します（`PATCH /users/{id}`）。
+    /// activation トークンの再発行は伴いません（再発行は専用エンドポイント）。
+    pub async fn edit_user(
+        &self,
+        actor_ctx: &ActorContext,
+        user_id: UserId,
+        name: Option<String>,
+        m_address: Option<EmailAddress>,
+    ) -> Result<User, ApplicationOperationError<UpdateError>> {
+        // get user
+        let Some(mut user) = self
+            .user_repo
+            .find_by_id(user_id)
+            .await
+            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
+        else {
+            return Err(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound,
+            ));
+        };
+
+        // authz（管理者の user:update が必要）
+        if !authz::can_update_user(actor_ctx, &user) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        if let Some(name) = name {
+            user.rename(name, self.clock)
+                .map_err(|FactoryError::InvalidInput(mes)| {
+                    ApplicationOperationError::InvalidInput(mes)
+                })?;
+        }
+        if let Some(m_address) = m_address {
+            user.change_m_address(m_address, self.clock);
+        }
+
+        self.user_repo.update(&user).await?;
+        Ok(user)
+    }
+
+    /// ユーザーを削除します。
+    pub async fn delete_user(
+        &self,
+        actor_ctx: &ActorContext,
+        user_id: UserId,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        // authz
+        if !authz::can_delete_user(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        self.user_repo.delete(user_id).await?;
         Ok(())
     }
 }

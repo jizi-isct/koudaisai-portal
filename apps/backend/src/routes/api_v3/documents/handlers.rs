@@ -1,7 +1,12 @@
+use super::super::V3State;
+use super::super::document_categories::DocumentCategoryRead;
 use super::dto::{DocumentCreate, DocumentRead, DocumentUpdate, DocumentsByCategoryEntry};
+use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
-use axum::extract::{Path, Query};
+use axum::extract::{Path, Query, State};
 use serde::Deserialize;
+use std::collections::HashMap;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
 use uuid::Uuid;
@@ -32,8 +37,23 @@ pub enum GetDocumentsResponse {
     responses(GetDocumentsResponse),
     tag = super::super::DOCUMENTS_TAG
 )]
-pub async fn get_documents(Query(query): Query<DocumentQuery>) -> GetDocumentsResponse {
-    todo!()
+pub async fn get_documents(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Query(query): Query<DocumentQuery>,
+) -> GetDocumentsResponse {
+    match st.app.document().get_all(&actor).await {
+        Ok(docs) => GetDocumentsResponse::Ok(
+            docs.iter()
+                .filter(|d| match query.category {
+                    Some(cat) => d.category() == Some(cat),
+                    None => true,
+                })
+                .map(DocumentRead::from)
+                .collect(),
+        ),
+        Err(_) => GetDocumentsResponse::InternalServerError,
+    }
 }
 
 /// by-category のクエリパラメーター。
@@ -60,9 +80,68 @@ pub enum GetDocumentsByCategoryResponse {
     tag = super::super::DOCUMENTS_TAG
 )]
 pub async fn get_documents_by_category(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Query(query): Query<DocumentsByCategoryQuery>,
 ) -> GetDocumentsByCategoryResponse {
-    todo!()
+    let Ok(by_category) = st.app.document().get_by_category(&actor).await else {
+        return GetDocumentsByCategoryResponse::InternalServerError;
+    };
+
+    // カテゴリのメタ情報。閲覧権限が無い(非管理者)場合は空とし、id のみでグルーピングする。
+    // created_at 昇順で並べたいので Vec<(Uuid, DocumentCategory)> も保持する。
+    let categories = st
+        .app
+        .document_category()
+        .get_all(&actor)
+        .await
+        .unwrap_or_default();
+    let mut ordered_category_ids: Vec<Uuid> = categories.iter().map(|c| c.id()).collect();
+    ordered_category_ids
+        .sort_by_key(|id| categories.iter().find(|c| c.id() == *id).map(|c| c.created_at()));
+    let lookup: HashMap<Uuid, DocumentCategoryRead> = categories
+        .iter()
+        .map(|c| (c.id(), DocumentCategoryRead::from(c)))
+        .collect();
+
+    let mut entries: Vec<DocumentsByCategoryEntry> = Vec::new();
+
+    // カテゴリ付きのエントリ(カテゴリ created_at 昇順)。
+    for cat_id in &ordered_category_ids {
+        if let Some(docs) = by_category.get(&Some(*cat_id)) {
+            entries.push(DocumentsByCategoryEntry {
+                category: lookup.get(cat_id).cloned(),
+                documents: docs.iter().map(DocumentRead::from).collect(),
+            });
+        } else if query.include_empty_categories.unwrap_or(false) {
+            entries.push(DocumentsByCategoryEntry {
+                category: lookup.get(cat_id).cloned(),
+                documents: Vec::new(),
+            });
+        }
+    }
+
+    // lookup に無い id を持つカテゴリ付きドキュメント(権限で解決できなかった等)。
+    for (cat_id_opt, docs) in &by_category {
+        if let Some(cat_id) = cat_id_opt {
+            if !lookup.contains_key(cat_id) {
+                entries.push(DocumentsByCategoryEntry {
+                    category: None,
+                    documents: docs.iter().map(DocumentRead::from).collect(),
+                });
+            }
+        }
+    }
+
+    // 未分類(None)は最後に。
+    if let Some(docs) = by_category.get(&None) {
+        entries.push(DocumentsByCategoryEntry {
+            category: None,
+            documents: docs.iter().map(DocumentRead::from).collect(),
+        });
+    }
+
+    GetDocumentsByCategoryResponse::Ok(entries)
 }
 
 #[http_response]
@@ -85,8 +164,28 @@ pub enum PostDocumentResponse {
     request_body = DocumentCreate,
     tag = super::super::DOCUMENTS_TAG
 )]
-pub async fn post_document(Json(body): Json<DocumentCreate>) -> PostDocumentResponse {
-    todo!()
+pub async fn post_document(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Json(body): Json<DocumentCreate>,
+) -> PostDocumentResponse {
+    match st
+        .app
+        .document()
+        .create(
+            &actor,
+            body.title,
+            body.category,
+            body.targets,
+            body.format.into(),
+        )
+        .await
+    {
+        Ok(doc) => PostDocumentResponse::Created(DocumentRead::from(&doc)),
+        Err(ApplicationOperationError::Unauthorized) => PostDocumentResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => PostDocumentResponse::UnprocessableEntity,
+        Err(_) => PostDocumentResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -107,8 +206,16 @@ pub enum GetDocumentResponse {
     responses(GetDocumentResponse),
     tag = super::super::DOCUMENTS_TAG
 )]
-pub async fn get_document(Path(path): Path<DocumentPath>) -> GetDocumentResponse {
-    todo!()
+pub async fn get_document(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<DocumentPath>,
+) -> GetDocumentResponse {
+    match st.app.document().get_by_id(&actor, path.id).await {
+        Ok(Some(doc)) => GetDocumentResponse::Ok(DocumentRead::from(&doc)),
+        Ok(None) => GetDocumentResponse::NotFound,
+        Err(_) => GetDocumentResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -135,10 +242,38 @@ pub enum PatchDocumentResponse {
     tag = super::super::DOCUMENTS_TAG
 )]
 pub async fn patch_document(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<DocumentPath>,
     Json(body): Json<DocumentUpdate>,
 ) -> PatchDocumentResponse {
-    todo!()
+    match st
+        .app
+        .document()
+        .update_document(
+            &actor,
+            path.id,
+            body.title,
+            body.category,
+            body.format.map(Into::into),
+            body.targets,
+        )
+        .await
+    {
+        Ok(()) => match st.app.document().get_by_id(&actor, path.id).await {
+            Ok(Some(doc)) => PatchDocumentResponse::Ok(DocumentRead::from(&doc)),
+            Ok(None) => PatchDocumentResponse::NotFound,
+            Err(_) => PatchDocumentResponse::InternalServerError,
+        },
+        Err(ApplicationOperationError::Unauthorized) => PatchDocumentResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchDocumentResponse::UnprocessableEntity
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchDocumentResponse::NotFound
+        }
+        Err(_) => PatchDocumentResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -161,6 +296,17 @@ pub enum DeleteDocumentResponse {
     responses(DeleteDocumentResponse),
     tag = super::super::DOCUMENTS_TAG
 )]
-pub async fn delete_document(Path(path): Path<DocumentPath>) -> DeleteDocumentResponse {
-    todo!()
+pub async fn delete_document(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<DocumentPath>,
+) -> DeleteDocumentResponse {
+    match st.app.document().delete_document(&actor, path.id).await {
+        Ok(()) => DeleteDocumentResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteDocumentResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteDocumentResponse::NotFound
+        }
+        Err(_) => DeleteDocumentResponse::InternalServerError,
+    }
 }

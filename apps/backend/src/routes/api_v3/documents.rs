@@ -5,12 +5,12 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
 pub fn router() -> OpenApiRouter<super::V3State> {
-    OpenApiRouter::new().routes(routes!(
-        handlers::get_documents,
-        handlers::get_documents_by_category,
-        handlers::post_document,
-        handlers::get_document,
-        handlers::patch_document,
-        handlers::delete_document
-    ))
+    OpenApiRouter::new()
+        .routes(routes!(handlers::get_documents, handlers::post_document))
+        .routes(routes!(handlers::get_documents_by_category))
+        .routes(routes!(
+            handlers::get_document,
+            handlers::patch_document,
+            handlers::delete_document
+        ))
 }

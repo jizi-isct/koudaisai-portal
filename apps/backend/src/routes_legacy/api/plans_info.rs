@@ -1,7 +1,5 @@
 use crate::config::Secrets;
-use crate::middlewares::CurrentUser;
 use crate::util::layers::RequireUserLayer;
-use axum::extract::Request;
 use axum::routing::{MethodRouter, any_service};
 use axum_proxy::AppendPrefix;
 use http::header::HOST;

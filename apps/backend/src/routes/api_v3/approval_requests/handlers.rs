@@ -1,6 +1,10 @@
+use super::super::V3State;
 use super::dto::{ApprovalActionBody, ApprovalRequestCreate, ApprovalRequestRead};
+use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
+use crate::domain::approval_request_id::ApprovalRequestId;
+use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
-use axum::extract::{Path, Query};
+use axum::extract::{Path, Query, State};
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
@@ -13,6 +17,8 @@ pub struct ApprovalRequestPath {
 
 #[derive(Deserialize, IntoParams)]
 pub struct ApprovalRequestQuery {
+    /// グループ絞り込み(現状はクエリ受理のみ。範囲は呼び出し元の所属グループに限定)。
+    #[allow(dead_code)]
     group_id: Option<String>,
 }
 
@@ -35,9 +41,30 @@ pub enum GetApprovalRequestsResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn get_approval_requests(
-    Query(query): Query<ApprovalRequestQuery>,
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Query(_query): Query<ApprovalRequestQuery>,
 ) -> GetApprovalRequestsResponse {
-    todo!()
+    // app に group_id 指定の use-case が無いため、group_id クエリは受理するが
+    // グループ範囲は呼び出し元の所属に限定する。
+    let result = if matches!(
+        actor,
+        crate::domain::actor_ctx::ActorContext::Admin { .. }
+    ) {
+        st.app.approval_request().get_all(&actor).await
+    } else if let Some(uid) = actor.user_id() {
+        st.app
+            .approval_request()
+            .get_by_group_members(&actor, uid)
+            .await
+    } else {
+        return GetApprovalRequestsResponse::Forbidden;
+    };
+    match result {
+        Ok(v) => GetApprovalRequestsResponse::Ok(v.iter().map(ApprovalRequestRead::from).collect()),
+        Err(ApplicationOperationError::Unauthorized) => GetApprovalRequestsResponse::Forbidden,
+        Err(_) => GetApprovalRequestsResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -61,9 +88,27 @@ pub enum PostApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn post_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Json(body): Json<ApprovalRequestCreate>,
 ) -> PostApprovalRequestResponse {
-    todo!()
+    let r#type = (&body.r#type).into();
+    match st
+        .app
+        .approval_request()
+        .create(&actor, r#type, body.issue_reason)
+        .await
+    {
+        Ok(id) => match st.app.approval_request().get_by_id(&actor, id).await {
+            Ok(Some(ar)) => PostApprovalRequestResponse::Created(ApprovalRequestRead::from(&ar)),
+            _ => PostApprovalRequestResponse::InternalServerError,
+        },
+        Err(ApplicationOperationError::Unauthorized) => PostApprovalRequestResponse::Forbidden,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostApprovalRequestResponse::UnprocessableEntity
+        }
+        Err(_) => PostApprovalRequestResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -72,6 +117,8 @@ pub enum GetApprovalRequestResponse {
     Ok(ApprovalRequestRead),
     #[response(status = NOT_FOUND, description = "Approval request not found")]
     NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
     InternalServerError,
 }
@@ -85,9 +132,21 @@ pub enum GetApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn get_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<ApprovalRequestPath>,
 ) -> GetApprovalRequestResponse {
-    todo!()
+    match st
+        .app
+        .approval_request()
+        .get_by_id(&actor, ApprovalRequestId::new(path.id))
+        .await
+    {
+        Ok(Some(ar)) => GetApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
+        Ok(None) => GetApprovalRequestResponse::NotFound,
+        Err(ApplicationOperationError::Unauthorized) => GetApprovalRequestResponse::Forbidden,
+        Err(_) => GetApprovalRequestResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -114,10 +173,25 @@ pub enum ApproveApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn approve_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<ApprovalRequestPath>,
     Json(body): Json<ApprovalActionBody>,
 ) -> ApproveApprovalRequestResponse {
-    todo!()
+    match st
+        .app
+        .approval_request()
+        .approve(&actor, ApprovalRequestId::new(path.id), body.reason)
+        .await
+    {
+        Ok(ar) => ApproveApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
+        Err(ApplicationOperationError::Unauthorized) => ApproveApprovalRequestResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            ApproveApprovalRequestResponse::NotFound
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => ApproveApprovalRequestResponse::Conflict,
+        Err(_) => ApproveApprovalRequestResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -144,10 +218,25 @@ pub enum RejectApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn reject_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<ApprovalRequestPath>,
     Json(body): Json<ApprovalActionBody>,
 ) -> RejectApprovalRequestResponse {
-    todo!()
+    match st
+        .app
+        .approval_request()
+        .reject(&actor, ApprovalRequestId::new(path.id), body.reason)
+        .await
+    {
+        Ok(ar) => RejectApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
+        Err(ApplicationOperationError::Unauthorized) => RejectApprovalRequestResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            RejectApprovalRequestResponse::NotFound
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => RejectApprovalRequestResponse::Conflict,
+        Err(_) => RejectApprovalRequestResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -173,9 +262,24 @@ pub enum CloseApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn close_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<ApprovalRequestPath>,
 ) -> CloseApprovalRequestResponse {
-    todo!()
+    let id = ApprovalRequestId::new(path.id);
+    match st.app.approval_request().close(&actor, id).await {
+        Ok(()) => match st.app.approval_request().get_by_id(&actor, id).await {
+            Ok(Some(ar)) => CloseApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
+            Ok(None) => CloseApprovalRequestResponse::NotFound,
+            _ => CloseApprovalRequestResponse::InternalServerError,
+        },
+        Err(ApplicationOperationError::Unauthorized) => CloseApprovalRequestResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            CloseApprovalRequestResponse::NotFound
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => CloseApprovalRequestResponse::Conflict,
+        Err(_) => CloseApprovalRequestResponse::InternalServerError,
+    }
 }
 
 #[http_response]
@@ -199,7 +303,21 @@ pub enum DeleteApprovalRequestResponse {
     tag = super::super::APPROVAL_REQUESTS_TAG
 )]
 pub async fn delete_approval_request(
+    State(st): State<V3State>,
+    actor: ActorContext,
     Path(path): Path<ApprovalRequestPath>,
 ) -> DeleteApprovalRequestResponse {
-    todo!()
+    match st
+        .app
+        .approval_request()
+        .delete(&actor, ApprovalRequestId::new(path.id))
+        .await
+    {
+        Ok(()) => DeleteApprovalRequestResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteApprovalRequestResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteApprovalRequestResponse::NotFound
+        }
+        Err(_) => DeleteApprovalRequestResponse::InternalServerError,
+    }
 }

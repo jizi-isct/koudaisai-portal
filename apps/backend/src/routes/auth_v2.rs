@@ -71,16 +71,17 @@ pub(crate) const AUTH_TAG: &str = "auth";
 
 /// `/auth/v2` 配下にマウントするルータ(utoipa-axum)。
 pub fn router() -> OpenApiRouter<AuthV2State> {
-    OpenApiRouter::new().routes(routes!(
-        handlers::login,
-        handlers::refresh,
-        handlers::logout,
-        handlers::logout_all,
-        handlers::activate,
-        handlers::password_change,
-        handlers::password_reset,
-        handlers::password_reset_confirm,
-        admin::admin_login,
-        admin::admin_redirect,
-    ))
+    // utoipa-axum の `routes!` は 1 呼び出し内のハンドラを単一 MethodRouter(=単一パス)へ
+    // 畳み込む。異なるパスは別々の `.routes()` 呼び出しに分ける必要がある。
+    OpenApiRouter::new()
+        .routes(routes!(handlers::login))
+        .routes(routes!(handlers::refresh))
+        .routes(routes!(handlers::logout))
+        .routes(routes!(handlers::logout_all))
+        .routes(routes!(handlers::activate))
+        .routes(routes!(handlers::password_change))
+        .routes(routes!(handlers::password_reset))
+        .routes(routes!(handlers::password_reset_confirm))
+        .routes(routes!(admin::admin_login))
+        .routes(routes!(admin::admin_redirect))
 }

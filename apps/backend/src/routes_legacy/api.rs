@@ -1,34 +1,3 @@
-mod approval_requests;
-mod document_categories;
-mod documents;
-mod files;
-mod forms;
-mod groups;
-mod notifications;
-mod plans_info;
-mod users;
-mod util;
-
-use crate::config::Secrets;
-use crate::routes_legacy::AppState;
-use axum::Router;
-use std::sync::Arc;
-use tracing::instrument;
-
-#[instrument(name = "init /api")]
-pub fn init_router(secrets: Secrets) -> Router<Arc<AppState>> {
-    Router::new()
-        .nest("/v2/forms", forms::init_router())
-        .nest("/v2/documents", documents::init_router())
-        .nest(
-            "/v2/document-categories",
-            document_categories::init_router(),
-        )
-        .nest("/v2/files", files::init_router())
-        .nest("/v2/users", users::init_router())
-        .nest("/v2/notifications", notifications::init_router())
-        .nest("/v2/util", util::init_router())
-        .nest("/v2/approval-requests", approval_requests::init_router())
-        .nest("/v2/groups", groups::init_router())
-        .nest_service("/plans_info", plans_info::init_service(secrets))
-}
+// 旧 `/api/v2/*` ハンドラは `api_v3` へ移行済みのため撤去した。
+// 移行先の無い `plans_info`(外部 API プロキシ)のみを残す。
+pub mod plans_info;

@@ -2,7 +2,7 @@ use crate::application::authz;
 use crate::application::authz::CanGetByIdError;
 use crate::application::error::{
     ApplicationOperationError, ApplicationSequentialOperationError, DeleteError, FindError,
-    InsertError,
+    InsertError, UpdateError,
 };
 use crate::application::ports::clock::Clock;
 use crate::application::ports::repositories::group_repo::GroupRepo;
@@ -207,5 +207,145 @@ impl<'a, Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRep
         tx.commit().await?;
 
         Ok(())
+    }
+
+    /// 役職スロットのメンバーを単一トランザクションで置換します（空席化＋追加を原子的に）．
+    /// 既存メンバーが居れば置換、空席なら新規追加とみなし `was_replace` を返します．
+    /// 追加後の集合がグループ種別に対して構造的に妥当かを検証してから保存します．
+    pub async fn replace_member(
+        &self,
+        actor_ctx: &ActorContext,
+        mut tx: Tx,
+        group_id: GroupId,
+        user_id: UserId,
+        role: Role,
+    ) -> Result<bool, ApplicationSequentialOperationError<InsertError>> {
+        // auth
+        if !authz::can_manage_group_members(actor_ctx) {
+            return Err(ApplicationSequentialOperationError::Unauthorized);
+        }
+
+        // グループの存在確認と種別の取得
+        let Some(group) = self
+            .group_repo
+            .find_by_id(group_id)
+            .await
+            .map_err(|e| ApplicationSequentialOperationError::InternalError(e.into()))?
+        else {
+            return Err(ApplicationSequentialOperationError::InvalidInput(
+                "group not found".to_string(),
+            ));
+        };
+
+        // 追加対象ユーザーの存在確認
+        if self
+            .user_repo
+            .find_by_id(user_id)
+            .await
+            .map_err(|e| ApplicationSequentialOperationError::InternalError(e.into()))?
+            .is_none()
+        {
+            return Err(ApplicationSequentialOperationError::InvalidInput(
+                "user not found".to_string(),
+            ));
+        }
+
+        // 既存スロットの占有者を特定し、置換後の集合(旧スロットを除外して新メンバーを追加)を検証
+        let members = self
+            .membership_repo
+            .find_by_group_id(group_id)
+            .await
+            .map_err(|e| ApplicationSequentialOperationError::InternalError(e.into()))?;
+        let existing_at_role = members.iter().find(|m| m.role() == role).cloned();
+        let was_replace = existing_at_role.is_some();
+
+        let membership = Membership::new(group_id, user_id, role, self.clock);
+        let mut post: Vec<Membership> = members.into_iter().filter(|m| m.role() != role).collect();
+        post.push(membership.clone());
+        if let Err(FactoryError::InvalidInput(mes)) =
+            Membership::validate_set(*group.r#type(), &post)
+        {
+            return Err(ApplicationSequentialOperationError::InvalidInput(mes));
+        }
+
+        // 空席化 → 追加 を 1 トランザクションで実行（途中失敗で空席のまま残さない）
+        tx.begin().await?;
+        if let Some(existing) = existing_at_role {
+            self.membership_repo
+                .delete_in(&mut tx, existing)
+                .await
+                .map_err(|e| ApplicationSequentialOperationError::InternalError(e.into()))?;
+        }
+        self.membership_repo.insert_in(&mut tx, membership).await?;
+        tx.commit().await?;
+
+        Ok(was_replace)
+    }
+
+    /// グループ名を変更します．
+    pub async fn rename_group(
+        &self,
+        actor_ctx: &ActorContext,
+        group_id: GroupId,
+        new_name: String,
+    ) -> Result<Group, ApplicationOperationError<UpdateError>> {
+        // auth
+        if !authz::can_update_group(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        let Some(mut group) = self
+            .group_repo
+            .find_by_id(group_id)
+            .await
+            .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
+        else {
+            return Err(ApplicationOperationError::OperationFailed(
+                UpdateError::NotFound,
+            ));
+        };
+
+        if let Err(FactoryError::InvalidInput(mes)) = group.rename(new_name, self.clock) {
+            return Err(ApplicationOperationError::InvalidInput(mes));
+        }
+
+        self.group_repo.update(group.clone()).await?;
+        Ok(group)
+    }
+
+    /// グループを削除します（所属メンバーは DB の外部キー連鎖で削除されます）．
+    pub async fn delete_group(
+        &self,
+        actor_ctx: &ActorContext,
+        group_id: GroupId,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        // auth
+        if !authz::can_delete_group(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        self.group_repo.delete(group_id).await?;
+        Ok(())
+    }
+
+    /// グループのメンバー一覧を取得します．グループが存在しない、または
+    /// 取得権限が無く存在を秘匿すべき場合は `None` を返します．
+    pub async fn get_members(
+        &self,
+        actor_ctx: &ActorContext,
+        group_id: GroupId,
+    ) -> Result<Option<Vec<Membership>>, ApplicationOperationError<FindError>> {
+        // グループの存在確認
+        let Some(_group) = self.group_repo.find_by_id(group_id).await? else {
+            return Ok(None);
+        };
+
+        let members = self.membership_repo.find_by_group_id(group_id).await?;
+
+        match authz::can_get_group_by_id(actor_ctx, &members) {
+            Ok(()) => Ok(Some(members)),
+            Err(CanGetByIdError::NotFound) => Ok(None),
+            Err(CanGetByIdError::Unauthorized) => Err(ApplicationOperationError::Unauthorized),
+        }
     }
 }

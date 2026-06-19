@@ -1,3 +1,4 @@
+use crate::application::ports::meta_fetcher::PageMeta;
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -6,4 +7,13 @@ use utoipa::ToSchema;
 pub struct MetaInfo {
     title: Option<String>,
     description: Option<String>,
+}
+
+impl From<PageMeta> for MetaInfo {
+    fn from(pm: PageMeta) -> Self {
+        MetaInfo {
+            title: pm.title,
+            description: pm.description,
+        }
+    }
 }

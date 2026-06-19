@@ -9,7 +9,6 @@ pub(crate) mod jwt;
 pub mod layers;
 pub mod oidc;
 pub mod secrets;
-pub mod sha;
 
 pub struct AppError(anyhow::Error);
 

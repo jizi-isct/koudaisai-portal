@@ -1,3 +1,4 @@
+use crate::domain::form::{Form, FormType as DomainFormType};
 use crate::domain::target_specifier::TargetSpecifier;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -8,6 +9,26 @@ use uuid::Uuid;
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum FormType {
     External { form_url: String },
+}
+
+impl From<&DomainFormType> for FormType {
+    fn from(t: &DomainFormType) -> Self {
+        match t {
+            DomainFormType::TypeExternal { form_url } => FormType::External {
+                form_url: form_url.clone(),
+            },
+        }
+    }
+}
+
+impl From<&FormType> for DomainFormType {
+    fn from(t: &FormType) -> Self {
+        match t {
+            FormType::External { form_url } => DomainFormType::TypeExternal {
+                form_url: form_url.clone(),
+            },
+        }
+    }
 }
 
 #[derive(Serialize, ToSchema)]
@@ -25,26 +46,42 @@ pub struct FormRead {
     r#type: FormType,
 }
 
+impl From<&Form> for FormRead {
+    fn from(f: &Form) -> Self {
+        FormRead {
+            id: f.id().as_uuid(),
+            created_at: f.created_at(),
+            updated_at: f.updated_at(),
+            created_by: Some(f.created_by()),
+            targets: f.targets().clone(),
+            name: f.name().to_string(),
+            summary: f.summary().to_string(),
+            due_date: f.due_date(),
+            r#type: f.r#type().into(),
+        }
+    }
+}
+
 #[derive(Deserialize, ToSchema)]
 pub struct FormCreate {
     #[schema(value_type = Vec<String>)]
-    targets: Vec<TargetSpecifier>,
-    name: String,
-    summary: String,
-    due_date: DateTime<Utc>,
+    pub targets: Vec<TargetSpecifier>,
+    pub name: String,
+    pub summary: String,
+    pub due_date: DateTime<Utc>,
     #[serde(flatten)]
-    r#type: FormType,
+    pub r#type: FormType,
 }
 
 #[derive(Deserialize, ToSchema)]
 pub struct FormUpdate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>)]
-    targets: Option<Vec<TargetSpecifier>>,
+    pub targets: Option<Vec<TargetSpecifier>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    pub name: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    summary: Option<String>,
+    pub summary: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    due_date: Option<DateTime<Utc>>,
+    pub due_date: Option<DateTime<Utc>>,
 }

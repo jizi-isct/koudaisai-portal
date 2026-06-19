@@ -10,6 +10,8 @@ use crate::domain::admin_id::AdminId;
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
 use crate::domain::target_specifier::TargetSpecifier;
+use crate::domain::user_id::UserId;
+use std::collections::HashSet;
 use std::marker::PhantomData;
 
 pub struct NotificationApp<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> {
@@ -138,6 +140,70 @@ impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a
 
         self.notification_repo.delete(id).await?;
         Ok(())
+    }
+
+    /// 対象ユーザー(`target_user_id`)宛ての通知を、そのユーザーの既読状態付きで返す
+    /// (`GET /users/{id}/notifications`)。新しい順にソートする。
+    ///
+    /// `target_ctx` は対象ユーザーの認可コンテキスト(`build_actor_context` の結果)。
+    /// 所属グループが無い等で構築できない場合は `None` を渡す(その場合は
+    /// 自分宛て(`UserId`)と全員宛て(`UserNologin`)のみが対象)。
+    /// 閲覧権限(caller)は管理者(notification:read)または本人のみ。
+    pub async fn get_for_user(
+        &self,
+        caller_ctx: &ActorContext,
+        target_user_id: UserId,
+        target_ctx: Option<&ActorContext>,
+    ) -> Result<Vec<(Notification, bool)>, ApplicationOperationError<FindError>> {
+        if !authz::can_get_user_notifications(caller_ctx, target_user_id) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        let read_ids: HashSet<NotificationId> = self
+            .notification_repo
+            .find_read_ids_by_user(target_user_id)
+            .await?
+            .into_iter()
+            .collect();
+
+        let mut notifications: Vec<Notification> = self
+            .notification_repo
+            .find_all()
+            .await?
+            .into_iter()
+            .filter(|n| {
+                n.targets()
+                    .iter()
+                    .any(|t| target_matches(t, target_user_id, target_ctx))
+            })
+            .collect();
+        // 新しい順(created_at 降順)。
+        notifications.sort_by(|a, b| b.created_at().cmp(a.created_at()));
+
+        Ok(notifications
+            .into_iter()
+            .map(|n| {
+                let is_read = read_ids.contains(&n.id());
+                (n, is_read)
+            })
+            .collect())
+    }
+}
+
+/// 通知のターゲットが対象ユーザーにマッチするか。
+/// `target_ctx` があればドメインの照合(`does_actor_match`)を用い、無ければ
+/// 自分宛て(`UserId`)・全員宛て(`UserNologin`)のみマッチとみなす。
+fn target_matches(
+    target: &TargetSpecifier,
+    target_user_id: UserId,
+    target_ctx: Option<&ActorContext>,
+) -> bool {
+    match target_ctx {
+        Some(ctx) => target.does_actor_match(ctx),
+        None => matches!(
+            target,
+            TargetSpecifier::UserNologin
+        ) || matches!(target, TargetSpecifier::UserId(u) if *u == target_user_id),
     }
 }
 

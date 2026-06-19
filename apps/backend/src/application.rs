@@ -4,6 +4,7 @@ use crate::application::ports::discord::Discord;
 use crate::application::ports::password_hasher::PasswordHasher;
 use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::ports::email::Email;
+use crate::application::ports::meta_fetcher::MetaFetcher;
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::document_category_repo::DocumentCategoryRepo;
@@ -11,6 +12,7 @@ use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::application::ports::repositories::form_repo::FormRepo;
 use crate::application::ports::repositories::group_repo::GroupRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
+use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
@@ -30,6 +32,7 @@ pub mod error;
 pub mod file;
 pub mod form;
 pub mod group;
+pub mod meta;
 pub mod notification;
 pub mod ports;
 pub mod transaction;
@@ -53,6 +56,8 @@ pub struct Application<
     PH: PasswordHasher,
     SG: SecretGenerator,
     ATI: AccessTokenIssuer,
+    NR: NotificationRepo<Tx>,
+    MF: MetaFetcher,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -71,6 +76,8 @@ pub struct Application<
     password_hasher: PH,
     secret_generator: SG,
     access_token_issuer: ATI,
+    notification_repo: NR,
+    meta_fetcher: MF,
     /// 通知の本文などで使う公開ベース URL(例: `https://portal.koudaisai.jp`)。
     base_url: String,
 }
@@ -93,7 +100,9 @@ impl<
     PH: PasswordHasher,
     SG: SecretGenerator,
     ATI: AccessTokenIssuer,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI>
+    NR: NotificationRepo<Tx>,
+    MF: MetaFetcher,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF>
 {
     pub fn new(
         approval_request_repo: AR,
@@ -112,6 +121,8 @@ impl<
         password_hasher: PH,
         secret_generator: SG,
         access_token_issuer: ATI,
+        notification_repo: NR,
+        meta_fetcher: MF,
         base_url: String,
     ) -> Self {
         Self {
@@ -132,6 +143,8 @@ impl<
             password_hasher,
             secret_generator,
             access_token_issuer,
+            notification_repo,
+            meta_fetcher,
             base_url,
         }
     }
@@ -177,6 +190,14 @@ impl<
 
     pub fn file(&'_ self) -> file::FileApp<'_, OS> {
         file::FileApp::new(&self.object_storage)
+    }
+
+    pub fn notification(&'_ self) -> notification::NotificationApp<'_, Tx, NR, C> {
+        notification::NotificationApp::new(&self.notification_repo, &self.clock)
+    }
+
+    pub fn meta(&'_ self) -> meta::MetaApp<'_, MF> {
+        meta::MetaApp::new(&self.meta_fetcher)
     }
 
     /// 認証ユースケース。`config` と定数時間ログイン用ダミー PHC は
