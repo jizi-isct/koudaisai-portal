@@ -37,6 +37,27 @@ const MINOR_VERSION: u32 = pkg_version_minor!();
 const PATCH_VERSION: u32 = pkg_version_patch!();
 #[tokio::main]
 async fn main() {
+    // OpenAPI スキーマのダンプ(クライアント型生成用)。config/DB を要さず stdout へ JSON を出す。
+    //   cargo run -- --dump-openapi=api_v3 > docs/api/api_v3/openapi.json
+    //   cargo run -- --dump-openapi=auth_v2 > docs/api/auth_v2/openapi.json
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(which) = args.iter().find_map(|a| a.strip_prefix("--dump-openapi=")) {
+        let (title, mut openapi) = match which {
+            "api_v3" => ("Koudaisai Portal API v3", routes::api_v3::router().split_for_parts().1),
+            "auth_v2" => ("Koudaisai Portal Auth v2", routes::auth_v2::router().split_for_parts().1),
+            other => {
+                eprintln!("unknown schema '{other}' (expected api_v3 | auth_v2)");
+                std::process::exit(2);
+            }
+        };
+        openapi.info = utoipa::openapi::Info::new(title, env!("CARGO_PKG_VERSION"));
+        println!(
+            "{}",
+            openapi.to_pretty_json().expect("serialize openapi as json")
+        );
+        return;
+    }
+
     //初期化
     let config = init_config().unwrap();
     init_logging(config.logging);

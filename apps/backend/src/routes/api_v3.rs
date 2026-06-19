@@ -21,11 +21,34 @@ const USERS_TAG: &str = "users";
 const UTIL_TAG: &str = "util";
 
 /// api_v3 全体で共有する State。auth_v2 と同じ `AuthV2State` を使う
-/// (`Actor` 抽出子が `FromRequestParts<AuthV2State>` のため)。
+/// (`ActorContext` 抽出子が `FromRequestParts<AuthV2State>` のため)。
 pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
 
+/// レスポンス DTO のスキーマ登録用ベースドキュメント。
+/// `#[http_response]` マクロは `$ref` を吐くが components へスキーマを登録しないため、
+/// レスポンス系 DTO をここで明示的に列挙して OpenApi の components に載せる
+/// (utoipa が入れ子の依存スキーマも再帰的に収集する)。
+#[derive(utoipa::OpenApi)]
+#[openapi(components(schemas(
+    groups::GroupRead,
+    groups::MemberRead,
+    users::UserRead,
+    users::UserCreated,
+    users::MAddressUpdated,
+    forms::FormRead,
+    documents::DocumentRead,
+    documents::DocumentsByCategoryEntry,
+    document_categories::DocumentCategoryRead,
+    notifications::NotificationRead,
+    approval_requests::ApprovalRequestRead,
+    files::FileUploadResponse,
+    files::FileDownloadResponse,
+    util::MetaInfo,
+)))]
+struct ApiV3Schemas;
+
 pub fn router() -> OpenApiRouter<V3State> {
-    OpenApiRouter::new()
+    OpenApiRouter::with_openapi(<ApiV3Schemas as utoipa::OpenApi>::openapi())
         .nest("/users", users::router())
         .nest("/groups", groups::router())
         .nest("/notifications", notifications::router())

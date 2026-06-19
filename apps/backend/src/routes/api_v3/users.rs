@@ -1,6 +1,8 @@
 mod dto;
 mod handlers;
 
+pub(super) use dto::{MAddressUpdated, UserCreated, UserRead};
+
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 

@@ -1,6 +1,8 @@
 mod dto;
 mod handlers;
 
+pub(super) use dto::FormRead;
+
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
