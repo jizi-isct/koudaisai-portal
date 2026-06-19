@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO document_categories (id, created_at, updated_at, title, emoji) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "46a816d257c78f6d44ba3e14815d843f9a70ec8f6dc5a304ef926dc1b8cf4891"
+}

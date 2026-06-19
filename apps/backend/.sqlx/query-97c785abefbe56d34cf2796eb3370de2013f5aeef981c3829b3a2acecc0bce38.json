@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE notifications SET created_at = ?, updated_at = ?, created_by = ?, updated_by = ?, targets = ?, type = ?, approval_request_id = ?, title = ?, content = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "97c785abefbe56d34cf2796eb3370de2013f5aeef981c3829b3a2acecc0bce38"
+}

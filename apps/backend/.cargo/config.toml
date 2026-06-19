@@ -1,0 +1,9 @@
+# sqlx の query!/query_as! マクロをオフライン(コミット済みの .sqlx キャッシュ)で検査する。
+# これにより通常のビルド・CI はライブ DB なしで動作する。
+#
+# クエリを追加・変更したらキャッシュを再生成すること:
+#   1. ローカル DB を用意:  sqlite3 koudaisai-portal.db < migrations/20260527042623_init.sql
+#   2. 再生成:              DATABASE_URL="sqlite://$PWD/koudaisai-portal.db" cargo sqlx prepare -- --lib
+#   3. .sqlx/ の差分をコミット
+[env]
+SQLX_OFFLINE = "true"

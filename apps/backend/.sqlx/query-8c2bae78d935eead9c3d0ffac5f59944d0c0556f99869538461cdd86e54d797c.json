@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, name, m_address, status,\n                      password_phc, password_changed_at, deactivated_at, deactivation_reason\n               FROM users WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "m_address",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "status",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "password_phc",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "password_changed_at",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "deactivated_at",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "deactivation_reason",
+        "ordinal": 9,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "8c2bae78d935eead9c3d0ffac5f59944d0c0556f99869538461cdd86e54d797c"
+}

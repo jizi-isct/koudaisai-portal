@@ -35,6 +35,7 @@ pub fn test_from_group_type(_path: &Path, contents: String) -> datatest_stable::
         },
         "lab_project" => GroupType::LabProject {
             representative: u(),
+            operator: u(),
         },
         "stage_project" => GroupType::StageProject {
             representative1: u(),

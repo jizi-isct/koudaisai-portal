@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO forms (id, created_at, updated_at, created_by, updated_by, targets, name, summary, due_date, type, form_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "461a6dccf1b484af3ebbd849ded098e1ca1d021b2c3ffe5939b2e29cfb7441f3"
+}

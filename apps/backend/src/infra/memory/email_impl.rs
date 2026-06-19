@@ -1,7 +1,6 @@
 use crate::application::error::ApplicationError;
 use crate::application::ports::email::Email;
 use crate::domain::email_address::EmailAddress;
-use crate::domain::error::DomainError;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use std::sync::{Arc, RwLock};

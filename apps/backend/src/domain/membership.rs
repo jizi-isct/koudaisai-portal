@@ -2,7 +2,6 @@ use crate::application::ports::clock::Clock;
 use crate::domain::group::GroupType;
 use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
-use serde::Serialize;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Membership {
@@ -11,7 +10,7 @@ pub struct Membership {
 }
 
 impl Membership {
-    pub fn new(group_id: GroupId, user_id: UserId, clock: &dyn Clock) -> Self {
+    pub fn new(group_id: GroupId, user_id: UserId, _clock: &dyn Clock) -> Self {
         Self { user_id, group_id }
     }
 
@@ -46,8 +45,18 @@ impl Membership {
                     Membership::new(group_id, *representative3, clock),
                 ]
             }
-            GroupType::LabProject { representative } => {
-                vec![Membership::new(group_id, *representative, clock)]
+            GroupType::LabProject {
+                representative,
+                operator,
+            } => {
+                if operator == representative {
+                    vec![Membership::new(group_id, *operator, clock)]
+                } else {
+                    vec![
+                        Membership::new(group_id, *representative, clock),
+                        Membership::new(group_id, *operator, clock),
+                    ]
+                }
             }
             GroupType::StageProject {
                 representative1,

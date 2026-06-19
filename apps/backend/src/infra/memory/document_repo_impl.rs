@@ -1,7 +1,6 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::document_repo::DocumentRepo;
 use crate::domain::document::Document;
-use crate::domain::target_specifier::TargetSpecifier;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use anyhow::anyhow;
 use async_trait::async_trait;

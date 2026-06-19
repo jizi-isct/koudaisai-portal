@@ -1,26 +1,29 @@
-use crate::config::{Db, Logging, init_config};
+// TODO(sqlx移行): Db 設定型は init_db 復活時に再度 import する
+use crate::config::{Logging, init_config};
 use crate::routes::init_routes;
 use crate::service::discord::Discord;
 use crate::util::oidc::OIDCClient;
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::config::Credentials;
-use migration::{Migrator, MigratorTrait};
+// TODO(sqlx移行): sea-orm の Migrator/Database はsqlx移行で application 層へ再配線する
+// use migration::{Migrator, MigratorTrait};
 use openidconnect::core::{CoreClient, CoreProviderMetadata};
 use openidconnect::{ClientId, ClientSecret, IssuerUrl, RedirectUrl};
 use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
-use sea_orm::{Database, DatabaseConnection, DbErr};
-use tracing::{debug, info, instrument};
+// use sea_orm::{Database, DatabaseConnection, DbErr};
+use tracing::{info, instrument};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
 pub(crate) mod application;
 pub mod config;
 pub(crate) mod domain;
-pub mod entities;
+// TODO(sqlx移行): entities/sea_orm_entities 層は撤去。DBアクセスは application 層へ再配線
+// pub mod entities;
 mod infra;
 pub mod middlewares;
 mod routes;
-pub mod sea_orm_entities;
+// pub mod sea_orm_entities;
 mod service;
 pub mod util;
 
@@ -55,12 +58,12 @@ async fn main() {
     .await;
 
     //app init
-    let db = init_db(&config.db).await.unwrap();
+    // TODO(sqlx移行): DB接続初期化は application 層(sqlx)へ再配線する
+    // let db = init_db(&config.db).await.unwrap();
     let discord = Discord::new(&config.discord.approval_request_url);
     let app = init_routes(
         &config.web,
         config.sendgrid,
-        db,
         oidc_client,
         s3_client,
         config.s3.bucket.clone(),
@@ -102,13 +105,14 @@ async fn init_oidc(
     client
 }
 
-#[instrument(skip(db))]
-pub async fn init_db(db: &Db) -> Result<DatabaseConnection, DbErr> {
-    debug!("Initializing database connection");
-    let db_conn = Database::connect(&db.address).await?;
-    Migrator::up(&db_conn, None).await?;
-    Ok(db_conn)
-}
+// TODO(sqlx移行): DB接続初期化(Migrator実行含む)は application 層(sqlx)へ再配線する
+// #[instrument(skip(db))]
+// pub async fn init_db(db: &Db) -> Result<DatabaseConnection, DbErr> {
+//     debug!("Initializing database connection");
+//     let db_conn = Database::connect(&db.address).await?;
+//     Migrator::up(&db_conn, None).await?;
+//     Ok(db_conn)
+// }
 
 pub fn init_logging(logging: Logging) {
     if logging.json {

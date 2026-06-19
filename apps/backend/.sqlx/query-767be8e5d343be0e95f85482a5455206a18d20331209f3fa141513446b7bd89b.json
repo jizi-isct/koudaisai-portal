@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, created_by, updated_by, title,\n                      category, targets, format, content, file_key, file_name\n               FROM documents WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_by",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_by",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "category",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "targets",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "format",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "content",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_key",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_name",
+        "ordinal": 11,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "767be8e5d343be0e95f85482a5455206a18d20331209f3fa141513446b7bd89b"
+}

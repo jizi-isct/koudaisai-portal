@@ -1,6 +1,5 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::user_repo::UserRepo;
-use crate::application::transaction::Transaction;
 use crate::domain::email_address::EmailAddress;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;

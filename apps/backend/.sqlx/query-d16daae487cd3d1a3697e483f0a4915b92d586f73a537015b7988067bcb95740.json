@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE documents SET created_at = ?, updated_at = ?, created_by = ?, updated_by = ?, title = ?, category = ?, targets = ?, format = ?, content = ?, file_key = ?, file_name = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 12
+    },
+    "nullable": []
+  },
+  "hash": "d16daae487cd3d1a3697e483f0a4915b92d586f73a537015b7988067bcb95740"
+}

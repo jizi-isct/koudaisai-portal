@@ -1,4 +1,5 @@
-use crate::entities::user::UserRead;
+// TODO(sqlx移行): UserRead の取得は application 層(sqlx)へ再配線する
+// use crate::entities::user::UserRead;
 use crate::routes::AppState;
 use crate::util::jwt;
 use axum::extract::{Request, State};
@@ -96,22 +97,23 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
             }
         };
         // ユーザー情報取得
-        let user = match UserRead::find_from_id(token.claims.sub, &state.db_conn).await {
-            Ok(Some(user)) => user,
-            Ok(None) => {
-                warn!("Authorization error: user not found for token");
-                return StatusCode::UNAUTHORIZED.into_response();
-            }
-            Err(err) => {
-                warn!("Authorization error: database error {:?}", err);
-                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-            }
-        };
+        // TODO(sqlx移行): user/membership 取得を application 層(sqlx)へ再配線する。
+        // 取得した user から ActorContext を組み立てる処理は再配線時に復活させる。
+        // let user = match UserRead::find_from_id(token.claims.sub, &state.db_conn).await {
+        //     Ok(Some(user)) => user,
+        //     Ok(None) => {
+        //         warn!("Authorization error: user not found for token");
+        //         return StatusCode::UNAUTHORIZED.into_response();
+        //     }
+        //     Err(err) => {
+        //         warn!("Authorization error: database error {:?}", err);
+        //         return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        //     }
+        // };
 
-        if state
-            .jwt_manager
-            .is_access_token_valid(&token.claims, &user)
-        {
+        // TODO(sqlx移行): user(UserRead) を用いた password_updated_at 検証を復活させる。
+        // 現状は JWT デコード結果(typ/exp)のみで検証するスタブ。
+        if state.jwt_manager.is_access_token_valid(&token.claims) {
             req.extensions_mut().insert(CurrentUser::User(token.claims));
             next.run(req).await
         } else {

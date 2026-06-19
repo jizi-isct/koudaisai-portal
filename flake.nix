@@ -22,6 +22,7 @@
             rustfmt
             clippy
             cargo-watch
+            sqlx-cli
 
             # Node.js
             nodejs_25
