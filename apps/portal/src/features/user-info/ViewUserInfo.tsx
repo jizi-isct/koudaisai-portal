@@ -1,4 +1,9 @@
-import type { GroupRead, UserRead } from '@koudaisai/shared-types';
+import type {
+  GroupRead,
+  MemberRead,
+  Role,
+  UserRead,
+} from '@koudaisai/shared-types';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useEffect, useState } from 'react';
 import { api } from '@/features/api/api';
@@ -7,21 +12,14 @@ import { UserInfoCard } from './UserInfoCard';
 export function ViewUserInfo() {
   const [user, setUser] = useState<UserRead | null>(null);
   const [group, setGroup] = useState<GroupRead | null>(null);
+  const [role, setRole] = useState<Role | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data: user, error: userError } = await api.GET(
-        '/users/{user_id}',
-        {
-          params: {
-            path: {
-              user_id: 'me',
-            },
-          },
-        },
-      );
+      // 現在のユーザーと所属団体は me / us エイリアスで取得する。
+      const { data: user, error: userError } = await api.GET('/users/me');
 
       if (userError || !user) {
         setError(
@@ -31,13 +29,7 @@ export function ViewUserInfo() {
         return;
       }
 
-      const { data: group, error: groupError } = await api.GET('/groups/{id}', {
-        params: {
-          path: {
-            id: user.group_id,
-          },
-        },
-      });
+      const { data: group, error: groupError } = await api.GET('/groups/us');
 
       if (groupError || !group) {
         setError(
@@ -46,6 +38,14 @@ export function ViewUserInfo() {
         setIsLoading(false);
         return;
       }
+
+      // 団体内での役割(第N責任者/代表者など)はメンバー一覧から自分を引く。
+      const { data: members } = await api.GET('/groups/{id}/members', {
+        params: { path: { id: group.id } },
+      });
+      setRole(
+        members?.find((m: MemberRead) => m.user_id === user.id)?.role,
+      );
 
       setUser(user);
       setGroup(group);
@@ -68,5 +68,5 @@ export function ViewUserInfo() {
     return null;
   }
 
-  return <UserInfoCard user={user} group={group} />;
+  return <UserInfoCard user={user} group={group} role={role} />;
 }
