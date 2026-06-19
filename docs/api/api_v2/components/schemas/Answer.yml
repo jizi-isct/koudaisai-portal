@@ -1,8 +1,0 @@
-description: 質問に対する回答
-type: object
-oneOf:
-  - allOf:
-      - $ref: ./AnswerGeneric.yml
-      - properties:
-          answer_text:
-            $ref: ./AnswerText.yml

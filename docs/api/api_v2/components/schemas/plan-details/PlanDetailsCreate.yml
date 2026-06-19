@@ -1,8 +1,0 @@
-type: object
-properties:
-  product:
-    $ref: 'products/ProductsCreate.yml'
-  additional_info:
-    type: string
-    nullable: true
-    description: 追加情報（マークダウン形式）
