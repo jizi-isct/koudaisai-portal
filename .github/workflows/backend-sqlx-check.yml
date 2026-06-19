@@ -57,5 +57,5 @@ jobs:
         env:
           DATABASE_URL: sqlite://sqlx-ci.db
           # .cargo/config.toml の SQLX_OFFLINE=true を上書きし、実DBに当てて検証する
-          SQLX_OFFLINE: "false"
+          SQLX_OFFLINE: 'false'
         run: cargo sqlx prepare --check -- --lib

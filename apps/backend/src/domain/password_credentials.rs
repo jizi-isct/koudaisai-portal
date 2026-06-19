@@ -36,6 +36,12 @@ impl PasswordCredentials {
         self.changed_at = clock.now();
         Ok(())
     }
+
+    /// ハッシュの透過昇格。argon2 パラメータ更新などで内部的に PHC を差し替える。
+    /// ユーザー操作ではないため `changed_at` は更新しない。
+    pub fn rehash(&mut self, new_phc: String) {
+        self.phc = new_phc;
+    }
 }
 
 #[cfg(test)]

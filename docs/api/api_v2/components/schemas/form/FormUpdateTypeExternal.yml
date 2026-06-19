@@ -1,7 +1,0 @@
-description: External form type
-type: object
-properties:
-  form_url:
-    type: string
-    format: uri
-    description: URL of the external form

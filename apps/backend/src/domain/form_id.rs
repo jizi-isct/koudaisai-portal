@@ -8,6 +8,16 @@ impl FormId {
     pub fn new(id: Uuid) -> Self {
         Self(id)
     }
+
+    pub fn as_uuid(&self) -> Uuid {
+        self.0
+    }
+}
+
+impl From<FormId> for Uuid {
+    fn from(id: FormId) -> Self {
+        id.0
+    }
 }
 
 impl Display for FormId {

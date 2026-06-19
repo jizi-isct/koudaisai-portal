@@ -21,12 +21,12 @@ use std::str::FromStr;
 use uuid::Uuid;
 
 fn matches_result(result: &Result<(), CanGetByIdError>, expected: &str) -> bool {
-    match (result, expected) {
-        (Ok(()), "ok") => true,
-        (Err(CanGetByIdError::Unauthorized), "unauthorized") => true,
-        (Err(CanGetByIdError::NotFound), "not_found") => true,
-        _ => false,
-    }
+    matches!(
+        (result, expected),
+        (Ok(()), "ok")
+            | (Err(CanGetByIdError::Unauthorized), "unauthorized")
+            | (Err(CanGetByIdError::NotFound), "not_found")
+    )
 }
 
 fn make_request(issued_by: UserId) -> ApprovalRequest {
@@ -335,6 +335,7 @@ pub fn test_can_close_approval_request(
                 (
                     issuer_uid,
                     ActorContext::User {
+                        name: "テストユーザー".to_string(),
                         user_id: issuer_uid,
                         memberships,
                         group_type: gt,

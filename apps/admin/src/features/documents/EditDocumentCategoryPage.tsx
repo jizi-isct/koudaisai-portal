@@ -53,16 +53,16 @@ function EditDocumentCategoryForm({ categoryId }: { categoryId: string }) {
     isLoading,
     error,
     refetch,
-  } = $api.useQuery('get', '/document-categories/{category_id}', {
+  } = $api.useQuery('get', '/document-categories/{id}', {
     params: {
       path: {
-        category_id: categoryId,
+        id: categoryId,
       },
     },
   });
   const { mutateAsync: mutateDocumentCategoryUpdate } = $api.useMutation(
     'patch',
-    '/document-categories/{category_id}',
+    '/document-categories/{id}',
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -92,7 +92,7 @@ function EditDocumentCategoryForm({ categoryId }: { categoryId: string }) {
       await mutateDocumentCategoryUpdate({
         params: {
           path: {
-            category_id: categoryId,
+            id: categoryId,
           },
         },
         body: {

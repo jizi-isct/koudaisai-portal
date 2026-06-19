@@ -12,6 +12,12 @@ pub struct MemoryMembershipRepo {
     memberships: Arc<RwLock<Vec<Membership>>>,
 }
 
+impl Default for MemoryMembershipRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryMembershipRepo {
     pub fn new() -> Self {
         Self {
@@ -53,7 +59,7 @@ impl MembershipRepo<MemoryTransaction> for MemoryMembershipRepo {
             .map_err(|e| InsertError::InternalError(anyhow!(e.to_string())))?;
         if memberships
             .iter()
-            .any(|m| m.user_id() == membership.user_id() && m.group_id() == membership.group_id())
+            .any(|m| m.group_id() == membership.group_id() && m.role() == membership.role())
         {
             return Err(InsertError::Conflict);
         }
@@ -76,7 +82,7 @@ impl MembershipRepo<MemoryTransaction> for MemoryMembershipRepo {
             .map_err(|e| UpdateError::InternalError(anyhow!(e.to_string())))?;
         if let Some(m) = memberships
             .iter_mut()
-            .find(|m| m.user_id() == membership.user_id() && m.group_id() == membership.group_id())
+            .find(|m| m.group_id() == membership.group_id() && m.role() == membership.role())
         {
             *m = membership;
             Ok(())
@@ -99,9 +105,8 @@ impl MembershipRepo<MemoryTransaction> for MemoryMembershipRepo {
             .write()
             .map_err(|e| DeleteError::InternalError(anyhow!(e.to_string())))?;
         let len_before = memberships.len();
-        memberships.retain(|m| {
-            !(m.user_id() == membership.user_id() && m.group_id() == membership.group_id())
-        });
+        memberships
+            .retain(|m| !(m.group_id() == membership.group_id() && m.role() == membership.role()));
         if memberships.len() < len_before {
             Ok(())
         } else {

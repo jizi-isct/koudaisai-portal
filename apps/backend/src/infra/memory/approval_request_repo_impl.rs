@@ -13,6 +13,12 @@ pub struct MemoryApprovalRequestRepo {
     approval_requests: Arc<RwLock<HashMap<ApprovalRequestId, ApprovalRequest>>>,
 }
 
+impl Default for MemoryApprovalRequestRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryApprovalRequestRepo {
     pub fn new() -> Self {
         Self {

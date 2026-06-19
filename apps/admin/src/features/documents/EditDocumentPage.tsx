@@ -75,10 +75,10 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
     isLoading: isLoadingDocuments,
     error,
     refetch,
-  } = $api.useQuery('get', '/documents/{document_id}', {
+  } = $api.useQuery('get', '/documents/{id}', {
     params: {
       path: {
-        document_id: documentId,
+        id: documentId,
       },
     },
   });
@@ -92,7 +92,7 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
   );
   const { mutateAsync: mutateDocumentUpdate } = $api.useMutation(
     'patch',
-    '/documents/{document_id}',
+    '/documents/{id}',
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -124,14 +124,8 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
     );
   }
 
-  let documentFormat = 'misc';
-  if (documentRead.format_pdf) {
-    documentFormat = 'pdf';
-  } else if (documentRead.format_markdown) {
-    documentFormat = 'markdown';
-  } else if (documentRead.format_misc) {
-    documentFormat = 'misc';
-  }
+  // format は平坦化された判別子(pdf/markdown/misc)。編集では変更不可。
+  const documentFormat = documentRead.format;
 
   const uploadFile = async (file: UploadFile) => {
     const uploaded = await mutateUploadFile({
@@ -152,71 +146,43 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
     setSubmitting(true);
     messageApi.loading('保存中...');
     try {
-      if (documentRead.format_pdf) {
-        let formatPdf = undefined;
+      // DocumentUpdate は format 判別 union を単一フィールド format で受ける。
+      // ファイル未差し替え(uid==='default')や markdown 未入力のときは format を
+      // 省略して他項目のみ更新する。
+      let format = undefined;
+      if (documentRead.format === 'pdf') {
         if (values.pdfFile && values.pdfFile[0].uid !== 'default') {
           const { key } = await uploadFile(values.pdfFile[0]);
-          formatPdf = {
+          format = {
+            format: 'pdf' as const,
             file_name: values.pdfFile[0].name,
             file_key: key,
           };
         }
-
-        await mutateDocumentUpdate({
-          params: {
-            path: {
-              document_id: documentId,
-            },
-          },
-          body: {
-            title: values.title,
-            category: values.category,
-            targets: values.targets.map((target) => target.join('/')),
-            format_pdf: formatPdf,
-          },
-        });
-      } else if (documentRead.format_markdown) {
-        await mutateDocumentUpdate({
-          params: {
-            path: {
-              document_id: documentId,
-            },
-          },
-          body: {
-            title: values.title,
-            category: values.category,
-            targets: values.targets.map((target) => target.join('/')),
-            format_markdown: values.markdownContent
-              ? {
-                  content: values.markdownContent,
-                }
-              : undefined,
-          },
-        });
-      } else if (documentRead.format_misc) {
-        let formatMisc = undefined;
+      } else if (documentRead.format === 'markdown') {
+        format = values.markdownContent
+          ? { format: 'markdown' as const, content: values.markdownContent }
+          : undefined;
+      } else if (documentRead.format === 'misc') {
         if (values.miscFile && values.miscFile[0].uid !== 'default') {
           const { key } = await uploadFile(values.miscFile[0]);
-          formatMisc = {
+          format = {
+            format: 'misc' as const,
             file_name: values.miscFile[0].name,
             file_key: key,
           };
         }
-
-        await mutateDocumentUpdate({
-          params: {
-            path: {
-              document_id: documentId,
-            },
-          },
-          body: {
-            title: values.title,
-            category: values.category,
-            targets: values.targets.map((target) => target.join('/')),
-            format_misc: formatMisc,
-          },
-        });
       }
+
+      await mutateDocumentUpdate({
+        params: { path: { id: documentId } },
+        body: {
+          title: values.title,
+          category: values.category,
+          targets: values.targets.map((target) => target.join('/')),
+          format,
+        },
+      });
     } catch (e) {
       setSubmitting(false);
       messageApi.destroy();
@@ -238,24 +204,26 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
           title: documentRead.title,
           category: documentRead.category,
           targets: documentRead.targets.map((target) => target.split('/')),
-          pdfFile: documentRead.format_pdf
-            ? [
-                {
-                  uid: 'default',
-                  name: documentRead.format_pdf.file_name,
-                  status: 'done',
-                },
-              ]
-            : [],
-          miscFile: documentRead.format_misc
-            ? [
-                {
-                  uid: 'default',
-                  name: documentRead.format_misc.file_name,
-                  status: 'done',
-                },
-              ]
-            : [],
+          pdfFile:
+            documentRead.format === 'pdf'
+              ? [
+                  {
+                    uid: 'default',
+                    name: documentRead.file_name,
+                    status: 'done',
+                  },
+                ]
+              : [],
+          miscFile:
+            documentRead.format === 'misc'
+              ? [
+                  {
+                    uid: 'default',
+                    name: documentRead.file_name,
+                    status: 'done',
+                  },
+                ]
+              : [],
         }}
         form={form}
       >
@@ -300,9 +268,11 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
         </Form.Item>
 
         <Form.Item label="資料のフォーマット">
-          {documentRead.format_pdf && <Tag color="orange">PDF</Tag>}
-          {documentRead.format_markdown && <Tag color="green">Markdown</Tag>}
-          {documentRead.format_misc && <Tag color="blue">その他</Tag>}
+          {documentRead.format === 'pdf' && <Tag color="orange">PDF</Tag>}
+          {documentRead.format === 'markdown' && (
+            <Tag color="green">Markdown</Tag>
+          )}
+          {documentRead.format === 'misc' && <Tag color="blue">その他</Tag>}
         </Form.Item>
 
         {documentFormat === 'pdf' && (
@@ -331,7 +301,9 @@ function EditDocumentForm({ documentId }: { documentId: string }) {
             label="markdown"
             name="markdownContent"
             rules={[{ required: true }]}
-            initialValue={documentRead.format_markdown?.content ?? ''}
+            initialValue={
+              documentRead.format === 'markdown' ? documentRead.content : ''
+            }
           >
             <Input.TextArea
               rows={10}

@@ -1,9 +1,0 @@
-type: object
-description: Request to create an approval request
-oneOf:
-  - allOf:
-      - $ref: './ApprovalRequestType.yml'
-      - properties:
-          issue_reason:
-            type: string
-            description: 承認申請の理由

@@ -1,11 +1,10 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::domain::group_id::GroupId;
-use crate::domain::membership::Membership;
+use crate::domain::membership::{Membership, Role};
 use crate::domain::user_id::UserId;
-use crate::infra::clock_impl::ClockImpl;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
-use crate::infra::sqlite::util::to_insert_error;
+use crate::infra::sqlite::util::{dt_to_ms, ms_to_dt, to_insert_error};
 use async_trait::async_trait;
 use sqlx::{Sqlite, SqlitePool};
 use std::str::FromStr;
@@ -21,16 +20,43 @@ impl SqliteMembershipRepo {
     }
 }
 
+/// `Role` を DB 上の snake_case 文字列へ変換する。
+fn role_to_db(role: Role) -> &'static str {
+    match role {
+        Role::Representative => "representative",
+        Role::Operator => "operator",
+        Role::FirstResponsible => "first_responsible",
+        Role::SecondResponsible => "second_responsible",
+        Role::ThirdResponsible => "third_responsible",
+    }
+}
+
+/// DB 上の snake_case 文字列を `Role` へ変換する。
+fn role_from_db(s: &str) -> anyhow::Result<Role> {
+    match s {
+        "representative" => Ok(Role::Representative),
+        "operator" => Ok(Role::Operator),
+        "first_responsible" => Ok(Role::FirstResponsible),
+        "second_responsible" => Ok(Role::SecondResponsible),
+        "third_responsible" => Ok(Role::ThirdResponsible),
+        other => Err(anyhow::anyhow!("unknown role: {}", other)),
+    }
+}
+
 async fn exec_insert<'c, E>(executor: E, membership: &Membership) -> Result<(), sqlx::Error>
 where
     E: sqlx::Executor<'c, Database = Sqlite>,
 {
-    let user_id = Uuid::from(membership.user_id()).to_string();
     let group_id = membership.group_id().to_string();
+    let user_id = Uuid::from(membership.user_id()).to_string();
+    let role = role_to_db(membership.role());
+    let created_at = dt_to_ms(membership.created_at());
     sqlx::query!(
-        "INSERT INTO memberships (user_id, group_id) VALUES (?, ?)",
-        user_id,
+        "INSERT INTO memberships (group_id, user_id, role, created_at) VALUES (?, ?, ?, ?)",
         group_id,
+        user_id,
+        role,
+        created_at,
     )
     .execute(executor)
     .await?;
@@ -41,12 +67,12 @@ async fn exec_exists<'c, E>(executor: E, membership: &Membership) -> Result<bool
 where
     E: sqlx::Executor<'c, Database = Sqlite>,
 {
-    let user_id = Uuid::from(membership.user_id()).to_string();
     let group_id = membership.group_id().to_string();
+    let role = role_to_db(membership.role());
     let row = sqlx::query!(
-        "SELECT user_id FROM memberships WHERE user_id = ? AND group_id = ?",
-        user_id,
+        "SELECT group_id FROM memberships WHERE group_id = ? AND role = ?",
         group_id,
+        role,
     )
     .fetch_optional(executor)
     .await?;
@@ -57,12 +83,12 @@ async fn exec_delete<'c, E>(executor: E, membership: &Membership) -> Result<u64,
 where
     E: sqlx::Executor<'c, Database = Sqlite>,
 {
-    let user_id = Uuid::from(membership.user_id()).to_string();
     let group_id = membership.group_id().to_string();
+    let role = role_to_db(membership.role());
     let res = sqlx::query!(
-        "DELETE FROM memberships WHERE user_id = ? AND group_id = ?",
-        user_id,
+        "DELETE FROM memberships WHERE group_id = ? AND role = ?",
         group_id,
+        role,
     )
     .execute(executor)
     .await?;
@@ -74,7 +100,7 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
     async fn find_by_user_id(&self, user_id: UserId) -> Result<Vec<Membership>, FindError> {
         let user_id = Uuid::from(user_id).to_string();
         let rows = sqlx::query!(
-            r#"SELECT user_id, group_id FROM memberships WHERE user_id = ?"#,
+            r#"SELECT group_id, user_id, role, created_at FROM memberships WHERE user_id = ?"#,
             user_id,
         )
         .fetch_all(&self.pool)
@@ -82,11 +108,11 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
         .map_err(|e| FindError::InternalError(e.into()))?;
         rows.into_iter()
             .map(|r| -> anyhow::Result<Membership> {
-                // Membership::new は clock を保持しないため，任意の Clock 実装で復元できる。
-                Ok(Membership::new(
+                Ok(Membership::restore(
                     GroupId::from_str(&r.group_id).map_err(|e| anyhow::anyhow!(e.to_string()))?,
                     UserId::new(Uuid::parse_str(&r.user_id)?),
-                    &ClockImpl,
+                    role_from_db(&r.role)?,
+                    ms_to_dt(r.created_at)?,
                 ))
             })
             .collect::<anyhow::Result<Vec<_>>>()
@@ -96,7 +122,7 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
     async fn find_by_group_id(&self, group_id: GroupId) -> Result<Vec<Membership>, FindError> {
         let group_id = group_id.to_string();
         let rows = sqlx::query!(
-            r#"SELECT user_id, group_id FROM memberships WHERE group_id = ?"#,
+            r#"SELECT group_id, user_id, role, created_at FROM memberships WHERE group_id = ?"#,
             group_id,
         )
         .fetch_all(&self.pool)
@@ -104,11 +130,11 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
         .map_err(|e| FindError::InternalError(e.into()))?;
         rows.into_iter()
             .map(|r| -> anyhow::Result<Membership> {
-                // Membership::new は clock を保持しないため，任意の Clock 実装で復元できる。
-                Ok(Membership::new(
+                Ok(Membership::restore(
                     GroupId::from_str(&r.group_id).map_err(|e| anyhow::anyhow!(e.to_string()))?,
                     UserId::new(Uuid::parse_str(&r.user_id)?),
-                    &ClockImpl,
+                    role_from_db(&r.role)?,
+                    ms_to_dt(r.created_at)?,
                 ))
             })
             .collect::<anyhow::Result<Vec<_>>>()
@@ -133,8 +159,8 @@ impl MembershipRepo<SqliteTransaction> for SqliteMembershipRepo {
     }
 
     async fn update(&self, membership: Membership) -> Result<(), UpdateError> {
-        // memberships は (user_id, group_id) のみで非キー列を持たないため，
-        // 更新は存在確認のみを行う。
+        // memberships は (group_id, role) を主キーとし，role 変更は remove+add で
+        // 表現するため実質的に不変である。更新は (group_id, role) の存在確認のみを行う。
         let exists = exec_exists(&self.pool, &membership)
             .await
             .map_err(|e| UpdateError::InternalError(e.into()))?;

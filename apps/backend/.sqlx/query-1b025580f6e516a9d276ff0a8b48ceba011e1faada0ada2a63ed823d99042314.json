@@ -1,0 +1,48 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, session_id, generation, secret_hash, issued_at, idle_expires_at, status\n               FROM session_tokens WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "session_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "generation",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "secret_hash",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "issued_at",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "idle_expires_at",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [false, false, false, false, false, false, false]
+  },
+  "hash": "1b025580f6e516a9d276ff0a8b48ceba011e1faada0ada2a63ed823d99042314"
+}

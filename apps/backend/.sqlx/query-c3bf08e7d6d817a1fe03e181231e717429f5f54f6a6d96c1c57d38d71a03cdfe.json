@@ -1,0 +1,18 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT group_id FROM memberships WHERE group_id = ? AND role = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "group_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [false]
+  },
+  "hash": "c3bf08e7d6d817a1fe03e181231e717429f5f54f6a6d96c1c57d38d71a03cdfe"
+}

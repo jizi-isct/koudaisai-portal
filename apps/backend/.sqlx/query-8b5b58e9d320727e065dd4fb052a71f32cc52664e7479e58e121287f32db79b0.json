@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, created_at, updated_at, name, type FROM groups WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "type",
+        "ordinal": 4,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [false, false, false, false, false]
+  },
+  "hash": "8b5b58e9d320727e065dd4fb052a71f32cc52664e7479e58e121287f32db79b0"
+}

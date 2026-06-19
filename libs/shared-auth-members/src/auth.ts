@@ -1,12 +1,10 @@
-import {
-  AuthFetchClient,
-  decodeAccessToken,
-  decodeJwtPayload,
-} from '@koudaisai/shared-auth';
+import { AuthFetchClient, decodeAccessToken } from '@koudaisai/shared-auth';
 import type { Middleware } from 'openapi-fetch';
 
 const ACCESS_TOKEN_KEY = 'exhibitor_access_token';
-const REFRESH_TOKEN_KEY = 'exhibitor_refresh_token';
+let refreshPromise: Promise<{ access_token: string } | undefined> | undefined;
+// リフレッシュトークンは HttpOnly Cookie(dev: `refresh_token` / prod: `__Host-refresh_token`)で
+// 配送される。JS からは読めないため localStorage には一切保持しない。
 
 export function getAuthMiddleware(fetchClient: AuthFetchClient): Middleware {
   return {
@@ -25,54 +23,45 @@ export function getAuthMiddleware(fetchClient: AuthFetchClient): Middleware {
   };
 }
 
-//団体向けトークンの取得
+//団体向けアクセストークンの取得。期限切れ/不在ならリフレッシュ Cookie で再発行する。
 export const getTokensMembers = async (fetchClient: AuthFetchClient) => {
-  const refresh_token = localStorage.getItem(REFRESH_TOKEN_KEY);
   const access_token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-  //nullだったらundefinedに
-  if (refresh_token === null || access_token === null) {
-    return undefined;
+  //アクセストークンが有効ならそのまま使う(時計ずれ対策に30秒の余裕を持たせる)
+  if (access_token !== null) {
+    const access_token_exp = decodeAccessToken(access_token).exp as number;
+    if (access_token_exp * 1000 > Date.now() + 30_000) {
+      return { access_token };
+    }
   }
 
-  //アクセストークンのexp確認
-  const access_token_exp = decodeAccessToken(access_token).exp as number;
-  if (access_token_exp * 1000 >= Date.now()) {
-    //有効期限OK
-    return {
-      refresh_token: refresh_token,
-      access_token: access_token,
-    };
-  }
-
-  //リフレッシュトークンのexp確認
-  const refresh_token_payload = decodeJwtPayload(refresh_token);
-  const refresh_token_exp = refresh_token_payload.exp as number;
-  if (refresh_token_exp * 1000 < Date.now()) {
-    //有効期限ダメ
-    localStorage.removeItem('exhibitor_refresh_token');
-    localStorage.removeItem('exhibitor_access_token');
-    return undefined;
-  }
-
-  //トークンのリフレッシュを試みる
-  const { data } = await fetchClient.POST('/refresh', {
-    body: {
-      refresh_token: refresh_token,
-    },
-  });
-
-  //リフレッシュに成功した場合トークンを保存しreturn
-  if (data) {
-    localStorage.setItem('exhibitor_access_token', data.access_token);
-    return data;
-  } else {
-    // refresh tokenが無効
-    return undefined;
+  //期限切れ or 不在 -> リフレッシュトークン Cookie で再発行を試みる。
+  //Cookie は HttpOnly のため明示送信できない。client の credentials:'include' で自動送出される。
+  //サーバはリクエストボディを取らず、Cookie のみから回転する。
+  //リフレッシュトークンは回転式で再利用を検知するとセッションファミリが失効するため、
+  //同時に複数の API リクエストが期限切れを検知しても 1 回だけ /refresh する。
+  refreshPromise ??= refreshTokensMembers(fetchClient);
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = undefined;
   }
 };
 
-//団体向けログイン
+const refreshTokensMembers = async (fetchClient: AuthFetchClient) => {
+  const { data } = await fetchClient.POST('/refresh', {});
+
+  if (data) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
+    return { access_token: data.access_token };
+  }
+
+  //リフレッシュ失敗(Cookie 無効/期限切れ/reuse 検知) -> 未ログイン扱い。
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  return undefined;
+};
+
+//団体向けログイン。リフレッシュトークンは Set-Cookie で配送され、本文には含まれない。
 export const login = async (
   fetchClient: AuthFetchClient,
   email: string,
@@ -86,7 +75,6 @@ export const login = async (
   });
 
   if (data) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
     localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
     return data;
   } else {
@@ -103,25 +91,21 @@ export const login = async (
   }
 };
 
-//団体向けログアウト
-export const logout = () => {
-  // localStorageから団体トークンを削除
+//団体向けログアウト。サーバ側で回転セッションを失効し、Cookie をクリアする(冪等)。
+export const logout = async (fetchClient: AuthFetchClient) => {
+  try {
+    await fetchClient.POST('/logout', {});
+  } catch {
+    //ネットワーク失敗時もローカルのアクセストークンは破棄して未ログイン状態にする。
+  }
   if (typeof window !== 'undefined') {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
   }
 };
 
-//アクセストークンのLocalStorageへの保存
+//アクセストークンの localStorage への保存
 export const setAccessToken = (token: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  }
-};
-
-//リフレッシュトークンのLocalStorageへの保存
-export const setRefreshToken = (token: string) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(REFRESH_TOKEN_KEY, token);
   }
 };

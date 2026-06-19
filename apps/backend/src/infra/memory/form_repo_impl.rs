@@ -11,6 +11,12 @@ pub struct MemoryFormRepo {
     forms: Arc<RwLock<HashMap<FormId, Form>>>,
 }
 
+impl Default for MemoryFormRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryFormRepo {
     pub fn new() -> Self {
         Self {

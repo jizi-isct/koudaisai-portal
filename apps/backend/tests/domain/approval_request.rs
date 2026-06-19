@@ -44,7 +44,7 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
         &FixedClock,
     );
     if c.ok {
-        let req = result.expect(&format!("expected Ok for reason {:?}", c.reason));
+        let req = result.unwrap_or_else(|_| panic!("expected Ok for reason {:?}", c.reason));
         assert_eq!(req.issue_reason(), c.reason.as_str());
     } else {
         assert!(result.is_err(), "expected Err for reason {:?}", c.reason);

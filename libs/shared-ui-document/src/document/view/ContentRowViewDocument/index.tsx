@@ -25,12 +25,12 @@ export function ContentRowViewDocument({
   const [isModalOpen, setModalOpen] = useState(false);
 
   const handleOpenDocument = useCallback(async () => {
-    if (document.format_misc) {
+    if (document.format === 'misc') {
       download();
     } else {
       setModalOpen(true);
     }
-  }, [document.format_misc, setModalOpen, download]);
+  }, [document.format, setModalOpen, download]);
 
   return (
     <>

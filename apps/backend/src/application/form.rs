@@ -88,6 +88,7 @@ impl<'a, FR: FormRepo, C: Clock> FormApp<'a, FR, C> {
         Ok(form_id)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn update(
         &self,
         actor_ctx: &ActorContext,

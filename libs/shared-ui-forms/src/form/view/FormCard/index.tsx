@@ -8,8 +8,8 @@ type FormCardProps = {
 
 export function FormCard({ form }: FormCardProps) {
   const formLink = useMemo(() => {
-    if ('type_external' in form) {
-      return form.type_external.form_url;
+    if (form.type === 'external') {
+      return form.form_url;
     } else {
       return `/forms/form?formId=${form.id}`;
     }
@@ -30,7 +30,7 @@ export function FormCard({ form }: FormCardProps) {
 
   return (
     <a href={formLink} className={styles.forms}>
-      <h2 className={styles.title}>{form.form_name}</h2>
+      <h2 className={styles.title}>{form.name}</h2>
       <p className={styles.summary}>{form.summary}</p>
       <h2 className={styles.dueDate}>回答期限: {formattedDueDate}</h2>
     </a>

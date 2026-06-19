@@ -47,7 +47,7 @@ export function ResetPasswordConfirmForm() {
       try {
         const response = await authFetchClient.POST('/password/reset/confirm', {
           body: {
-            reset_token: token,
+            token,
             new_password: password,
           },
         });

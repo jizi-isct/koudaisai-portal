@@ -1,7 +1,8 @@
 use crate::application::error::{DeleteError, FindError, InsertError, UpdateError};
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::domain::email_address::EmailAddress;
-use crate::domain::user::User;
+use crate::domain::password_credentials::PasswordCredentials;
+use crate::domain::user::{User, UserStatus};
 use crate::domain::user_id::UserId;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use anyhow::anyhow;
@@ -11,6 +12,12 @@ use std::sync::{Arc, RwLock};
 
 pub struct MemoryUserRepo {
     users: Arc<RwLock<HashMap<UserId, User>>>,
+}
+
+impl Default for MemoryUserRepo {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MemoryUserRepo {
@@ -85,6 +92,43 @@ impl UserRepo<MemoryTransaction> for MemoryUserRepo {
         user: &User,
     ) -> Result<(), anyhow::Error> {
         self.update(user).await.map_err(|e| anyhow::anyhow!(e))
+    }
+
+    async fn rehash_password_in(
+        &self,
+        _tx: &mut MemoryTransaction,
+        id: UserId,
+        expected_old_phc: &str,
+        new_phc: &str,
+    ) -> Result<u64, anyhow::Error> {
+        let mut users = self.users.write().map_err(|e| anyhow!(e.to_string()))?;
+        let Some(user) = users.get(&id) else {
+            return Ok(0);
+        };
+        // Active かつ phc が検証時のままのときだけ rehash する(changed_at は維持)。
+        let UserStatus::Active {
+            password_credentials,
+        } = user.status()
+        else {
+            return Ok(0);
+        };
+        if password_credentials.phc() != expected_old_phc {
+            return Ok(0);
+        }
+        let changed_at = *password_credentials.changed_at();
+        let updated = User::restore(
+            user.id(),
+            *user.created_at(),
+            *user.updated_at(),
+            user.name().to_string(),
+            user.m_address().clone(),
+            UserStatus::Active {
+                password_credentials: PasswordCredentials::restore(new_phc, changed_at)
+                    .map_err(|e| anyhow!(e.to_string()))?,
+            },
+        );
+        users.insert(id, updated);
+        Ok(1)
     }
 
     async fn delete(&self, id: UserId) -> Result<(), DeleteError> {

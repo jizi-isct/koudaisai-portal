@@ -55,54 +55,38 @@ create table users
 ) strict;
 
 -- groups ----------------------------------------------------------------
+-- GroupType は団体種別を表す単純な列挙型。所属と役職は memberships で表現する。
 
 create table groups
 (
-    id              text primary key not null,                       -- GroupId 文字列表現 "X-NNN"
-    created_at      integer          not null,                       -- unix ms
-    updated_at      integer          not null,
-    name            text             not null,
-    type            text             not null check (type in ('press', 'general_project', 'booth_project', 'lab_project', 'stage_project')),
-    representative1 text references users (id),                       -- uuid
-    representative2 text references users (id),
-    representative3 text references users (id),
-    operator        text references users (id),
-
-    -- GroupType(代数的データ型)のバリアントごとの列構成
-    check (
-        (
-            type in ('general_project', 'booth_project', 'stage_project')
-                and representative1 is not null
-                and representative2 is not null
-                and representative3 is not null
-                and operator is null
-            )
-            or (
-            type = 'lab_project'
-                and representative1 is not null
-                and representative2 is null
-                and representative3 is null
-                and operator is not null
-            )
-            or (
-            type = 'press'
-                and representative1 is not null
-                and representative2 is null
-                and representative3 is null
-                and operator is null
-            )
-        )
+    id         text primary key not null,                            -- GroupId 文字列表現 "X-NNN"
+    created_at integer          not null,                            -- unix ms
+    updated_at integer          not null,
+    name       text             not null,
+    type       text             not null check (type in ('press', 'general_project', 'booth_project', 'lab_project', 'stage_project'))
 ) strict;
 
 -- memberships -----------------------------------------------------------
+-- ユーザーのグループへの所属と役職(Role)。
+--   * 同一グループ内では各役職スロットを高々1人が担うため (group_id, role) を主キーとする。
+--     これにより「各役職は最大1人(<=1)」という構造的整合性のみを担保する。
+--   * 研究室企画で責任者(representative)と実施担当者(operator)を兼任する場合は，
+--     同一ユーザーが role 違いの2行を持つ(= 同一 (user_id, group_id) が複数行になりうる)。
+--   * 「どの役職がどの団体種別で有効か」「責任者が互いに別人か」「充足しているか」等の
+--     業務ルールはバックエンド(Membership::validate_set)で担保する。
 
 create table memberships
 (
-    user_id  text not null references users (id) on delete cascade,
-    group_id text not null references groups (id) on delete cascade,
+    group_id   text    not null references groups (id) on delete cascade,
+    user_id    text    not null references users (id) on delete cascade,
+    role       text    not null check (role in ('representative', 'operator', 'first_responsible', 'second_responsible', 'third_responsible')),
+    created_at integer not null,                                     -- unix ms
 
-    primary key (user_id, group_id)
+    primary key (group_id, role)
 ) strict;
+
+-- ユーザーの所属グループ逆引き(ActorContext 構築など)用の索引
+create index idx_memberships_user_id on memberships (user_id);
 
 -- approval_requests -----------------------------------------------------
 

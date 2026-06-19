@@ -19,16 +19,7 @@ export function ViewQuestionsWrapper() {
 
   useEffect(() => {
     (async () => {
-      const { data: user, error: userError } = await api.GET(
-        '/users/{user_id}',
-        {
-          params: {
-            path: {
-              user_id: 'me',
-            },
-          },
-        },
-      );
+      const { data: user, error: userError } = await api.GET('/users/me');
 
       if (userError || !user) {
         setError(
@@ -38,13 +29,7 @@ export function ViewQuestionsWrapper() {
         return;
       }
 
-      const { data: group, error: groupError } = await api.GET('/groups/{id}', {
-        params: {
-          path: {
-            id: user.group_id,
-          },
-        },
-      });
+      const { data: group, error: groupError } = await api.GET('/groups/us');
 
       if (groupError || !group) {
         setError(
@@ -56,11 +41,11 @@ export function ViewQuestionsWrapper() {
 
       setUser(user);
 
-      if (group.type_plan?.type_booth) {
+      if (group.type === 'booth_project') {
         setGroupType('booth');
-      } else if (group.type_plan?.type_general) {
+      } else if (group.type === 'general_project') {
         setGroupType('general');
-      } else if (group.type_plan?.type_stage) {
+      } else if (group.type === 'stage_project') {
         setGroupType('stage');
       }
 

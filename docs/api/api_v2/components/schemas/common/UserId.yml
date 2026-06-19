@@ -1,5 +1,0 @@
-oneOf:
-  - type: string
-    format: uuid
-  - type: string
-    enum: [me]

@@ -24,7 +24,10 @@ function ApprovalRequestsTable() {
     if (!users) return {};
 
     return users.reduce<Record<string, string>>((acc, user) => {
-      acc[user.id] = `${user.group_id}の${user.name}`;
+      // group_id は一覧レスポンスでは省略されるため名前のみのフォールバック。
+      acc[user.id] = user.group_id
+        ? `${user.group_id}の${user.name}`
+        : user.name;
       return acc;
     }, {});
   }, [users]);
@@ -41,7 +44,7 @@ function ApprovalRequestsTable() {
       key: 'type',
       title: '種類',
       render: (_value, record) => {
-        if (record.type_edit_exhibition_info) {
+        if (record.type === 'edit_exhibition_info') {
           return <Tag color="green">企画情報更新</Tag>;
         }
 

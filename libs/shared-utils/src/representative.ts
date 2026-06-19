@@ -1,44 +1,23 @@
 /**
- * ユーザーIDから代表者のインデックスを取得
+ * メンバーの役割(Role)を「第N責任者」の N(一/二/三)に対応付ける。
+ *
+ * api_v3 では代表者情報は Group ではなくメンバーシップの role
+ * (`/groups/{id}/members` の `MemberRead.role`)に移った。第一/二/三責任者のみ
+ * インデックスを持ち、代表者(representative)・運営担当(operator)等は undefined を返す。
  */
-import { GroupRead, UserRead } from '@koudaisai/shared-types';
+import type { Role } from '@koudaisai/shared-types';
 
 export function getRepresentativeIndex(
-  user: UserRead,
-  group: GroupRead,
+  role: Role | undefined,
 ): string | undefined {
-  if (group.type_press) {
-    return undefined;
-  }
-  if (group.type_plan?.type_booth) {
-    if (group.type_plan.type_booth.representative1 === user.id) {
+  switch (role) {
+    case 'first_responsible':
       return '一';
-    } else if (group.type_plan.type_booth.representative2 === user.id) {
+    case 'second_responsible':
       return '二';
-    } else if (group.type_plan.type_booth.representative3 === user.id) {
+    case 'third_responsible':
       return '三';
-    }
+    default:
+      return undefined;
   }
-  if (group.type_plan?.type_general) {
-    if (group.type_plan.type_general.representative1 === user.id) {
-      return '一';
-    } else if (group.type_plan.type_general.representative2 === user.id) {
-      return '二';
-    } else if (group.type_plan.type_general.representative3 === user.id) {
-      return '三';
-    }
-  }
-  if (group.type_plan?.type_stage) {
-    if (group.type_plan.type_stage.representative1 === user.id) {
-      return '一';
-    } else if (group.type_plan.type_stage.representative2 === user.id) {
-      return '二';
-    } else if (group.type_plan.type_stage.representative3 === user.id) {
-      return '三';
-    }
-  }
-  if (group.type_plan?.type_labo) {
-    return undefined;
-  }
-  return undefined;
 }

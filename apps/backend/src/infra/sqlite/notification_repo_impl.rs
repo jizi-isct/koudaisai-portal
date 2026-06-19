@@ -4,11 +4,13 @@ use crate::domain::admin_id::AdminId;
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::notification::{Notification, NotificationType};
 use crate::domain::notification_id::NotificationId;
+use crate::domain::user_id::UserId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::util::{
     dt_to_ms, ms_to_dt, targets_from_json, targets_to_json, to_insert_error,
 };
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use sqlx::{Sqlite, SqlitePool};
 use uuid::Uuid;
 
@@ -212,6 +214,49 @@ impl NotificationRepo<SqliteTransaction> for SqliteNotificationRepo {
             })
             .collect::<anyhow::Result<Vec<_>>>()
             .map_err(FindError::InternalError)
+    }
+
+    async fn find_read_ids_by_user(
+        &self,
+        user_id: UserId,
+    ) -> Result<Vec<NotificationId>, FindError> {
+        let uid = Uuid::from(user_id).to_string();
+        let rows = sqlx::query!(
+            "SELECT notification_id FROM notification_reads WHERE user_id = ?",
+            uid,
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| FindError::InternalError(e.into()))?;
+        rows.into_iter()
+            .map(|r| -> anyhow::Result<NotificationId> {
+                Ok(NotificationId::new(Uuid::parse_str(&r.notification_id)?))
+            })
+            .collect::<anyhow::Result<Vec<_>>>()
+            .map_err(FindError::InternalError)
+    }
+
+    async fn mark_read(
+        &self,
+        user_id: UserId,
+        notification_id: NotificationId,
+        read_at: DateTime<Utc>,
+    ) -> Result<(), InsertError> {
+        let uid = Uuid::from(user_id).to_string();
+        let nid = notification_id.as_uuid().to_string();
+        let read_at = dt_to_ms(read_at);
+        sqlx::query!(
+            "INSERT INTO notification_reads (user_id, notification_id, read_at) \
+             VALUES (?, ?, ?) \
+             ON CONFLICT (user_id, notification_id) DO UPDATE SET read_at = excluded.read_at",
+            uid,
+            nid,
+            read_at,
+        )
+        .execute(&self.pool)
+        .await
+        .map_err(to_insert_error)?;
+        Ok(())
     }
 
     async fn insert(&self, notification: &Notification) -> Result<(), InsertError> {

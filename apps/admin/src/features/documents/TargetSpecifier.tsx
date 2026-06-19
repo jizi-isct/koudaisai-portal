@@ -57,7 +57,8 @@ export function TargetSpecifier({ value, onChange }: TargetSpecifierProps) {
           label: '個人',
           children: users.map((user) => ({
             value: user.id,
-            label: `${user.group_id}の${user.name}`,
+            // group_id は一覧レスポンスでは省略されるため名前のみのフォールバック。
+            label: user.group_id ? `${user.group_id}の${user.name}` : user.name,
           })),
         },
       ],

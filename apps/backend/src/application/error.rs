@@ -37,7 +37,7 @@ pub enum ApplicationSequentialOperationError<Op: OperationError> {
     InternalError(anyhow::Error),
 }
 
-trait OperationError {}
+pub trait OperationError {}
 impl OperationError for InsertError {}
 impl OperationError for FindError {}
 impl OperationError for UpdateError {}

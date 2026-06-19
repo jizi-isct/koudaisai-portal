@@ -54,17 +54,18 @@ impl Document {
             id: Uuid::new_v4(),
             created_at: now,
             updated_at: now,
-            created_by: created_by,
+            created_by,
             updated_by: created_by,
-            format: format,
-            title: title,
-            category: category,
-            targets: targets,
+            format,
+            title,
+            category,
+            targets,
         })
     }
 
     /// 復元用コンストラクタ
     /// 入力をそのままフィールドに設定
+    #[allow(clippy::too_many_arguments)]
     pub fn restore(
         id: Uuid,
         created_at: DateTime<Utc>,

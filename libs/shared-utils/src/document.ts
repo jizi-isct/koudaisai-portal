@@ -7,31 +7,23 @@ export async function downloadDocument(
   fetchClient: ApiFetchClient,
   download: (url: string, fileName: string) => void,
 ) {
-  if (document.format_pdf) {
+  // format は document に平坦化された判別子(pdf/misc は file_key/file_name、
+  // markdown は content を持つ)。
+  if (document.format === 'pdf' || document.format === 'misc') {
     const { data: downloadUrl } = await getDownloadUrl(
       fetchClient,
-      document.format_pdf.file_key,
-      document.format_pdf.file_name,
+      document.file_key,
+      document.file_name,
     );
     if (downloadUrl?.presigned_url) {
-      download(downloadUrl.presigned_url, document.format_pdf.file_name);
+      download(downloadUrl.presigned_url, document.file_name);
     }
   }
-  if (document.format_markdown) {
-    const blob = new Blob([document.format_markdown.content], {
+  if (document.format === 'markdown') {
+    const blob = new Blob([document.content], {
       type: 'text/markdown;charset=utf-8;',
     });
     const url = URL.createObjectURL(blob);
     download(url, `${document.title}.md`);
-  }
-  if (document.format_misc) {
-    const { data: downloadUrl } = await getDownloadUrl(
-      fetchClient,
-      document.format_misc.file_key,
-      document.format_misc.file_name,
-    );
-    if (downloadUrl?.presigned_url) {
-      download(downloadUrl.presigned_url, document.format_misc.file_name);
-    }
   }
 }

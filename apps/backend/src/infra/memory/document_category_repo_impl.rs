@@ -12,6 +12,12 @@ pub struct MemoryDocumentCategoryRepo {
     document_categories: Arc<RwLock<HashMap<Uuid, DocumentCategory>>>,
 }
 
+impl Default for MemoryDocumentCategoryRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryDocumentCategoryRepo {
     pub fn new() -> Self {
         Self {
