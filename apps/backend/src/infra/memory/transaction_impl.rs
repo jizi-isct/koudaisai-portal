@@ -5,6 +5,12 @@ pub struct MemoryTransaction {
     is_active: bool,
 }
 
+impl Default for MemoryTransaction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryTransaction {
     pub fn new() -> Self {
         Self { is_active: false }

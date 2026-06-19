@@ -19,6 +19,7 @@ fn make_app() -> MemoryApplication {
 
 fn admin_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:user:read".to_string()],
     }
@@ -100,10 +101,9 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
 
         for (i, gid_str) in c.target_group_ids.iter().enumerate() {
             let gid = GroupId::from_str(gid_str).unwrap();
-            let group_type = GroupType::Press {
-                representative: target_user_id,
-            };
+            let group_type = GroupType::Press;
             let admin = ActorContext::Admin {
+                name: "テストユーザー".to_string(),
                 user_id: uid(),
                 claims: vec!["koudaisai-portal:admin:group:create".to_string()],
             };
@@ -117,6 +117,16 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
                 )
                 .await
                 .unwrap();
+            // メンバーシップは独立管理なので、対象ユーザーの所属を明示的にシードする
+            if c.target_exists {
+                crate::application::common::seed_member(
+                    &app,
+                    gid,
+                    target_user_id,
+                    koudaisai_portal_backend::domain::membership::Role::Representative,
+                )
+                .await;
+            }
         }
 
         let (_, ctx) = build_actor(c.actor);
@@ -126,7 +136,7 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
             "some" => {
                 let opt = result.expect("expected Ok");
                 assert!(opt.is_some(), "expected Some");
-                assert_eq!(opt.unwrap().id(), target_user_id);
+                assert_eq!(opt.unwrap().0.id(), target_user_id);
             }
             "none" => {
                 let opt = result.expect("expected Ok");
@@ -170,7 +180,7 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 let admin = admin_ctx();
                 let saved = app.user().get_by_id(&admin, user.id()).await.unwrap();
                 assert!(saved.is_some());
-                assert_eq!(saved.unwrap().name(), "Updated Name");
+                assert_eq!(saved.unwrap().0.name(), "Updated Name");
             }
             "unauthorized" => {
                 assert!(matches!(

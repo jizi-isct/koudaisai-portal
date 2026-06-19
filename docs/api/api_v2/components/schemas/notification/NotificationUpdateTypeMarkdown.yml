@@ -1,8 +1,0 @@
-description: マークダウンタイプの通知
-type: object
-properties:
-  title:
-    description: 通知のタイトル
-    type: string
-  content:
-    type: string

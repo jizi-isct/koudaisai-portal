@@ -6,7 +6,6 @@ use koudaisai_portal_backend::application::error::{
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
-use koudaisai_portal_backend::domain::user_id::UserId;
 use koudaisai_portal_backend::infra::memory::MemoryApplication;
 use koudaisai_portal_backend::infra::memory::transaction_impl::MemoryTransaction;
 use serde::Deserialize;
@@ -19,6 +18,7 @@ fn make_app() -> MemoryApplication {
 
 fn admin_create_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:group:create".to_string()],
     }
@@ -26,22 +26,20 @@ fn admin_create_ctx() -> ActorContext {
 
 fn admin_read_ctx() -> ActorContext {
     ActorContext::Admin {
+        name: "テストユーザー".to_string(),
         user_id: uid(),
         claims: vec!["koudaisai-portal:admin:group:read".to_string()],
     }
 }
 
-async fn seed_group(app: &MemoryApplication, group_id: GroupId, name: String, rep_id: UserId) {
-    let group_type = GroupType::Press {
-        representative: rep_id,
-    };
+async fn seed_group(app: &MemoryApplication, group_id: GroupId, name: String) {
     app.group()
         .create_group(
             &admin_create_ctx(),
             MemoryTransaction::new(),
             group_id,
             name,
-            group_type,
+            GroupType::Press,
         )
         .await
         .unwrap();
@@ -63,7 +61,7 @@ pub fn test_get_all(_path: &Path, contents: String) -> datatest_stable::Result<(
 
         for i in 0..c.seed_group_count {
             let group_id = GroupId::new('P', (i + 1) as u16).unwrap();
-            seed_group(&app, group_id, format!("Test Group {}", i + 1), uid()).await;
+            seed_group(&app, group_id, format!("Test Group {}", i + 1)).await;
         }
 
         let (_, ctx) = build_actor(c.actor);
@@ -108,13 +106,18 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
         let (actor_uid, ctx) = build_actor(c.actor);
 
         if c.group_exists {
-            // If seed_actor_membership, use actor_uid as representative so they get a DB membership
-            let rep_id = if c.seed_actor_membership {
-                actor_uid
-            } else {
-                uid()
-            };
-            seed_group(&app, group_id, "Test Group".to_string(), rep_id).await;
+            seed_group(&app, group_id, "Test Group".to_string()).await;
+            // メンバーシップは独立して管理されるので、必要なら明示的にシードする
+            if c.seed_actor_membership {
+                crate::application::common::seed_user(&app, actor_uid).await;
+                crate::application::common::seed_member(
+                    &app,
+                    group_id,
+                    actor_uid,
+                    koudaisai_portal_backend::domain::membership::Role::Representative,
+                )
+                .await;
+            }
         }
 
         let result = app.group().get_by_id(&ctx, group_id).await;
@@ -157,10 +160,7 @@ pub fn test_create_group(_path: &Path, contents: String) -> datatest_stable::Res
         let app = make_app();
 
         let group_id = GroupId::from_str(&c.group_id).unwrap();
-        let rep_id = uid();
-        let group_type = GroupType::Press {
-            representative: rep_id,
-        };
+        let group_type = GroupType::Press;
         let tx = MemoryTransaction::new();
 
         let (_, ctx) = build_actor(c.actor);
@@ -172,24 +172,11 @@ pub fn test_create_group(_path: &Path, contents: String) -> datatest_stable::Res
         match c.expected.as_str() {
             "ok" => {
                 assert!(result.is_ok(), "expected Ok, got {:?}", result);
+                // create_group はグループ本体のみ作成する（メンバーシップは別ユースケースで管理）．
                 let admin = admin_read_ctx();
                 let saved = app.group().get_by_id(&admin, group_id).await.unwrap();
                 assert!(saved.is_some());
                 assert_eq!(saved.unwrap().name(), c.group_name);
-                // Verify the representative has a membership by checking that
-                // get_by_id returns Some for a context that includes rep_id in the group
-                let rep_ctx = ActorContext::User {
-                    user_id: rep_id,
-                    memberships: vec![],
-                    group_type: GroupType::Press {
-                        representative: rep_id,
-                    },
-                };
-                let visible = app.group().get_by_id(&rep_ctx, group_id).await.unwrap();
-                assert!(
-                    visible.is_some(),
-                    "representative should be able to see their group"
-                );
             }
             "unauthorized" => {
                 assert!(matches!(

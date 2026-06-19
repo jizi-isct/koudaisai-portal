@@ -23,8 +23,22 @@ issuer = "http://localhost:8000/realms/jizi-portal"
 web_path = "/var/www/html/web"
 admin_path = "/var/www/html/admin"
 
+# v3 認証(argon2 + 回転セッション)。未指定の項目は OWASP/設計の既定値を使用。
+# ローカル開発は http のため __Host-/Secure Cookie が使えない: 緩めた値で上書きする。
+[web.auth_v3]
+refresh_cookie_name = "refresh_token"
+refresh_cookie_secure = false
+refresh_cookie_same_site = "Lax"
+reset_link_base = "http://portal.koudaisai.localhost/password/reset"
+access_token_iss = "http://api.koudaisai.localhost"
+cors_allowed_origins = [
+    "http://portal.koudaisai.localhost",
+    "http://admin.koudaisai.localhost",
+    "http://join.koudaisai.localhost",
+]
+
 [db]
-address = "postgres://root:root@localhost:5432/koudaisai-portal"
+address = "sqlite://koudaisai-portal.db?mode=rwc"
 
 [s3]
 # S3連携が必要な場合は別途設定の必要あり
@@ -46,3 +60,5 @@ approval_request_url = ""
 # 企画情報API連携が必要な場合は別途設定の必要あり
 plans_info_api_client_id = ""
 plans_info_api_client_secret = ""
+# 回転セッションの HMAC ペッパー(本番では十分長いランダム値に変更すること)
+session_secret_pepper = "dev-only-change-me-in-production"

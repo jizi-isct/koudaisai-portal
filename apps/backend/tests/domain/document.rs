@@ -1,12 +1,10 @@
 use crate::domain::common::FixedClock;
+use koudaisai_portal_backend::domain::admin_id::AdminId;
 use koudaisai_portal_backend::domain::document::Document;
 use koudaisai_portal_backend::domain::document::DocumentFormat;
 use koudaisai_portal_backend::domain::document_category::DocumentCategory;
-use koudaisai_portal_backend::domain::group_id::GroupId;
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
-use koudaisai_portal_backend::domain::user_id::UserId;
 
-use oauth2::url::form_urlencoded::Target;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
@@ -31,7 +29,7 @@ fn make_document() -> Document {
         Some(category.id()),
         format,
         targets,
-        UserId::new(Uuid::new_v4()),
+        AdminId::new(Uuid::new_v4()),
         &FixedClock,
     )
     .unwrap()
@@ -104,7 +102,7 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
         Some(category.id()),
         format,
         targets,
-        UserId::new(Uuid::new_v4()),
+        AdminId::new(Uuid::new_v4()),
         &FixedClock,
     );
 
@@ -182,7 +180,7 @@ pub fn test_change_title(_path: &Path, contents: String) -> datatest_stable::Res
     let mut doc = make_document();
     let result = doc.change_title(
         c.new_title.clone(),
-        UserId::new(Uuid::new_v4()),
+        AdminId::new(Uuid::new_v4()),
         &FixedClock,
     );
     if c.ok {
@@ -204,7 +202,7 @@ struct ChangeCategoryCase {
 pub fn test_change_category(_path: &Path, contents: String) -> datatest_stable::Result<()> {
     let c: ChangeCategoryCase = serde_json::from_str(&contents)?;
     let mut doc = make_document();
-    let result = doc.change_category(c.new_category, UserId::new(Uuid::new_v4()), &FixedClock);
+    let result = doc.change_category(c.new_category, AdminId::new(Uuid::new_v4()), &FixedClock);
 
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_category);
@@ -227,7 +225,7 @@ pub fn test_change_format(_path: &Path, contents: String) -> datatest_stable::Re
     let mut doc = make_document();
     let result = doc.change_format(
         c.new_format.clone().into(),
-        UserId::new(Uuid::new_v4()),
+        AdminId::new(Uuid::new_v4()),
         &FixedClock,
     );
 
@@ -254,15 +252,13 @@ pub fn test_change_targets(_path: &Path, contents: String) -> datatest_stable::R
     // パース失敗の可能性もある
     let parsed_targets = parse_targets(c.new_targets.clone());
 
-    if c.ok == false {
-        if parsed_targets.is_err() {
-            return Ok(()); // 失敗ケースはparse失敗でも良い
-        }
+    if !c.ok && parsed_targets.is_err() {
+        return Ok(()); // 失敗ケースはparse失敗でも良い
     }
 
     let targets = parsed_targets?;
 
-    let result = doc.change_targets(targets, UserId::new(Uuid::new_v4()), &FixedClock);
+    let result = doc.change_targets(targets, AdminId::new(Uuid::new_v4()), &FixedClock);
 
     if c.ok {
         assert!(result.is_ok(), "expected Ok for {:?}", c.new_targets);

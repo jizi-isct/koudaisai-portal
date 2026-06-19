@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE session_tokens SET status = 'revoked' WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?) AND status <> 'revoked'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "ce1395f0c646035447853df1bf3aa979262f84e5c9a85fa342f4ee60f1d7d5a1"
+}

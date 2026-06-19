@@ -1,45 +1,27 @@
 use crate::application::ports::clock::Clock;
 use crate::domain::error::FactoryError;
 use crate::domain::group_id::GroupId;
-use crate::domain::membership::Membership;
-use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
-use std::mem::discriminant;
-use thiserror::Error;
 
-#[derive(Debug, Error)]
-pub enum UpdateRolesError {
-    #[error("Invalid transition")]
-    InvalidTransition,
-    #[error("Invalid input")]
-    InvalidInput(String),
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
+/// 団体の種類を表す列挙型です．
+/// 各団体の種類の詳細については委員内ドキュメント(JIZI Wikiなど)を参照してください．
+/// メンバーの所属とロールは `Membership` で表現し，どのロール構成が妥当かは
+/// `Membership::validate_set` が検証します．
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GroupType {
-    Press {
-        representative: UserId,
-    },
-    GeneralProject {
-        representative1: UserId,
-        representative2: UserId,
-        representative3: UserId,
-    },
-    BoothProject {
-        representative1: UserId,
-        representative2: UserId,
-        representative3: UserId,
-    },
-    LabProject {
-        representative: UserId,
-    },
-    StageProject {
-        representative1: UserId,
-        representative2: UserId,
-        representative3: UserId,
-    },
+    /// 学内取材団体．一人の代表者(Representative)を持つ．
+    Press,
+    /// 一般企画団体．第一〜第三責任者(First/Second/ThirdResponsible)計３名を持つ．
+    GeneralProject,
+    /// 模擬店企画団体．第一〜第三責任者計３名を持つ．
+    BoothProject,
+    /// 研究室企画団体．企画責任者(Representative)と企画実施担当者(Operator)を持つ．兼任可能．
+    LabProject,
+    /// ステージ企画団体．第一〜第三責任者計３名を持つ．
+    StageProject,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Group {
     id: GroupId,
     created_at: DateTime<Utc>,
@@ -116,72 +98,112 @@ impl Group {
     pub fn r#type(&self) -> &GroupType {
         &self.r#type
     }
-
-    /// ユーザーの役職を変更します
-    ///
-    /// # Params
-    /// - `r#type` - 新たな役職を含んだGroupType
-    /// - `clock` - 時計ポート
-    /// - `membership` - 役職を変更するユーザーのMembership．ユーザーがグループに所属していることの証明として使用されます．
-    ///
-    /// # Errors
-    /// - `UpdateRolesError::InvalidTransition` - 異なるGroupTypeへ遷移しようとした場合に発生します．
-    /// - `UpdateRolesError::InvalidInput` - 不正な入力が行われた場合に発生します．
-    pub fn update_roles<C: Clock>(
-        &mut self,
-        r#type: GroupType,
-        clock: &C,
-        membership: &Membership,
-    ) -> Result<(), UpdateRolesError> {
-        if discriminant(&r#type) != discriminant(&self.r#type) {
-            return Err(UpdateRolesError::InvalidTransition);
-        }
-
-        if membership.group_id() != self.id {
-            return Err(UpdateRolesError::InvalidInput(format!(
-                "Membership group id {} does not match group id {}",
-                membership.group_id(),
-                self.id
-            )));
-        }
-
-        self.r#type = r#type;
-        self.updated_at = clock.now();
-        Ok(())
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::group_id::GroupId;
-    use crate::domain::user_id::UserId;
-    use uuid::Uuid;
+    use chrono::TimeZone;
+
+    struct MockClock {
+        now: DateTime<Utc>,
+    }
+
+    impl Clock for MockClock {
+        fn now(&self) -> DateTime<Utc> {
+            self.now
+        }
+    }
+
+    fn group_id() -> GroupId {
+        GroupId::new('A', 1).unwrap()
+    }
 
     #[test]
-    fn test_restore_success() {
-        let group_id = GroupId::new('A', 1).unwrap();
-        let created_at = Utc::now();
-        let updated_at = Utc::now();
-        let name = "Restored Group".to_string();
-        let user_id = UserId::new(Uuid::new_v4());
-        let group_type = GroupType::Press {
-            representative: user_id,
-        };
+    fn test_register_success() {
+        let now = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
+        let clock = MockClock { now };
 
-        let group = Group::restore(
-            group_id,
-            created_at,
-            updated_at,
-            name.clone(),
-            group_type.clone(),
+        let group = Group::register(
+            group_id(),
+            "Test Group".to_string(),
+            GroupType::Press,
+            &clock,
         )
         .unwrap();
 
-        assert_eq!(group.id(), group_id);
+        assert_eq!(group.id(), group_id());
+        assert_eq!(group.name(), "Test Group");
+        assert_eq!(group.r#type(), &GroupType::Press);
+        assert_eq!(group.created_at(), now);
+        assert_eq!(group.updated_at(), now);
+    }
+
+    #[test]
+    fn test_register_empty_name_fails() {
+        let clock = MockClock { now: Utc::now() };
+
+        let result = Group::register(
+            group_id(),
+            "   ".to_string(),
+            GroupType::GeneralProject,
+            &clock,
+        );
+
+        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+    }
+
+    #[test]
+    fn test_restore_success() {
+        let created_at = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
+        let updated_at = Utc.with_ymd_and_hms(2024, 1, 1, 1, 0, 0).unwrap();
+        let name = "Restored Group".to_string();
+        let group_type = GroupType::Press;
+
+        let group =
+            Group::restore(group_id(), created_at, updated_at, name.clone(), group_type).unwrap();
+
+        assert_eq!(group.id(), group_id());
         assert_eq!(group.name(), name);
         assert_eq!(group.r#type(), &group_type);
         assert_eq!(group.created_at(), created_at);
         assert_eq!(group.updated_at(), updated_at);
+    }
+
+    #[test]
+    fn test_rename_success() {
+        let initial = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
+        let clock1 = MockClock { now: initial };
+        let mut group = Group::register(
+            group_id(),
+            "Old Name".to_string(),
+            GroupType::LabProject,
+            &clock1,
+        )
+        .unwrap();
+
+        let updated = Utc.with_ymd_and_hms(2024, 1, 2, 0, 0, 0).unwrap();
+        let clock2 = MockClock { now: updated };
+        group.rename("New Name".to_string(), &clock2).unwrap();
+
+        assert_eq!(group.name(), "New Name");
+        assert_eq!(group.updated_at(), updated);
+    }
+
+    #[test]
+    fn test_rename_whitespace_fails() {
+        let clock = MockClock { now: Utc::now() };
+        let mut group = Group::register(
+            group_id(),
+            "Valid Name".to_string(),
+            GroupType::StageProject,
+            &clock,
+        )
+        .unwrap();
+
+        let result = group.rename("   ".to_string(), &clock);
+
+        assert!(matches!(result, Err(FactoryError::InvalidInput(_))));
+        assert_eq!(group.name(), "Valid Name");
     }
 }

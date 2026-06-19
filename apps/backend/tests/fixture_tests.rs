@@ -30,9 +30,8 @@ datatest_stable::harness! {
     // group
     { test = domain::group::test_register,     root = "tests/fixtures/domain", pattern = r"group/register/[^/]+\.json" },
     { test = domain::group::test_rename,       root = "tests/fixtures/domain", pattern = r"group/rename/[^/]+\.json" },
-    { test = domain::group::test_update_roles, root = "tests/fixtures/domain", pattern = r"group/update_roles/[^/]+\.json" },
     // membership
-    { test = domain::membership::test_from_group_type, root = "tests/fixtures/domain", pattern = r"membership/from_group_type/[^/]+\.json" },
+    { test = domain::membership::test_validate_set, root = "tests/fixtures/domain", pattern = r"membership/validate_set/[^/]+\.json" },
     // password_credentials
     { test = domain::password_credentials::test_new, root = "tests/fixtures/domain", pattern = r"password_credentials/new/[^/]+\.json" },
     // user

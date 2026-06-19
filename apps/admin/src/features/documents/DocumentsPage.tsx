@@ -11,7 +11,8 @@ import { useMemo, useState } from 'react';
 import { $api } from '@/features/api/api';
 
 type RowType = {
-  category: DocumentCategoryRead | null;
+  // by-category レスポンスの category は省略可(未分類のとき null/省略)。
+  category?: DocumentCategoryRead | null;
   documents: DocumentRead[];
 };
 
@@ -46,7 +47,7 @@ function DocumentsTable() {
   );
   const { mutateAsync: mutateDocumentCategoryDelete } = $api.useMutation(
     'delete',
-    '/document-categories/{category_id}',
+    '/document-categories/{id}',
   );
   const { mutateAsync: mutateDocumentCategoryCreate } = $api.useMutation(
     'post',
@@ -54,7 +55,7 @@ function DocumentsTable() {
   );
   const { mutateAsync: mutateDocumentDelete } = $api.useMutation(
     'delete',
-    '/documents/{document_id}',
+    '/documents/{id}',
   );
 
   const dataSource = useMemo(() => {
@@ -130,7 +131,7 @@ function DocumentsTable() {
                 await mutateDocumentCategoryDelete({
                   params: {
                     path: {
-                      category_id: record.category?.id ?? '',
+                      id: record.category?.id ?? '',
                     },
                   },
                 });
@@ -172,10 +173,10 @@ function DocumentsTable() {
       key: 'format',
       title: '種類',
       render: (_value, record) => {
-        if ('format_pdf' in record) return <Tag color="orange">PDF</Tag>;
-        if ('format_markdown' in record)
+        if (record.format === 'pdf') return <Tag color="orange">PDF</Tag>;
+        if (record.format === 'markdown')
           return <Tag color="green">Markdown</Tag>;
-        if ('format_misc' in record) return <Tag color="blue">その他</Tag>;
+        if (record.format === 'misc') return <Tag color="blue">その他</Tag>;
         return <Tag color="red">不明</Tag>;
       },
     },
@@ -233,7 +234,7 @@ function DocumentsTable() {
               await mutateDocumentDelete({
                 params: {
                   path: {
-                    document_id: value,
+                    id: value,
                   },
                 },
               });

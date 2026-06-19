@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE document_categories SET created_at = ?, updated_at = ?, title = ?, emoji = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "dd041a76dd4ab04241f150a588bf46d6c294d826731132cfb418df96d20d3cf1"
+}

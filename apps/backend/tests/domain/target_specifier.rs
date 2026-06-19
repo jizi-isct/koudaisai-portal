@@ -2,7 +2,7 @@ use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
 use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
-use koudaisai_portal_backend::domain::membership::Membership;
+use koudaisai_portal_backend::domain::membership::{Membership, Role};
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::domain::user_id::UserId;
 use serde::Deserialize;
@@ -63,32 +63,14 @@ fn uid(s: Option<&String>) -> UserId {
 }
 
 fn parse_group_type(s: &str) -> GroupType {
-    let u = || UserId::new(Uuid::new_v4());
+    let _u = || UserId::new(Uuid::new_v4());
     match s {
-        "press" => GroupType::Press {
-            representative: u(),
-        },
-        "general" => GroupType::GeneralProject {
-            representative1: u(),
-            representative2: u(),
-            representative3: u(),
-        },
-        "booth" => GroupType::BoothProject {
-            representative1: u(),
-            representative2: u(),
-            representative3: u(),
-        },
-        "stage" => GroupType::StageProject {
-            representative1: u(),
-            representative2: u(),
-            representative3: u(),
-        },
-        "labo" => GroupType::LabProject {
-            representative: u(),
-        },
-        _ => GroupType::Press {
-            representative: u(),
-        },
+        "press" => GroupType::Press,
+        "general" => GroupType::GeneralProject,
+        "booth" => GroupType::BoothProject,
+        "stage" => GroupType::StageProject,
+        "labo" => GroupType::LabProject,
+        _ => GroupType::Press,
     }
 }
 
@@ -105,15 +87,24 @@ pub fn test_does_actor_match(_path: &Path, contents: String) -> datatest_stable:
             let user_id = uid(user_id.as_ref());
             let memberships = group_ids
                 .iter()
-                .map(|g| Membership::new(GroupId::from_str(g).unwrap(), user_id, &FixedClock))
+                .map(|g| {
+                    Membership::new(
+                        GroupId::from_str(g).unwrap(),
+                        user_id,
+                        Role::Representative,
+                        &FixedClock,
+                    )
+                })
                 .collect();
             ActorContext::User {
+                name: "テストユーザー".to_string(),
                 user_id,
                 memberships,
                 group_type: parse_group_type(group_type),
             }
         }
         ActorSpec::Admin { user_id } => ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: uid(user_id.as_ref()),
             claims: vec![],
         },

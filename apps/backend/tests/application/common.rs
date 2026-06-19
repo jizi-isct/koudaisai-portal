@@ -1,10 +1,13 @@
 use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::actor_ctx::ActorContext;
+use koudaisai_portal_backend::domain::email_address::EmailAddress;
 use koudaisai_portal_backend::domain::group::GroupType;
 use koudaisai_portal_backend::domain::group_id::GroupId;
-use koudaisai_portal_backend::domain::membership::Membership;
+use koudaisai_portal_backend::domain::membership::{Membership, Role};
 use koudaisai_portal_backend::domain::target_specifier::TargetSpecifier;
 use koudaisai_portal_backend::domain::user_id::UserId;
+use koudaisai_portal_backend::infra::memory::MemoryApplication;
+use koudaisai_portal_backend::infra::memory::transaction_impl::MemoryTransaction;
 use serde::Deserialize;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -14,7 +17,43 @@ pub fn uid() -> UserId {
 }
 
 pub fn mem(group_id: GroupId, user_id: UserId) -> Membership {
-    Membership::new(group_id, user_id, &FixedClock)
+    Membership::new(group_id, user_id, Role::Representative, &FixedClock)
+}
+
+/// 全権限を持つ管理者コンテキスト（テストでのシード用）．
+fn seed_admin_ctx() -> ActorContext {
+    ActorContext::Admin {
+        user_id: uid(),
+        name: "Seed Admin".to_string(),
+        claims: vec![
+            "koudaisai-portal:admin:group:create".to_string(),
+            "koudaisai-portal:admin:group:update".to_string(),
+            "koudaisai-portal:admin:user:read".to_string(),
+        ],
+    }
+}
+
+/// テスト用に既存ユーザーを登録します．
+pub async fn seed_user(app: &MemoryApplication, user_id: UserId) {
+    let email = EmailAddress::new(format!("{}@example.com", user_id)).unwrap();
+    app.user()
+        .register(&seed_admin_ctx(), user_id, "Seed User".to_string(), email)
+        .await
+        .unwrap();
+}
+
+/// テスト用に（登録済みの）ユーザーを役職付きでグループへ追加します．
+pub async fn seed_member(app: &MemoryApplication, group_id: GroupId, user_id: UserId, role: Role) {
+    app.group()
+        .add_member(
+            &seed_admin_ctx(),
+            MemoryTransaction::new(),
+            group_id,
+            user_id,
+            role,
+        )
+        .await
+        .unwrap();
 }
 
 #[derive(Deserialize)]
@@ -34,27 +73,11 @@ pub enum ActorSpec {
 
 pub fn parse_group_type(s: &str) -> GroupType {
     match s {
-        "" | "press" => GroupType::Press {
-            representative: uid(),
-        },
-        "general" => GroupType::GeneralProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "booth" => GroupType::BoothProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "stage" => GroupType::StageProject {
-            representative1: uid(),
-            representative2: uid(),
-            representative3: uid(),
-        },
-        "labo" => GroupType::LabProject {
-            representative: uid(),
-        },
+        "" | "press" => GroupType::Press,
+        "general" => GroupType::GeneralProject,
+        "booth" => GroupType::BoothProject,
+        "stage" => GroupType::StageProject,
+        "labo" => GroupType::LabProject,
         s => panic!("unknown group_type: {s}"),
     }
 }
@@ -73,7 +96,14 @@ pub fn parse_target(s: &str) -> TargetSpecifier {
 pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
     let user_id = uid();
     match spec {
-        ActorSpec::Admin { claims } => (user_id, ActorContext::Admin { user_id, claims }),
+        ActorSpec::Admin { claims } => (
+            user_id,
+            ActorContext::Admin {
+                user_id,
+                name: "Test Admin".to_string(),
+                claims,
+            },
+        ),
         ActorSpec::User {
             group_type,
             group_ids,
@@ -87,6 +117,7 @@ pub fn build_actor(spec: ActorSpec) -> (UserId, ActorContext) {
                 user_id,
                 ActorContext::User {
                     user_id,
+                    name: "Test User".to_string(),
                     memberships,
                     group_type: gt,
                 },

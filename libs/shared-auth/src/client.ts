@@ -11,10 +11,14 @@ export type AuthQueryClient = OpenapiQueryClient<
 /**
  * fetch clientを生成する関数。
  *
+ * リフレッシュトークンは HttpOnly Cookie(`__Host-refresh_token`)で配送されるため，
+ * login / refresh / logout で Cookie を送受信できるよう `credentials: 'include'` を付ける。
+ * CORS は credentials 付き(allow_credentials + origin 許可リスト)で構成されている。
+ *
  * @param baseUrl APIのbase url
  */
 export function getAuthFetchClient(baseUrl: string): AuthFetchClient {
-  return createFetchClient<authPaths>({ baseUrl });
+  return createFetchClient<authPaths>({ baseUrl, credentials: 'include' });
 }
 
 /**

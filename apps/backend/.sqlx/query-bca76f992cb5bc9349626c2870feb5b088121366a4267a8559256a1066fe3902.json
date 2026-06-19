@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO groups (id, created_at, updated_at, name, type) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "bca76f992cb5bc9349626c2870feb5b088121366a4267a8559256a1066fe3902"
+}

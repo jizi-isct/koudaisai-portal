@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE users SET created_at = ?, updated_at = ?, name = ?, m_address = ?, status = ?, password_phc = ?, password_changed_at = ?, deactivated_at = ?, deactivation_reason = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "74a723e7ce89e13a7c358ba29d8008dea4624c8763ca829a556453dceedcd62c"
+}

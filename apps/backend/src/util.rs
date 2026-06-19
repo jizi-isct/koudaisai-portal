@@ -1,14 +1,11 @@
 use axum::response::{IntoResponse, Response};
 use http::{HeaderName, StatusCode};
-use sea_orm::ActiveValue;
+// TODO(sqlx移行): sea-orm の ActiveValue は撤去。sqlx 用の変換は application 層へ
+// use sea_orm::ActiveValue;
 use tracing::warn;
 use uuid::Uuid;
 
-pub(crate) mod jwt;
-pub mod layers;
 pub mod oidc;
-pub mod secrets;
-pub mod sha;
 
 pub struct AppError(anyhow::Error);
 
@@ -38,18 +35,20 @@ pub fn contains_uuid(tuple: (Uuid, Uuid, Uuid), target: Uuid) -> bool {
     tuple.0 == target || tuple.1 == target || tuple.2 == target
 }
 
-pub trait IntoActiveValue<T: Into<migration::Value>> {
-    fn into_active_value(self) -> ActiveValue<T>;
-}
-
-impl<T: Into<migration::Value>> IntoActiveValue<T> for Option<T> {
-    fn into_active_value(self) -> ActiveValue<T> {
-        match self {
-            Some(value) => ActiveValue::Set(value),
-            None => ActiveValue::NotSet,
-        }
-    }
-}
+// TODO(sqlx移行): sea-orm の ActiveValue / migration::Value に依存した変換ヘルパー。
+// sqlx 移行時に application 層の更新用型へ再配線する。
+// pub trait IntoActiveValue<T: Into<migration::Value>> {
+//     fn into_active_value(self) -> ActiveValue<T>;
+// }
+//
+// impl<T: Into<migration::Value>> IntoActiveValue<T> for Option<T> {
+//     fn into_active_value(self) -> ActiveValue<T> {
+//         match self {
+//             Some(value) => ActiveValue::Set(value),
+//             None => ActiveValue::NotSet,
+//         }
+//     }
+// }
 
 pub fn format_secs_ja_full(duration: i64) -> String {
     let hours = duration / 3600;

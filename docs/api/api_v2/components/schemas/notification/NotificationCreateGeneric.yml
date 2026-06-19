@@ -1,9 +1,0 @@
-type: object
-properties:
-  target:
-    type: array
-    description: Target specifiers for the form
-    items:
-      $ref: '../common/TargetSpecifier.yml'
-required:
-  - target

@@ -3,3 +3,6 @@ target/
 /migration/target
 /debug/private-key.pem
 /debug/public-key.pem
+# sqlx マクロのコンパイル時検査に使うローカル DB（生成物）。.sqlx キャッシュをコミットすればCIはオフラインでビルドできる
+koudaisai-portal.db
+koudaisai-portal.db-*

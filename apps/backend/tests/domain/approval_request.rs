@@ -1,5 +1,6 @@
 use crate::domain::common::FixedClock;
 use koudaisai_portal_backend::domain::{
+    admin_id::AdminId,
     approval_request::{ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType},
     approval_request_id::ApprovalRequestId,
     user_id::UserId,
@@ -43,7 +44,7 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
         &FixedClock,
     );
     if c.ok {
-        let req = result.expect(&format!("expected Ok for reason {:?}", c.reason));
+        let req = result.unwrap_or_else(|_| panic!("expected Ok for reason {:?}", c.reason));
         assert_eq!(req.issue_reason(), c.reason.as_str());
     } else {
         assert!(result.is_err(), "expected Err for reason {:?}", c.reason);
@@ -63,7 +64,7 @@ struct TransitionCase {
 pub fn test_transition(_path: &Path, contents: String) -> datatest_stable::Result<()> {
     let c: TransitionCase = serde_json::from_str(&contents)?;
     let mut req = make_pending();
-    let user = UserId::new(Uuid::new_v4());
+    let user = AdminId::new(Uuid::new_v4());
 
     match c.initial.as_str() {
         "pending" => {}

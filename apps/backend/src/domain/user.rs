@@ -114,8 +114,13 @@ impl User {
     }
 
     /// ユーザーをアクティベートするメソッド
-    /// `Registered` または `Deactivated` 状態のユーザーのみアクティベート可能
+    /// `Registered` 状態のユーザーのみアクティベート可能
     /// それ以外の状態の場合、`InvalidTransitionError` を返す
+    ///
+    /// `Deactivated` は終端状態で，本ドメインに再活性化経路は無い
+    /// (パスワードリセットも `change_password` も Active 限定のため Deactivated は復帰しない)。
+    /// (旧実装は `Deactivated` アームで引数 `password_credentials` をパターン束縛で
+    ///  握り潰し，古い creds を clone する不具合があったため `Registered` 限定にした。)
     pub fn activate<C: Clock>(
         &mut self,
         password_credentials: PasswordCredentials,
@@ -129,17 +134,63 @@ impl User {
                 self.updated_at = clock.now();
                 Ok(())
             }
-            UserStatus::Deactivated {
+            _ => Err(InvalidTransitionError {}),
+        }
+    }
+
+    /// パスワードを変更する。`Active` 状態のユーザーのみ可能。
+    /// `password_credentials.changed_at` が更新され，発行済みアクセストークンの
+    /// `iat` ゲート(iat >= changed_at)を失効させる。
+    pub fn change_password<C: Clock>(
+        &mut self,
+        new_phc: String,
+        clock: &C,
+    ) -> Result<(), InvalidTransitionError> {
+        match &mut self.status {
+            UserStatus::Active {
+                password_credentials,
+            } => {
+                password_credentials
+                    .change(new_phc, clock)
+                    .map_err(|_| InvalidTransitionError {})?;
+            }
+            _ => return Err(InvalidTransitionError {}),
+        }
+        self.updated_at = clock.now();
+        Ok(())
+    }
+
+    /// ハッシュの透過昇格(rehash)。`Active` 状態のユーザーのみ可能。
+    /// ログイン成功時に旧パラメータのハッシュを現行 argon2 へ差し替える用途。
+    /// ユーザー操作ではないため `changed_at` は更新せず，`updated_at` のみ更新する。
+    pub fn rehash_password<C: Clock>(
+        &mut self,
+        new_phc: String,
+        clock: &C,
+    ) -> Result<(), InvalidTransitionError> {
+        match &mut self.status {
+            UserStatus::Active {
+                password_credentials,
+            } => {
+                password_credentials.rehash(new_phc);
+            }
+            _ => return Err(InvalidTransitionError {}),
+        }
+        self.updated_at = clock.now();
+        Ok(())
+    }
+
+    /// 保存済みパスワード PHC を返す。`Registered`(未有効化)は未設定のため `None`。
+    pub fn password_phc(&self) -> Option<&str> {
+        match &self.status {
+            UserStatus::Active {
+                password_credentials,
+            }
+            | UserStatus::Deactivated {
                 password_credentials,
                 ..
-            } => {
-                self.status = UserStatus::Active {
-                    password_credentials: password_credentials.clone(),
-                };
-                self.updated_at = clock.now();
-                Ok(())
-            }
-            _ => Err(InvalidTransitionError {}),
+            } => Some(password_credentials.phc()),
+            UserStatus::Registered => None,
         }
     }
 
@@ -181,12 +232,6 @@ mod tests {
     }
 
     impl Clock for MockClock {
-        fn now(&self) -> DateTime<Utc> {
-            self.now
-        }
-    }
-
-    impl Clock for &MockClock {
         fn now(&self) -> DateTime<Utc> {
             self.now
         }
@@ -239,5 +284,78 @@ mod tests {
 
         assert_eq!(user.m_address(), &new_address);
         assert_eq!(user.updated_at(), &update_time);
+    }
+
+    fn creds(phc: &str, clock: &MockClock) -> PasswordCredentials {
+        PasswordCredentials::new(phc.to_string(), clock).unwrap()
+    }
+
+    #[test]
+    fn test_activate_from_registered_sets_phc() {
+        let clock = MockClock {
+            now: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+        };
+        let mut user = setup_user(&clock);
+        assert_eq!(user.password_phc(), None);
+
+        user.activate(creds("$fake$pw", &clock), &clock).unwrap();
+
+        assert!(matches!(user.status(), UserStatus::Active { .. }));
+        assert_eq!(user.password_phc(), Some("$fake$pw"));
+    }
+
+    #[test]
+    fn test_activate_twice_fails() {
+        let clock = MockClock {
+            now: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+        };
+        let mut user = setup_user(&clock);
+        user.activate(creds("$fake$pw", &clock), &clock).unwrap();
+
+        // すでに Active なので再 activate は不可。
+        assert!(user.activate(creds("$fake$pw2", &clock), &clock).is_err());
+        assert_eq!(user.password_phc(), Some("$fake$pw"));
+    }
+
+    #[test]
+    fn test_change_password_requires_active() {
+        let clock = MockClock {
+            now: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+        };
+        let mut user = setup_user(&clock); // Registered
+        assert!(
+            user.change_password("$fake$new".to_string(), &clock)
+                .is_err()
+        );
+
+        user.activate(creds("$fake$pw", &clock), &clock).unwrap();
+        assert!(
+            user.change_password("$fake$new".to_string(), &clock)
+                .is_ok()
+        );
+        assert_eq!(user.password_phc(), Some("$fake$new"));
+    }
+
+    #[test]
+    fn test_rehash_password_keeps_changed_at_but_bumps_updated_at() {
+        let t0 = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
+        let clock0 = MockClock { now: t0 };
+        let mut user = setup_user(&clock0);
+        user.activate(creds("$fake$pw", &clock0), &clock0).unwrap();
+
+        let t1 = t0 + Duration::seconds(100);
+        let clock1 = MockClock { now: t1 };
+        user.rehash_password("$argon2$better".to_string(), &clock1)
+            .unwrap();
+
+        assert_eq!(user.password_phc(), Some("$argon2$better"));
+        assert_eq!(user.updated_at(), &t1);
+        // rehash はユーザー操作ではないので changed_at は据え置き。
+        match user.status() {
+            UserStatus::Active {
+                password_credentials,
+            } => assert_eq!(password_credentials.changed_at(), &t0),
+            _ => panic!("expected Active"),
+        }
     }
 }

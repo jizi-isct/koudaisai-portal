@@ -1,0 +1,382 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Koudaisai Portal Auth v2",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/activate": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "activate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "有効化成功(初回パスワード設定)"
+          },
+          "400": {
+            "description": "パスワードポリシー違反"
+          },
+          "401": {
+            "description": "トークン無効/失効/消費済み"
+          },
+          "409": {
+            "description": "既に有効化済み"
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "admin_login",
+        "responses": {
+          "302": {
+            "description": "Keycloak 認可エンドポイントへリダイレクト"
+          }
+        }
+      }
+    },
+    "/admin/redirect": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "admin_redirect",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRedirectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Keycloak トークン",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "未知の state"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "ログイン成功。リフレッシュトークンは Set-Cookie で配送",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証失敗(存在/状態を区別しない汎用)"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "ログアウト(冪等)。Cookie をクリア"
+          }
+        }
+      }
+    },
+    "/logout-all": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "logout_all",
+        "responses": {
+          "204": {
+            "description": "全デバイスのセッションを失効。Cookie クリア"
+          },
+          "401": {
+            "description": "アクセストークン無効"
+          }
+        }
+      }
+    },
+    "/password/change": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "password_change",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "変更成功。全セッション失効・Cookie クリア"
+          },
+          "400": {
+            "description": "新パスワードがポリシー違反"
+          },
+          "401": {
+            "description": "アクセストークン無効 / 旧パスワード不一致"
+          }
+        }
+      }
+    },
+    "/password/reset": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "password_reset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "常に 202(存在/不在を漏らさない)"
+          }
+        }
+      }
+    },
+    "/password/reset/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "password_reset_confirm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "リセット成功。全セッション失効・Cookie クリア"
+          },
+          "400": {
+            "description": "パスワードポリシー違反"
+          },
+          "401": {
+            "description": "トークン無効/失効/消費済み"
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "refresh",
+        "responses": {
+          "200": {
+            "description": "回転成功。新リフレッシュトークンを Set-Cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "トークン無効 / reuse 検知 / Cookie 無し"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivateRequest": {
+        "type": "object",
+        "required": [
+          "token",
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "不透明な有効化トークン `\"{id}.{secret}\"`。"
+          }
+        }
+      },
+      "AdminRedirectRequest": {
+        "type": "object",
+        "required": [
+          "code",
+          "state"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminTokenResponse": {
+        "type": "object",
+        "required": [
+          "refresh_token",
+          "access_token"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "old_password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "m_address",
+          "password"
+        ],
+        "properties": {
+          "m_address": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordResetConfirmRequest": {
+        "type": "object",
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "不透明なリセットトークン `\"{id}.{secret}\"`。"
+          }
+        }
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "required": [
+          "m_address"
+        ],
+        "properties": {
+          "m_address": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "description": "ログイン/リフレッシュ成功時のレスポンス。リフレッシュトークンは本文に含めず\n`__Host-` Cookie で配送する。アクセストークンのみ本文で返す。",
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "expires_in": {
+            "type": "integer",
+            "format": "int64",
+            "description": "アクセストークンの有効秒数。"
+          },
+          "token_type": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -13,7 +13,6 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { Button, ConfigProvider, Flex, Layout, Menu, theme } from 'antd';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { authFetchClient } from '@/features/api/api';
 
 type Props = {
   children: ReactNode;
@@ -48,7 +47,7 @@ function AdminLayoutContent({ children, currentPath }: Props) {
 
   useEffect(() => {
     (async () => {
-      const tokens = await getTokensAdmin(authFetchClient);
+      const tokens = getTokensAdmin();
 
       if (tokens) {
         setIsAuthenticated(true);

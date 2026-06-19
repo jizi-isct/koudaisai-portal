@@ -1,12 +1,10 @@
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::document::Document;
 use crate::domain::form::Form;
-use crate::domain::group::Group;
 use crate::domain::membership::Membership;
 use crate::domain::notification::Notification;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
-use uuid::Uuid;
 
 pub fn can_get_all_users(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
@@ -50,7 +48,7 @@ pub fn can_get_user_by_id(
     }
 }
 
-pub fn can_update_user(actor_ctx: &ActorContext, user: &User) -> bool {
+pub fn can_update_user(actor_ctx: &ActorContext, _user: &User) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:update".to_string())
@@ -59,10 +57,19 @@ pub fn can_update_user(actor_ctx: &ActorContext, user: &User) -> bool {
     }
 }
 
-pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, user_id: UserId) -> bool {
+pub fn can_change_m_address_of_the_user(actor_ctx: &ActorContext, _user_id: UserId) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:user:change-email".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_user(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:user:delete".to_string())
         }
         _ => false,
     }
@@ -79,7 +86,7 @@ pub fn can_get_all_groups(actor_ctx: &ActorContext) -> bool {
 
 pub fn can_get_group_by_id(
     actor_ctx: &ActorContext,
-    members: &Vec<Membership>,
+    members: &[Membership],
 ) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -105,6 +112,35 @@ pub fn can_create_group(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
             claims.contains(&"koudaisai-portal:admin:group:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_update_group(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+pub fn can_delete_group(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// グループのメンバー（所属・役職）を追加・削除できるか．
+// TODO: 現状は管理者(group:update クレーム)のみ許可．団体メンバー自身による管理を許す場合はここを拡張する．
+pub fn can_manage_group_members(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:group:update".to_string())
         }
         _ => false,
     }
@@ -180,7 +216,7 @@ pub fn can_get_group_approval_requests(actor_ctx: &ActorContext, group_id: Group
 /// 特定の承認申請を取得できるか
 pub fn can_get_approval_request(
     actor_ctx: &ActorContext,
-    request: &ApprovalRequest,
+    _request: &ApprovalRequest,
     memberships_of_issuer: &[Membership],
 ) -> bool {
     match actor_ctx {
@@ -349,6 +385,8 @@ pub fn can_delete_document_category(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+// 通知一覧の全件取得権限。ハンドラ未接続だが authz コントラクトとして保持する。
+#[allow(dead_code)]
 pub fn can_get_all_notifications(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -367,6 +405,18 @@ pub fn can_get_notification(actor_ctx: &ActorContext, notification: &Notificatio
             .targets()
             .iter()
             .any(|target| target.does_actor_match(actor_ctx)),
+    }
+}
+
+/// 対象ユーザーの通知一覧(既読状態付き)を閲覧できるか。
+/// 管理者(notification:read)または本人のみ。
+pub fn can_get_user_notifications(actor_ctx: &ActorContext, target_user_id: UserId) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:notification:read".to_string())
+        }
+        ActorContext::User { user_id, .. } => *user_id == target_user_id,
+        ActorContext::NoLogin => false,
     }
 }
 
@@ -397,6 +447,25 @@ pub fn can_delete_notification(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+/// ファイルのアップロード用URLを要求できるか。
+pub fn can_upload_file(actor_ctx: &ActorContext) -> bool {
+    matches!(
+        actor_ctx,
+        ActorContext::Admin { .. } | ActorContext::User { .. }
+    )
+}
+
+/// ファイルのダウンロード用URLを要求できるか。
+/// ダウンロードは（レガシー同様）無認証で誰でも要求できる。鍵(key)を知っていることを前提とする。
+pub fn can_download_file(_actor_ctx: &ActorContext) -> bool {
+    true
+}
+
+/// 外部 URL のメタ情報(OGP)を取得できるか。legacy 同様に管理者専用。
+pub fn can_fetch_meta(actor_ctx: &ActorContext) -> bool {
+    matches!(actor_ctx, ActorContext::Admin { .. })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -406,7 +475,7 @@ mod tests {
     use crate::domain::approval_request_id::ApprovalRequestId;
     use crate::domain::group::GroupType;
     use crate::domain::group_id::GroupId;
-    use crate::domain::membership::Membership;
+    use crate::domain::membership::{Membership, Role};
     use crate::domain::user_id::UserId;
     use chrono::{DateTime, Utc};
     use uuid::Uuid;
@@ -427,7 +496,7 @@ mod tests {
     }
 
     fn create_membership(group_id: GroupId, user_id: UserId) -> Membership {
-        Membership::new(group_id, user_id, &MockClock)
+        Membership::new(group_id, user_id, Role::Representative, &MockClock)
     }
 
     fn create_pending_approval_request(issued_by: UserId) -> ApprovalRequest {
@@ -447,23 +516,24 @@ mod tests {
     #[test]
     fn test_can_get_all_users() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:read".to_string()],
         };
         assert!(can_get_all_users(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
         assert!(!can_get_all_users(&unauthorized_admin_ctx));
 
         let user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: create_user_id(),
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_all_users(&user_ctx));
 
@@ -479,6 +549,7 @@ mod tests {
 
         // Admin with permission
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:read".to_string()],
         };
@@ -486,6 +557,7 @@ mod tests {
 
         // Admin without permission
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -497,22 +569,20 @@ mod tests {
         // User in the same group
         let other_user_id = create_user_id();
         let same_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![create_membership(group_id, other_user_id)],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_user_by_id(&same_group_user_ctx, memberships_of_the_user.clone()).is_ok());
 
         // User in a different group
         let diff_group_id = GroupId::new('G', 2).unwrap();
         let diff_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![create_membership(diff_group_id, other_user_id)],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(matches!(
             can_get_user_by_id(&diff_group_user_ctx, memberships_of_the_user.clone()),
@@ -541,12 +611,14 @@ mod tests {
         .unwrap();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:update".to_string()],
         };
         assert!(can_update_user(&admin_ctx, &user));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -560,12 +632,14 @@ mod tests {
         let user_id = create_user_id();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:user:change-email".to_string()],
         };
         assert!(can_change_m_address_of_the_user(&admin_ctx, user_id));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -583,12 +657,14 @@ mod tests {
     #[test]
     fn test_can_get_all_groups() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:read".to_string()],
         };
         assert!(can_get_all_groups(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -605,6 +681,7 @@ mod tests {
 
         // Admin with permission
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:read".to_string()],
         };
@@ -612,6 +689,7 @@ mod tests {
 
         // Admin without permission
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -622,22 +700,20 @@ mod tests {
 
         // User who is a member
         let member_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_group_by_id(&member_user_ctx, &members).is_ok());
 
         // User who is not a member
         let other_user_id = create_user_id();
         let non_member_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(matches!(
             can_get_group_by_id(&non_member_user_ctx, &members),
@@ -654,12 +730,14 @@ mod tests {
     #[test]
     fn test_can_create_group() {
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:group:create".to_string()],
         };
         assert!(can_create_group(&admin_ctx));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -674,12 +752,14 @@ mod tests {
         let user_id = create_user_id();
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:read".to_string()],
         };
         assert!(can_get_group_approval_requests(&admin_ctx, group_id));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -689,11 +769,10 @@ mod tests {
         ));
 
         let user_ctx_same_group = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(group_id, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_group_approval_requests(
             &user_ctx_same_group,
@@ -702,11 +781,10 @@ mod tests {
 
         let other_group = GroupId::new('G', 2).unwrap();
         let user_ctx_other_group = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id,
             memberships: vec![create_membership(other_group, user_id)],
-            group_type: GroupType::Press {
-                representative: user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_group_approval_requests(
             &user_ctx_other_group,
@@ -727,6 +805,7 @@ mod tests {
         let request = create_pending_approval_request(issuer_id);
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:read".to_string()],
         };
@@ -737,6 +816,7 @@ mod tests {
         ));
 
         let unauthorized_admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec![],
         };
@@ -748,11 +828,10 @@ mod tests {
 
         let viewer_id = create_user_id();
         let same_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: viewer_id,
             memberships: vec![create_membership(issuer_group, viewer_id)],
-            group_type: GroupType::Press {
-                representative: viewer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_get_approval_request(
             &same_group_user_ctx,
@@ -762,11 +841,10 @@ mod tests {
 
         let other_group = GroupId::new('G', 2).unwrap();
         let other_group_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: viewer_id,
             memberships: vec![create_membership(other_group, viewer_id)],
-            group_type: GroupType::Press {
-                representative: viewer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_get_approval_request(
             &other_group_user_ctx,
@@ -787,25 +865,24 @@ mod tests {
         let request = create_pending_approval_request(issuer_id);
 
         let issuer_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: issuer_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: issuer_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(can_close_approval_request(&issuer_ctx, &request));
 
         let other_user_id = create_user_id();
         let other_user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
             user_id: other_user_id,
             memberships: vec![],
-            group_type: GroupType::Press {
-                representative: other_user_id,
-            },
+            group_type: GroupType::Press,
         };
         assert!(!can_close_approval_request(&other_user_ctx, &request));
 
         let admin_ctx = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
             user_id: create_user_id(),
             claims: vec!["koudaisai-portal:admin:approval-request:approve".to_string()],
         };

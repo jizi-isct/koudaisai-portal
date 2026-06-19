@@ -1,8 +1,13 @@
 use crate::application::error::ApplicationError;
 use crate::domain::email_address::EmailAddress;
-use crate::domain::error::DomainError;
 
 #[async_trait::async_trait]
 pub trait Email {
-    async fn send(&self, address: &EmailAddress, body: &str) -> Result<(), ApplicationError>;
+    /// メールを送信する。`subject` は件名、`body` は本文(text/plain)。
+    async fn send(
+        &self,
+        address: &EmailAddress,
+        subject: &str,
+        body: &str,
+    ) -> Result<(), ApplicationError>;
 }

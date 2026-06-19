@@ -63,11 +63,11 @@ function ApprovalRequestReviewForm({
       },
     },
   });
-  const { data: issuer } = $api.useQuery('get', '/users/{user_id}', {
+  const { data: issuer } = $api.useQuery('get', '/users/{id}', {
     enabled: !!approvalRequest?.issued_by,
     params: {
       path: {
-        user_id: approvalRequest?.issued_by ?? '',
+        id: approvalRequest?.issued_by ?? '',
       },
     },
   });
@@ -94,7 +94,15 @@ function ApprovalRequestReviewForm({
   const [approvalReason, setApprovalReason] = useState('');
 
   useEffect(() => {
-    setApprovalReason(approvalRequest?.approval_reason ?? '');
+    // 理由は status ごとの別フィールドに分かれた(approved→approval_reason,
+    // rejected→rejection_reason)。審査中は空。
+    if (approvalRequest?.status === 'approved') {
+      setApprovalReason(approvalRequest.approval_reason ?? '');
+    } else if (approvalRequest?.status === 'rejected') {
+      setApprovalReason(approvalRequest.rejection_reason ?? '');
+    } else {
+      setApprovalReason('');
+    }
   }, [approvalRequest]);
 
   if (isLoading) {
@@ -133,7 +141,7 @@ function ApprovalRequestReviewForm({
           },
         },
         body: {
-          approval_reason: getApprovalReason(),
+          reason: getApprovalReason(),
         },
       });
     } catch (e) {
@@ -161,7 +169,7 @@ function ApprovalRequestReviewForm({
           },
         },
         body: {
-          approval_reason: getApprovalReason(),
+          reason: getApprovalReason(),
         },
       });
     } catch (e) {
@@ -198,7 +206,7 @@ function ApprovalRequestReviewForm({
           )}
         </Form.Item>
 
-        {approvalRequest.type_edit_exhibition_info && (
+        {approvalRequest.type === 'edit_exhibition_info' && (
           <Card title="申請内容" style={{ margin: '16px 0' }}>
             <ViewPendingEditExhibitionInfoRequest
               approvalRequest={approvalRequest}

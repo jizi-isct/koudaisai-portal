@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, user_id, purpose, token_hash, created_at, expires_at, consumed_at, m_address\n               FROM one_time_tokens WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "purpose",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "token_hash",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "expires_at",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "consumed_at",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "m_address",
+        "ordinal": 7,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "91e46ea7cad59f8f4e8408b96c679379a64124e9edda8495e2410e19a522d4a5"
+}

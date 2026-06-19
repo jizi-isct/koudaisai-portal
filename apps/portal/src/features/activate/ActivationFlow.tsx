@@ -272,9 +272,10 @@ function ActivationPhaseActivating({
     hasActivated.current = true;
 
     (async () => {
+      // 新 API は token(不透明な `{id}.{secret}`)と password のみを受け取る。
+      // m_address はトークンに束縛済みのため本文では送らない。
       const { response } = await authFetchClient.POST('/activate', {
         body: {
-          m_address: mAddress,
           token,
           password,
         },

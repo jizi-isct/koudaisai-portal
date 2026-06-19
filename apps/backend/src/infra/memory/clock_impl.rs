@@ -21,9 +21,3 @@ impl Clock for MemoryClock {
         self.now
     }
 }
-
-impl Clock for &MemoryClock {
-    fn now(&self) -> DateTime<Utc> {
-        self.now
-    }
-}

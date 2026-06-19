@@ -32,7 +32,7 @@ function FormsTable() {
   const { data, isLoading, refetch } = $api.useQuery('get', '/forms');
   const { mutateAsync: mutateFormDelete } = $api.useMutation(
     'delete',
-    '/forms/{form_id}',
+    '/forms/{id}',
   );
 
   const handleDelete = (id: string) => async () => {
@@ -41,7 +41,7 @@ function FormsTable() {
       await mutateFormDelete({
         params: {
           path: {
-            form_id: id,
+            id,
           },
         },
       });
@@ -60,7 +60,7 @@ function FormsTable() {
     {
       key: 'title',
       title: 'タイトル',
-      dataIndex: 'form_name',
+      dataIndex: 'name',
       rowScope: 'row',
       render: (value, record) => (
         <a
@@ -75,8 +75,7 @@ function FormsTable() {
       key: 'type',
       title: '種類',
       render: (_value, record) => {
-        if ('type_external' in record) return <Tag color="green">外部</Tag>;
-        if ('type_builtin' in record) return <Tag color="blue">ビルトイン</Tag>;
+        if (record.type === 'external') return <Tag color="green">外部</Tag>;
         return <Tag color="blue">不明</Tag>;
       },
     },

@@ -11,20 +11,14 @@ type ViewDocumentProps = {
 export function ViewDocument({ download, document }: ViewDocumentProps) {
   return (
     <>
-      {document.format_pdf && (
-        <ViewDocumentFormatPdf
-          download={download}
-          format={document.format_pdf}
-        />
+      {document.format === 'pdf' && (
+        <ViewDocumentFormatPdf download={download} format={document} />
       )}
-      {document.format_markdown && (
-        <ViewDocumentFormatMarkdown format={document.format_markdown} />
+      {document.format === 'markdown' && (
+        <ViewDocumentFormatMarkdown format={document} />
       )}
-      {document.format_misc && (
-        <ViewDocumentFormatMisc
-          download={download}
-          format={document.format_misc}
-        />
+      {document.format === 'misc' && (
+        <ViewDocumentFormatMisc download={download} format={document} />
       )}
     </>
   );

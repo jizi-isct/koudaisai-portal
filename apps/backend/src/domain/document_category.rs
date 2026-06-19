@@ -36,8 +36,8 @@ impl DocumentCategory {
             id: Uuid::new_v4(),
             created_at: now,
             updated_at: now,
-            title: title,
-            emoji: emoji,
+            title,
+            emoji,
         })
     }
 

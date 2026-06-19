@@ -1,9 +1,0 @@
-type: object
-description: 企画情報訂正申請
-properties:
-  description:
-    type: string
-    description: 企画内容説明文
-  icon_key:
-    type: string
-    description: 企画アイコンのキー．

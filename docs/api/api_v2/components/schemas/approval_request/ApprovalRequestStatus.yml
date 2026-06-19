@@ -1,8 +1,0 @@
-type: string
-description: Status of the approval request
-enum:
-  - pending
-  - approved
-  - rejected
-  - closed
-example: pending

@@ -1,0 +1,61 @@
+name: Backend sqlx offline check
+
+# .sqlx(オフラインクエリキャッシュ)がマイグレーション/クエリと同期しているか検証する。
+# 通常ビルドは .cargo/config.toml の SQLX_OFFLINE=true で .sqlx を使うため、
+# キャッシュが古いと query!/query_as! が壊れる。ここでは実DBに当てて検証する。
+
+on:
+  pull_request:
+    paths:
+      - 'apps/backend/src/**'
+      - 'apps/backend/migrations/**'
+      - 'apps/backend/.sqlx/**'
+      - 'apps/backend/Cargo.toml'
+      - 'apps/backend/Cargo.lock'
+      - '.github/workflows/backend-sqlx-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sqlx-check:
+    name: cargo sqlx prepare --check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        run: rustup default stable
+
+      - name: Cache cargo & target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry
+            ~/.cargo/git
+            apps/backend/target
+          key: ${{ runner.os }}-sqlx-check-${{ hashFiles('apps/backend/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-sqlx-check-
+
+      - name: Install sqlx-cli (if not cached)
+        run: command -v sqlx || cargo install sqlx-cli --no-default-features --features sqlite,rustls --version '^0.8' --locked
+
+      - name: Apply migrations to a fresh SQLite DB
+        env:
+          DATABASE_URL: sqlite://sqlx-ci.db
+        run: |
+          rm -f sqlx-ci.db
+          sqlx database create
+          sqlx migrate run
+
+      - name: Check .sqlx is in sync with queries & schema
+        env:
+          DATABASE_URL: sqlite://sqlx-ci.db
+          # .cargo/config.toml の SQLX_OFFLINE=true を上書きし、実DBに当てて検証する
+          SQLX_OFFLINE: 'false'
+        run: cargo sqlx prepare --check -- --lib
