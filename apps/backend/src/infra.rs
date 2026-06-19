@@ -6,5 +6,5 @@ pub mod memory;
 pub mod random_secret_generator;
 pub mod reqwest_meta_fetcher;
 pub mod s3_object_storage;
-pub mod sendgrid_email;
+pub mod ses_email;
 pub mod sqlite;

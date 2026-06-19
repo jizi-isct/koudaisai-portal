@@ -47,10 +47,12 @@ secret_access_key = ""
 endpoint = ""
 bucket = ""
 
-[sendgrid]
-# sendgrid連携が必要な場合は別途設定の必要あり
+[ses]
+# Amazon SES連携が必要な場合は別途設定の必要あり
 sender_address = ""
-api_key = ""
+region = "ap-northeast-1"
+access_key_id = ""
+secret_access_key = ""
 
 [discord]
 # Discord連携が必要な場合は別途設定の必要あり

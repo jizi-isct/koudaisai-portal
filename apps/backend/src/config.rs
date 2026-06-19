@@ -21,7 +21,9 @@ pub struct Config {
     pub web: Web,
     pub db: Db,
     pub s3: S3,
-    pub sendgrid: Sendgrid,
+    /// Amazon SES(メール送信)。既存 config を壊さないため `serde(default)`。
+    #[serde(default)]
+    pub ses: Ses,
     pub discord: Discord,
     pub secrets: Secrets,
 }
@@ -212,10 +214,24 @@ pub struct S3 {
     pub bucket: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Sendgrid {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Ses {
+    /// 送信元(検証済み)アドレス。
     pub sender_address: String,
-    pub api_key: String,
+    pub region: String,
+    pub access_key_id: String,
+    pub secret_access_key: String,
+}
+
+impl Default for Ses {
+    fn default() -> Self {
+        Self {
+            sender_address: String::new(),
+            region: "ap-northeast-1".to_string(),
+            access_key_id: String::new(),
+            secret_access_key: String::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
