@@ -3,7 +3,7 @@
 import styles from './MobileNavigator.module.css';
 import { headerItemsAdmin, headerItemsMembers } from '../lib/magicNumbers';
 import { Button } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type Props = {
   header_type: 'admin' | 'members';
@@ -12,11 +12,9 @@ type Props = {
 };
 
 export function MobileNavigator({ header_type, logout, isLoggedIn }: Props) {
-  const [currentPath, setCurrentPath] = useState('');
-
-  useEffect(() => {
-    setCurrentPath(window.location.pathname);
-  }, []);
+  const [currentPath] = useState(() =>
+    typeof window !== 'undefined' ? window.location.pathname : '',
+  );
 
   const handleLogout = async () => {
     await logout();

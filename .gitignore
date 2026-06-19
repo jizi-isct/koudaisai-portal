@@ -68,3 +68,6 @@ vite.config.*.timestamp*
 vitest.config.*.timestamp*
 
 .ai
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

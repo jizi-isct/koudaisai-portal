@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  IMAGE_NAME: ghcr.io/jizi-isct/koudaisai-portal
+  IMAGE_NAME: ghcr.io/jizi-isct/koudaisai-portal-backend
 
 jobs:
   build:

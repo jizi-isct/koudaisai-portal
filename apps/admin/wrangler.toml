@@ -1,0 +1,20 @@
+name = "admin"
+compatibility_date = "2026-06-19"
+preview_urls = true
+
+[assets]
+directory = "dist"
+
+[observability]
+enabled = true
+
+[[routes]]
+pattern = "admin.koudaisai.jp"
+custom_domain = true
+
+[env.preview]
+name = "admin-preview"
+
+[[env.preview.routes]]
+pattern = "admin-preview.koudaisai.jp"
+custom_domain = true

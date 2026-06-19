@@ -26,12 +26,6 @@ WORKDIR /usr/src/app
 
 RUN nx build --verbose backend
 
-FROM build-base AS build-web
-
-WORKDIR /usr/src/app
-
-RUN nx build --verbose web
-
 FROM debian:bookworm-slim AS final
 
 RUN apt-get update \
@@ -44,7 +38,6 @@ USER 33
 WORKDIR /var/www
 
 COPY --chown=33 --chmod=774 --from=build-backend /usr/src/app/apps/backend/target/release/koudaisai-portal-backend /bin/
-COPY --chown=33 --chmod=774 --from=build-web /usr/src/app/apps/web/out /var/www/html/
 
 EXPOSE 8080
 
