@@ -20,17 +20,12 @@ export function ResetPasswordRequestForm() {
       setIsSubmitting(true);
 
       try {
-        const response = await authFetchClient.POST('/password/reset', {
+        // 仕様上、存在/不在を漏らさないため常に 202 が返る(エラーレスポンスなし)。
+        await authFetchClient.POST('/password/reset', {
           body: {
             m_address: mAddress,
           },
         });
-
-        if (response.error) {
-          setError(`${response.error}`);
-          setIsSubmitting(false);
-          return;
-        }
       } catch (caughtError) {
         setError(`${caughtError}`);
         setIsSubmitting(false);
