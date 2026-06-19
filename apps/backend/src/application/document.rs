@@ -29,12 +29,15 @@ pub struct DocumentApp<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> {
 impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR, C> {
     pub fn new(document_repo: &'a DR, clock: &'a C) -> Self {
         Self {
-            _phantom: PhantomData::default(),
+            _phantom: PhantomData,
             document_repo,
             clock,
         }
     }
 
+    // 文書可視性フィルタ用のターゲット展開ヘルパー。ハンドラ未接続だが
+    // 可視性絞り込みの再配線で利用予定のため保持する。
+    #[allow(dead_code)]
     fn get_target_specifier(
         user_id: &UserId,
         memberships: &[Membership],
@@ -42,28 +45,28 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
     ) -> Vec<TargetSpecifier> {
         let mut targets = vec![
             TargetSpecifier::UserNologin,
-            TargetSpecifier::UserId(user_id.clone()),
+            TargetSpecifier::UserId(*user_id),
         ];
         for membership in memberships {
             targets.push(TargetSpecifier::GroupId(membership.group_id()));
         }
         targets.push(match group_type {
-            crate::domain::group::GroupType::GeneralProject { .. } => {
+            crate::domain::group::GroupType::GeneralProject => {
                 TargetSpecifier::GroupTypeProjectGeneral
             }
-            crate::domain::group::GroupType::BoothProject { .. } => {
+            crate::domain::group::GroupType::BoothProject => {
                 TargetSpecifier::GroupTypeProjectBooth
             }
-            crate::domain::group::GroupType::StageProject { .. } => {
+            crate::domain::group::GroupType::StageProject => {
                 TargetSpecifier::GroupTypeProjectStage
             }
-            crate::domain::group::GroupType::LabProject { .. } => {
+            crate::domain::group::GroupType::LabProject => {
                 TargetSpecifier::GroupTypeProjectLabo
             }
-            crate::domain::group::GroupType::Press { .. } => TargetSpecifier::GroupTypePress,
+            crate::domain::group::GroupType::Press => TargetSpecifier::GroupTypePress,
         });
 
-        return targets;
+        targets
     }
 
     pub async fn create(
@@ -116,7 +119,7 @@ impl<'a, Tx: Transaction, DR: DocumentRepo<Tx>, C: Clock> DocumentApp<'a, Tx, DR
             .into_iter()
             .filter(|doc| can_get_document(actor_ctx, doc).is_ok())
             .fold(HashMap::new(), |mut acc, doc| {
-                acc.entry(doc.category().clone())
+                acc.entry(doc.category())
                     .or_insert_with(Vec::new)
                     .push(doc);
                 acc

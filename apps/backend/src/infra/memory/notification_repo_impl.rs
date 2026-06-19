@@ -16,6 +16,12 @@ pub struct MemoryNotificationRepo {
     reads: Arc<RwLock<HashSet<(UserId, NotificationId)>>>,
 }
 
+impl Default for MemoryNotificationRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryNotificationRepo {
     pub fn new() -> Self {
         Self {

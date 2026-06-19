@@ -6,7 +6,7 @@ export {
   type $defs as $apiDefs,
   type operations as apiOperations,
 } from './api_v3';
-export {type paths as authPaths} from './auth_v2';
+export { type paths as authPaths } from './auth_v2';
 export {
   type paths as plansInfoPaths,
   type components as plansInfoComponents,

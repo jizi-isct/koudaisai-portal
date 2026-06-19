@@ -12,6 +12,12 @@ pub struct MemoryDocumentRepo {
     documents: Arc<RwLock<HashMap<Uuid, Document>>>,
 }
 
+impl Default for MemoryDocumentRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryDocumentRepo {
     pub fn new() -> Self {
         Self {

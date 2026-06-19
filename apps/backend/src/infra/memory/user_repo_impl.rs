@@ -14,6 +14,12 @@ pub struct MemoryUserRepo {
     users: Arc<RwLock<HashMap<UserId, User>>>,
 }
 
+impl Default for MemoryUserRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryUserRepo {
     pub fn new() -> Self {
         Self {

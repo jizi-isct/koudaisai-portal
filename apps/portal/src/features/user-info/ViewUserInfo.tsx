@@ -43,9 +43,7 @@ export function ViewUserInfo() {
       const { data: members } = await api.GET('/groups/{id}/members', {
         params: { path: { id: group.id } },
       });
-      setRole(
-        members?.find((m: MemberRead) => m.user_id === user.id)?.role,
-      );
+      setRole(members?.find((m: MemberRead) => m.user_id === user.id)?.role);
 
       setUser(user);
       setGroup(group);

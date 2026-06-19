@@ -54,9 +54,9 @@ impl FromStr for TargetSpecifier {
     }
 }
 
-impl Into<String> for &TargetSpecifier {
-    fn into(self) -> String {
-        match self {
+impl From<&TargetSpecifier> for String {
+    fn from(val: &TargetSpecifier) -> Self {
+        match val {
             TargetSpecifier::GroupTypeProjectGeneral => "group/type/project_general".to_string(),
             TargetSpecifier::GroupTypeProjectBooth => "group/type/project_booth".to_string(),
             TargetSpecifier::GroupTypeProjectStage => "group/type/project_stage".to_string(),

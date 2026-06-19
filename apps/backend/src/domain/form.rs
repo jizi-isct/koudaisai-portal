@@ -59,6 +59,7 @@ impl Form {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn restore(
         id: FormId,
         created_at: DateTime<Utc>,
@@ -114,7 +115,7 @@ impl Form {
         targets: Vec<TargetSpecifier>,
         updated_by: Option<Uuid>,
         clock: &C,
-    ) -> () {
+    ) {
         self.targets = targets;
 
         if let Some(user_id) = updated_by {
@@ -123,7 +124,7 @@ impl Form {
 
         self.updated_at = clock.now();
 
-        ()
+        
     }
 
     pub fn name(&self) -> &str {

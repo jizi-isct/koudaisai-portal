@@ -12,6 +12,12 @@ pub struct MemoryMembershipRepo {
     memberships: Arc<RwLock<Vec<Membership>>>,
 }
 
+impl Default for MemoryMembershipRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryMembershipRepo {
     pub fn new() -> Self {
         Self {

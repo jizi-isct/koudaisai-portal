@@ -86,7 +86,7 @@ pub fn can_get_all_groups(actor_ctx: &ActorContext) -> bool {
 
 pub fn can_get_group_by_id(
     actor_ctx: &ActorContext,
-    members: &Vec<Membership>,
+    members: &[Membership],
 ) -> Result<(), CanGetByIdError> {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {
@@ -385,6 +385,8 @@ pub fn can_delete_document_category(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+// 通知一覧の全件取得権限。ハンドラ未接続だが authz コントラクトとして保持する。
+#[allow(dead_code)]
 pub fn can_get_all_notifications(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {
         ActorContext::Admin { claims, .. } => {

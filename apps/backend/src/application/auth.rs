@@ -220,11 +220,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
 
         // トークンが宛先に束縛されている場合、現在の m_address と一致しなければ拒否する
         // (email 変更後に旧宛先宛のトークンでアカウントを乗っ取られるのを防ぐ)。
-        if let Some(bound) = token.m_address() {
-            if bound != user.m_address() {
+        if let Some(bound) = token.m_address()
+            && bound != user.m_address() {
                 return Err(AuthError::InvalidToken);
             }
-        }
 
         let plaintext = PlaintextPassword::new(password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;
@@ -304,13 +303,12 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
         );
 
         tx.begin().await.map_err(internal)?;
-        if actives.len() >= self.config.max_sessions_per_user {
-            if let Some(oldest) = actives.iter().min_by_key(|s| *s.created_at()) {
+        if actives.len() >= self.config.max_sessions_per_user
+            && let Some(oldest) = actives.iter().min_by_key(|s| *s.created_at()) {
                 self.session_repo
                     .revoke_family_in(&mut tx, oldest.id(), RevocationReason::EvictedLru, now)
                     .await?;
             }
-        }
         if let Some(new_phc) = &rehash_to {
             // 並行パスワード変更を巻き戻さないため楽観的に rehash する
             // (password_phc が検証時のままの Active ユーザにだけ適用。不一致なら no-op)。
@@ -568,11 +566,10 @@ impl<'a, Tx: Transaction + Send, C: Clock + Send + Sync> AuthApp<'a, Tx, C> {
             .map_err(internal)?
             .ok_or(AuthError::InvalidToken)?;
         // 宛先束縛の検証(email 変更後の旧宛先トークンを拒否)。
-        if let Some(bound) = token.m_address() {
-            if bound != user.m_address() {
+        if let Some(bound) = token.m_address()
+            && bound != user.m_address() {
                 return Err(AuthError::InvalidToken);
             }
-        }
         let user_id = user.id();
         let plaintext = PlaintextPassword::new(new_password.to_string())
             .map_err(|e| AuthError::InvalidInput(e.to_string()))?;

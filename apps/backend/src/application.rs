@@ -68,6 +68,8 @@ pub struct Application<
     document_category_repo: DCR,
     form_repo: FR,
     clock: C,
+    // Email ポートは配線済みだが現状 app 層に消費者がいない。将来の通知メール送出で利用予定。
+    #[allow(dead_code)]
     email: E,
     object_storage: OS,
     discord: D,
@@ -104,6 +106,8 @@ impl<
     MF: MetaFetcher,
 > Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF>
 {
+    // 全リポジトリ/ポートを束ねる合成ルート。引数が多いのは設計上不可避。
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         approval_request_repo: AR,
         group_repo: GR,

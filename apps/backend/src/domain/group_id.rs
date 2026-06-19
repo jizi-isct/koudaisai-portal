@@ -60,7 +60,8 @@ impl FromStr for GroupId {
             .next()
             .ok_or(FactoryError::InvalidInput("Invalid format".to_string()))?;
         let index_str = parts[1];
-        let index = u16::from_str_radix(index_str, 10)
+        let index = index_str
+            .parse::<u16>()
             .map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))?;
         GroupId::new(prefix, index)
             .map_err(|_| FactoryError::InvalidInput("Invalid format".to_string()))

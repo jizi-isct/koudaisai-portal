@@ -12,7 +12,6 @@ use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::{connect_and_migrate, new_sqlite_application};
 use crate::routes::auth_v2::{AuthV2State, CookieConfig};
-use crate::routes_legacy::init_routes;
 use chrono::Duration;
 use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
 use std::net::SocketAddr;
@@ -27,9 +26,7 @@ pub(crate) mod domain;
 // TODO(sqlx移行): entities/sea_orm_entities 層は撤去。DBアクセスは application 層へ再配線
 // pub mod entities;
 mod infra;
-pub mod middlewares;
 pub mod routes;
-mod routes_legacy;
 pub mod util;
 
 const MAJOR_VERSION: u32 = pkg_version_major!();
@@ -123,7 +120,7 @@ async fn main() {
         access_decoding_key: Arc::new(config.web.auth.get_jwt_decoding_key().unwrap()),
         access_iss: v3.access_token_iss.clone(),
         allowed_origins: Arc::new(v3.cors_allowed_origins.clone()),
-        oidc_client: Arc::new(oidc_client.clone()),
+        oidc_client: Arc::new(oidc_client),
         auth_sessions: Arc::new(tokio::sync::Mutex::new(std::collections::HashMap::new())),
         http_client: reqwest::Client::new(),
     };
@@ -149,19 +146,14 @@ async fn main() {
 
     // auth_v2(事前認証) と api_v3(リソース系)は同じ `AuthV2State` を共有する
     // (`V3State = AuthV2State`)。State は 1 度だけ注入する。
+    // legacy ルータ(静的配信 + /api/plans_info プロキシ)は撤去済み。
     let (auth_v2_router, _auth_openapi) = routes::auth_v2::router().split_for_parts();
     let (api_v3_router, _api_v3_openapi) = routes::api_v3::router().split_for_parts();
-    let v3_app = axum::Router::new()
+    let app = axum::Router::new()
         .nest("/auth/v2", auth_v2_router)
         .nest("/api/v3", api_v3_router)
         .with_state(auth_v2_state)
         .layer(auth_cors);
-
-    // ===== legacy(静的配信 + /api/plans_info プロキシのみ)。
-    // legacy /auth と /api/v2/* は auth_v2 / api_v3 へ移行済みのため撤去。 =====
-    let legacy = init_routes(&config.web, oidc_client, config.secrets);
-
-    let app = legacy.merge(v3_app);
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",

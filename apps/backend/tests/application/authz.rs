@@ -21,12 +21,12 @@ use std::str::FromStr;
 use uuid::Uuid;
 
 fn matches_result(result: &Result<(), CanGetByIdError>, expected: &str) -> bool {
-    match (result, expected) {
-        (Ok(()), "ok") => true,
-        (Err(CanGetByIdError::Unauthorized), "unauthorized") => true,
-        (Err(CanGetByIdError::NotFound), "not_found") => true,
-        _ => false,
-    }
+    matches!(
+        (result, expected),
+        (Ok(()), "ok")
+            | (Err(CanGetByIdError::Unauthorized), "unauthorized")
+            | (Err(CanGetByIdError::NotFound), "not_found")
+    )
 }
 
 fn make_request(issued_by: UserId) -> ApprovalRequest {

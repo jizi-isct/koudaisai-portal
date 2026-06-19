@@ -27,7 +27,7 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
 {
     pub fn new(membership_repo: &'a MR, user_repo: &'a UR, clock: &'a C) -> Self {
         Self {
-            _phantom: PhantomData::default(),
+            _phantom: PhantomData,
             membership_repo,
             user_repo,
             clock,

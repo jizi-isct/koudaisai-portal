@@ -125,14 +125,13 @@ pub async fn get_documents_by_category(
 
     // lookup に無い id を持つカテゴリ付きドキュメント(権限で解決できなかった等)。
     for (cat_id_opt, docs) in &by_category {
-        if let Some(cat_id) = cat_id_opt {
-            if !lookup.contains_key(cat_id) {
+        if let Some(cat_id) = cat_id_opt
+            && !lookup.contains_key(cat_id) {
                 entries.push(DocumentsByCategoryEntry {
                     category: None,
                     documents: docs.iter().map(DocumentRead::from).collect(),
                 });
             }
-        }
     }
 
     // 未分類(None)は最後に。

@@ -12,6 +12,12 @@ pub struct MemoryGroupRepo {
     groups: Arc<RwLock<HashMap<GroupId, Group>>>,
 }
 
+impl Default for MemoryGroupRepo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryGroupRepo {
     pub fn new() -> Self {
         Self {
@@ -33,7 +39,7 @@ impl GroupRepo<MemoryTransaction> for MemoryGroupRepo {
                 g.created_at(),
                 g.updated_at(),
                 g.name().to_string(),
-                g.r#type().clone(),
+                *g.r#type(),
             )
             .unwrap()
         }))
@@ -52,7 +58,7 @@ impl GroupRepo<MemoryTransaction> for MemoryGroupRepo {
                     g.created_at(),
                     g.updated_at(),
                     g.name().to_string(),
-                    g.r#type().clone(),
+                    *g.r#type(),
                 )
                 .unwrap()
             })

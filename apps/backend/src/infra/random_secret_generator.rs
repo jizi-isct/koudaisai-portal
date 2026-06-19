@@ -48,7 +48,7 @@ impl SecretGenerator for RandomSecretGenerator {
     fn generate_secret(&self) -> String {
         let mut buf = [0u8; 32];
         rand::rng().fill_bytes(&mut buf);
-        base64url::encode(&buf)
+        base64url::encode(buf)
     }
 
     fn hash_secret(&self, secret: &str) -> String {

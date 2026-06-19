@@ -10,6 +10,12 @@ pub struct MemoryObjectStorage {
     objects: Arc<RwLock<HashMap<String, Vec<u8>>>>,
 }
 
+impl Default for MemoryObjectStorage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryObjectStorage {
     pub fn new() -> Self {
         Self {

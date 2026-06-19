@@ -63,7 +63,7 @@ fn uid(s: Option<&String>) -> UserId {
 }
 
 fn parse_group_type(s: &str) -> GroupType {
-    let u = || UserId::new(Uuid::new_v4());
+    let _u = || UserId::new(Uuid::new_v4());
     match s {
         "press" => GroupType::Press,
         "general" => GroupType::GeneralProject,

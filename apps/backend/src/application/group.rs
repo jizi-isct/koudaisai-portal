@@ -42,7 +42,7 @@ impl<'a, Tx: Transaction, GR: GroupRepo<Tx>, MR: MembershipRepo<Tx>, UR: UserRep
         clock: &'a C,
     ) -> Self {
         Self {
-            _phantom: PhantomData::default(),
+            _phantom: PhantomData,
             group_repo,
             membership_repo,
             user_repo,

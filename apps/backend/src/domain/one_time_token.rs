@@ -22,6 +22,8 @@ impl OneTimeTokenPurpose {
         }
     }
 
+    // as_str と対になる `&str -> Option<Self>` パーサ。FromStr(Result 返し)とは別物。
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "activation" => Some(OneTimeTokenPurpose::Activation),

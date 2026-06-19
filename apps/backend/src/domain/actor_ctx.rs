@@ -28,7 +28,7 @@ impl ActorContext {
     pub fn is_group_type_project_general(&self) -> bool {
         match self {
             ActorContext::User { group_type, .. } => {
-                matches!(group_type, GroupType::GeneralProject { .. })
+                matches!(group_type, GroupType::GeneralProject)
             }
             _ => false,
         }
@@ -37,7 +37,7 @@ impl ActorContext {
     pub fn is_group_type_project_booth(&self) -> bool {
         match self {
             ActorContext::User { group_type, .. } => {
-                matches!(group_type, GroupType::BoothProject { .. })
+                matches!(group_type, GroupType::BoothProject)
             }
             _ => false,
         }
@@ -46,7 +46,7 @@ impl ActorContext {
     pub fn is_group_type_project_stage(&self) -> bool {
         match self {
             ActorContext::User { group_type, .. } => {
-                matches!(group_type, GroupType::StageProject { .. })
+                matches!(group_type, GroupType::StageProject)
             }
             _ => false,
         }
@@ -55,7 +55,7 @@ impl ActorContext {
     pub fn is_group_type_project_labo(&self) -> bool {
         match self {
             ActorContext::User { group_type, .. } => {
-                matches!(group_type, GroupType::LabProject { .. })
+                matches!(group_type, GroupType::LabProject)
             }
             _ => false,
         }
@@ -64,7 +64,7 @@ impl ActorContext {
     pub fn is_group_type_press(&self) -> bool {
         match self {
             ActorContext::User { group_type, .. } => {
-                matches!(group_type, GroupType::Press { .. })
+                matches!(group_type, GroupType::Press)
             }
             _ => false,
         }

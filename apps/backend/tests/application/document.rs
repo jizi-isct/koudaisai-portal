@@ -322,25 +322,17 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
         };
 
         let category_update: Option<Option<Uuid>> = if c.update_category {
-            Some(c.new_category.clone())
+            Some(c.new_category)
         } else {
             None
         };
 
-        let format_update: Option<DocumentFormat> = match c.new_format.clone() {
-            Some(test_formats) => Some(test_formats.into()),
-            None => None,
-        };
+        let format_update: Option<DocumentFormat> = c.new_format.clone().map(|test_formats| test_formats.into());
 
-        let targets_update: Option<Vec<TargetSpecifier>> = match c.new_targets.clone() {
-            Some(targets) => Some(
-                targets
+        let targets_update: Option<Vec<TargetSpecifier>> = c.new_targets.clone().map(|targets| targets
                     .into_iter()
                     .map(|s| TargetSpecifier::from_str(&s).unwrap())
-                    .collect(),
-            ),
-            None => None,
-        };
+                    .collect());
 
         let (_, ctx) = build_actor(c.actor);
         let result = app

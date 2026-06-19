@@ -10,6 +10,12 @@ pub struct MemoryDiscord {
     sent_messages: Arc<RwLock<Vec<DiscordMessage>>>,
 }
 
+impl Default for MemoryDiscord {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryDiscord {
     pub fn new() -> Self {
         Self {

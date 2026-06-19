@@ -10,6 +10,12 @@ pub struct MemoryEmail {
     sent_emails: Arc<RwLock<Vec<(EmailAddress, String, String)>>>,
 }
 
+impl Default for MemoryEmail {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryEmail {
     pub fn new() -> Self {
         Self {

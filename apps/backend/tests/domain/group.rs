@@ -33,7 +33,7 @@ pub fn test_register(_path: &Path, contents: String) -> datatest_stable::Result<
         &FixedClock,
     );
     if c.ok {
-        let group = result.expect(&format!("expected Ok for {:?}", c.name));
+        let group = result.unwrap_or_else(|_| panic!("expected Ok for {:?}", c.name));
         assert_eq!(group.name(), c.name.as_str());
     } else {
         assert!(result.is_err(), "expected Err for {:?}", c.name);

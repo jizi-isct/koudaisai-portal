@@ -1,5 +1,5 @@
-import {components as apiComponents} from './api_v3';
-import {components as plansInfoComponents} from './plans_info_api_v1';
+import { components as apiComponents } from './api_v3';
+import { components as plansInfoComponents } from './plans_info_api_v1';
 
 export type Item = apiComponents['schemas']['Item'];
 export type Form = apiComponents['schemas']['Form'];
@@ -25,7 +25,10 @@ export type DocumentFormatMarkdownRead = Extract<
   DocumentFormat,
   { format: 'markdown' }
 >;
-export type DocumentFormatMiscRead = Extract<DocumentFormat, { format: 'misc' }>;
+export type DocumentFormatMiscRead = Extract<
+  DocumentFormat,
+  { format: 'misc' }
+>;
 export type DocumentCategoryCreate =
   apiComponents['schemas']['DocumentCategoryCreate'];
 export type DocumentCategoryRead =

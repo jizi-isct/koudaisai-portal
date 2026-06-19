@@ -7,7 +7,9 @@
  */
 import type { Role } from '@koudaisai/shared-types';
 
-export function getRepresentativeIndex(role: Role | undefined): string | undefined {
+export function getRepresentativeIndex(
+  role: Role | undefined,
+): string | undefined {
   switch (role) {
     case 'first_responsible':
       return '一';

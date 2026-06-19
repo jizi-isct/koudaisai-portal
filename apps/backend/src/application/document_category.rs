@@ -25,7 +25,7 @@ impl<'a, Tx: Transaction, DCR: DocumentCategoryRepo<Tx>, C: Clock>
 {
     pub fn new(document_category_repo: &'a DCR, clock: &'a C) -> Self {
         Self {
-            _phantom: PhantomData::default(),
+            _phantom: PhantomData,
             document_category_repo,
             clock,
         }

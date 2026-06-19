@@ -138,12 +138,11 @@ impl SessionRepo<MemoryTransaction> for MemorySessionRepo {
     ) -> Result<(), anyhow::Error> {
         {
             let mut sessions = self.sessions.write().map_err(|e| anyhow!(e.to_string()))?;
-            if let Some(s) = sessions.get(&session_id) {
-                if s.is_active() {
+            if let Some(s) = sessions.get(&session_id)
+                && s.is_active() {
                     let revoked = revoked_session(s, reason, at);
                     sessions.insert(session_id, revoked);
                 }
-            }
         }
         {
             let mut tokens = self.tokens.write().map_err(|e| anyhow!(e.to_string()))?;

@@ -23,7 +23,7 @@ pub struct NotificationApp<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clo
 impl<'a, Tx: Transaction, NR: NotificationRepo<Tx>, C: Clock> NotificationApp<'a, Tx, NR, C> {
     pub fn new(notification_repo: &'a NR, clock: &'a C) -> Self {
         Self {
-            _phantom: PhantomData::default(),
+            _phantom: PhantomData,
             notification_repo,
             clock,
         }

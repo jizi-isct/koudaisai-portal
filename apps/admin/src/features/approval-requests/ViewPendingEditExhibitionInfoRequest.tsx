@@ -39,9 +39,7 @@ export function ViewPendingEditExhibitionInfoRequest({
           />
           <h3>変更後</h3>
           <img
-            src={getFilesRedirectUrl(
-              approvalRequest.icon_key,
-            )}
+            src={getFilesRedirectUrl(approvalRequest.icon_key)}
             alt="新しい企画アイコン"
             width={128}
             height={128}
