@@ -29,7 +29,12 @@ export function ViewDocumentsWrapper() {
         return;
       }
 
-      setDocuments(data ?? []);
+      setDocuments(
+        (data ?? []).map((entry) => ({
+          category: entry.category ?? null,
+          documents: entry.documents,
+        })),
+      );
     })().catch((caughtError) => {
       setError(`${caughtError}`);
       setDocuments([]);
@@ -43,33 +48,33 @@ export function ViewDocumentsWrapper() {
 
     if (!document) return;
 
-    if (document.format_pdf) {
+    if (document.format === 'pdf') {
       const { data: downloadUrl } = await getDownloadUrl(
         api,
-        document.format_pdf.file_key,
-        document.format_pdf.file_name,
+        document.file_key,
+        document.file_name,
       );
       if (downloadUrl?.presigned_url) {
-        download(downloadUrl.presigned_url, document.format_pdf.file_name);
+        download(downloadUrl.presigned_url, document.file_name);
       }
     }
 
-    if (document.format_markdown) {
-      const blob = new Blob([document.format_markdown.content], {
+    if (document.format === 'markdown') {
+      const blob = new Blob([document.content], {
         type: 'text/markdown;charset=utf-8;',
       });
       const url = URL.createObjectURL(blob);
       download(url, `${document.title}.md`);
     }
 
-    if (document.format_misc) {
+    if (document.format === 'misc') {
       const { data: downloadUrl } = await getDownloadUrl(
         api,
-        document.format_misc.file_key,
-        document.format_misc.file_name,
+        document.file_key,
+        document.file_name,
       );
       if (downloadUrl?.presigned_url) {
-        download(downloadUrl.presigned_url, document.format_misc.file_name);
+        download(downloadUrl.presigned_url, document.file_name);
       }
     }
   };

@@ -1,9 +1,5 @@
 import { decodeAccessToken } from '@koudaisai/shared-auth';
-import type {
-  NotificationRead,
-  NotificationReadTypeApprovalRequest,
-  NotificationReadTypeMarkdown,
-} from '@koudaisai/shared-types';
+import type { NotificationRead } from '@koudaisai/shared-types';
 import {
   ContentList,
   ContentRow,
@@ -15,10 +11,11 @@ import Markdown from 'react-markdown';
 import { api } from '@/features/api/api';
 import styles from './ViewNotifications.module.css';
 
-type NotificationWithReadState = {
-  notification: NotificationRead;
-  is_read: boolean;
-};
+type MarkdownNotification = Extract<NotificationRead, { type: 'markdown' }>;
+type ApprovalRequestNotification = Extract<
+  NotificationRead,
+  { type: 'approval_request' }
+>;
 
 const statusMapping = {
   approved: '承認',
@@ -46,9 +43,9 @@ const getUserIdFromAccessToken = () => {
 };
 
 export function ViewNotifications() {
-  const [notifications, setNotifications] = useState<
-    NotificationWithReadState[] | null
-  >(null);
+  const [notifications, setNotifications] = useState<NotificationRead[] | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,13 +57,7 @@ export function ViewNotifications() {
     }
 
     (async () => {
-      const { data, error } = await api.GET('/users/{user_id}/notifications', {
-        params: {
-          path: {
-            user_id: userId,
-          },
-        },
-      });
+      const { data, error } = await api.GET('/notifications');
 
       if (error) {
         setError(`${error}`);
@@ -84,8 +75,7 @@ export function ViewNotifications() {
   const sortedNotifications = useMemo(() => {
     return [...(notifications ?? [])].sort((a, b) => {
       return (
-        new Date(b.notification.created_at).getTime() -
-        new Date(a.notification.created_at).getTime()
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
     });
   }, [notifications]);
@@ -114,7 +104,7 @@ export function ViewNotifications() {
     <ContentList
       pagination
       pageSize={5}
-      contents={sortedNotifications.map(({ notification }) => (
+      contents={sortedNotifications.map((notification) => (
         <NotificationRow key={notification.id} notification={notification} />
       ))}
     />
@@ -122,22 +112,12 @@ export function ViewNotifications() {
 }
 
 function NotificationRow({ notification }: { notification: NotificationRead }) {
-  if ('type_markdown' in notification) {
-    return (
-      <MarkdownNotificationRow
-        notification={notification}
-        markdown={notification.type_markdown}
-      />
-    );
+  if (notification.type === 'markdown') {
+    return <MarkdownNotificationRow notification={notification} />;
   }
 
-  if ('type_approval_request' in notification) {
-    return (
-      <ApprovalRequestNotificationRow
-        notification={notification}
-        notificationApprovalRequest={notification.type_approval_request}
-      />
-    );
+  if (notification.type === 'approval_request') {
+    return <ApprovalRequestNotificationRow notification={notification} />;
   }
 
   return null;
@@ -145,10 +125,8 @@ function NotificationRow({ notification }: { notification: NotificationRead }) {
 
 function MarkdownNotificationRow({
   notification,
-  markdown,
 }: {
-  notification: NotificationRead;
-  markdown: NotificationReadTypeMarkdown;
+  notification: MarkdownNotification;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -156,15 +134,15 @@ function MarkdownNotificationRow({
     <>
       <ContentRow
         content={{
-          title: markdown.title,
+          title: notification.title,
           date: formatDate(notification.created_at),
           onClick: () => setIsModalOpen(true),
         }}
       />
       <Modal isOpen={isModalOpen} setOpen={setIsModalOpen}>
         <div className={styles.modalContent}>
-          <h1>{markdown.title}</h1>
-          <Markdown>{markdown.content}</Markdown>
+          <h1>{notification.title}</h1>
+          <Markdown>{notification.content}</Markdown>
         </div>
       </Modal>
     </>
@@ -173,10 +151,8 @@ function MarkdownNotificationRow({
 
 function ApprovalRequestNotificationRow({
   notification,
-  notificationApprovalRequest,
 }: {
-  notification: NotificationRead;
-  notificationApprovalRequest: NotificationReadTypeApprovalRequest;
+  notification: ApprovalRequestNotification;
 }) {
   const [approvalStatus, setApprovalStatus] = useState<
     keyof typeof statusMapping | null
@@ -185,26 +161,25 @@ function ApprovalRequestNotificationRow({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchApprovalRequest = useCallback(async () => {
-    const userId = getUserIdFromAccessToken();
-    if (!userId) return;
-
-    const { data } = await api.GET(
-      '/users/{user_id}/approval_requests/{request_id}',
-      {
-        params: {
-          path: {
-            user_id: userId,
-            request_id: notificationApprovalRequest.approval_request_id,
-          },
+    const { data } = await api.GET('/approval-requests/{id}', {
+      params: {
+        path: {
+          id: notification.approval_request_id,
         },
       },
-    );
+    });
 
     if (data) {
       setApprovalStatus(data.status);
-      setApprovalReason(data.approval_reason);
+      setApprovalReason(
+        data.status === 'approved'
+          ? (data.approval_reason ?? null)
+          : data.status === 'rejected'
+            ? (data.rejection_reason ?? null)
+            : null,
+      );
     }
-  }, [notificationApprovalRequest.approval_request_id]);
+  }, [notification.approval_request_id]);
 
   useEffect(() => {
     fetchApprovalRequest().catch(() => undefined);
