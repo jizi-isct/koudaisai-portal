@@ -4,6 +4,13 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# sqlx の query! マクロをオフライン(コミット済み .sqlx キャッシュ)で検査させる。
+# apps/backend/.cargo/config.toml にも同設定があるが、cargo の config 探索は
+# manifest ではなくカレントディレクトリ起点なので、ここ(docs/api)から
+# --manifest-path で起動すると読まれない。CI(クリーンビルド)で live DB へ
+# 接続しようとして失敗するため、明示的に設定する。
+export SQLX_OFFLINE=true
+
 BACKEND=../../apps/backend/Cargo.toml
 cargo run --quiet --manifest-path "$BACKEND" -- --dump-openapi=api_v3 > api_v3/openapi.json
 cargo run --quiet --manifest-path "$BACKEND" -- --dump-openapi=auth_v2 > auth_v2/openapi.json
