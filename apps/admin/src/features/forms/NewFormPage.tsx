@@ -38,16 +38,21 @@ function NewForm() {
     dueDate,
   }: FormValues) => {
     setSubmitting(true);
+    // api_v3 では due_date は必須。
+    if (!dueDate) {
+      setSubmitting(false);
+      messageApi.error('回答期限を入力してください');
+      return;
+    }
     try {
       await mutateFormCreate({
         body: {
-          form_name: formName,
+          name: formName,
           targets: targets.map((target) => target.join('/')),
           summary,
-          type_external: {
-            form_url: url,
-          },
-          due_date: dueDate ? new Date(dueDate).toISOString() : null,
+          type: 'external',
+          form_url: url,
+          due_date: new Date(dueDate).toISOString(),
         },
       });
     } catch (e) {
@@ -170,7 +175,7 @@ function NewForm() {
           </Button>
         </Form.Item>
 
-        <Form.Item name="dueDate" label="回答期限">
+        <Form.Item name="dueDate" label="回答期限" rules={[{ required: true }]}>
           <Input type="datetime-local" />
         </Form.Item>
 

@@ -2,7 +2,7 @@ import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Button, Flex, Form, Input, message, Radio, Result, Space } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { $api } from '@/features/api/api';
 import { TargetSpecifier } from '@/features/documents/TargetSpecifier';
 import { timeZoneOffset } from './TimeZoneOffset/timeZoneOffset.ts';
@@ -55,21 +55,17 @@ function EditForm({ formId }: { formId: string }) {
     data: form,
     isLoading,
     error,
-  } = $api.useQuery('get', '/forms/{form_id}', {
-    params: { path: { form_id: formId } },
+  } = $api.useQuery('get', '/forms/{id}', {
+    params: { path: { id: formId } },
   });
   const { mutateAsync: mutateFormUpdate } = $api.useMutation(
     'patch',
-    '/forms/{form_id}',
+    '/forms/{id}',
   );
   const [submitting, setSubmitting] = useState(false);
 
-  const formType = useMemo(() => {
-    if (!form) return undefined;
-    if ('type_external' in form) return 'external';
-    if ('type_builtin' in form) return 'builtin';
-    return 'external';
-  }, [form]);
+  // api_v3 のフォームは外部フォームのみ。
+  const formType = form?.type;
 
   if (isLoading) return <LoadingScreen />;
 
@@ -93,18 +89,17 @@ function EditForm({ formId }: { formId: string }) {
     formName,
     summary,
     dueDate,
-    url,
   }: FormValues) => {
     setSubmitting(true);
     try {
+      // FormUpdate は name/summary/targets/due_date のみ。フォーム URL/種別は変更不可。
       await mutateFormUpdate({
-        params: { path: { form_id: formId } },
+        params: { path: { id: formId } },
         body: {
-          form_name: formName,
+          name: formName,
           targets: targets?.map((target) => target.join('/')),
           summary,
           due_date: dueDate ? new Date(dueDate).toISOString() : undefined,
-          type_external: { form_url: url },
         },
       });
     } catch (e) {
@@ -122,10 +117,10 @@ function EditForm({ formId }: { formId: string }) {
       <Form
         onFinish={handleSubmit}
         initialValues={{
-          formName: form.form_name,
+          formName: form.name,
           summary: form.summary,
           targets: form.targets.map((target) => target.split('/')),
-          url: 'type_external' in form ? form.type_external.form_url : '',
+          url: form.type === 'external' ? form.form_url : '',
           dueDate: form.due_date
             ? timeZoneOffset({ serverDate: new Date(form.due_date) })
             : undefined,
