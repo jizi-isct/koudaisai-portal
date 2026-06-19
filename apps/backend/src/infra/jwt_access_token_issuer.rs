@@ -39,6 +39,19 @@ impl JwtAccessTokenIssuer {
             encoding_key,
         }
     }
+
+    /// 設定から RS256・iss・署名鍵(RSA 秘密鍵)を読んで構築する。
+    pub fn from_config(
+        auth: &crate::config::Auth,
+        auth_v3: &crate::config::AuthV3,
+    ) -> anyhow::Result<Self> {
+        let encoding_key = auth.get_jwt_encoding_key()?;
+        Ok(Self::new(
+            Algorithm::RS256,
+            auth_v3.access_token_iss.clone(),
+            encoding_key,
+        ))
+    }
 }
 
 impl AccessTokenIssuer for JwtAccessTokenIssuer {

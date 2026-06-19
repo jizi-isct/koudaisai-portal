@@ -49,6 +49,17 @@ impl Argon2PasswordHasher {
         }
     }
 
+    /// v3 認証設定から argon2 パラメータを読んで構築する。
+    pub fn from_config(cfg: &crate::config::AuthV3) -> Self {
+        Self::new(
+            cfg.argon2_m_cost_kib,
+            cfg.argon2_t_cost,
+            cfg.argon2_p_cost,
+            cfg.argon2_output_len,
+            cfg.argon2_max_parallelism,
+        )
+    }
+
     fn params(&self) -> Result<Params, PasswordHashError> {
         Params::new(self.m_cost_kib, self.t_cost, self.p_cost, Some(self.output_len))
             .map_err(|e| PasswordHashError::Internal(anyhow!("invalid argon2 params: {e}")))

@@ -8,7 +8,6 @@ use uuid::Uuid;
 pub(crate) mod jwt;
 pub mod layers;
 pub mod oidc;
-pub mod secrets;
 
 pub struct AppError(anyhow::Error);
 

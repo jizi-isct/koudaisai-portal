@@ -13,6 +13,17 @@ impl ReqwestMetaFetcher {
     pub fn new(client: reqwest::Client) -> Self {
         Self { client }
     }
+
+    /// 既定の reqwest クライアントで構築する。
+    pub fn from_config() -> Self {
+        Self::new(reqwest::Client::new())
+    }
+}
+
+impl Default for ReqwestMetaFetcher {
+    fn default() -> Self {
+        Self::from_config()
+    }
 }
 
 /// `<meta property="og:xxx" content="...">` / `<meta name="xxx" content="...">` の content を引く。

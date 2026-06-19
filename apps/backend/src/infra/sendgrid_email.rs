@@ -22,6 +22,11 @@ impl SendgridEmail {
             from_address,
         }
     }
+
+    /// SendGrid 設定(API キー・送信元アドレス)から構築する。
+    pub fn from_config(cfg: &crate::config::Sendgrid) -> Self {
+        Self::new(cfg.api_key.clone(), cfg.sender_address.clone())
+    }
 }
 
 #[async_trait]

@@ -27,6 +27,11 @@ impl WebhookDiscord {
             thread_id,
         }
     }
+
+    /// Discord 設定(承認申請 Webhook URL)から構築する。
+    pub fn from_config(cfg: &crate::config::Discord) -> Self {
+        Self::new(cfg.approval_request_url.clone())
+    }
 }
 
 #[async_trait]

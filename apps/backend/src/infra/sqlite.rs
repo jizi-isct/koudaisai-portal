@@ -113,7 +113,7 @@ pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
         secret_generator,
         access_token_issuer,
         SqliteNotificationRepo::new(pool.clone()),
-        ReqwestMetaFetcher::new(reqwest::Client::new()),
+        ReqwestMetaFetcher::from_config(),
         base_url,
     )
 }

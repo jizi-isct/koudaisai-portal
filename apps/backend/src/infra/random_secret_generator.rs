@@ -25,6 +25,11 @@ impl RandomSecretGenerator {
         }
     }
 
+    /// 設定の HMAC ペッパーから構築する。
+    pub fn from_config(secrets: &crate::config::Secrets) -> Self {
+        Self::new(secrets.session_secret_pepper.as_ref().as_bytes().to_vec())
+    }
+
     fn hmac_hex(&self, secret: &str) -> String {
         // HMAC は任意長の鍵を受け付けるため new_from_slice は失敗しない。
         let mut mac =

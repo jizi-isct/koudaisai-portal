@@ -13,20 +13,11 @@ use crate::infra::sendgrid_email::SendgridEmail;
 use crate::infra::sqlite::{connect_and_migrate, new_sqlite_application};
 use crate::routes::auth_v2::{AuthV2State, CookieConfig};
 use crate::routes_legacy::init_routes;
-use crate::util::oidc::OIDCClient;
 use chrono::Duration;
-use jsonwebtoken::Algorithm;
+use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
 use std::net::SocketAddr;
 use std::sync::Arc;
-use aws_config::BehaviorVersion;
-use aws_sdk_s3::config::Credentials;
-// TODO(sqlx移行): sea-orm の Migrator/Database はsqlx移行で application 層へ再配線する
-// use migration::{Migrator, MigratorTrait};
-use openidconnect::core::{CoreClient, CoreProviderMetadata};
-use openidconnect::{ClientId, ClientSecret, IssuerUrl, RedirectUrl};
-use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
-// use sea_orm::{Database, DatabaseConnection, DbErr};
-use tracing::{info, instrument};
+use tracing::info;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
@@ -54,20 +45,11 @@ async fn main() {
         MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION
     );
 
-    // openid connect init
-    let oidc_client = init_oidc(
-        config.web.auth.keycloak.id.clone(),
-        config.web.auth.keycloak.secret.clone(),
-        config.web.auth.keycloak.issuer.to_string(),
+    // 各アダプタ/クライアントの初期化は infra 側の `from_config` コンストラクタが担う。
+    // main は config を読み、構築結果を合成(composition root)するだけ。
+    let oidc_client = crate::util::oidc::from_config(
+        &config.web.auth.keycloak,
         format!("{}{}", &config.web.server.base_url, "/login"),
-    )
-    .await;
-
-    // s3 init
-    let s3_client = init_s3(
-        config.s3.access_key_id.clone(),
-        config.s3.secret_access_key.clone(),
-        config.s3.endpoint.clone(),
     )
     .await;
 
@@ -75,26 +57,10 @@ async fn main() {
     let pool = connect_and_migrate(&config.db.address).await.unwrap();
     let v3 = config.web.auth_v3.clone();
 
-    let password_hasher = Argon2PasswordHasher::new(
-        v3.argon2_m_cost_kib,
-        v3.argon2_t_cost,
-        v3.argon2_p_cost,
-        v3.argon2_output_len,
-        v3.argon2_max_parallelism,
-    );
-    let secret_generator = RandomSecretGenerator::new(
-        config
-            .secrets
-            .session_secret_pepper
-            .as_ref()
-            .as_bytes()
-            .to_vec(),
-    );
-    let access_issuer = JwtAccessTokenIssuer::new(
-        Algorithm::RS256,
-        v3.access_token_iss.clone(),
-        config.web.auth.get_jwt_encoding_key().unwrap(),
-    );
+    let password_hasher = Argon2PasswordHasher::from_config(&config.web.auth_v3);
+    let secret_generator = RandomSecretGenerator::from_config(&config.secrets);
+    let access_issuer =
+        JwtAccessTokenIssuer::from_config(&config.web.auth, &config.web.auth_v3).unwrap();
 
     // 定数時間ログイン用ダミー PHC は本番 argon2 で乱数をハッシュして生成する(監査 Low 対応)。
     let dummy_phc = {
@@ -105,12 +71,9 @@ async fn main() {
 
     let prod_app = new_sqlite_application(
         pool.clone(),
-        SendgridEmail::new(
-            config.sendgrid.api_key.clone(),
-            config.sendgrid.sender_address.clone(),
-        ),
-        S3ObjectStorage::new(s3_client.clone(), config.s3.bucket.clone()),
-        WebhookDiscord::new(config.discord.approval_request_url.clone()),
+        SendgridEmail::from_config(&config.sendgrid),
+        S3ObjectStorage::from_config(&config.s3).await,
+        WebhookDiscord::from_config(&config.discord),
         config.web.server.base_url.clone(),
         password_hasher,
         secret_generator,
@@ -134,10 +97,7 @@ async fn main() {
             secure: v3.refresh_cookie_secure,
             same_site: v3.refresh_cookie_same_site.clone(),
         },
-        email: Arc::new(SendgridEmail::new(
-            config.sendgrid.api_key.clone(),
-            config.sendgrid.sender_address.clone(),
-        )),
+        email: Arc::new(SendgridEmail::from_config(&config.sendgrid)),
         reset_link_base: v3.reset_link_base.clone(),
         access_decoding_key: Arc::new(config.web.auth.get_jwt_decoding_key().unwrap()),
         access_iss: v3.access_token_iss.clone(),
@@ -197,39 +157,6 @@ async fn main() {
     .unwrap();
 }
 
-#[instrument(skip(client_secret))]
-async fn init_oidc(
-    client_id: String,
-    client_secret: String,
-    issuer_url: String,
-    redirect_url: String,
-) -> OIDCClient {
-    let http_client = reqwest::Client::new();
-
-    let provider_metadata: CoreProviderMetadata =
-        CoreProviderMetadata::discover_async(IssuerUrl::new(issuer_url).unwrap(), &http_client)
-            .await
-            .unwrap();
-
-    let client = CoreClient::from_provider_metadata(
-        provider_metadata,
-        ClientId::new(client_id),
-        Some(ClientSecret::new(client_secret)),
-    )
-    .set_redirect_uri(RedirectUrl::new(redirect_url).unwrap());
-
-    client
-}
-
-// TODO(sqlx移行): DB接続初期化(Migrator実行含む)は application 層(sqlx)へ再配線する
-// #[instrument(skip(db))]
-// pub async fn init_db(db: &Db) -> Result<DatabaseConnection, DbErr> {
-//     debug!("Initializing database connection");
-//     let db_conn = Database::connect(&db.address).await?;
-//     Migrator::up(&db_conn, None).await?;
-//     Ok(db_conn)
-// }
-
 pub fn init_logging(logging: Logging) {
     if logging.json {
         tracing_subscriber::registry()
@@ -242,29 +169,4 @@ pub fn init_logging(logging: Logging) {
             .with(tracing_subscriber::fmt::layer())
             .init();
     }
-}
-
-pub async fn init_s3(
-    access_key_id: impl Into<String>,
-    secret_access_key: impl Into<String>,
-    endpoint: impl Into<String>,
-) -> aws_sdk_s3::Client {
-    let shared_cfg = aws_config::defaults(BehaviorVersion::latest())
-        .credentials_provider(
-            Credentials::builder()
-                .access_key_id(access_key_id)
-                .secret_access_key(secret_access_key)
-                .provider_name("default-provider")
-                .build(),
-        )
-        .endpoint_url(endpoint)
-        .region("ap-northeast-1")
-        .load()
-        .await;
-
-    let s3_cfg = aws_sdk_s3::config::Builder::from(&shared_cfg)
-        .force_path_style(true)
-        .build();
-
-    aws_sdk_s3::Client::from_conf(s3_cfg)
 }

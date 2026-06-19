@@ -1,8 +1,8 @@
-use crate::util::secrets::Secret;
 use confy::ConfyError;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use rand::distr::{Alphanumeric, SampleString};
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::{env, fs, path::PathBuf};
 use tracing_core::LevelFilter;
 
@@ -118,11 +118,11 @@ impl Default for Auth {
 }
 
 impl Auth {
-    pub(crate) fn get_jwt_encoding_key(&self) -> jsonwebtoken::errors::Result<EncodingKey> {
+    pub fn get_jwt_encoding_key(&self) -> jsonwebtoken::errors::Result<EncodingKey> {
         EncodingKey::from_rsa_pem(fs::read(&self.jwt_secret_key_path).unwrap().as_slice())
     }
 
-    pub(crate) fn get_jwt_decoding_key(&self) -> jsonwebtoken::errors::Result<DecodingKey> {
+    pub fn get_jwt_decoding_key(&self) -> jsonwebtoken::errors::Result<DecodingKey> {
         DecodingKey::from_rsa_pem(fs::read(&self.jwt_public_key_path).unwrap().as_slice())
     }
 }
@@ -235,4 +235,41 @@ pub struct Secrets {
     /// 回転セッションの secret をハッシュする HMAC ペッパー。DB には出さない。
     #[serde(default)]
     pub session_secret_pepper: Secret,
+}
+
+/// 機密情報のラッパー。`Debug` でマスクし、誤ってログに秘密が漏れるのを防ぐ。
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(untagged)]
+pub enum Secret {
+    String(String),
+}
+
+impl Debug for Secret {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Secret::String(_) => write!(f, "***"),
+        }
+    }
+}
+
+impl Default for Secret {
+    fn default() -> Self {
+        Secret::String("".to_string())
+    }
+}
+
+impl From<Secret> for String {
+    fn from(secret: Secret) -> Self {
+        match secret {
+            Secret::String(s) => s,
+        }
+    }
+}
+
+impl AsRef<str> for Secret {
+    fn as_ref(&self) -> &str {
+        match self {
+            Secret::String(s) => s.as_str(),
+        }
+    }
 }
