@@ -140,6 +140,25 @@ pub async fn get_user(
     }
 }
 
+#[utoipa::path(
+    get,
+    description = "Get the currently authenticated user.",
+    path = "/me",
+    responses(GetUserResponse),
+    tag = super::super::USERS_TAG
+)]
+pub async fn get_user_me(State(st): State<V3State>, actor: ActorContext) -> GetUserResponse {
+    let Some(user_id) = actor.user_id() else {
+        return GetUserResponse::Forbidden;
+    };
+    match st.app.user().get_by_id(&actor, user_id).await {
+        Ok(Some(u)) => GetUserResponse::Ok(UserRead::from(&u)),
+        Ok(None) => GetUserResponse::NotFound,
+        Err(ApplicationOperationError::Unauthorized) => GetUserResponse::Forbidden,
+        Err(_) => GetUserResponse::InternalServerError,
+    }
+}
+
 #[http_response]
 pub enum PatchUserResponse {
     #[response(status = OK, description = "User updated")]

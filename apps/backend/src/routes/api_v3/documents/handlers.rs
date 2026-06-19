@@ -17,6 +17,7 @@ pub struct DocumentPath {
 }
 
 #[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct DocumentQuery {
     category: Option<Uuid>,
 }
@@ -58,6 +59,7 @@ pub async fn get_documents(
 
 /// by-category のクエリパラメーター。
 #[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct DocumentsByCategoryQuery {
     /// 真のとき、ドキュメントが無いカテゴリも空リストで含める。
     include_empty_categories: Option<bool>,

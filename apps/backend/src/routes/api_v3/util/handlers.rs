@@ -8,6 +8,7 @@ use utoipa_axum_auto_into_response::http_response;
 
 /// メタ情報取得のクエリパラメーター。
 #[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct MetaQuery {
     /// メタ情報を取得する対象 URL。
     url: String,

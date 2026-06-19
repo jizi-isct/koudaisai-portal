@@ -1,5 +1,5 @@
-import { components as apiComponents } from './api_v2';
-import { components as plansInfoComponents } from './plans_info_api_v1';
+import {components as apiComponents} from './api_v3';
+import {components as plansInfoComponents} from './plans_info_api_v1';
 
 export type Item = apiComponents['schemas']['Item'];
 export type Form = apiComponents['schemas']['Form'];
@@ -68,7 +68,10 @@ export type ApprovalRequestUpdate =
 export type GroupCreate = apiComponents['schemas']['GroupCreate'];
 export type GroupRead = apiComponents['schemas']['GroupRead'];
 export type GroupUpdate = apiComponents['schemas']['GroupUpdate'];
+export type GroupType = apiComponents['schemas']['GroupType'];
 export type UserRead = apiComponents['schemas']['UserRead'];
+export type MemberRead = apiComponents['schemas']['MemberRead'];
+export type Role = apiComponents['schemas']['Role'];
 
 export type ProductsCreate = plansInfoComponents['schemas']['ProductsCreate'];
 export type ProductsRead = plansInfoComponents['schemas']['ProductsRead'];

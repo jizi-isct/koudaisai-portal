@@ -119,6 +119,25 @@ pub enum GetGroupResponse {
 
 #[utoipa::path(
     get,
+    description = "Get the group the current user belongs to.",
+    path = "/us",
+    responses(GetGroupResponse),
+    tag = super::super::GROUPS_TAG
+)]
+pub async fn get_group_us(State(st): State<V3State>, actor: ActorContext) -> GetGroupResponse {
+    let Some(group_id) = actor.primary_group_id() else {
+        return GetGroupResponse::Forbidden;
+    };
+    match st.app.group().get_by_id(&actor, group_id).await {
+        Ok(Some(g)) => GetGroupResponse::Ok(GroupRead::from(&g)),
+        Ok(None) => GetGroupResponse::NotFound,
+        Err(ApplicationOperationError::Unauthorized) => GetGroupResponse::Forbidden,
+        Err(_) => GetGroupResponse::InternalServerError,
+    }
+}
+
+#[utoipa::path(
+    get,
     description = "Get a group by id.",
     params(GroupPath),
     path = "/{id}",

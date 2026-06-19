@@ -45,6 +45,7 @@ pub async fn post_file_upload(
 
 /// ダウンロード用のクエリパラメーター。
 #[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct FileDownloadQuery {
     key: String,
     file_name: String,

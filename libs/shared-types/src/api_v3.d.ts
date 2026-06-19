@@ -270,6 +270,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/groups/us': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get the group the current user belongs to. */
+    get: operations['get_group_us'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/groups/{id}': {
     parameters: {
       query?: never;
@@ -374,6 +391,23 @@ export interface paths {
     put?: never;
     /** @description Create a new user (id is generated server-side); returns the activation token. */
     post: operations['post_user'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get the currently authenticated user. */
+    get: operations['get_user_me'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -770,12 +804,12 @@ export type $defs = Record<string, never>;
 export interface operations {
   get_approval_requests: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
+      query?: {
         /** @description グループ絞り込み(現状はクエリ受理のみ。範囲は呼び出し元の所属グループに限定)。 */
-        group_id: string | null;
+        group_id?: string;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1307,11 +1341,11 @@ export interface operations {
   };
   get_documents: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        category: string | null;
+      query?: {
+        category?: string;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1379,12 +1413,12 @@ export interface operations {
   };
   get_documents_by_category: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
+      query?: {
         /** @description 真のとき、ドキュメントが無いカテゴリも空リストで含める。 */
-        include_empty_categories: boolean | null;
+        include_empty_categories?: boolean;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1539,14 +1573,14 @@ export interface operations {
   };
   get_file_download: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
+      query: {
         key: string;
         file_name: string;
         /** @description 真のとき presigned URL へ 302 リダイレクトする。 */
-        redirect: boolean;
+        redirect?: boolean;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1841,6 +1875,47 @@ export interface operations {
       };
       /** @description Forbidden */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_group_us: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Group found */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['GroupRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Group not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -2481,6 +2556,47 @@ export interface operations {
       };
     };
   };
+  get_user_me: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description User found */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description User not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   get_user: {
     parameters: {
       query?: never;
@@ -2717,12 +2833,12 @@ export interface operations {
   };
   get_meta: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
+      query: {
         /** @description メタ情報を取得する対象 URL。 */
         url: string;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;

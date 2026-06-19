@@ -16,6 +16,7 @@ pub struct ApprovalRequestPath {
 }
 
 #[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct ApprovalRequestQuery {
     /// グループ絞り込み(現状はクエリ受理のみ。範囲は呼び出し元の所属グループに限定)。
     #[allow(dead_code)]

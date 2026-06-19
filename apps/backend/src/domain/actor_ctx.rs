@@ -104,4 +104,13 @@ impl ActorContext {
             ActorContext::NoLogin => None,
         }
     }
+
+    /// 認証済みユーザーが所属する代表グループ ID(`/groups/us` 用)。
+    /// 慣習に従い最初の所属グループを採用する(`build_actor_context` の group_type 解決と同じ)。
+    pub fn primary_group_id(&self) -> Option<GroupId> {
+        match self {
+            ActorContext::User { memberships, .. } => memberships.first().map(|m| m.group_id()),
+            _ => None,
+        }
+    }
 }

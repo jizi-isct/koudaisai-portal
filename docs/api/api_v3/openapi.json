@@ -15,14 +15,11 @@
         "parameters": [
           {
             "name": "group_id",
-            "in": "path",
+            "in": "query",
             "description": "グループ絞り込み(現状はクエリ受理のみ。範囲は呼び出し元の所属グループに限定)。",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": "string"
             }
           }
         ],
@@ -515,13 +512,10 @@
         "parameters": [
           {
             "name": "category",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "schema": {
-              "type": [
-                "string",
-                "null"
-              ],
+              "type": "string",
               "format": "uuid"
             }
           }
@@ -594,14 +588,11 @@
         "parameters": [
           {
             "name": "include_empty_categories",
-            "in": "path",
+            "in": "query",
             "description": "真のとき、ドキュメントが無いカテゴリも空リストで含める。",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": [
-                "boolean",
-                "null"
-              ]
+              "type": "boolean"
             }
           }
         ],
@@ -757,7 +748,7 @@
         "parameters": [
           {
             "name": "key",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -765,7 +756,7 @@
           },
           {
             "name": "file_name",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -773,9 +764,9 @@
           },
           {
             "name": "redirect",
-            "in": "path",
+            "in": "query",
             "description": "真のとき presigned URL へ 302 リダイレクトする。",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "boolean"
             }
@@ -1051,6 +1042,36 @@
           },
           "403": {
             "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/groups/us": {
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "description": "Get the group the current user belongs to.",
+        "operationId": "get_group_us",
+        "responses": {
+          "200": {
+            "description": "Group found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Group not found"
           },
           "500": {
             "description": "Internal server error"
@@ -1649,6 +1670,36 @@
         }
       }
     },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "description": "Get the currently authenticated user.",
+        "operationId": "get_user_me",
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/users/{id}": {
       "get": {
         "tags": [
@@ -1882,7 +1933,7 @@
         "parameters": [
           {
             "name": "url",
-            "in": "path",
+            "in": "query",
             "description": "メタ情報を取得する対象 URL。",
             "required": true,
             "schema": {
