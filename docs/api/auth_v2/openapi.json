@@ -7,7 +7,9 @@
   "paths": {
     "/activate": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "activate",
         "requestBody": {
           "content": {
@@ -37,7 +39,9 @@
     },
     "/admin/login": {
       "get": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "admin_login",
         "responses": {
           "302": {
@@ -48,7 +52,9 @@
     },
     "/admin/redirect": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "admin_redirect",
         "requestBody": {
           "content": {
@@ -79,7 +85,9 @@
     },
     "/login": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -110,7 +118,9 @@
     },
     "/logout": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "logout",
         "responses": {
           "204": {
@@ -121,7 +131,9 @@
     },
     "/logout-all": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "logout_all",
         "responses": {
           "204": {
@@ -135,7 +147,9 @@
     },
     "/password/change": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "password_change",
         "requestBody": {
           "content": {
@@ -162,7 +176,9 @@
     },
     "/password/reset": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "password_reset",
         "requestBody": {
           "content": {
@@ -183,7 +199,9 @@
     },
     "/password/reset/confirm": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "password_reset_confirm",
         "requestBody": {
           "content": {
@@ -210,7 +228,9 @@
     },
     "/refresh": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "refresh",
         "responses": {
           "200": {
@@ -234,7 +254,10 @@
     "schemas": {
       "ActivateRequest": {
         "type": "object",
-        "required": ["token", "password"],
+        "required": [
+          "token",
+          "password"
+        ],
         "properties": {
           "password": {
             "type": "string"
@@ -247,7 +270,10 @@
       },
       "AdminRedirectRequest": {
         "type": "object",
-        "required": ["code", "state"],
+        "required": [
+          "code",
+          "state"
+        ],
         "properties": {
           "code": {
             "type": "string"
@@ -259,7 +285,10 @@
       },
       "AdminTokenResponse": {
         "type": "object",
-        "required": ["refresh_token", "access_token"],
+        "required": [
+          "refresh_token",
+          "access_token"
+        ],
         "properties": {
           "access_token": {
             "type": "string"
@@ -271,7 +300,10 @@
       },
       "ChangePasswordRequest": {
         "type": "object",
-        "required": ["old_password", "new_password"],
+        "required": [
+          "old_password",
+          "new_password"
+        ],
         "properties": {
           "new_password": {
             "type": "string"
@@ -283,7 +315,10 @@
       },
       "LoginRequest": {
         "type": "object",
-        "required": ["m_address", "password"],
+        "required": [
+          "m_address",
+          "password"
+        ],
         "properties": {
           "m_address": {
             "type": "string"
@@ -295,7 +330,10 @@
       },
       "PasswordResetConfirmRequest": {
         "type": "object",
-        "required": ["token", "new_password"],
+        "required": [
+          "token",
+          "new_password"
+        ],
         "properties": {
           "new_password": {
             "type": "string"
@@ -308,7 +346,9 @@
       },
       "PasswordResetRequest": {
         "type": "object",
-        "required": ["m_address"],
+        "required": [
+          "m_address"
+        ],
         "properties": {
           "m_address": {
             "type": "string"
@@ -318,7 +358,11 @@
       "TokenResponse": {
         "type": "object",
         "description": "ログイン/リフレッシュ成功時のレスポンス。リフレッシュトークンは本文に含めず\n`__Host-` Cookie で配送する。アクセストークンのみ本文で返す。",
-        "required": ["access_token", "token_type", "expires_in"],
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ],
         "properties": {
           "access_token": {
             "type": "string"
