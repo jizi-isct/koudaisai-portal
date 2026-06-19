@@ -133,7 +133,9 @@ pub async fn get_user(
     Path(path): Path<UserPath>,
 ) -> GetUserResponse {
     match st.app.user().get_by_id(&actor, path.id).await {
-        Ok(Some(u)) => GetUserResponse::Ok(UserRead::from(&u)),
+        Ok(Some((u, group))) => {
+            GetUserResponse::Ok(UserRead::with_group(&u, group.map(|g| g.to_string())))
+        }
         Ok(None) => GetUserResponse::NotFound,
         Err(ApplicationOperationError::Unauthorized) => GetUserResponse::Forbidden,
         Err(_) => GetUserResponse::InternalServerError,
@@ -152,7 +154,9 @@ pub async fn get_user_me(State(st): State<V3State>, actor: ActorContext) -> GetU
         return GetUserResponse::Forbidden;
     };
     match st.app.user().get_by_id(&actor, user_id).await {
-        Ok(Some(u)) => GetUserResponse::Ok(UserRead::from(&u)),
+        Ok(Some((u, group))) => {
+            GetUserResponse::Ok(UserRead::with_group(&u, group.map(|g| g.to_string())))
+        }
         Ok(None) => GetUserResponse::NotFound,
         Err(ApplicationOperationError::Unauthorized) => GetUserResponse::Forbidden,
         Err(_) => GetUserResponse::InternalServerError,

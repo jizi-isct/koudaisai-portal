@@ -10,6 +10,7 @@ use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::email_address::EmailAddress;
+use crate::domain::group_id::GroupId;
 use crate::domain::user::User;
 use crate::domain::user_id::UserId;
 use std::marker::PhantomData;
@@ -65,11 +66,13 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
         Ok(self.user_repo.find_all().await?)
     }
 
+    /// ユーザーと代表グループ ID(最初の所属)を返す。`group_id` は表示や
+    /// プラン情報参照のために使う(`build_actor_context` と同じ「最初の所属」慣習)。
     pub async fn get_by_id(
         &self,
         actor_ctx: &ActorContext,
         id: UserId,
-    ) -> Result<Option<User>, ApplicationOperationError<FindError>> {
+    ) -> Result<Option<(User, Option<GroupId>)>, ApplicationOperationError<FindError>> {
         // find user
         let Some(user) = self.user_repo.find_by_id(id).await? else {
             return Ok(None);
@@ -77,10 +80,11 @@ impl<'a, Tx: Transaction, MR: MembershipRepo<Tx>, UR: UserRepo<Tx>, C: Clock>
 
         // get membership
         let members = self.membership_repo.find_by_user_id(id).await?;
+        let primary_group = members.first().map(|m| m.group_id());
 
         // auth and return
         match authz::can_get_user_by_id(actor_ctx, members) {
-            Ok(()) => Ok(Some(user)),
+            Ok(()) => Ok(Some((user, primary_group))),
             Err(CanGetByIdError::NotFound) => Ok(None),
             Err(CanGetByIdError::Unauthorized) => Err(ApplicationOperationError::Unauthorized),
         }

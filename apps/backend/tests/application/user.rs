@@ -136,7 +136,7 @@ pub fn test_get_by_id(_path: &Path, contents: String) -> datatest_stable::Result
             "some" => {
                 let opt = result.expect("expected Ok");
                 assert!(opt.is_some(), "expected Some");
-                assert_eq!(opt.unwrap().id(), target_user_id);
+                assert_eq!(opt.unwrap().0.id(), target_user_id);
             }
             "none" => {
                 let opt = result.expect("expected Ok");
@@ -180,7 +180,7 @@ pub fn test_update(_path: &Path, contents: String) -> datatest_stable::Result<()
                 let admin = admin_ctx();
                 let saved = app.user().get_by_id(&admin, user.id()).await.unwrap();
                 assert!(saved.is_some());
-                assert_eq!(saved.unwrap().name(), "Updated Name");
+                assert_eq!(saved.unwrap().0.name(), "Updated Name");
             }
             "unauthorized" => {
                 assert!(matches!(

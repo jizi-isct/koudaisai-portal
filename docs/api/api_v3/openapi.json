@@ -2957,6 +2957,13 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "group_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "所属する代表グループ ID(`\"G-001\"` 形式)。単体取得時のみ付与され、\n一覧/作成/更新では省略される(所属が無い場合も省略)。"
+              },
               "id": {
                 "type": "string",
                 "format": "uuid"

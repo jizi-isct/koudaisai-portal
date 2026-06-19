@@ -48,6 +48,10 @@ pub struct UserRead {
     pub updated_at: DateTime<Utc>,
     pub name: String,
     pub m_address: String,
+    /// 所属する代表グループ ID(`"G-001"` 形式)。単体取得時のみ付与され、
+    /// 一覧/作成/更新では省略される(所属が無い場合も省略)。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_id: Option<String>,
     #[serde(flatten)]
     pub status: UserReadStatus,
 }
@@ -60,7 +64,18 @@ impl From<&User> for UserRead {
             updated_at: *u.updated_at(),
             name: u.name().to_string(),
             m_address: u.m_address().address.clone(),
+            group_id: None,
             status: u.status().into(),
+        }
+    }
+}
+
+impl UserRead {
+    /// 代表グループ ID を付与した `UserRead` を構築する(単体取得用)。
+    pub fn with_group(u: &User, group_id: Option<String>) -> Self {
+        UserRead {
+            group_id,
+            ..UserRead::from(u)
         }
     }
 }

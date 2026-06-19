@@ -758,6 +758,11 @@ export interface components {
     UserRead: components['schemas']['UserReadStatus'] & {
       /** Format: date-time */
       created_at: string;
+      /**
+       * @description 所属する代表グループ ID(`"G-001"` 形式)。単体取得時のみ付与され、
+       *     一覧/作成/更新では省略される(所属が無い場合も省略)。
+       */
+      group_id?: string | null;
       /** Format: uuid */
       id: string;
       m_address: string;
