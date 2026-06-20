@@ -16,6 +16,24 @@
       },
       "dependsOn": ["^build"]
     },
+    "deploy:production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "wrangler deploy",
+        "cwd": "apps/join"
+      },
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "deploy:preview": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "wrangler deploy --env preview",
+        "cwd": "apps/join"
+      },
+      "dependsOn": ["build"]
+    },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
