@@ -6,8 +6,7 @@ type Props = {
   isLoggedIn?: boolean;
 };
 
-const { isLoggedIn } = Astro.props;
-const lineUrl = isLoggedIn ? "https://lin.ee/9Sud7lK" : "https://lin.ee/43ugikz";
+const lineUrl = "https://lin.ee/qld1QmN"
 ---
 
 <footer class="site-footer">
@@ -26,9 +25,7 @@ const lineUrl = isLoggedIn ? "https://lin.ee/9Sud7lK" : "https://lin.ee/43ugikz"
     <a href="/questions/" class="site-footer-nav-item">よくある質問</a>
   </nav>
   <p class="site-footer-contacts">
-    公式LINEアカウント：{
-      isLoggedIn === undefined ? "..." : <a href={lineUrl}>{lineUrl}</a>
-    } <br />
+    公式LINEアカウント：<a href={lineUrl}>{lineUrl}</a><br />
     メールアドレス([at]を@に置き換えてください)：sanka[at]koudaisai.jp
   </p>
   <p class="site-footer-copyright-text">©︎ 2025 JIZI All Rights Reserved.</p>
