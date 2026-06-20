@@ -11,3 +11,10 @@ enabled = true
 [[routes]]
 pattern = "join.koudaisai.jp"
 custom_domain = true
+
+[env.preview]
+name = "join-preview"
+
+[[env.preview.routes]]
+pattern = "join-preview.koudaisai.jp"
+custom_domain = true
