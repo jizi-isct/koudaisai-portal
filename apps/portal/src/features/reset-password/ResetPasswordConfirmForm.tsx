@@ -1,8 +1,8 @@
-import {validatePassword} from '@koudaisai/shared-utils';
-import {useCallback, useEffect, useState} from 'react';
-import {authFetchClient} from '../api/api';
+import { validatePassword } from '@koudaisai/shared-utils';
+import { useCallback, useEffect, useState } from 'react';
+import { authFetchClient } from '../api/api';
 import membersLogo from '@/features/header/assets/members_logo.png';
-import {NextPhaseButton} from '@/features/plain-form/NextPhaseButton';
+import { NextPhaseButton } from '@/features/plain-form/NextPhaseButton';
 import styles from '@/features/plain-form/PlainForm.module.css';
 
 export function ResetPasswordConfirmForm() {

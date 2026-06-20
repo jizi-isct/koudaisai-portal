@@ -1,10 +1,10 @@
-import {validatePassword} from '@koudaisai/shared-utils';
-import {login} from '@koudaisai/shared-auth-members';
-import type {FormEvent} from 'react';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {authFetchClient} from '../api/api';
+import { validatePassword } from '@koudaisai/shared-utils';
+import { login } from '@koudaisai/shared-auth-members';
+import type { FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { authFetchClient } from '../api/api';
 import membersLogo from '@/features/header/assets/members_logo.png';
-import {NextPhaseButton} from '@/features/plain-form/NextPhaseButton';
+import { NextPhaseButton } from '@/features/plain-form/NextPhaseButton';
 import formStyles from '@/features/plain-form/PlainForm.module.css';
 import styles from './ActivationFlow.module.css';
 
@@ -54,9 +54,9 @@ export function ActivationFlow() {
 
   switch (phase) {
     case 'first':
-      return <ActivationPhaseFirst next={() => setPhase('m_address')}/>;
+      return <ActivationPhaseFirst next={() => setPhase('m_address')} />;
     case 'm_address':
-      return <ActivationPhaseMAddress next={handleMAddressChange}/>;
+      return <ActivationPhaseMAddress next={handleMAddressChange} />;
     case 'password':
       return (
         <ActivationPhasePassword
@@ -74,11 +74,11 @@ export function ActivationFlow() {
         />
       );
     case 'done':
-      return <ActivationPhaseDone mAddress={mAddress} password={password}/>;
+      return <ActivationPhaseDone mAddress={mAddress} password={password} />;
   }
 }
 
-function Logo({size}: { size: 'small' | 'big' }) {
+function Logo({ size }: { size: 'small' | 'big' }) {
   return (
     <div
       className={size === 'small' ? formStyles.logoSmall : formStyles.logoBig}
@@ -93,11 +93,11 @@ function Logo({size}: { size: 'small' | 'big' }) {
   );
 }
 
-function ActivationPhaseFirst({next}: { next: () => void }) {
+function ActivationPhaseFirst({ next }: { next: () => void }) {
   return (
     <main className={formStyles.root}>
       <div className={styles.item}>
-        <Logo size="big"/>
+        <Logo size="big" />
       </div>
       <h1 className={`${formStyles.title} ${styles.item}`}>
         工大祭ポータルへようこそ
@@ -106,15 +106,15 @@ function ActivationPhaseFirst({next}: { next: () => void }) {
         アカウントを有効化しましょう
       </p>
       <div className={styles.item}>
-        <NextPhaseButton label="次の画面へ進む" onClick={next}/>
+        <NextPhaseButton label="次の画面へ進む" onClick={next} />
       </div>
     </main>
   );
 }
 
 function ActivationPhaseMAddress({
-                                   next,
-                                 }: {
+  next,
+}: {
   next: (mAddress: string) => void;
 }) {
   const handleSubmit = useCallback(
@@ -139,7 +139,7 @@ function ActivationPhaseMAddress({
       onSubmit={handleSubmit}
     >
       <div className={styles.item}>
-        <Logo size="small"/>
+        <Logo size="small" />
       </div>
       <h1 className={`${formStyles.title} ${styles.item}`}>
         工大祭ポータルへようこそ
@@ -159,16 +159,16 @@ function ActivationPhaseMAddress({
         />
       </label>
       <div className={styles.item}>
-        <NextPhaseButton type="submit" label="次の画面へ進む"/>
+        <NextPhaseButton type="submit" label="次の画面へ進む" />
       </div>
     </form>
   );
 }
 
 function ActivationPhasePassword({
-                                   mAddress,
-                                   next,
-                                 }: {
+  mAddress,
+  next,
+}: {
   mAddress: string;
   next: (password: string) => void;
 }) {
@@ -210,7 +210,7 @@ function ActivationPhasePassword({
       onSubmit={handleSubmit}
     >
       <div className={styles.item}>
-        <Logo size="small"/>
+        <Logo size="small" />
       </div>
       <h1 className={`${formStyles.title} ${styles.item}`}>
         工大祭ポータルへようこそ
@@ -218,7 +218,7 @@ function ActivationPhasePassword({
       <p className={`${formStyles.description} ${styles.item}`}>
         ログインに使用するパスワードを決めましょう
       </p>
-      <input name="username" type="email" value={mAddress} readOnly hidden/>
+      <input name="username" type="email" value={mAddress} readOnly hidden />
       <label className={`${formStyles.field} ${styles.item}`}>
         パスワード
         <input
@@ -247,18 +247,18 @@ function ActivationPhasePassword({
         </p>
       )}
       <div className={styles.item}>
-        <NextPhaseButton type="submit" label="次の画面へ進む"/>
+        <NextPhaseButton type="submit" label="次の画面へ進む" />
       </div>
     </form>
   );
 }
 
 function ActivationPhaseActivating({
-                                     mAddress,
-                                     password,
-                                     token,
-                                     next,
-                                   }: {
+  mAddress,
+  password,
+  token,
+  next,
+}: {
   mAddress: string;
   password: string;
   token: string;
@@ -274,7 +274,7 @@ function ActivationPhaseActivating({
     (async () => {
       // 新 API は token(不透明な `{id}.{secret}`)と password のみを受け取る。
       // m_address はトークンに束縛済みのため本文では送らない。
-      const {response} = await authFetchClient.POST('/activate', {
+      const { response } = await authFetchClient.POST('/activate', {
         body: {
           token,
           password,
@@ -316,7 +316,7 @@ function ActivationPhaseActivating({
     return (
       <main className={formStyles.root}>
         <div className={styles.item}>
-          <Logo size="big"/>
+          <Logo size="big" />
         </div>
         <p className={`${formStyles.error} ${styles.item}`}>
           アカウントの有効化に失敗しました
@@ -329,7 +329,7 @@ function ActivationPhaseActivating({
   return (
     <main className={formStyles.root}>
       <div className={styles.item}>
-        <Logo size="big"/>
+        <Logo size="big" />
       </div>
       <p className={`${formStyles.description} ${styles.item}`}>
         アカウントを有効化中
@@ -343,9 +343,9 @@ function ActivationPhaseActivating({
 }
 
 function ActivationPhaseDone({
-                               mAddress,
-                               password,
-                             }: {
+  mAddress,
+  password,
+}: {
   mAddress: string;
   password: string;
 }) {
@@ -368,11 +368,11 @@ function ActivationPhaseDone({
   return (
     <main className={formStyles.root}>
       <div className={styles.item}>
-        <Logo size="big"/>
+        <Logo size="big" />
       </div>
       <p className={`${formStyles.description} ${styles.item}`}>
         アカウントは有効化されました
-        <br/>
+        <br />
         我々と一緒に工大祭を盛り上げましょう！
       </p>
       <div className={styles.item}>
