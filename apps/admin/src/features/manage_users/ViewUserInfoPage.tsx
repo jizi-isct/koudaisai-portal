@@ -110,7 +110,10 @@ function UserInfo({ userId }: { userId: string }) {
             <Button href="/manage_users/" type="default">
               戻る
             </Button>
-            <Button href={`/manage_users/view?user_id=${userId}`} type="primary">
+            <Button
+              href={`/manage_users/view?user_id=${userId}`}
+              type="primary"
+            >
               再読み込み
             </Button>
           </>
@@ -159,7 +162,9 @@ function UserInfo({ userId }: { userId: string }) {
       return 'error';
     }
 
-    const targetUserRole = groupMember.find((member) => member.user_id === userId);
+    const targetUserRole = groupMember.find(
+      (member) => member.user_id === userId,
+    );
     return (targetUserRole?.role ?? 'error') as keyof typeof roleNames;
   };
 
