@@ -118,10 +118,10 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                     label: <a href="/approval_requests/">承認申請</a>,
                   },
                   {
-                    key: '/manageUsers/',
+                    key: '/manage_users/',
                     icon: <DatabaseOutlined />,
                     label: <a href="/manage_users/">ユーザー管理</a>,
-                  },
+                  }
                 ],
               },
               {
