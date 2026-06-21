@@ -1,4 +1,4 @@
-import { $api } from '../api/api';
+import { $api } from '@/features/api/api';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
