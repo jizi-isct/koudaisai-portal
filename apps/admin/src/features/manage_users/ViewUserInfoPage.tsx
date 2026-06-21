@@ -104,7 +104,7 @@ function UserInfo({ userId }: { userId: string }) {
       <Result
         status="error"
         title="ユーザー情報の取得に失敗しました"
-        subTitle="userInfo が undefined です"
+        subTitle="ユーザーが存在しないか、通信エラーによりユーザー情報を取得できませんでした。再読み込みしてください。"
         extra={
           <>
             <Button href="/manage_users/" type="default">
