@@ -6,7 +6,7 @@ import {
   InfoOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  DatabaseOutlined
+  DatabaseOutlined,
 } from '@ant-design/icons';
 import { getTokensAdmin } from '@koudaisai/shared-auth-admin';
 import { LoadingScreen } from '@koudaisai/shared-ui';
@@ -116,11 +116,12 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                     key: '/approval_requests/',
                     icon: <BellOutlined />,
                     label: <a href="/approval_requests/">承認申請</a>,
-                  },{
+                  },
+                  {
                     key: '/manageUsers/',
                     icon: <DatabaseOutlined />,
-                    label: <a href="/manageUsers/">ユーザー管理</a>
-                  }
+                    label: <a href="/manage_users/">ユーザー管理</a>,
+                  },
                 ],
               },
               {
