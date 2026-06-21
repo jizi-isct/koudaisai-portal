@@ -148,15 +148,17 @@ function UserInfo({ userId }: { userId: string }) {
     }
   };
 
-  const userRole = () => {
-    if (!groupMember) {
+  const userRole = (): keyof typeof roleNames => {
+    if (!userInfo.group_id) {
       return 'noRole';
-    } else {
-      const targetUserRole = groupMember.find(
-        (member) => member.user_id === userId,
-      );
-      return !targetUserRole ? 'error' : targetUserRole.role;
     }
+
+    if (!groupMember) {
+      return 'error';
+    }
+
+    const targetUserRole = groupMember.find((member) => member.user_id === userId);
+    return (targetUserRole?.role ?? 'error') as keyof typeof roleNames;
   };
 
   const userInfoData: DescriptionsProps['items'] = [
