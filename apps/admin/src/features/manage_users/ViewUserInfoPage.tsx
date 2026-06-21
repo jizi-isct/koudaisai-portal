@@ -107,7 +107,7 @@ function UserInfo({ userId }: { userId: string }) {
         subTitle="userInfo が undefined です"
         extra={
           <>
-            <Button href="/manageUsers/" type="default">
+            <Button href="/manage_users/" type="default">
               戻る
             </Button>
             <Button href={`/manage_users/view?user_id=${userId}`} type="primary">
