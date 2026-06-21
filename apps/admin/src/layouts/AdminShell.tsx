@@ -121,7 +121,7 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                     key: '/manage_users/',
                     icon: <DatabaseOutlined />,
                     label: <a href="/manage_users/">ユーザー管理</a>,
-                  }
+                  },
                 ],
               },
               {
