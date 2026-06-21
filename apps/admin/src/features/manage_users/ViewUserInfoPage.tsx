@@ -28,10 +28,8 @@ export function ViewUserInfoPage() {
     return (
       <Result
         status="error"
-        title="クエリパラメータに不足があります"
-        subTitle="ユーザーIDが指定されていません。URLに?user_id=xxxxのように指定してください。"
         extra={
-          <Button href="/manageUsers" type="primary">
+          <Button href="/manage_users/" type="primary">
             戻る
           </Button>
         }
