@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { $api } from '@/features/api/api';
 import type { UserRead } from '@koudaisai/shared-types';
@@ -30,8 +30,7 @@ function UserTable() {
     return <Heading1 emoji="⚠️">エラーです</Heading1>;
   }
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setKeyWords(e.target.value);
   };
 
