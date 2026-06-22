@@ -4,8 +4,7 @@ import { formatDate } from '@koudaisai/shared-utils';
 import { $api } from '@/features/api/api';
 import type { UserRead } from '@koudaisai/shared-types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Table, Tag, Flex, Input } from 'antd';
-import type { TableProps } from 'antd';
+import { Table, type TableProps, Tag, Flex, Input } from 'antd';
 
 export default function ManageGroupPage() {
   const [queryClient] = useState(() => new QueryClient());
