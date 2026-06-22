@@ -110,7 +110,10 @@ function UserInfo({ userId }: { userId: string }) {
             <Button href="/kebab-case/" type="default">
               戻る
             </Button>
-            <Button href={`/kebab-case/view?user_id=${userId}`} type="primary">
+            <Button
+              href={`/manage-users/view?user_id=${userId}`}
+              type="primary"
+            >
               再読み込み
             </Button>
           </>

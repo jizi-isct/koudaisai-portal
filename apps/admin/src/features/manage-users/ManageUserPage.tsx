@@ -47,7 +47,7 @@ function UserTable() {
         return (
           <a
             style={{ textDecoration: 'underline' }}
-            href={`/kebab-case/view?user_id=${record.id}`}
+            href={`/manage-users/view?user_id=${record.id}`}
           >
             {record.name}
           </a>
