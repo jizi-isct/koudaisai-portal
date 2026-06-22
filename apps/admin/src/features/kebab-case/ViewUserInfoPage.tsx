@@ -2,6 +2,7 @@ import { $api } from '@/features/api/api';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { formatDate } from '@koudaisai/shared-utils';
 import {
   Descriptions,
   Tag,
@@ -10,7 +11,6 @@ import {
   Result,
   type DescriptionsProps,
 } from 'antd';
-import formatDate from './modules/formatDate';
 
 export function ViewUserInfoPage() {
   const [queryClient] = useState(() => new QueryClient());
@@ -110,10 +110,7 @@ function UserInfo({ userId }: { userId: string }) {
             <Button href="/kebab-case/" type="default">
               戻る
             </Button>
-            <Button
-              href={`/kebab-case/view?user_id=${userId}`}
-              type="primary"
-            >
+            <Button href={`/kebab-case/view?user_id=${userId}`} type="primary">
               再読み込み
             </Button>
           </>

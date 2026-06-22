@@ -1,9 +1,9 @@
 import { useState, type ChangeEvent } from 'react';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
+import { formatDate } from '@koudaisai/shared-utils';
 import { $api } from '@/features/api/api';
 import type { UserRead } from '@koudaisai/shared-types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import formatDate from './modules/formatDate';
 import { Table, Tag, Flex, Input } from 'antd';
 import type { TableProps } from 'antd';
 
