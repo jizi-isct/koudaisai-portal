@@ -256,6 +256,8 @@ function GroupInfo({ groupId }: { groupId: string }) {
       case 'lab_project':
         return <Tag color="orange">研究室</Tag>;
       case 'press':
+        return <Tag color="pink">学内取材</Tag>;
+      default:
         return <Tag color="gray">不明</Tag>;
     }
   };
