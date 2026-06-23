@@ -123,7 +123,7 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                     label: <a href="/manage-users/">ユーザー管理</a>,
                   },
                   {
-                    key: '/manage_groups/',
+                    key: '/manage-groups/',
                     icon: <DatabaseOutlined />,
                     label: <a href='/manage-groups/'>参加団体管理</a>
                   },
