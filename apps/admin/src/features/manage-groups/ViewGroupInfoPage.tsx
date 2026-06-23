@@ -192,6 +192,29 @@ function GroupInfo({ groupId }: { groupId: string }) {
     );
   }
 
+  if (!memberInfo) {
+    return (
+      <Result
+        status="error"
+        title="団体メンバー情報の取得に失敗しました"
+        subTitle="通信エラーによりメンバー情報を取得できませんでした。再読み込みしてください。"
+        extra={
+          <>
+            <Button href="/manage-groups/" type="default">
+              戻る
+            </Button>
+            <Button
+              href={`/manage-groups/view?group_id=${groupId}`}
+              type="primary"
+            >
+              再読み込み
+            </Button>
+          </>
+        }
+      />
+    );
+  }
+
   const filteredMemberNameByRole = {
     representative: !representativeInfo ? (
       'まだ紐づいていません'
