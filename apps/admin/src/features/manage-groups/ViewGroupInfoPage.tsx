@@ -30,7 +30,7 @@ export function ViewGroupInfoPage() {
       <Result
         status="error"
         title="クエリパラメータに不足があります"
-        subTitle="団体Idが指定されていません。URLに?group_id=xxxxのように指定してください。"
+        subTitle="団体IDが指定されていません。URLに?group_id=xxxxのように指定してください。"
         extra={
           <Button href="/manage-groups/" type="primary">
             戻る
