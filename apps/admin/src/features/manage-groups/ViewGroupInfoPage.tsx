@@ -200,7 +200,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
         style={{ textDecoration: 'underline' }}
         href={`/manage-users/view?user_id=${representativeInfo.id}`}
       >
-        {representativeInfo.name + `(${representativeInfo.m_address})`},
+        {representativeInfo.name + `(${representativeInfo.m_address})`}
       </a>
     ),
     operator: !operatorInfo ? (
