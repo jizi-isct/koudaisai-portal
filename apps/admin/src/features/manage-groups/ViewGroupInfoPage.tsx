@@ -30,7 +30,7 @@ export function ViewGroupInfoPage() {
       <Result
         status="error"
         title="クエリパラメータに不足があります"
-        subTitle="団体Idが指定されていません。URLに?group_id=xxxxのように指定してください。"
+        subTitle="団体IDが指定されていません。URLに?group_id=xxxxのように指定してください。"
         extra={
           <Button href="/manage-groups/" type="primary">
             戻る
@@ -200,7 +200,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
         style={{ textDecoration: 'underline' }}
         href={`/manage-users/view?user_id=${representativeInfo.id}`}
       >
-        {representativeInfo.name + `(${representativeInfo.m_address})`},
+        {representativeInfo.name + `(${representativeInfo.m_address})`}
       </a>
     ),
     operator: !operatorInfo ? (
