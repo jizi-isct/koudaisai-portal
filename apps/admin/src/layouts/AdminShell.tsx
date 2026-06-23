@@ -125,7 +125,7 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                   {
                     key: '/manage-groups/',
                     icon: <DatabaseOutlined />,
-                    label: <a href='/manage-groups/'>参加団体管理</a>
+                    label: <a href="/manage-groups/">参加団体管理</a>,
                   },
                 ],
               },

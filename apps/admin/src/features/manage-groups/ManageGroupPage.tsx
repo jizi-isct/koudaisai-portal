@@ -17,7 +17,7 @@ export default function ManageGroupPage() {
   );
 }
 
-function GroupTable(){
+function GroupTable() {
   const { data, isLoading } = $api.useQuery('get', '/groups');
   const groupDataSet = data ?? [];
   const [keyWords, setKeyWords] = useState('');
@@ -40,76 +40,70 @@ function GroupTable(){
   const typeOfGroups = (groupType: GroupRead['type']) => {
     switch (groupType) {
       case 'booth_project':
-        return (<Tag color="green">模擬店</Tag>);
+        return <Tag color="green">模擬店</Tag>;
       case 'stage_project':
-        return (<Tag color="yellow">ステージ</Tag>);
+        return <Tag color="yellow">ステージ</Tag>;
       case 'general_project':
-        return (<Tag color="blue">一般</Tag>);
+        return <Tag color="blue">一般</Tag>;
       case 'lab_project':
-        return (<Tag color="orange">研究室</Tag>);
+        return <Tag color="orange">研究室</Tag>;
       case 'press':
-        return (<Tag color="gray">不明</Tag>);
-    };
+        return <Tag color="gray">不明</Tag>;
+    }
   };
 
   const columns: TableProps<GroupRead>['columns'] = [
     {
-      key: "group_id",
-      title: "団体ID",
+      key: 'group_id',
+      title: '団体ID',
       render: (_value, record) => {
-        return(
+        return (
           <a
-            style={{textDecoration: 'underline'}}
+            style={{ textDecoration: 'underline' }}
             href={`/manage-groups/view?group_id=${record.id}`}
           >
             {record.id}
           </a>
-        )
-      }
+        );
+      },
     },
     {
-      key: "name",
-      title: "団体名",
+      key: 'name',
+      title: '団体名',
       render: (_value, record) => {
-        return (
-          <p>{record.id}</p>
-        );
-      }
+        return <p>{record.name}</p>;
+      },
     },
     {
-      key: "type",
-      title: "団体種別",
+      key: 'type',
+      title: '団体種別',
       render: (_value, record) => {
-        return(
-          typeOfGroups(record.type)
-        );
-      }
+        return typeOfGroups(record.type);
+      },
     },
     {
-      key: "updated_at",
-      title: "更新日時",
+      key: 'updated_at',
+      title: '更新日時',
       render: (_value, record) => {
-        return (
-          formatDate(record.updated_at)
-        );
-      }
-    }
+        return formatDate(record.updated_at);
+      },
+    },
   ];
 
   return (
-      <Flex gap={8} vertical>
-        <Input
-          placeholder="名前を検索"
-          onChange={handleOnChange}
-          style={{ width: 200 }}
-          value={keyWords}
-        />
-        <Table<GroupRead>
-          dataSource={targetedGroups.map((item) => ({ ...item, key: item.id }))}
-          columns={columns}
-          bordered
-          scroll={{ x: 'max-content' }}
-        />
-      </Flex>
-    );
+    <Flex gap={8} vertical>
+      <Input
+        placeholder="団体IDを検索"
+        onChange={handleOnChange}
+        style={{ width: 200 }}
+        value={keyWords}
+      />
+      <Table<GroupRead>
+        dataSource={targetedGroups.map((item) => ({ ...item, key: item.id }))}
+        columns={columns}
+        bordered
+        scroll={{ x: 'max-content' }}
+      />
+    </Flex>
+  );
 }
