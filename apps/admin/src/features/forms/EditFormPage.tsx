@@ -172,7 +172,40 @@ function EditForm({ formId }: { formId: string }) {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item name="url" label="外部フォームurl">
+        <Form.Item
+          name="url"
+          label="外部フォームurl"
+          extra={
+            <span>
+              Google
+              フォームの「フォームに事前入力する」ボタンから事前入力URLを作成する際、各回答欄の初期値として以下のプレースホルダーを入力してください。ポータルで開かれたとき、回答者の情報に自動で置き換わります。
+              <table
+                style={{
+                  marginTop: 4,
+                  borderSpacing: '8px 2px',
+                  borderCollapse: 'separate',
+                }}
+              >
+                <tbody>
+                  {[
+                    ['{user.name}', '氏名'],
+                    ['{user.email}', 'メールアドレス'],
+                    ['{user.id}', 'ユーザーID'],
+                    ['{group.id}', '団体ID（G-001の形式）'],
+                    ['{group.name}', '団体名'],
+                  ].map(([placeholder, label]) => (
+                    <tr key={placeholder}>
+                      <td>
+                        <code>{placeholder}</code>
+                      </td>
+                      <td>{label}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </span>
+          }
+        >
           <Input.TextArea />
         </Form.Item>
 
