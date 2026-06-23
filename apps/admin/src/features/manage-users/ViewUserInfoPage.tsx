@@ -31,7 +31,7 @@ export function ViewUserInfoPage() {
         title="クエリパラメータに不足があります"
         subTitle="ユーザーIDが指定されていません。URLに?user_id=xxxxのように指定してください。"
         extra={
-          <Button href="/kebab-case/" type="primary">
+          <Button href="/manage-users/" type="primary">
             戻る
           </Button>
         }
@@ -107,7 +107,7 @@ function UserInfo({ userId }: { userId: string }) {
         subTitle="ユーザーが存在しないか、通信エラーによりユーザー情報を取得できませんでした。再読み込みしてください。"
         extra={
           <>
-            <Button href="/kebab-case/" type="default">
+            <Button href="/manage-users/" type="default">
               戻る
             </Button>
             <Button
