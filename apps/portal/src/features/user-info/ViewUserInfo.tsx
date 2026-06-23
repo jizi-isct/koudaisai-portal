@@ -1,9 +1,4 @@
-import type {
-  GroupRead,
-  MemberRead,
-  Role,
-  UserRead,
-} from '@koudaisai/shared-types';
+import type { GroupRead, Role, UserRead } from '@koudaisai/shared-types';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useEffect, useState } from 'react';
 import { api } from '@/features/api/api';
@@ -12,7 +7,7 @@ import { UserInfoCard } from './UserInfoCard';
 export function ViewUserInfo() {
   const [user, setUser] = useState<UserRead | null>(null);
   const [group, setGroup] = useState<GroupRead | null>(null);
-  const [role, setRole] = useState<Role | undefined>(undefined);
+  const [roles, setRoles] = useState<Role[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +38,9 @@ export function ViewUserInfo() {
       const { data: members } = await api.GET('/groups/{id}/members', {
         params: { path: { id: group.id } },
       });
-      setRole(members?.find((m: MemberRead) => m.user_id === user.id)?.role);
+      setRoles(
+        members?.filter((m) => m.user_id === user.id).map((m) => m.role),
+      );
 
       setUser(user);
       setGroup(group);
@@ -66,5 +63,5 @@ export function ViewUserInfo() {
     return null;
   }
 
-  return <UserInfoCard user={user} group={group} role={role} />;
+  return <UserInfoCard user={user} group={group} roles={roles} />;
 }
