@@ -227,7 +227,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
       </a>
     ),
     operator: !operatorInfo ? (
-      'まだ紐づいてないか，企画責任者と兼任です'
+      'まだ紐づいてないません'
     ) : (
       <a
         style={{ textDecoration: 'underline' }}
