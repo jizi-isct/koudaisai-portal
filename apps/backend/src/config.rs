@@ -175,7 +175,11 @@ impl Default for AuthV3 {
             refresh_cookie_same_site: "Strict".to_string(),
             reset_link_base: "https://portal.koudaisai.jp/password/reset".to_string(),
             access_token_iss: "https://portal.koudaisai.jp".to_string(),
-            cors_allowed_origins: vec!["https://portal.koudaisai.jp".to_string()],
+            cors_allowed_origins: vec![
+                "https://portal.koudaisai.jp".to_string(),
+                "https://admin.koudaisai.jp".to_string(),
+                "https://join.koudaisai.jp".to_string(),
+            ],
         }
     }
 }
