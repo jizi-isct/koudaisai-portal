@@ -168,7 +168,7 @@ impl Default for AuthV3 {
             session_absolute_ttl_secs: 60 * 60 * 24 * 183, // ~6 か月
             session_idle_ttl_secs: 60 * 60 * 24 * 183,
             max_sessions_per_user: 10,
-            activation_token_ttl_secs: 60 * 60 * 48,
+            activation_token_ttl_secs: 60 * 60 * 24 * 183, // 6 か月
             reset_token_ttl_secs: 60 * 30,
             refresh_cookie_name: "__Host-refresh_token".to_string(),
             refresh_cookie_secure: true,
