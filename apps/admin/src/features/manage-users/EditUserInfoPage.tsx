@@ -161,8 +161,7 @@ function EditUserInfo({ userId }: { userId: string }) {
       setStateOfMailModal('successOnSendUserMAddress');
     } else {
       messageApi.error(
-        `メールアドレスの更新に失敗しましtあ: ${String(result.error)}`,
-      );
+        `メールアドレスの更新に失敗しました: ${String(result.error)}`,
       setStateOfMailModal('failedOnSendUserMAddress');
     }
   };
