@@ -219,7 +219,13 @@ function UserInfo({ userId }: { userId: string }) {
         bordered
         items={userInfoData}
       />
-      <Button type="primary" href={`/manage-users/edit?user_id=${userId}`}>ユーザー情報を編集</Button>
+      <Button
+        type="primary"
+        href={`/manage-users/edit?user_id=${userId}`}
+        style={{ width: '15vw' }}
+      >
+        ユーザー情報を編集
+      </Button>
     </Flex>
   );
 }
