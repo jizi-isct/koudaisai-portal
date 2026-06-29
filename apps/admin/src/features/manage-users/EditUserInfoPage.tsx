@@ -200,11 +200,12 @@ function EditUserInfo({ userId }: { userId: string }) {
         },
       });
       if (!response.activation_token) {
-        return {
-          ok: false as const,
-          error: new Error('Activation Tokenの取得に失敗しました．'),
-        };
-      }
+      setIsSending(false);
+      return {
+        ok: false as const,
+        error: new Error('Activation Tokenの取得に失敗しました．'),
+      };
+    }
       setActivationUrl(
         'https://portal.koudaisai.jp/activate?token=' +
           response.activation_token,
