@@ -9,7 +9,7 @@ type FormValues = {
   usermaddress: string;
 };
 
-type stateOfModal =
+type StateOfModal =
   | 'pendingSendUserName'
   | 'sending'
   | 'successOnSendUserName'
@@ -68,10 +68,10 @@ function EditUserInfo({ userId }: { userId: string }) {
 
   const [openNameModal, setOpenNameModal] = useState<boolean>(false);
   const [openMAddressModal, setOpenMAddressModal] = useState<boolean>(false);
-  const [stateOfNameModal, setStateOfNameModal] = useState<stateOfModal>(
+  const [stateOfNameModal, setStateOfNameModal] = useState<StateOfModal>(
     'pendingSendUserName',
   );
-  const [stateOfMailModal, setStateOfMailModal] = useState<stateOfModal>(
+  const [stateOfMailModal, setStateOfMailModal] = useState<StateOfModal>(
     'pendingSendUserMAddress',
   );
   const [activationUrl, setActivationUrl] = useState<string>('');
@@ -162,6 +162,7 @@ function EditUserInfo({ userId }: { userId: string }) {
     } else {
       messageApi.error(
         `メールアドレスの更新に失敗しました: ${String(result.error)}`,
+      );
       setStateOfMailModal('failedOnSendUserMAddress');
     }
   };
@@ -199,12 +200,12 @@ function EditUserInfo({ userId }: { userId: string }) {
         },
       });
       if (!response.activation_token) {
-      setIsSending(false);
-      return {
-        ok: false as const,
-        error: new Error('Activation Tokenの取得に失敗しました．'),
-      };
-    }
+        setIsSending(false);
+        return {
+          ok: false as const,
+          error: new Error('Activation Tokenの取得に失敗しました．'),
+        };
+      }
       setActivationUrl(
         'https://portal.koudaisai.jp/activate?token=' +
           response.activation_token,
@@ -494,7 +495,7 @@ function EditUserInfo({ userId }: { userId: string }) {
             <Button
               type="primary"
               htmlType="submit"
-              style={{ maxWidth: '200' }}
+              style={{ maxWidth: '12.5rem' }}
             >
               ユーザー名を変更
             </Button>
@@ -523,7 +524,7 @@ function EditUserInfo({ userId }: { userId: string }) {
             <Button
               type="primary"
               htmlType="submit"
-              style={{ maxWidth: '200' }}
+              style={{ maxWidth: '12.5rem' }}
             >
               メールアドレスを変更
             </Button>
