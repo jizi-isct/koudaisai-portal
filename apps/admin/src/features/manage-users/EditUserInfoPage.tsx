@@ -425,7 +425,7 @@ function EditUserInfo({ userId }: { userId: string }) {
               </Button>
             </>,
           ],
-          modalContents: <p>ユーザー名の送信に失敗しました．</p>,
+          modalContents: <p>メールアドレスの送信に失敗しました．</p>,
         };
       case 'successOnSendUserMAddress':
         return {
