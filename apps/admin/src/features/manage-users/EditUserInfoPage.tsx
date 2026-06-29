@@ -291,7 +291,7 @@ function EditUserInfo({ userId }: { userId: string }) {
             <>
               <Button
                 type="default"
-                onClick={handleSendUserName}
+                onClick={handleUpdateUserNameCancel}
                 loading={isSending}
               >
                 キャンセル
