@@ -148,7 +148,7 @@ function EditUserInfo({ userId }: { userId: string }) {
       messageApi.error(
         `ユーザー名の更新に失敗しました: ${String(result.error)}`,
       );
-      setStateOfNameModal('successOnSendUserName');
+      setStateOfNameModal('failedOnSendUserName');
     }
   };
 
