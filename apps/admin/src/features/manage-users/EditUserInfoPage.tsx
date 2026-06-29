@@ -402,7 +402,7 @@ function EditUserInfo({ userId }: { userId: string }) {
         return {
           modalTitle: 'エラーが発生しました．',
           modalOnOk: () => {
-            void handleSendUserName();
+            void handleSendUserMAddress();
           },
           modalOnCancel: { handleUpdateUserMAddressCancel },
           modalFooter: [
