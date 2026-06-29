@@ -388,7 +388,7 @@ function EditUserInfo({ userId }: { userId: string }) {
               <Button
                 type="primary"
                 onClick={() => {
-                  void handleSendUserName();
+                  void handleSendUserMAddress();
                 }}
                 loading={isSending}
               >
