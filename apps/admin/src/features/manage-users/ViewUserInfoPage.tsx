@@ -220,11 +220,7 @@ function UserInfo({ userId }: { userId: string }) {
         items={userInfoData}
       />
       <Flex gap={8} wrap>
-        <Button
-          type="default"
-          href={'/manage-users'}
-          style={{width: "5rem"}}
-        >
+        <Button type="default" href={'/manage-users'} style={{ width: '5rem' }}>
           戻る
         </Button>
         <Button
