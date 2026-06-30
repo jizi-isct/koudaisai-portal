@@ -133,8 +133,9 @@ function EditUserInfo({ userId }: { userId: string }) {
 
   const handleUpdateUserMAddressCancel = () => {
     setOpenMAddressModal(false);
+    setStateOfMailModal('pendingSendUserMAddress');
+    setActivationUrl('');
   };
-
   const newName = nameForm.getFieldValue('username');
   const newAddress = mailForm.getFieldValue('usermaddress');
 
