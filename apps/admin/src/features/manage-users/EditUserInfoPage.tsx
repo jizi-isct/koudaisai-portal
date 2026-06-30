@@ -3,6 +3,7 @@ import { LoadingScreen, Heading1 } from '@koudaisai/shared-ui';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Form, Flex, Button, Result, Input, Modal, message } from 'antd';
+import { ACTIVATION_BASE_URL } from 'astro:env/client';
 
 type FormValues = {
   username: string;
@@ -206,10 +207,7 @@ function EditUserInfo({ userId }: { userId: string }) {
           error: new Error('Activation Tokenの取得に失敗しました．'),
         };
       }
-      setActivationUrl(
-        'https://portal.koudaisai.jp/activate?token=' +
-          response.activation_token,
-      );
+      setActivationUrl(ACTIVATION_BASE_URL + response.activation_token);
       setIsSending(false);
       return { ok: true as const };
     } catch (error) {
