@@ -125,8 +125,8 @@ function EditUserInfo({ userId }: { userId: string }) {
 
   const handleUpdateUserNameCancel = () => {
     setOpenNameModal(false);
+    setStateOfNameModal('pendingSendUserName');
   };
-
   const handleUpdateUserMAddress = () => {
     setOpenMAddressModal(true);
   };
