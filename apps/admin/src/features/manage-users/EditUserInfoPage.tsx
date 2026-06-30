@@ -207,7 +207,7 @@ function EditUserInfo({ userId }: { userId: string }) {
           error: new Error('Activation Tokenの取得に失敗しました．'),
         };
       }
-      setActivationUrl(ACTIVATION_BASE_URL + response.activation_token);
+      setActivationUrl(ACTIVATION_BASE_URL + encodeURIComponent(response.activation_token));
       setIsSending(false);
       return { ok: true as const };
     } catch (error) {
