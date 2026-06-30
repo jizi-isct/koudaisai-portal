@@ -208,7 +208,9 @@ function EditUserInfo({ userId }: { userId: string }) {
           error: new Error('Activation Tokenの取得に失敗しました．'),
         };
       }
-      setActivationUrl(ACTIVATION_BASE_URL + encodeURIComponent(response.activation_token));
+      setActivationUrl(
+        ACTIVATION_BASE_URL + encodeURIComponent(response.activation_token),
+      );
       setIsSending(false);
       return { ok: true as const };
     } catch (error) {
@@ -528,6 +530,13 @@ function EditUserInfo({ userId }: { userId: string }) {
               メールアドレスを変更
             </Button>
           </Form.Item>
+          <Button
+            type="default"
+            href={`/manage-users/view?user_id=${userId}`}
+            style={{ width: '5rem' }}
+          >
+            戻る
+          </Button>
         </Form>
         <Modal
           title={stateOfModalOnSendUserName()?.modalTitle}
