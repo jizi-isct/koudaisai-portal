@@ -108,7 +108,7 @@ function EditUserInfo({ userId }: { userId: string }) {
               戻る
             </Button>
             <Button
-              href={`/manage-users/view?user_id=${userId}`}
+              href={`/manage-users/edit?user_id=${userId}`}
               type="primary"
             >
               再読み込み
