@@ -222,7 +222,7 @@ function UserInfo({ userId }: { userId: string }) {
       <Button
         type="primary"
         href={`/manage-users/edit?user_id=${userId}`}
-        style={{ width: '15vw' }}
+        style={{ width: '12rem' }}
       >
         ユーザー情報を編集
       </Button>
