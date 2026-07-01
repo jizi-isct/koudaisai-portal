@@ -9,8 +9,12 @@ import {
   Flex,
   Button,
   Result,
+  Input,
+  Modal,
+  message,
   type DescriptionsProps,
 } from 'antd';
+import { ACTIVATION_BASE_URL } from 'astro:env/client';
 
 export function ViewUserInfoPage() {
   const [queryClient] = useState(() => new QueryClient());
@@ -57,7 +61,19 @@ const roleNames = {
 };
 
 function UserInfo({ userId }: { userId: string }) {
-  const { data: userInfo, isLoading: isLoadingUsers } = $api.useQuery(
+  const [messageApi, contextHolder] = message.useMessage();
+  const [editingField, setEditingField] = useState<'name' | 'email' | null>(
+    null,
+  );
+  const [editingValue, setEditingValue] = useState('');
+  const [activationUrl, setActivationUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const {
+    data: userInfo,
+    isLoading: isLoadingUsers,
+    refetch: refetchUserInfo,
+  } = $api.useQuery(
     'get',
     '/users/{id}',
     {
@@ -67,6 +83,15 @@ function UserInfo({ userId }: { userId: string }) {
         },
       },
     },
+  );
+
+  const { mutateAsync: updateUserName } = $api.useMutation(
+    'patch',
+    '/users/{id}',
+  );
+  const { mutateAsync: updateUserEmail } = $api.useMutation(
+    'post',
+    '/users/{id}/m_address',
   );
 
   const { data: groupData, isLoading: isLoadingGroups } = $api.useQuery(
@@ -168,6 +193,94 @@ function UserInfo({ userId }: { userId: string }) {
     return (targetUserRole?.role ?? 'error') as keyof typeof roleNames;
   };
 
+  const startEditing = (field: 'name' | 'email', value: string) => {
+    setEditingField(field);
+    setEditingValue(value);
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditingValue('');
+  };
+
+  const saveEditing = async () => {
+    const value = editingValue.trim();
+    if (!editingField || !value) {
+      messageApi.error('値を入力してください');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (editingField === 'name') {
+        await updateUserName({
+          params: { path: { id: userId } },
+          body: { name: value },
+        });
+        messageApi.success('ユーザー名を更新しました');
+      } else {
+        const response = await updateUserEmail({
+          params: { path: { id: userId } },
+          body: { m_address: value },
+        });
+        if (userInfo.status === 'registered' && response.activation_token) {
+          setActivationUrl(
+            ACTIVATION_BASE_URL +
+              encodeURIComponent(response.activation_token),
+          );
+        }
+        messageApi.success('メールアドレスを更新しました');
+      }
+      cancelEditing();
+      await refetchUserInfo();
+    } catch (error) {
+      messageApi.error(`更新に失敗しました: ${String(error)}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const editableValue = (
+    field: 'name' | 'email',
+    value: string,
+    inputType: 'text' | 'email' = 'text',
+  ) => {
+    if (editingField === field) {
+      return (
+        <Flex gap={8} align="start" wrap>
+          <Input
+            type={inputType}
+            value={editingValue}
+            onChange={(event) => setEditingValue(event.target.value)}
+            onPressEnter={() => void saveEditing()}
+            autoFocus
+            style={{ width: 'min(100%, 28rem)' }}
+            status={editingValue.trim() ? undefined : 'error'}
+          />
+          <Button
+            type="primary"
+            onClick={() => void saveEditing()}
+            loading={isSaving}
+          >
+            保存
+          </Button>
+          <Button onClick={cancelEditing} disabled={isSaving}>
+            キャンセル
+          </Button>
+        </Flex>
+      );
+    }
+
+    return (
+      <Flex gap={8} align="center" justify="space-between">
+        <span>{value}</span>
+        <Button size="small" onClick={() => startEditing(field, value)}>
+          編集
+        </Button>
+      </Flex>
+    );
+  };
+
   const userInfoData: DescriptionsProps['items'] = [
     {
       key: 'id',
@@ -175,9 +288,14 @@ function UserInfo({ userId }: { userId: string }) {
       children: userInfo.id,
     },
     {
+      key: 'name',
+      label: 'ユーザー名',
+      children: editableValue('name', userInfo.name),
+    },
+    {
       key: 'm_address',
       label: 'メールアドレス',
-      children: userInfo.m_address,
+      children: editableValue('email', userInfo.m_address, 'email'),
     },
     {
       key: 'status',
@@ -214,7 +332,7 @@ function UserInfo({ userId }: { userId: string }) {
   return (
     <Flex gap={8} vertical>
       <Descriptions
-        title={userInfo.name}
+        title="ユーザー情報"
         column={1}
         bordered
         items={userInfoData}
@@ -223,14 +341,20 @@ function UserInfo({ userId }: { userId: string }) {
         <Button type="default" href="/manage-users/" style={{ width: '5rem' }}>
           戻る
         </Button>
-        <Button
-          type="primary"
-          href={`/manage-users/edit?user_id=${userId}`}
-          style={{ width: '12rem' }}
-        >
-          ユーザー情報を編集
-        </Button>
       </Flex>
+      <Modal
+        title="メールアドレスを更新しました"
+        open={Boolean(activationUrl)}
+        onOk={() => setActivationUrl('')}
+        onCancel={() => setActivationUrl('')}
+        cancelButtonProps={{ style: { display: 'none' } }}
+      >
+        <p>新しい有効化URL</p>
+        <p style={{ overflowWrap: 'anywhere', fontWeight: 'bold' }}>
+          {activationUrl}
+        </p>
+      </Modal>
+      {contextHolder}
     </Flex>
   );
 }
