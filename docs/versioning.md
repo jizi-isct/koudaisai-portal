@@ -17,9 +17,9 @@ vX.Y.Z.W-A
 - `A` - Prerelease
   Version．そのビルドが不安定であり，関連する通常のバージョンが示す要件と互換性を満たさない可能性があることを示す．主に以下の値が使用されます(
   nは自然数)
-    - `alpha.n`, `beta.n`, `gamma.n` - デバッグなどが十分に行われていない試験的なビルドであることを示す．nが大きくなりすぎた際にalphaからbeta、betaから
-      gammaに繰り上げられます．
-    - `rc.n` - Release Candidate．バグなどが十分に取り除かれた正式リリース直前のビルドであることを示す．
+  - `alpha.n`, `beta.n`, `gamma.n` - デバッグなどが十分に行われていない試験的なビルドであることを示す．nが大きくなりすぎた際にalphaからbeta、betaから
+    gammaに繰り上げられます．
+  - `rc.n` - Release Candidate．バグなどが十分に取り除かれた正式リリース直前のビルドであることを示す．
 
 ## packageのtag命名規則
 
