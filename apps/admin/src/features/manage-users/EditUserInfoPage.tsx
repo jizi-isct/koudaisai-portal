@@ -205,7 +205,7 @@ function EditUserInfo({ userId }: { userId: string }) {
         setIsSending(false);
         return {
           ok: false as const,
-          error: new Error('Activation Tokenの取得に失敗しました．'),
+          error: new Error('有効化アドレスの取得に失敗しました．'),
         };
       }
       setActivationUrl(
