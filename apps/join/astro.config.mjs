@@ -8,6 +8,11 @@ export default defineConfig({
   env: {
     schema: {
       API_URL: envField.string({ context: 'client', access: 'public' }),
+      GA_MEASUREMENT_ID: envField.string({
+        context: 'client',
+        access: 'public',
+          optional: true,
+      }),
     },
   },
 });
