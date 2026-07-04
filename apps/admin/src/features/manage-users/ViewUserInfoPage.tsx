@@ -78,6 +78,7 @@ function UserInfo({ userId }: { userId: string }) {
   const [activationUrl, setActivationUrl] = useState('');
   const [isPendSaving, setIsPendSaving] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCopying, setIsCopying] = useState<boolean>(false);
 
   const [openNameModal, setOpenNameModal] = useState<boolean>(false);
   const [openEmailModal, setOpenEmailModal] = useState<boolean>(false);
@@ -409,6 +410,13 @@ function UserInfo({ userId }: { userId: string }) {
                 <>
                   <p>新しい有効化URL</p>
                   <p style={{ fontWeight: 'bold' }}>{activationUrl}</p>
+                  <Button
+                    size="small"
+                    onClick={handleCopyActivationUrl}
+                    loading={isCopying}
+                  >
+                    有効化URLをコピー
+                  </Button>
                 </>
               ) : (
                 <p>
@@ -534,6 +542,18 @@ function UserInfo({ userId }: { userId: string }) {
       return { ok: false as const, error };
     }
   };
+
+  const handleCopyActivationUrl = async () => {
+    try {
+      setIsCopying(true);
+      await navigator.clipboard.writeText(activationUrl);
+      setIsCopying(false);
+      messageApi.success('有効化URLをコピーしました');
+    } catch (error) {
+      setIsCopying(false);
+      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`)
+    }
+  }
 
   const editableValue = (
     field: 'name' | 'email',
