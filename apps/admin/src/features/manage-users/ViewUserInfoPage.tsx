@@ -547,6 +547,11 @@ function UserInfo({ userId }: { userId: string }) {
             type={inputType}
             value={editingValue}
             onChange={(event) => setEditingValue(event.target.value)}
+            onPressEnter={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              handleSaveEditing();
+            }}
             autoFocus
             style={{ width: 'min(100%, 28rem)' }}
             status={editingValue.trim() ? undefined : 'error'}
