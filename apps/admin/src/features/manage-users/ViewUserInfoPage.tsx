@@ -16,6 +16,15 @@ import {
 } from 'antd';
 import { ACTIVATION_BASE_URL } from 'astro:env/client';
 
+type StateOfModal =
+  | 'pendingSaveUserName'
+  | 'sending'
+  | 'successOnSaveUserName'
+  | 'failedOnSaveUserName'
+  | 'pendingSaveUserEmail'
+  | 'successOnSaveUserEmail'
+  | 'failedOnSaveUserEmail';
+
 export function ViewUserInfoPage() {
   const [queryClient] = useState(() => new QueryClient());
   const [userId, setUserId] = useState<string | null>();
@@ -67,23 +76,29 @@ function UserInfo({ userId }: { userId: string }) {
   );
   const [editingValue, setEditingValue] = useState('');
   const [activationUrl, setActivationUrl] = useState('');
+  const [isPendSaving, setIsPendSaving] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [openNameModal, setOpenNameModal] = useState<boolean>(false);
+  const [openEmailModal, setOpenEmailModal] = useState<boolean>(false);
+  const [stateOfNameModal, setStateOfNameModal] = useState<StateOfModal>(
+    'pendingSaveUserName',
+  );
+  const [stateOfMailModal, setStateOfMailModal] = useState<StateOfModal>(
+    'pendingSaveUserEmail',
+  );
 
   const {
     data: userInfo,
     isLoading: isLoadingUsers,
-    refetch: refetchUserInfo,
-  } = $api.useQuery(
-    'get',
-    '/users/{id}',
-    {
-      params: {
-        path: {
-          id: userId,
-        },
+    // refetch: refetchUserInfo,
+  } = $api.useQuery('get', '/users/{id}', {
+    params: {
+      path: {
+        id: userId,
       },
     },
-  );
+  });
 
   const { mutateAsync: updateUserName } = $api.useMutation(
     'patch',
@@ -193,50 +208,330 @@ function UserInfo({ userId }: { userId: string }) {
     return (targetUserRole?.role ?? 'error') as keyof typeof roleNames;
   };
 
+  const stateOfModalOnSendUserName = () => {
+    switch (stateOfNameModal) {
+      case 'pendingSaveUserName':
+        return {
+          modalTitle: 'ユーザー名を変更',
+          modalOnOk: () => {
+            void handleSaveUserName();
+          },
+          modalFooter: [
+            <>
+              <Button
+                type="default"
+                onClick={handleCloseNameModal}
+                disabled={isSaving}
+              >
+                キャンセル
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  void handleSaveUserName();
+                }}
+                loading={isSaving}
+              >
+                ユーザー名を変更
+              </Button>
+            </>,
+          ],
+          modalContents: (
+            <>
+              <p>本当に変更しますか？</p>
+              <br />
+              <p>新しいユーザー名: {newUserValue}</p>
+            </>
+          ),
+        };
+      case 'sending':
+        return {
+          modalTitle: '変更中',
+          modalFooter: [
+            <>
+              <Button type="default" disabled={isSaving}>
+                キャンセル
+              </Button>
+              <Button type="primary" loading={isSaving}>
+                ユーザー名を変更
+              </Button>
+            </>,
+          ],
+          modalContents: <p>変更中...</p>,
+        };
+      case 'failedOnSaveUserName':
+        return {
+          modalTitle: 'エラーが発生しました．',
+          modalOnOk: () => {
+            void handleSaveUserName();
+          },
+          modalFooter: [
+            <>
+              <Button
+                type="default"
+                onClick={handleCloseNameModal}
+                loading={isSaving}
+              >
+                キャンセル
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  void handleSaveUserName();
+                }}
+                loading={isSaving}
+              >
+                再送信
+              </Button>
+            </>,
+          ],
+          modalContents: <p>ユーザー名の変更に失敗しました．</p>,
+        };
+      case 'successOnSaveUserName':
+        return {
+          modalTitle: '変更完了',
+          modalOnOk: () => {
+            window.location.href = `/manage-users/view?user_id=${userId}`;
+          },
+          modalFooter: [
+            <>
+              <Button
+                type="primary"
+                onClick={() => {
+                  window.location.href = `/manage-users/view?user_id=${userId}`;
+                }}
+                loading={isSaving}
+              >
+                OK
+              </Button>
+            </>,
+          ],
+          modalContents: <p>ユーザー名の変更が完了しました．</p>,
+        };
+    }
+  };
+
+  const stateOfModalOnSendUserMAddress = () => {
+    switch (stateOfMailModal) {
+      case 'pendingSaveUserEmail':
+        return {
+          modalTitle: 'メールアドレスを変更',
+          modalOnOk: () => {
+            void handleSaveUserEmail();
+          },
+          modalFooter: [
+            <>
+              <Button type="default" onClick={handleCloseEmailModal}>
+                キャンセル
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  void handleSaveUserEmail();
+                }}
+              >
+                メールアドレスを変更
+              </Button>
+            </>,
+          ],
+          modalContents: (
+            <>
+              <p>本当に変更しますか？</p>
+              <br />
+              <p>新しいメールアドレス: </p>
+              <p style={{ fontWeight: 'bold' }}>{newUserValue}</p>
+            </>
+          ),
+        };
+      case 'sending':
+        return {
+          modalTitle: '変更中',
+          modalFooter: [
+            <>
+              <Button type="default" disabled={isSaving}>
+                キャンセル
+              </Button>
+              <Button type="primary" loading={isSaving}>
+                メールアドレスを変更
+              </Button>
+            </>,
+          ],
+          modalContents: <p>変更中...</p>,
+        };
+      case 'failedOnSaveUserEmail':
+        return {
+          modalTitle: 'エラーが発生しました．',
+          modalOnOk: () => {
+            void handleSaveUserEmail();
+          },
+          modalFooter: [
+            <>
+              <Button type="default" onClick={handleCloseEmailModal}>
+                キャンセル
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  void handleSaveUserEmail();
+                }}
+                loading={isSaving}
+              >
+                再送信
+              </Button>
+            </>,
+          ],
+          modalContents: <p>メールアドレスの変更に失敗しました．</p>,
+        };
+      case 'successOnSaveUserEmail':
+        return {
+          modalTitle: '変更完了',
+          modalOnOk: () => {
+            window.location.href = `/manage-users/view?user_id=${userId}`;
+          },
+          modalFooter: [
+            <>
+              <Button
+                type="primary"
+                onClick={() => {
+                  window.location.href = `/manage-users/view?user_id=${userId}`;
+                }}
+                loading={isSaving}
+              >
+                OK
+              </Button>
+            </>,
+          ],
+          modalContents: (
+            <>
+              <p>メールアドレスを変更しました．</p>
+              <br />
+              {userInfo.status === 'registered' ? (
+                <>
+                  <p>新しい有効化URL</p>
+                  <p style={{ fontWeight: 'bold' }}>{activationUrl}</p>
+                </>
+              ) : (
+                <p>
+                  すでに有効化しているユーザーのため，有効化URLは表示されません．
+                </p>
+              )}
+            </>
+          ),
+        };
+    }
+  };
+
+  const handleCloseNameModal = () => {
+    setOpenNameModal(false);
+    setIsPendSaving(false);
+    setStateOfNameModal('pendingSaveUserName');
+  };
+
+  const handleCloseEmailModal = () => {
+    setOpenEmailModal(false);
+    setIsPendSaving(false);
+    setActivationUrl('');
+    setStateOfMailModal('pendingSaveUserEmail');
+  };
+
   const startEditing = (field: 'name' | 'email', value: string) => {
     setEditingField(field);
     setEditingValue(value);
   };
 
-  const cancelEditing = () => {
+  const handleCancelEditing = () => {
     setEditingField(null);
     setEditingValue('');
   };
 
-  const saveEditing = async () => {
-    const value = editingValue.trim();
-    if (!editingField || !value) {
+  const newUserValue = editingValue.trim();
+
+  const handleSaveEditing = () => {
+    if (!editingField || !newUserValue) {
       messageApi.error('値を入力してください');
       return;
     }
 
+    setIsPendSaving(true);
+
+    if (editingField === 'name') {
+      setOpenNameModal(true);
+    } else {
+      setOpenEmailModal(true);
+    }
+  };
+
+  const handleSaveUserName = async () => {
     setIsSaving(true);
+    setStateOfNameModal('sending');
+    const result = await saveUserName();
+    if (result.ok) {
+      messageApi.success('ユーザー名を更新しました');
+      setStateOfNameModal('successOnSaveUserName');
+    } else {
+      messageApi.error(
+        `ユーザー名の更新に失敗しました: ${String(result.error)}`,
+      );
+      setStateOfNameModal('failedOnSaveUserName');
+    }
+  };
+
+  const saveUserName = async () => {
     try {
-      if (editingField === 'name') {
-        await updateUserName({
-          params: { path: { id: userId } },
-          body: { name: value },
-        });
-        messageApi.success('ユーザー名を更新しました');
-      } else {
-        const response = await updateUserEmail({
-          params: { path: { id: userId } },
-          body: { m_address: value },
-        });
-        if (userInfo.status === 'registered' && response.activation_token) {
-          setActivationUrl(
-            ACTIVATION_BASE_URL +
-              encodeURIComponent(response.activation_token),
-          );
-        }
-        messageApi.success('メールアドレスを更新しました');
-      }
-      cancelEditing();
-      await refetchUserInfo();
-    } catch (error) {
-      messageApi.error(`更新に失敗しました: ${String(error)}`);
-    } finally {
+      await updateUserName({
+        params: { path: { id: userId } },
+        body: { name: newUserValue },
+      });
       setIsSaving(false);
+      return { ok: true as const };
+    } catch (error) {
+      setIsSaving(false);
+      return { ok: false as const, error };
+    }
+  };
+
+  const handleSaveUserEmail = async () => {
+    setIsSaving(true);
+    setStateOfMailModal('sending');
+    const result = await saveUserEmail();
+    if (result.ok) {
+      messageApi.success('メールアドレスを更新しました');
+      setStateOfMailModal('successOnSaveUserEmail');
+    } else {
+      messageApi.error(
+        `メールアドレスの更新に失敗しました: ${String(result.error)}`,
+      );
+      setStateOfMailModal('failedOnSaveUserEmail');
+    }
+  };
+
+  const saveUserEmail = async () => {
+    try {
+      const response = await updateUserEmail({
+        params: {
+          path: {
+            id: userId,
+          },
+        },
+        body: {
+          m_address: newUserValue,
+        },
+      });
+      if (!response.activation_token) {
+        setIsSaving(false);
+        return {
+          ok: false as const,
+          error: new Error('有効化アドレスの取得に失敗しました．'),
+        };
+      }
+      setActivationUrl(
+        ACTIVATION_BASE_URL + encodeURIComponent(response.activation_token),
+      );
+      setIsSaving(false);
+      return { ok: true as const };
+    } catch (error) {
+      setIsSaving(false);
+      return { ok: false as const, error };
     }
   };
 
@@ -252,19 +547,18 @@ function UserInfo({ userId }: { userId: string }) {
             type={inputType}
             value={editingValue}
             onChange={(event) => setEditingValue(event.target.value)}
-            onPressEnter={() => void saveEditing()}
             autoFocus
             style={{ width: 'min(100%, 28rem)' }}
             status={editingValue.trim() ? undefined : 'error'}
           />
           <Button
             type="primary"
-            onClick={() => void saveEditing()}
-            loading={isSaving}
+            onClick={handleSaveEditing}
+            loading={isPendSaving}
           >
             保存
           </Button>
-          <Button onClick={cancelEditing} disabled={isSaving}>
+          <Button onClick={handleCancelEditing} disabled={isPendSaving}>
             キャンセル
           </Button>
         </Flex>
@@ -343,16 +637,40 @@ function UserInfo({ userId }: { userId: string }) {
         </Button>
       </Flex>
       <Modal
-        title="メールアドレスを更新しました"
-        open={Boolean(activationUrl)}
-        onOk={() => setActivationUrl('')}
-        onCancel={() => setActivationUrl('')}
-        cancelButtonProps={{ style: { display: 'none' } }}
+        title={stateOfModalOnSendUserName()?.modalTitle}
+        open={openNameModal}
+        onOk={stateOfModalOnSendUserName()?.modalOnOk}
+        onCancel={handleCloseNameModal}
+        centered
+        footer={stateOfModalOnSendUserName()?.modalFooter}
+        closable={false}
+        mask={{ closable: false }}
+        styles={{
+          body: {
+            overflowY: 'auto',
+            maxHeight: '80vh',
+          },
+        }}
       >
-        <p>新しい有効化URL</p>
-        <p style={{ overflowWrap: 'anywhere', fontWeight: 'bold' }}>
-          {activationUrl}
-        </p>
+        {stateOfModalOnSendUserName()?.modalContents}
+      </Modal>
+      <Modal
+        title={stateOfModalOnSendUserMAddress()?.modalTitle}
+        open={openEmailModal}
+        onOk={stateOfModalOnSendUserMAddress()?.modalOnOk}
+        onCancel={handleCloseEmailModal}
+        centered
+        footer={stateOfModalOnSendUserMAddress()?.modalFooter}
+        closable={false}
+        mask={{ closable: false }}
+        styles={{
+          body: {
+            overflowY: 'auto',
+            maxHeight: '80vh',
+          },
+        }}
+      >
+        {stateOfModalOnSendUserMAddress()?.modalContents}
       </Modal>
       {contextHolder}
     </Flex>
