@@ -13,11 +13,7 @@ const {
 
 const canonical = new URL(Astro.url.pathname, "https://join.koudaisai.jp").toString();
 const gaInlineScript = GA_MEASUREMENT_ID
-  ? `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${GA_MEASUREMENT_ID}');
+    gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});
   `
   : "";
 
