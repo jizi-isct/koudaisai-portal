@@ -24,6 +24,43 @@ const UTIL_TAG: &str = "util";
 /// (`ActorContext` 抽出子が `FromRequestParts<AuthV2State>` のため)。
 pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
 
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub(super) struct ErrorMessage {
+    message: String,
+}
+
+impl ErrorMessage {
+    pub(super) fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
+    }
+
+    pub(super) fn bad_request() -> Self {
+        Self::new("Invalid input")
+    }
+
+    pub(super) fn forbidden() -> Self {
+        Self::new("Forbidden")
+    }
+
+    pub(super) fn not_found() -> Self {
+        Self::new("Not found")
+    }
+
+    pub(super) fn unprocessable_entity() -> Self {
+        Self::new("Invalid input")
+    }
+
+    pub(super) fn conflict() -> Self {
+        Self::new("Conflict")
+    }
+
+    pub(super) fn internal_server_error() -> Self {
+        Self::new("Internal server error")
+    }
+}
+
 /// レスポンス DTO のスキーマ登録用ベースドキュメント。
 /// `#[http_response]` マクロは `$ref` を吐くが components へスキーマを登録しないため、
 /// レスポンス系 DTO をここで明示的に列挙して OpenApi の components に載せる
@@ -32,6 +69,7 @@ pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
 #[openapi(components(schemas(
     groups::GroupRead,
     groups::MemberRead,
+    ErrorMessage,
     users::UserRead,
     users::UserCreated,
     users::MAddressUpdated,

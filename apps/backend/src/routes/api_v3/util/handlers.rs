@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::dto::MetaInfo;
 use crate::application::error::ApplicationError;
 use crate::domain::actor_ctx::ActorContext;
@@ -19,9 +20,9 @@ pub enum GetMetaResponse {
     #[response(status = OK, description = "Returns the page title and description")]
     Ok(MetaInfo),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -39,7 +40,9 @@ pub async fn get_meta(
 ) -> GetMetaResponse {
     match st.app.meta().get_meta(&actor, &query.url).await {
         Ok(pm) => GetMetaResponse::Ok(MetaInfo::from(pm)),
-        Err(ApplicationError::Unauthorized) => GetMetaResponse::Forbidden,
-        Err(_) => GetMetaResponse::InternalServerError,
+        Err(ApplicationError::Unauthorized) => {
+            GetMetaResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetMetaResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }

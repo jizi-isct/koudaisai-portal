@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::super::document_categories::DocumentCategoryRead;
 use super::dto::{DocumentCreate, DocumentRead, DocumentUpdate, DocumentsByCategoryEntry};
@@ -27,7 +28,7 @@ pub enum GetDocumentsResponse {
     #[response(status = OK)]
     Ok(Vec<DocumentRead>),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -53,7 +54,7 @@ pub async fn get_documents(
                 .map(DocumentRead::from)
                 .collect(),
         ),
-        Err(_) => GetDocumentsResponse::InternalServerError,
+        Err(_) => GetDocumentsResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -70,7 +71,7 @@ pub enum GetDocumentsByCategoryResponse {
     #[response(status = OK)]
     Ok(Vec<DocumentsByCategoryEntry>),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -87,7 +88,9 @@ pub async fn get_documents_by_category(
     Query(query): Query<DocumentsByCategoryQuery>,
 ) -> GetDocumentsByCategoryResponse {
     let Ok(by_category) = st.app.document().get_by_category(&actor).await else {
-        return GetDocumentsByCategoryResponse::InternalServerError;
+        return GetDocumentsByCategoryResponse::InternalServerError(
+            ErrorMessage::internal_server_error(),
+        );
     };
 
     // カテゴリのメタ情報。閲覧権限が無い(非管理者)場合は空とし、id のみでグルーピングする。
@@ -155,11 +158,11 @@ pub enum PostDocumentResponse {
     #[response(status = CREATED)]
     Created(DocumentRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid document")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -188,11 +191,13 @@ pub async fn post_document(
         .await
     {
         Ok(doc) => PostDocumentResponse::Created(DocumentRead::from(&doc)),
-        Err(ApplicationOperationError::Unauthorized) => PostDocumentResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => {
-            PostDocumentResponse::UnprocessableEntity
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostDocumentResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PostDocumentResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostDocumentResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => PostDocumentResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -201,9 +206,9 @@ pub enum GetDocumentResponse {
     #[response(status = OK, description = "Document found")]
     Ok(DocumentRead),
     #[response(status = NOT_FOUND, description = "Document not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -221,8 +226,8 @@ pub async fn get_document(
 ) -> GetDocumentResponse {
     match st.app.document().get_by_id(&actor, path.id).await {
         Ok(Some(doc)) => GetDocumentResponse::Ok(DocumentRead::from(&doc)),
-        Ok(None) => GetDocumentResponse::NotFound,
-        Err(_) => GetDocumentResponse::InternalServerError,
+        Ok(None) => GetDocumentResponse::NotFound(ErrorMessage::not_found()),
+        Err(_) => GetDocumentResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -231,13 +236,13 @@ pub enum PatchDocumentResponse {
     #[response(status = OK, description = "Document updated")]
     Ok(DocumentRead),
     #[response(status = NOT_FOUND, description = "Document not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid document")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -270,17 +275,21 @@ pub async fn patch_document(
     {
         Ok(()) => match st.app.document().get_by_id(&actor, path.id).await {
             Ok(Some(doc)) => PatchDocumentResponse::Ok(DocumentRead::from(&doc)),
-            Ok(None) => PatchDocumentResponse::NotFound,
-            Err(_) => PatchDocumentResponse::InternalServerError,
+            Ok(None) => PatchDocumentResponse::NotFound(ErrorMessage::not_found()),
+            Err(_) => {
+                PatchDocumentResponse::InternalServerError(ErrorMessage::internal_server_error())
+            }
         },
-        Err(ApplicationOperationError::Unauthorized) => PatchDocumentResponse::Forbidden,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchDocumentResponse::Forbidden(ErrorMessage::forbidden())
+        }
         Err(ApplicationOperationError::InvalidInput(_)) => {
-            PatchDocumentResponse::UnprocessableEntity
+            PatchDocumentResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
         }
         Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchDocumentResponse::NotFound
+            PatchDocumentResponse::NotFound(ErrorMessage::not_found())
         }
-        Err(_) => PatchDocumentResponse::InternalServerError,
+        Err(_) => PatchDocumentResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -289,11 +298,11 @@ pub enum DeleteDocumentResponse {
     #[response(status = NO_CONTENT, description = "Document deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Document not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -311,10 +320,14 @@ pub async fn delete_document(
 ) -> DeleteDocumentResponse {
     match st.app.document().delete_document(&actor, path.id).await {
         Ok(()) => DeleteDocumentResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteDocumentResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteDocumentResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteDocumentResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteDocumentResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteDocumentResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => {
+            DeleteDocumentResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }

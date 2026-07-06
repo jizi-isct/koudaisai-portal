@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{DocumentCategoryCreate, DocumentCategoryRead, DocumentCategoryUpdate};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
@@ -19,9 +20,9 @@ pub enum GetDocumentCategoriesResponse {
     #[response(status = OK)]
     Ok(Vec<DocumentCategoryRead>),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -40,8 +41,12 @@ pub async fn get_document_categories(
             cats.sort_by_key(|c| c.created_at());
             GetDocumentCategoriesResponse::Ok(cats.iter().map(DocumentCategoryRead::from).collect())
         }
-        Err(ApplicationOperationError::Unauthorized) => GetDocumentCategoriesResponse::Forbidden,
-        Err(_) => GetDocumentCategoriesResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetDocumentCategoriesResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => {
+            GetDocumentCategoriesResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -50,11 +55,11 @@ pub enum GetDocumentCategoryResponse {
     #[response(status = OK, description = "Document category found")]
     Ok(DocumentCategoryRead),
     #[response(status = NOT_FOUND, description = "Document category not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -72,9 +77,13 @@ pub async fn get_document_category(
 ) -> GetDocumentCategoryResponse {
     match st.app.document_category().get_by_id(&actor, path.id).await {
         Ok(Some(cat)) => GetDocumentCategoryResponse::Ok(DocumentCategoryRead::from(&cat)),
-        Ok(None) => GetDocumentCategoryResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetDocumentCategoryResponse::Forbidden,
-        Err(_) => GetDocumentCategoryResponse::InternalServerError,
+        Ok(None) => GetDocumentCategoryResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetDocumentCategoryResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => {
+            GetDocumentCategoryResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -83,11 +92,11 @@ pub enum PostDocumentCategoryResponse {
     #[response(status = CREATED)]
     Created(DocumentCategoryRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid document category")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -110,11 +119,15 @@ pub async fn post_document_category(
         .await
     {
         Ok(cat) => PostDocumentCategoryResponse::Created(DocumentCategoryRead::from(&cat)),
-        Err(ApplicationOperationError::Unauthorized) => PostDocumentCategoryResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => {
-            PostDocumentCategoryResponse::UnprocessableEntity
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostDocumentCategoryResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PostDocumentCategoryResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostDocumentCategoryResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => {
+            PostDocumentCategoryResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -123,13 +136,13 @@ pub enum PatchDocumentCategoryResponse {
     #[response(status = OK, description = "Document category updated")]
     Ok(DocumentCategoryRead),
     #[response(status = NOT_FOUND, description = "Document category not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid document category")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -155,17 +168,23 @@ pub async fn patch_document_category(
     {
         Ok(()) => match st.app.document_category().get_by_id(&actor, path.id).await {
             Ok(Some(cat)) => PatchDocumentCategoryResponse::Ok(DocumentCategoryRead::from(&cat)),
-            Ok(None) => PatchDocumentCategoryResponse::NotFound,
-            _ => PatchDocumentCategoryResponse::InternalServerError,
+            Ok(None) => PatchDocumentCategoryResponse::NotFound(ErrorMessage::not_found()),
+            _ => PatchDocumentCategoryResponse::InternalServerError(
+                ErrorMessage::internal_server_error(),
+            ),
         },
-        Err(ApplicationOperationError::Unauthorized) => PatchDocumentCategoryResponse::Forbidden,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchDocumentCategoryResponse::Forbidden(ErrorMessage::forbidden())
+        }
         Err(ApplicationOperationError::InvalidInput(_)) => {
-            PatchDocumentCategoryResponse::UnprocessableEntity
+            PatchDocumentCategoryResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
         }
         Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchDocumentCategoryResponse::NotFound
+            PatchDocumentCategoryResponse::NotFound(ErrorMessage::not_found())
         }
-        Err(_) => PatchDocumentCategoryResponse::InternalServerError,
+        Err(_) => {
+            PatchDocumentCategoryResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -174,11 +193,11 @@ pub enum DeleteDocumentCategoryResponse {
     #[response(status = NO_CONTENT, description = "Document category deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Document category not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -201,10 +220,14 @@ pub async fn delete_document_category(
         .await
     {
         Ok(()) => DeleteDocumentCategoryResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteDocumentCategoryResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteDocumentCategoryResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteDocumentCategoryResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteDocumentCategoryResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteDocumentCategoryResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => DeleteDocumentCategoryResponse::InternalServerError(
+            ErrorMessage::internal_server_error(),
+        ),
     }
 }

@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{ApprovalActionBody, ApprovalRequestCreate, ApprovalRequestRead};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
@@ -28,9 +29,9 @@ pub enum GetApprovalRequestsResponse {
     #[response(status = OK)]
     Ok(Vec<ApprovalRequestRead>),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -56,12 +57,16 @@ pub async fn get_approval_requests(
             .get_by_group_members(&actor, uid)
             .await
     } else {
-        return GetApprovalRequestsResponse::Forbidden;
+        return GetApprovalRequestsResponse::Forbidden(ErrorMessage::forbidden());
     };
     match result {
         Ok(v) => GetApprovalRequestsResponse::Ok(v.iter().map(ApprovalRequestRead::from).collect()),
-        Err(ApplicationOperationError::Unauthorized) => GetApprovalRequestsResponse::Forbidden,
-        Err(_) => GetApprovalRequestsResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetApprovalRequestsResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => {
+            GetApprovalRequestsResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -70,11 +75,11 @@ pub enum PostApprovalRequestResponse {
     #[response(status = CREATED)]
     Created(ApprovalRequestRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid approval request")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -99,13 +104,19 @@ pub async fn post_approval_request(
     {
         Ok(id) => match st.app.approval_request().get_by_id(&actor, id).await {
             Ok(Some(ar)) => PostApprovalRequestResponse::Created(ApprovalRequestRead::from(&ar)),
-            _ => PostApprovalRequestResponse::InternalServerError,
+            _ => PostApprovalRequestResponse::InternalServerError(
+                ErrorMessage::internal_server_error(),
+            ),
         },
-        Err(ApplicationOperationError::Unauthorized) => PostApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => {
-            PostApprovalRequestResponse::UnprocessableEntity
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PostApprovalRequestResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostApprovalRequestResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => {
+            PostApprovalRequestResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -114,11 +125,11 @@ pub enum GetApprovalRequestResponse {
     #[response(status = OK, description = "Approval request found")]
     Ok(ApprovalRequestRead),
     #[response(status = NOT_FOUND, description = "Approval request not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -141,9 +152,13 @@ pub async fn get_approval_request(
         .await
     {
         Ok(Some(ar)) => GetApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
-        Ok(None) => GetApprovalRequestResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetApprovalRequestResponse::Forbidden,
-        Err(_) => GetApprovalRequestResponse::InternalServerError,
+        Ok(None) => GetApprovalRequestResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => {
+            GetApprovalRequestResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -152,13 +167,13 @@ pub enum ApproveApprovalRequestResponse {
     #[response(status = OK, description = "Approval request approved")]
     Ok(ApprovalRequestRead),
     #[response(status = NOT_FOUND, description = "Approval request not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = CONFLICT, description = "Approval request is not pending")]
-    Conflict,
+    Conflict(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -183,12 +198,18 @@ pub async fn approve_approval_request(
         .await
     {
         Ok(ar) => ApproveApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
-        Err(ApplicationOperationError::Unauthorized) => ApproveApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            ApproveApprovalRequestResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            ApproveApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(ApplicationOperationError::InvalidInput(_)) => ApproveApprovalRequestResponse::Conflict,
-        Err(_) => ApproveApprovalRequestResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            ApproveApprovalRequestResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            ApproveApprovalRequestResponse::Conflict(ErrorMessage::conflict())
+        }
+        Err(_) => ApproveApprovalRequestResponse::InternalServerError(
+            ErrorMessage::internal_server_error(),
+        ),
     }
 }
 
@@ -197,13 +218,13 @@ pub enum RejectApprovalRequestResponse {
     #[response(status = OK, description = "Approval request rejected")]
     Ok(ApprovalRequestRead),
     #[response(status = NOT_FOUND, description = "Approval request not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = CONFLICT, description = "Approval request is not pending")]
-    Conflict,
+    Conflict(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -228,12 +249,18 @@ pub async fn reject_approval_request(
         .await
     {
         Ok(ar) => RejectApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
-        Err(ApplicationOperationError::Unauthorized) => RejectApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            RejectApprovalRequestResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            RejectApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(ApplicationOperationError::InvalidInput(_)) => RejectApprovalRequestResponse::Conflict,
-        Err(_) => RejectApprovalRequestResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            RejectApprovalRequestResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            RejectApprovalRequestResponse::Conflict(ErrorMessage::conflict())
+        }
+        Err(_) => {
+            RejectApprovalRequestResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -242,13 +269,13 @@ pub enum CloseApprovalRequestResponse {
     #[response(status = OK, description = "Approval request closed")]
     Ok(ApprovalRequestRead),
     #[response(status = NOT_FOUND, description = "Approval request not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = CONFLICT, description = "Approval request is not pending")]
-    Conflict,
+    Conflict(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -268,15 +295,23 @@ pub async fn close_approval_request(
     match st.app.approval_request().close(&actor, id).await {
         Ok(()) => match st.app.approval_request().get_by_id(&actor, id).await {
             Ok(Some(ar)) => CloseApprovalRequestResponse::Ok(ApprovalRequestRead::from(&ar)),
-            Ok(None) => CloseApprovalRequestResponse::NotFound,
-            _ => CloseApprovalRequestResponse::InternalServerError,
+            Ok(None) => CloseApprovalRequestResponse::NotFound(ErrorMessage::not_found()),
+            _ => CloseApprovalRequestResponse::InternalServerError(
+                ErrorMessage::internal_server_error(),
+            ),
         },
-        Err(ApplicationOperationError::Unauthorized) => CloseApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            CloseApprovalRequestResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            CloseApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(ApplicationOperationError::InvalidInput(_)) => CloseApprovalRequestResponse::Conflict,
-        Err(_) => CloseApprovalRequestResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            CloseApprovalRequestResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            CloseApprovalRequestResponse::Conflict(ErrorMessage::conflict())
+        }
+        Err(_) => {
+            CloseApprovalRequestResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -285,11 +320,11 @@ pub enum DeleteApprovalRequestResponse {
     #[response(status = NO_CONTENT, description = "Approval request deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Approval request not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -312,10 +347,14 @@ pub async fn delete_approval_request(
         .await
     {
         Ok(()) => DeleteApprovalRequestResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteApprovalRequestResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteApprovalRequestResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteApprovalRequestResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteApprovalRequestResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => {
+            DeleteApprovalRequestResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }

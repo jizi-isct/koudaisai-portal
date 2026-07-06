@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{NotificationCreate, NotificationRead, NotificationUpdate};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
@@ -20,7 +21,7 @@ pub enum GetNotificationsResponse {
     #[response(status = OK)]
     Ok(Vec<NotificationRead>),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -38,7 +39,9 @@ pub async fn get_notifications(
         Ok(notifications) => {
             GetNotificationsResponse::Ok(notifications.iter().map(NotificationRead::from).collect())
         }
-        Err(_) => GetNotificationsResponse::InternalServerError,
+        Err(_) => {
+            GetNotificationsResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -47,11 +50,11 @@ pub enum PostNotificationResponse {
     #[response(status = CREATED)]
     Created(NotificationRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid notification")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -69,7 +72,11 @@ pub async fn post_notification(
 ) -> PostNotificationResponse {
     let ntype = match body.r#type.to_domain() {
         Ok(t) => t,
-        Err(_) => return PostNotificationResponse::UnprocessableEntity,
+        Err(_) => {
+            return PostNotificationResponse::UnprocessableEntity(
+                ErrorMessage::unprocessable_entity(),
+            );
+        }
     };
     match st
         .app
@@ -79,13 +86,19 @@ pub async fn post_notification(
     {
         Ok(id) => match st.app.notification().get_by_id(&actor, id).await {
             Ok(Some(n)) => PostNotificationResponse::Created(NotificationRead::from(&n)),
-            _ => PostNotificationResponse::InternalServerError,
+            _ => {
+                PostNotificationResponse::InternalServerError(ErrorMessage::internal_server_error())
+            }
         },
-        Err(ApplicationOperationError::Unauthorized) => PostNotificationResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => {
-            PostNotificationResponse::UnprocessableEntity
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostNotificationResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PostNotificationResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostNotificationResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => {
+            PostNotificationResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -94,9 +107,9 @@ pub enum GetNotificationResponse {
     #[response(status = OK, description = "Notification found")]
     Ok(NotificationRead),
     #[response(status = NOT_FOUND, description = "Notification not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -119,8 +132,10 @@ pub async fn get_notification(
         .await
     {
         Ok(Some(n)) => GetNotificationResponse::Ok(NotificationRead::from(&n)),
-        Ok(None) => GetNotificationResponse::NotFound,
-        Err(_) => GetNotificationResponse::InternalServerError,
+        Ok(None) => GetNotificationResponse::NotFound(ErrorMessage::not_found()),
+        Err(_) => {
+            GetNotificationResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -129,13 +144,13 @@ pub enum PatchNotificationResponse {
     #[response(status = OK, description = "Notification updated")]
     Ok(NotificationRead),
     #[response(status = NOT_FOUND, description = "Notification not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid notification")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -164,14 +179,18 @@ pub async fn patch_notification(
         .await
     {
         Ok(n) => PatchNotificationResponse::Ok(NotificationRead::from(&n)),
-        Err(ApplicationOperationError::Unauthorized) => PatchNotificationResponse::Forbidden,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchNotificationResponse::Forbidden(ErrorMessage::forbidden())
+        }
         Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchNotificationResponse::NotFound
+            PatchNotificationResponse::NotFound(ErrorMessage::not_found())
         }
         Err(ApplicationOperationError::InvalidInput(_)) => {
-            PatchNotificationResponse::UnprocessableEntity
+            PatchNotificationResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
         }
-        Err(_) => PatchNotificationResponse::InternalServerError,
+        Err(_) => {
+            PatchNotificationResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -180,11 +199,11 @@ pub enum DeleteNotificationResponse {
     #[response(status = NO_CONTENT, description = "Notification deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Notification not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -207,10 +226,14 @@ pub async fn delete_notification(
         .await
     {
         Ok(()) => DeleteNotificationResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteNotificationResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteNotificationResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteNotificationResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteNotificationResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteNotificationResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => {
+            DeleteNotificationResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }

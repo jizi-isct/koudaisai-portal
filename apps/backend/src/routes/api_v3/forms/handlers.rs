@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{FormCreate, FormRead, FormUpdate};
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
@@ -21,7 +22,7 @@ pub enum GetFormsResponse {
     #[response(status = OK)]
     Ok(Vec<FormRead>),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -34,7 +35,7 @@ pub enum GetFormsResponse {
 pub async fn get_forms(State(st): State<V3State>, actor: ActorContext) -> GetFormsResponse {
     match st.app.form().get_all(&actor).await {
         Ok(forms) => GetFormsResponse::Ok(forms.iter().map(FormRead::from).collect()),
-        Err(_) => GetFormsResponse::InternalServerError,
+        Err(_) => GetFormsResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -43,11 +44,11 @@ pub enum PostFormResponse {
     #[response(status = CREATED)]
     Created(FormRead),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid form")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -79,11 +80,15 @@ pub async fn post_form(
     {
         Ok(form_id) => match st.app.form().get_by_id(&actor, form_id).await {
             Ok(Some(f)) => PostFormResponse::Created(FormRead::from(&f)),
-            _ => PostFormResponse::InternalServerError,
+            _ => PostFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
         },
-        Err(ApplicationOperationError::Unauthorized) => PostFormResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => PostFormResponse::UnprocessableEntity,
-        Err(_) => PostFormResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostFormResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostFormResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => PostFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -92,9 +97,9 @@ pub enum GetFormResponse {
     #[response(status = OK, description = "Form found")]
     Ok(FormRead),
     #[response(status = NOT_FOUND, description = "Form not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -112,8 +117,8 @@ pub async fn get_form(
 ) -> GetFormResponse {
     match st.app.form().get_by_id(&actor, FormId::new(path.id)).await {
         Ok(Some(f)) => GetFormResponse::Ok(FormRead::from(&f)),
-        Ok(None) => GetFormResponse::NotFound,
-        Err(_) => GetFormResponse::InternalServerError,
+        Ok(None) => GetFormResponse::NotFound(ErrorMessage::not_found()),
+        Err(_) => GetFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -122,13 +127,13 @@ pub enum PatchFormResponse {
     #[response(status = OK, description = "Form updated")]
     Ok(FormRead),
     #[response(status = NOT_FOUND, description = "Form not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid form")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -163,14 +168,18 @@ pub async fn patch_form(
     {
         Ok(()) => match st.app.form().get_by_id(&actor, form_id).await {
             Ok(Some(f)) => PatchFormResponse::Ok(FormRead::from(&f)),
-            _ => PatchFormResponse::InternalServerError,
+            _ => PatchFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
         },
-        Err(ApplicationOperationError::Unauthorized) => PatchFormResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchFormResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchFormResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(ApplicationOperationError::InvalidInput(_)) => PatchFormResponse::UnprocessableEntity,
-        Err(_) => PatchFormResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchFormResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchFormResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => PatchFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -179,11 +188,11 @@ pub enum DeleteFormResponse {
     #[response(status = NO_CONTENT, description = "Form deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Form not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -201,10 +210,12 @@ pub async fn delete_form(
 ) -> DeleteFormResponse {
     match st.app.form().delete(&actor, FormId::new(path.id)).await {
         Ok(()) => DeleteFormResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteFormResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteFormResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteFormResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteFormResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteFormResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => DeleteFormResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }

@@ -7,7 +7,9 @@
   "paths": {
     "/approval-requests": {
       "get": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Get all approval requests, optionally filtered by group.",
         "operationId": "get_approval_requests",
         "parameters": [
@@ -36,15 +38,31 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Create an approval request.",
         "operationId": "post_approval_request",
         "requestBody": {
@@ -69,20 +87,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid approval request"
+            "description": "Invalid approval request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/approval-requests/{id}": {
       "get": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Get an approval request by id.",
         "operationId": "get_approval_request",
         "parameters": [
@@ -108,18 +149,41 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Approval request not found"
+            "description": "Approval request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Delete an approval request by id.",
         "operationId": "delete_approval_request",
         "parameters": [
@@ -138,20 +202,43 @@
             "description": "Approval request deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Approval request not found"
+            "description": "Approval request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/approval-requests/{id}/approve": {
       "post": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Approve an approval request by id.",
         "operationId": "approve_approval_request",
         "parameters": [
@@ -187,23 +274,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Approval request not found"
+            "description": "Approval request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Approval request is not pending"
+            "description": "Approval request is not pending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/approval-requests/{id}/close": {
       "post": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Close an approval request by id.",
         "operationId": "close_approval_request",
         "parameters": [
@@ -229,23 +346,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Approval request not found"
+            "description": "Approval request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Approval request is not pending"
+            "description": "Approval request is not pending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/approval-requests/{id}/reject": {
       "post": {
-        "tags": ["approval-requests"],
+        "tags": [
+          "approval-requests"
+        ],
         "description": "Reject an approval request by id.",
         "operationId": "reject_approval_request",
         "parameters": [
@@ -281,23 +428,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Approval request not found"
+            "description": "Approval request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Approval request is not pending"
+            "description": "Approval request is not pending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/document-categories": {
       "get": {
-        "tags": ["document-categories"],
+        "tags": [
+          "document-categories"
+        ],
         "description": "Get all document categories.",
         "operationId": "get_document_categories",
         "responses": {
@@ -315,15 +492,31 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["document-categories"],
+        "tags": [
+          "document-categories"
+        ],
         "description": "Create a document category.",
         "operationId": "post_document_category",
         "requestBody": {
@@ -348,20 +541,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid document category"
+            "description": "Invalid document category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/document-categories/{id}": {
       "get": {
-        "tags": ["document-categories"],
+        "tags": [
+          "document-categories"
+        ],
         "description": "Get a document category by id.",
         "operationId": "get_document_category",
         "parameters": [
@@ -387,18 +603,41 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Document category not found"
+            "description": "Document category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["document-categories"],
+        "tags": [
+          "document-categories"
+        ],
         "description": "Delete a document category by id.",
         "operationId": "delete_document_category",
         "parameters": [
@@ -417,18 +656,41 @@
             "description": "Document category deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Document category not found"
+            "description": "Document category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["document-categories"],
+        "tags": [
+          "document-categories"
+        ],
         "description": "Edit a document category by id.",
         "operationId": "patch_document_category",
         "parameters": [
@@ -464,23 +726,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Document category not found"
+            "description": "Document category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid document category"
+            "description": "Invalid document category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/documents": {
       "get": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Get all documents visible to the caller.",
         "operationId": "get_documents",
         "parameters": [
@@ -509,12 +801,21 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Create a document.",
         "operationId": "post_document",
         "requestBody": {
@@ -539,20 +840,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid document"
+            "description": "Invalid document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/documents/by-category": {
       "get": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Get documents visible to the caller, grouped by category.",
         "operationId": "get_documents_by_category",
         "parameters": [
@@ -581,14 +905,23 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/documents/{id}": {
       "get": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Get a document by id.",
         "operationId": "get_document",
         "parameters": [
@@ -614,15 +947,31 @@
             }
           },
           "404": {
-            "description": "Document not found"
+            "description": "Document not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Delete a document by id.",
         "operationId": "delete_document",
         "parameters": [
@@ -641,18 +990,41 @@
             "description": "Document deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Document not found"
+            "description": "Document not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["documents"],
+        "tags": [
+          "documents"
+        ],
         "description": "Edit a document by id.",
         "operationId": "patch_document",
         "parameters": [
@@ -688,23 +1060,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Document not found"
+            "description": "Document not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid document"
+            "description": "Invalid document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/files/download": {
       "get": {
-        "tags": ["files"],
+        "tags": [
+          "files"
+        ],
         "description": "Issue a presigned URL for downloading a file.",
         "operationId": "get_file_download",
         "parameters": [
@@ -749,17 +1151,33 @@
             "description": "Redirect to the presigned URL (when redirect=true)"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/files/upload": {
       "post": {
-        "tags": ["files"],
+        "tags": [
+          "files"
+        ],
         "description": "Issue a presigned URL for uploading a file.",
         "operationId": "post_file_upload",
         "requestBody": {
@@ -784,17 +1202,33 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/forms": {
       "get": {
-        "tags": ["forms"],
+        "tags": [
+          "forms"
+        ],
         "description": "Get all forms visible to the caller.",
         "operationId": "get_forms",
         "responses": {
@@ -812,12 +1246,21 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["forms"],
+        "tags": [
+          "forms"
+        ],
         "description": "Create a form.",
         "operationId": "post_form",
         "requestBody": {
@@ -842,20 +1285,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid form"
+            "description": "Invalid form",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/forms/{id}": {
       "get": {
-        "tags": ["forms"],
+        "tags": [
+          "forms"
+        ],
         "description": "Get a form by id.",
         "operationId": "get_form",
         "parameters": [
@@ -881,15 +1347,31 @@
             }
           },
           "404": {
-            "description": "Form not found"
+            "description": "Form not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["forms"],
+        "tags": [
+          "forms"
+        ],
         "description": "Delete a form by id.",
         "operationId": "delete_form",
         "parameters": [
@@ -908,18 +1390,41 @@
             "description": "Form deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Form not found"
+            "description": "Form not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["forms"],
+        "tags": [
+          "forms"
+        ],
         "description": "Edit a form by id.",
         "operationId": "patch_form",
         "parameters": [
@@ -955,23 +1460,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Form not found"
+            "description": "Form not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid form"
+            "description": "Invalid form",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/groups": {
       "get": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Get all groups.",
         "operationId": "get_groups",
         "responses": {
@@ -989,17 +1524,33 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/groups/us": {
       "get": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Get the group the current user belongs to.",
         "operationId": "get_group_us",
         "responses": {
@@ -1014,20 +1565,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/groups/{id}": {
       "get": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Get a group by id.",
         "operationId": "get_group",
         "parameters": [
@@ -1052,18 +1626,41 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "put": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Create a group by id or replace an existing one.",
         "operationId": "put_group",
         "parameters": [
@@ -1108,18 +1705,41 @@
             }
           },
           "400": {
-            "description": "Invalid group id or input"
+            "description": "Invalid group id or input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Delete a group by id.",
         "operationId": "delete_group",
         "parameters": [
@@ -1137,18 +1757,41 @@
             "description": "Group deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Edit a group by id.",
         "operationId": "patch_group",
         "parameters": [
@@ -1183,23 +1826,53 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/groups/{id}/members": {
       "get": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Get all members of a group.",
         "operationId": "get_members",
         "parameters": [
@@ -1227,20 +1900,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/groups/{id}/members/{role}": {
       "put": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Assign a member to a role in a group or replace an existing one.",
         "operationId": "put_member",
         "parameters": [
@@ -1293,21 +1989,51 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid for group type"
+            "description": "Invalid for group type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["groups"],
+        "tags": [
+          "groups"
+        ],
         "description": "Remove a member from a role in a group.",
         "operationId": "delete_member",
         "parameters": [
@@ -1333,20 +2059,43 @@
             "description": "Member deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Group not found"
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/notifications": {
       "get": {
-        "tags": ["notifications"],
+        "tags": [
+          "notifications"
+        ],
         "description": "Get all notifications visible to the caller.",
         "operationId": "get_notifications",
         "responses": {
@@ -1364,12 +2113,21 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["notifications"],
+        "tags": [
+          "notifications"
+        ],
         "description": "Create a notification.",
         "operationId": "post_notification",
         "requestBody": {
@@ -1394,20 +2152,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid notification"
+            "description": "Invalid notification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/notifications/{id}": {
       "get": {
-        "tags": ["notifications"],
+        "tags": [
+          "notifications"
+        ],
         "description": "Get a notification by id.",
         "operationId": "get_notification",
         "parameters": [
@@ -1433,15 +2214,31 @@
             }
           },
           "404": {
-            "description": "Notification not found"
+            "description": "Notification not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["notifications"],
+        "tags": [
+          "notifications"
+        ],
         "description": "Delete a notification by id.",
         "operationId": "delete_notification",
         "parameters": [
@@ -1460,18 +2257,41 @@
             "description": "Notification deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Notification not found"
+            "description": "Notification not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["notifications"],
+        "tags": [
+          "notifications"
+        ],
         "description": "Edit a notification by id.",
         "operationId": "patch_notification",
         "parameters": [
@@ -1507,23 +2327,53 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Notification not found"
+            "description": "Notification not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid notification"
+            "description": "Invalid notification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/users": {
       "get": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Get all users.",
         "operationId": "get_users",
         "responses": {
@@ -1541,15 +2391,31 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Create a new user (id is generated server-side); returns the activation token.",
         "operationId": "post_user",
         "requestBody": {
@@ -1574,23 +2440,53 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "409": {
-            "description": "m_address already in use"
+            "description": "m_address already in use",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/users/me": {
       "get": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Get the currently authenticated user.",
         "operationId": "get_user_me",
         "responses": {
@@ -1605,20 +2501,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/users/{id}": {
       "get": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Get a user by id.",
         "operationId": "get_user",
         "parameters": [
@@ -1644,18 +2563,41 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Delete a user by id.",
         "operationId": "delete_user",
         "parameters": [
@@ -1674,18 +2616,41 @@
             "description": "User deleted"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Edit a user's name by id (m_address is changed via its own endpoint).",
         "operationId": "patch_user",
         "parameters": [
@@ -1721,23 +2686,53 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/users/{id}/m_address": {
       "post": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Change a user's m_address and re-issue an activation token.",
         "operationId": "post_user_m_address",
         "parameters": [
@@ -1773,23 +2768,53 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/users/{id}/read-notifications": {
       "get": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "description": "Get the notifications the user has marked as read.",
         "operationId": "get_user_read_notifications",
         "parameters": [
@@ -1818,20 +2843,43 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
     },
     "/util/meta": {
       "get": {
-        "tags": ["util"],
+        "tags": [
+          "util"
+        ],
         "description": "Fetch OpenGraph/HTML metadata (title, description) for a URL.",
         "operationId": "get_meta",
         "parameters": [
@@ -1857,10 +2905,24 @@
             }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         }
       }
@@ -1872,7 +2934,10 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -1883,7 +2948,9 @@
           },
           {
             "type": "object",
-            "required": ["issue_reason"],
+            "required": [
+              "issue_reason"
+            ],
             "properties": {
               "issue_reason": {
                 "type": "string"
@@ -1902,7 +2969,12 @@
           },
           {
             "type": "object",
-            "required": ["id", "issued_at", "issued_by", "issue_reason"],
+            "required": [
+              "id",
+              "issued_at",
+              "issued_by",
+              "issue_reason"
+            ],
             "properties": {
               "id": {
                 "type": "string",
@@ -1927,20 +2999,31 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["status"],
+            "required": [
+              "status"
+            ],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["pending"]
+                "enum": [
+                  "pending"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["approved_by", "approved_at", "status"],
+            "required": [
+              "approved_by",
+              "approved_at",
+              "status"
+            ],
             "properties": {
               "approval_reason": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "approved_at": {
                 "type": "string",
@@ -1952,13 +3035,19 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["approved"]
+                "enum": [
+                  "approved"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["rejected_by", "rejected_at", "status"],
+            "required": [
+              "rejected_by",
+              "rejected_at",
+              "status"
+            ],
             "properties": {
               "rejected_at": {
                 "type": "string",
@@ -1969,17 +3058,25 @@
                 "format": "uuid"
               },
               "rejection_reason": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
-                "enum": ["rejected"]
+                "enum": [
+                  "rejected"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["closed_at", "status"],
+            "required": [
+              "closed_at",
+              "status"
+            ],
             "properties": {
               "closed_at": {
                 "type": "string",
@@ -1987,7 +3084,9 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["closed"]
+                "enum": [
+                  "closed"
+                ]
               }
             }
           }
@@ -1997,17 +3096,27 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["type"],
+            "required": [
+              "type"
+            ],
             "properties": {
               "description": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "icon_key": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "type": {
                 "type": "string",
-                "enum": ["edit_exhibition_info"]
+                "enum": [
+                  "edit_exhibition_info"
+                ]
               }
             }
           }
@@ -2015,10 +3124,15 @@
       },
       "DocumentCategoryCreate": {
         "type": "object",
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "properties": {
           "emoji": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "title": {
             "type": "string"
@@ -2027,14 +3141,22 @@
       },
       "DocumentCategoryRead": {
         "type": "object",
-        "required": ["id", "created_at", "updated_at", "title"],
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "title"
+        ],
         "properties": {
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "emoji": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "type": "string",
@@ -2053,10 +3175,16 @@
         "type": "object",
         "properties": {
           "emoji": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "title": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2067,10 +3195,16 @@
           },
           {
             "type": "object",
-            "required": ["title", "targets"],
+            "required": [
+              "title",
+              "targets"
+            ],
             "properties": {
               "category": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "uuid"
               },
               "targets": {
@@ -2090,20 +3224,29 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["content", "format"],
+            "required": [
+              "content",
+              "format"
+            ],
             "properties": {
               "content": {
                 "type": "string"
               },
               "format": {
                 "type": "string",
-                "enum": ["markdown"]
+                "enum": [
+                  "markdown"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["file_key", "file_name", "format"],
+            "required": [
+              "file_key",
+              "file_name",
+              "format"
+            ],
             "properties": {
               "file_key": {
                 "type": "string"
@@ -2113,13 +3256,19 @@
               },
               "format": {
                 "type": "string",
-                "enum": ["pdf"]
+                "enum": [
+                  "pdf"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["file_key", "file_name", "format"],
+            "required": [
+              "file_key",
+              "file_name",
+              "format"
+            ],
             "properties": {
               "file_key": {
                 "type": "string"
@@ -2129,7 +3278,9 @@
               },
               "format": {
                 "type": "string",
-                "enum": ["misc"]
+                "enum": [
+                  "misc"
+                ]
               }
             }
           }
@@ -2152,7 +3303,10 @@
             ],
             "properties": {
               "category": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "uuid"
               },
               "created_at": {
@@ -2188,7 +3342,10 @@
         "type": "object",
         "properties": {
           "category": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "uuid"
           },
           "format": {
@@ -2202,20 +3359,28 @@
             ]
           },
           "targets": {
-            "type": ["array", "null"],
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             }
           },
           "title": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "DocumentsByCategoryEntry": {
         "type": "object",
         "description": "`GET /documents/by-category` の 1 カテゴリ分のエントリ。\n`category` が `None` のときは未分類ドキュメントを表す。",
-        "required": ["documents"],
+        "required": [
+          "documents"
+        ],
         "properties": {
           "category": {
             "oneOf": [
@@ -2235,10 +3400,23 @@
           }
         }
       },
+      "ErrorMessage": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "FileDownloadResponse": {
         "type": "object",
         "description": "ダウンロード用に発行した presigned URL。",
-        "required": ["presigned_url"],
+        "required": [
+          "presigned_url"
+        ],
         "properties": {
           "presigned_url": {
             "type": "string"
@@ -2248,7 +3426,9 @@
       "FileUploadRequest": {
         "type": "object",
         "description": "アップロード用 presigned URL のリクエストボディ。",
-        "required": ["file_name"],
+        "required": [
+          "file_name"
+        ],
         "properties": {
           "file_name": {
             "type": "string"
@@ -2258,7 +3438,10 @@
       "FileUploadResponse": {
         "type": "object",
         "description": "アップロード用に発行した presigned URL とストレージキー。",
-        "required": ["presigned_url", "key"],
+        "required": [
+          "presigned_url",
+          "key"
+        ],
         "properties": {
           "key": {
             "type": "string"
@@ -2275,7 +3458,12 @@
           },
           {
             "type": "object",
-            "required": ["targets", "name", "summary", "due_date"],
+            "required": [
+              "targets",
+              "name",
+              "summary",
+              "due_date"
+            ],
             "properties": {
               "due_date": {
                 "type": "string",
@@ -2319,7 +3507,10 @@
                 "format": "date-time"
               },
               "created_by": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "uuid"
               },
               "due_date": {
@@ -2354,14 +3545,19 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["form_url", "type"],
+            "required": [
+              "form_url",
+              "type"
+            ],
             "properties": {
               "form_url": {
                 "type": "string"
               },
               "type": {
                 "type": "string",
-                "enum": ["external"]
+                "enum": [
+                  "external"
+                ]
               }
             }
           }
@@ -2371,17 +3567,29 @@
         "type": "object",
         "properties": {
           "due_date": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "date-time"
           },
           "name": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "summary": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "targets": {
-            "type": ["array", "null"],
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             }
@@ -2390,7 +3598,10 @@
       },
       "GroupCreate": {
         "type": "object",
-        "required": ["name", "type"],
+        "required": [
+          "name",
+          "type"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -2402,7 +3613,13 @@
       },
       "GroupRead": {
         "type": "object",
-        "required": ["id", "created_at", "updated_at", "name", "type"],
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "name",
+          "type"
+        ],
         "properties": {
           "created_at": {
             "type": "string",
@@ -2437,14 +3654,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "MAddressUpdate": {
         "type": "object",
         "description": "`POST /users/{id}/m_address` のリクエストボディ。",
-        "required": ["m_address"],
+        "required": [
+          "m_address"
+        ],
         "properties": {
           "m_address": {
             "type": "string"
@@ -2454,7 +3676,9 @@
       "MAddressUpdated": {
         "type": "object",
         "description": "m アドレス変更時に再発行される activation token を含むレスポンス。",
-        "required": ["activation_token"],
+        "required": [
+          "activation_token"
+        ],
         "properties": {
           "activation_token": {
             "type": "string"
@@ -2463,7 +3687,9 @@
       },
       "MemberCreate": {
         "type": "object",
-        "required": ["user_id"],
+        "required": [
+          "user_id"
+        ],
         "properties": {
           "user_id": {
             "type": "string",
@@ -2473,7 +3699,11 @@
       },
       "MemberRead": {
         "type": "object",
-        "required": ["user_id", "role", "created_at"],
+        "required": [
+          "user_id",
+          "role",
+          "created_at"
+        ],
         "properties": {
           "created_at": {
             "type": "string",
@@ -2493,10 +3723,16 @@
         "description": "取得先 URL の OpenGraph / HTML メタ情報（リンクプレビュー用）。",
         "properties": {
           "description": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "title": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2507,7 +3743,9 @@
           },
           {
             "type": "object",
-            "required": ["targets"],
+            "required": [
+              "targets"
+            ],
             "properties": {
               "targets": {
                 "type": "array",
@@ -2526,14 +3764,22 @@
           },
           {
             "type": "object",
-            "required": ["id", "created_at", "updated_at", "targets"],
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "targets"
+            ],
             "properties": {
               "created_at": {
                 "type": "string",
                 "format": "date-time"
               },
               "created_by": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "uuid"
               },
               "id": {
@@ -2558,7 +3804,11 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["title", "content", "type"],
+            "required": [
+              "title",
+              "content",
+              "type"
+            ],
             "properties": {
               "content": {
                 "type": "string"
@@ -2568,13 +3818,18 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["markdown"]
+                "enum": [
+                  "markdown"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["approval_request_id", "type"],
+            "required": [
+              "approval_request_id",
+              "type"
+            ],
             "properties": {
               "approval_request_id": {
                 "type": "string",
@@ -2582,7 +3837,9 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["approval_request"]
+                "enum": [
+                  "approval_request"
+                ]
               }
             }
           }
@@ -2592,16 +3849,25 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "targets": {
-            "type": ["array", "null"],
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             }
           },
           "title": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2617,7 +3883,10 @@
       },
       "UserCreate": {
         "type": "object",
-        "required": ["name", "m_address"],
+        "required": [
+          "name",
+          "m_address"
+        ],
         "properties": {
           "m_address": {
             "type": "string"
@@ -2634,7 +3903,9 @@
           },
           {
             "type": "object",
-            "required": ["activation_token"],
+            "required": [
+              "activation_token"
+            ],
             "properties": {
               "activation_token": {
                 "type": "string"
@@ -2651,14 +3922,23 @@
           },
           {
             "type": "object",
-            "required": ["id", "created_at", "updated_at", "name", "m_address"],
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "name",
+              "m_address"
+            ],
             "properties": {
               "created_at": {
                 "type": "string",
                 "format": "date-time"
               },
               "group_id": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "所属する代表グループ ID(`\"G-001\"` 形式)。単体取得時のみ付与され、\n一覧/作成/更新では省略される(所属が無い場合も省略)。"
               },
               "id": {
@@ -2683,27 +3963,39 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["status"],
+            "required": [
+              "status"
+            ],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["registered"]
+                "enum": [
+                  "registered"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["status"],
+            "required": [
+              "status"
+            ],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["active"]
+                "enum": [
+                  "active"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["deactivated_at", "reason", "status"],
+            "required": [
+              "deactivated_at",
+              "reason",
+              "status"
+            ],
             "properties": {
               "deactivated_at": {
                 "type": "string",
@@ -2714,7 +4006,9 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["deactivated"]
+                "enum": [
+                  "deactivated"
+                ]
               }
             }
           }
@@ -2726,7 +4020,10 @@
         "description": "`PATCH /users/{id}` のリクエストボディ。氏名のみ変更可能\n(m アドレス変更は専用エンドポイント `POST /users/{id}/m_address`)。",
         "properties": {
           "name": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       }
