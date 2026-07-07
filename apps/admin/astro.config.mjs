@@ -12,6 +12,10 @@ export default defineConfig({
         context: 'client',
         access: 'public',
       }),
+      ACTIVATION_BASE_URL: envField.string({
+        context: 'client',
+        access: 'public',
+      }),
     },
   },
 });
