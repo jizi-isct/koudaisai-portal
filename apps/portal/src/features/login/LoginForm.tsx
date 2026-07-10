@@ -77,7 +77,6 @@ export function LoginForm() {
       </label>
 
       <div className={styles.links}>
-        <a href="/">トップページに戻る</a>
         <a href="/reset-password/">パスワードを忘れた場合</a>
       </div>
 
