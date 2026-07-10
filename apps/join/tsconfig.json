@@ -5,9 +5,13 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "declarationDir": "dist",
-    "customConditions": ["development"],
+    "customConditions": [
+      "development"
+    ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "references": [
@@ -26,5 +30,8 @@
     {
       "path": "../../libs/shared-types"
     }
+  ],
+  "include": [
+    "./worker-configuration.d.ts"
   ]
 }

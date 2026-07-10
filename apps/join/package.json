@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "generate-types": "wrangler types"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.5",
-    "astro": "^6.2.1"
+    "@astrojs/cloudflare": "^14.1.2",
+    "@astrojs/react": "^6.0.1",
+    "astro": "^7.0.7",
+    "wrangler": "^4.110.0"
   }
 }
