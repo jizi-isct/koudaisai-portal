@@ -694,6 +694,7 @@ function UserInfo({ userId }: { userId: string }) {
         </Button>
         <Button
           danger
+          type="primary"
           disabled={!userInfo.group_id}
           onClick={() => setOpenDeleteGroupModal(true)}
         >
