@@ -732,7 +732,6 @@ function UserInfo({ userId }: { userId: string }) {
             overflowY: 'auto',
             maxHeight: '80vh',
           },
-          
         }}
       >
         {stateOfModalOnSendUserName()?.modalContents}
