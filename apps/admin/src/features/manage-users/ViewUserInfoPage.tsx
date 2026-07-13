@@ -96,7 +96,7 @@ function UserInfo({ userId }: { userId: string }) {
   const {
     data: userInfo,
     isLoading: isLoadingUsers,
-    // refetch: refetchUserInfo,
+    refetch: refetchUserInfo,
   } = $api.useQuery('get', '/users/{id}', {
     params: {
       path: {
@@ -466,9 +466,9 @@ function UserInfo({ userId }: { userId: string }) {
       await deleteGroup({ params: { path: { id: userInfo.group_id } } });
       messageApi.success('参加団体を削除しました');
       setOpenDeleteGroupModal(false);
-      window.location.href = `/manage-users/view?user_id=${userId}`;
-    } catch (error) {
-      messageApi.error(`参加団体の削除に失敗しました: ${String(error)}`);
+      await refetchUserInfo();
+    } catch {
+      messageApi.error('参加団体の削除に失敗しました');
     } finally {
       setIsDeletingGroup(false);
     }
