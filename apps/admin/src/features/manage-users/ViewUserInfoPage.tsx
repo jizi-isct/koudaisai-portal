@@ -89,14 +89,10 @@ function UserInfo({ userId }: { userId: string }) {
     'pendingSaveUserEmail',
   );
 
-  const [openDeleteGroupModal, setOpenDeleteGroupModal] =
-    useState<boolean>(false);
-  const [isDeletingGroup, setIsDeletingGroup] = useState<boolean>(false);
-
   const {
     data: userInfo,
     isLoading: isLoadingUsers,
-    refetch: refetchUserInfo,
+    // refetch: refetchUserInfo,
   } = $api.useQuery('get', '/users/{id}', {
     params: {
       path: {
@@ -112,10 +108,6 @@ function UserInfo({ userId }: { userId: string }) {
   const { mutateAsync: updateUserEmail } = $api.useMutation(
     'post',
     '/users/{id}/m_address',
-  );
-  const { mutateAsync: deleteGroup } = $api.useMutation(
-    'delete',
-    '/groups/{id}',
   );
 
   const { data: groupData, isLoading: isLoadingGroups } = $api.useQuery(
@@ -450,30 +442,6 @@ function UserInfo({ userId }: { userId: string }) {
     setStateOfMailModal('pendingSaveUserEmail');
   };
 
-  const handleCloseDeleteGroupModal = () => {
-    if (isDeletingGroup) {
-      return;
-    }
-    setOpenDeleteGroupModal(false);
-  };
-
-  const handleDeleteGroup = async () => {
-    if (!userInfo.group_id) {
-      return;
-    }
-    setIsDeletingGroup(true);
-    try {
-      await deleteGroup({ params: { path: { id: userInfo.group_id } } });
-      messageApi.success('参加団体を削除しました');
-      setOpenDeleteGroupModal(false);
-      await refetchUserInfo();
-    } catch {
-      messageApi.error('参加団体の削除に失敗しました');
-    } finally {
-      setIsDeletingGroup(false);
-    }
-  };
-
   const startEditing = (field: 'name' | 'email', value: string) => {
     setEditingField(field);
     setEditingValue(value);
@@ -688,36 +656,11 @@ function UserInfo({ userId }: { userId: string }) {
         bordered
         items={userInfoData}
       />
-      <Flex gap={8} wrap justify="space-between">
+      <Flex gap={8} wrap>
         <Button type="default" href="/manage-users/" style={{ width: '5rem' }}>
           戻る
         </Button>
-        <Button
-          danger
-          type="primary"
-          disabled={!userInfo.group_id}
-          onClick={() => setOpenDeleteGroupModal(true)}
-        >
-          参加団体を削除
-        </Button>
       </Flex>
-      <Modal
-        title="参加団体を削除"
-        open={openDeleteGroupModal}
-        onOk={() => {
-          void handleDeleteGroup();
-        }}
-        onCancel={handleCloseDeleteGroupModal}
-        centered
-        closable={false}
-        maskClosable={false}
-        okText="削除する"
-        cancelText="キャンセル"
-        okButtonProps={{ danger: true, loading: isDeletingGroup }}
-        cancelButtonProps={{ disabled: isDeletingGroup }}
-      >
-        <p>本当にこの参加団体を削除しますか？この操作は取り消せません。</p>
-      </Modal>
       <Modal
         title={stateOfModalOnSendUserName()?.modalTitle}
         open={openNameModal}
