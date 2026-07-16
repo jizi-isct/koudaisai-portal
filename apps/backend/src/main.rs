@@ -73,7 +73,7 @@ async fn main() {
     // main は config を読み、構築結果を合成(composition root)するだけ。
     let oidc_client = crate::util::oidc::from_config(
         &config.web.auth.keycloak,
-        format!("{}{}", &config.web.server.base_url, "/login"),
+        format!("{}{}", config.web.server.base_url, "/login"),
     )
     .await;
 
@@ -163,7 +163,7 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",
-        &config.web.server.host, &config.web.server.port
+        config.web.server.host, config.web.server.port
     ))
     .await
     .unwrap();
