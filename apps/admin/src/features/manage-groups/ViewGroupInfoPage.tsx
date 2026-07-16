@@ -51,7 +51,7 @@ export function ViewGroupInfoPage() {
 
 function GroupInfo({ groupId }: { groupId: string }) {
   const [messageApi, contextHolder] = message.useMessage();
-  const [deleteCheckModal, setDeleteCheckModal] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const { mutateAsync: deleteGroup } = $api.useMutation('delete', '/groups/{id}');
@@ -371,7 +371,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
     if (isDeleting) {
       return;
     }
-    setDeleteCheckModal(false);
+    setIsDeleteModalOpen(false);
   };
 
   const handleDeleteGroup = async () => {
@@ -379,7 +379,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
     try {
       await deleteGroup({ params: { path: { id: groupId } } });
       messageApi.success('参加団体を削除しました');
-      setDeleteCheckModal(false);
+      setIsDeleteModalOpen(false);
       window.location.href = '/manage-groups/';
     } catch {
       messageApi.error('参加団体の削除に失敗しました');
@@ -404,14 +404,14 @@ function GroupInfo({ groupId }: { groupId: string }) {
         <Button
           danger
           type="primary"
-          onClick={() => setDeleteCheckModal(true)}
+          onClick={() => setIsDeleteModalOpen(true)}
         >
           参加団体を削除
         </Button>
       </Flex>
       <Modal
         title="参加団体を削除"
-        open={deleteCheckModal}
+        open={isDeleteModalOpen}
         onOk={() => {
           void handleDeleteGroup();
         }}
