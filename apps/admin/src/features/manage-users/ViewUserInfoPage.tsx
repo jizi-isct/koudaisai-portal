@@ -79,7 +79,7 @@ function UserInfo({ userId }: { userId: string }) {
   const [isPendSaving, setIsPendSaving] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCopying, setIsCopying] = useState<boolean>(false);
-  const [deleteCheckModal, setDeleteCheckModal] = useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [openNameModal, setOpenNameModal] = useState<boolean>(false);
@@ -551,7 +551,7 @@ function UserInfo({ userId }: { userId: string }) {
     if (isDeleting) {
       return;
     }
-    setDeleteCheckModal(false);
+    setOpenDeleteModal(false);
   };
 
   const handleDeleteUser = async () => {
@@ -559,7 +559,7 @@ function UserInfo({ userId }: { userId: string }) {
     try {
       await deleteUser({ params: { path: { id: userId } } });
       messageApi.success('ユーザーを削除しました');
-      setDeleteCheckModal(false);
+      setOpenDeleteModal(false);
       window.location.href = '/manage-users/';
     } catch {
       messageApi.error('ユーザーの削除に失敗しました');
@@ -688,14 +688,14 @@ function UserInfo({ userId }: { userId: string }) {
         <Button
           danger
           type="primary"
-          onClick={() => setDeleteCheckModal(true)}
+          onClick={() => setOpenDeleteModal(true)}
         >
           削除
         </Button>
       </Flex>
       <Modal
         title="ユーザーを削除"
-        open={deleteCheckModal}
+        open={openDeleteModal}
         onOk={() => {
           void handleDeleteUser();
         }}
