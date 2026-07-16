@@ -551,9 +551,9 @@ function UserInfo({ userId }: { userId: string }) {
       messageApi.success('有効化URLをコピーしました');
     } catch (error) {
       setIsCopying(false);
-      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`)
+      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`);
     }
-  }
+  };
 
   const editableValue = (
     field: 'name' | 'email',
