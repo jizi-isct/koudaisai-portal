@@ -19,7 +19,7 @@
     "deploy:production": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "wrangler deploy",
+        "command": "wrangler deploy --main dist/server/entry.mjs",
         "cwd": "apps/join"
       },
       "cache": false,
@@ -29,7 +29,7 @@
       "executor": "nx:run-commands",
       "cache": false,
       "options": {
-        "command": "wrangler deploy --env preview",
+        "command": "wrangler deploy --main dist/server/entry.mjs --env preview",
         "cwd": "apps/join"
       },
       "dependsOn": ["build"]
