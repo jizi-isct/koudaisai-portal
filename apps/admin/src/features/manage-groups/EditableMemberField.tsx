@@ -156,7 +156,7 @@ export function EditableMemberField({
         onClick={() => {
           void handleSaveMember();
         }}
-        disabled={isLoadingOptions}
+        disabled={isLoadingOptions || isSavingMember}
         loading={isSavingMember}
       >
         保存
