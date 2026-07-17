@@ -10,8 +10,10 @@ import {
   Flex,
   Button,
   Result,
+  message,
   type DescriptionsProps,
 } from 'antd';
+import { EditableMemberField } from './EditableMemberField';
 
 export function ViewGroupInfoPage() {
   const [queryClient] = useState(() => new QueryClient());
@@ -48,6 +50,8 @@ export function ViewGroupInfoPage() {
 }
 
 function GroupInfo({ groupId }: { groupId: string }) {
+  const [messageApi, contextHolder] = message.useMessage();
+
   const { data: groupInfo, isLoading: isLoadingGruop } = $api.useQuery(
     'get',
     '/groups/{id}',
@@ -59,17 +63,17 @@ function GroupInfo({ groupId }: { groupId: string }) {
       },
     },
   );
-  const { data: memberInfo, isLoading: isLoadingMember } = $api.useQuery(
-    'get',
-    '/groups/{id}/members',
-    {
-      params: {
-        path: {
-          id: groupId,
-        },
+  const {
+    data: memberInfo,
+    isLoading: isLoadingMember,
+    refetch: refetchMemberInfo,
+  } = $api.useQuery('get', '/groups/{id}/members', {
+    params: {
+      path: {
+        id: groupId,
       },
     },
-  );
+  });
 
   const filteredMemberByRole = {
     representative:
@@ -301,12 +305,30 @@ function GroupInfo({ groupId }: { groupId: string }) {
       {
         key: 'representative',
         label: '企画責任者',
-        children: filteredMemberNameByRole.representative,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="representative"
+            displayNode={filteredMemberNameByRole.representative}
+            currentUserId={filteredMemberByRole.representative}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+          />
+        ),
       },
       {
         key: 'operator',
         label: '企画実施担当者',
-        children: filteredMemberNameByRole.operator,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="operator"
+            displayNode={filteredMemberNameByRole.operator}
+            currentUserId={filteredMemberByRole.operator}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+          />
+        ),
       },
       {
         key: 'created_at',
@@ -334,17 +356,44 @@ function GroupInfo({ groupId }: { groupId: string }) {
       {
         key: 'first_responsible',
         label: '第1責任者',
-        children: filteredMemberNameByRole.first_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="first_responsible"
+            displayNode={filteredMemberNameByRole.first_responsible}
+            currentUserId={filteredMemberByRole.first_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+          />
+        ),
       },
       {
         key: 'second_responsible',
         label: '第2責任者',
-        children: filteredMemberNameByRole.second_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="second_responsible"
+            displayNode={filteredMemberNameByRole.second_responsible}
+            currentUserId={filteredMemberByRole.second_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+          />
+        ),
       },
       {
         key: 'third_responsible',
         label: '第3責任者',
-        children: filteredMemberNameByRole.third_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="third_responsible"
+            displayNode={filteredMemberNameByRole.third_responsible}
+            currentUserId={filteredMemberByRole.third_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+          />
+        ),
       },
       {
         key: 'created_at',
@@ -366,6 +415,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
         bordered
         items={groupInfoData}
       />
+      {contextHolder}
     </Flex>
   );
 }
