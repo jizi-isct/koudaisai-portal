@@ -10,6 +10,8 @@ import {
   Flex,
   Button,
   Result,
+  Modal,
+  message,
   type DescriptionsProps,
 } from 'antd';
 
@@ -48,6 +50,12 @@ export function ViewGroupInfoPage() {
 }
 
 function GroupInfo({ groupId }: { groupId: string }) {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  const { mutateAsync: deleteGroup } = $api.useMutation('delete', '/groups/{id}');
+
   const { data: groupInfo, isLoading: isLoadingGruop } = $api.useQuery(
     'get',
     '/groups/{id}',
@@ -358,14 +366,66 @@ function GroupInfo({ groupId }: { groupId: string }) {
       },
     ];
   }
+
+  const handleCloseDeleteModal = () => {
+    if (isDeleting) {
+      return;
+    }
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDeleteGroup = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteGroup({ params: { path: { id: groupId } } });
+      messageApi.success('参加団体を削除しました');
+      setIsDeleteModalOpen(false);
+      window.location.href = '/manage-groups/';
+    } catch {
+      messageApi.error('参加団体の削除に失敗しました');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <Flex gap={8} vertical>
+      {contextHolder}
       <Descriptions
         title={groupInfo.name}
         column={1}
         bordered
         items={groupInfoData}
       />
+      <Flex gap={8} wrap justify="space-between">
+        <Button type="default" href="/manage-groups/" style={{ width: '5rem' }}>
+          戻る
+        </Button>
+        <Button
+          danger
+          type="primary"
+          onClick={() => setIsDeleteModalOpen(true)}
+        >
+          参加団体を削除
+        </Button>
+      </Flex>
+      <Modal
+        title="参加団体を削除"
+        open={isDeleteModalOpen}
+        onOk={() => {
+          void handleDeleteGroup();
+        }}
+        onCancel={handleCloseDeleteModal}
+        centered
+        closable={false}
+        mask={{ closable: false }}
+        okText="削除する"
+        cancelText="キャンセル"
+        okButtonProps={{ danger: true, loading: isDeleting }}
+        cancelButtonProps={{ disabled: isDeleting }}
+      >
+        <p>本当にこの参加団体を削除しますか？この操作は取り消せません。</p>
+      </Modal>
     </Flex>
   );
 }
