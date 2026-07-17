@@ -57,12 +57,14 @@ export function EditableMemberField({
         );
         const ids = new Set<string>();
         for (const result of results) {
+          if (result.error) {
+            throw result.error;
+          }
           for (const member of result.data ?? []) {
             ids.add(member.user_id);
           }
         }
         return ids;
-      },
       enabled: isEditing && Boolean(allGroups),
     });
 
