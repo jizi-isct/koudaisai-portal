@@ -25,6 +25,7 @@ export function FormCard({ form }: FormCardProps) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
+      timeZone: 'Asia/Tokyo',
     }).format(new Date(form.due_date));
   }, [form.due_date]);
 
