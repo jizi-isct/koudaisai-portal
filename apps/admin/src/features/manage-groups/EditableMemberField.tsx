@@ -65,6 +65,7 @@ export function EditableMemberField({
           }
         }
         return ids;
+      },
       enabled: isEditing && Boolean(allGroups),
     });
 
