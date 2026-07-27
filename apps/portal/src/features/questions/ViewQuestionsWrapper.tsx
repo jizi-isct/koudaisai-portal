@@ -7,12 +7,13 @@ import {
   questionDataPlanBooth,
   questionDataPlanGeneral,
   questionDataPlanStage,
+  questionDataPlanLab,
 } from './questionData';
 
 export function ViewQuestionsWrapper() {
   const [user, setUser] = useState<UserRead | null>(null);
   const [groupType, setGroupType] = useState<
-    'booth' | 'general' | 'stage' | null
+    'booth' | 'general' | 'stage' | 'lab' | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +48,8 @@ export function ViewQuestionsWrapper() {
         setGroupType('general');
       } else if (group.type === 'stage_project') {
         setGroupType('stage');
+      } else if (group.type === 'lab_project') {
+        setGroupType('lab');
       }
 
       setIsLoading(false);
@@ -60,6 +63,7 @@ export function ViewQuestionsWrapper() {
     if (groupType === 'booth') return questionDataPlanBooth;
     if (groupType === 'general') return questionDataPlanGeneral;
     if (groupType === 'stage') return questionDataPlanStage;
+    if (groupType === 'lab') return questionDataPlanLab;
     return questionDataNoLogin;
   }, [groupType]);
 
