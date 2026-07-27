@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{GroupCreate, GroupRead, GroupUpdate, MemberCreate, MemberRead, Role};
 use crate::application::error::{
@@ -21,9 +22,9 @@ pub enum GetGroupsResponse {
     #[response(status = OK)]
     Ok(Vec<GroupRead>),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -36,8 +37,10 @@ pub enum GetGroupsResponse {
 pub async fn get_groups(State(st): State<V3State>, actor: ActorContext) -> GetGroupsResponse {
     match st.app.group().get_all(&actor).await {
         Ok(groups) => GetGroupsResponse::Ok(groups.iter().map(GroupRead::from).collect()),
-        Err(ApplicationOperationError::Unauthorized) => GetGroupsResponse::Forbidden,
-        Err(_) => GetGroupsResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetGroupsResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetGroupsResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -53,11 +56,11 @@ pub enum PutGroupResponse {
     #[response(status = OK, description = "Group replaced")]
     Ok(GroupRead),
     #[response(status = BAD_REQUEST, description = "Invalid group id or input")]
-    BadRequest,
+    BadRequest(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -76,7 +79,7 @@ pub async fn put_group(
     Json(group): Json<GroupCreate>,
 ) -> PutGroupResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return PutGroupResponse::BadRequest;
+        return PutGroupResponse::BadRequest(ErrorMessage::bad_request());
     };
     let domain_type = (&group.r#type).into();
     let tx = SqliteTransaction::new(st.pool.clone());
@@ -88,7 +91,7 @@ pub async fn put_group(
     {
         Ok(()) => match st.app.group().get_by_id(&actor, group_id).await {
             Ok(Some(g)) => PutGroupResponse::Created(GroupRead::from(&g)),
-            _ => PutGroupResponse::InternalServerError,
+            _ => PutGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
         },
         // 既存グループ → 名称を置換する(種別は変更不可)。
         Err(ApplicationSequentialOperationError::OperationFailed(InsertError::Conflict)) => {
@@ -99,14 +102,24 @@ pub async fn put_group(
                 .await
             {
                 Ok(g) => PutGroupResponse::Ok(GroupRead::from(&g)),
-                Err(ApplicationOperationError::Unauthorized) => PutGroupResponse::Forbidden,
-                Err(ApplicationOperationError::InvalidInput(_)) => PutGroupResponse::BadRequest,
-                Err(_) => PutGroupResponse::InternalServerError,
+                Err(ApplicationOperationError::Unauthorized) => {
+                    PutGroupResponse::Forbidden(ErrorMessage::forbidden())
+                }
+                Err(ApplicationOperationError::InvalidInput(_)) => {
+                    PutGroupResponse::BadRequest(ErrorMessage::bad_request())
+                }
+                Err(_) => {
+                    PutGroupResponse::InternalServerError(ErrorMessage::internal_server_error())
+                }
             }
         }
-        Err(ApplicationSequentialOperationError::Unauthorized) => PutGroupResponse::Forbidden,
-        Err(ApplicationSequentialOperationError::InvalidInput(_)) => PutGroupResponse::BadRequest,
-        Err(_) => PutGroupResponse::InternalServerError,
+        Err(ApplicationSequentialOperationError::Unauthorized) => {
+            PutGroupResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(ApplicationSequentialOperationError::InvalidInput(_)) => {
+            PutGroupResponse::BadRequest(ErrorMessage::bad_request())
+        }
+        Err(_) => PutGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -115,11 +128,11 @@ pub enum GetGroupResponse {
     #[response(status = OK, description = "Group found")]
     Ok(GroupRead),
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -131,13 +144,15 @@ pub enum GetGroupResponse {
 )]
 pub async fn get_group_us(State(st): State<V3State>, actor: ActorContext) -> GetGroupResponse {
     let Some(group_id) = actor.primary_group_id() else {
-        return GetGroupResponse::Forbidden;
+        return GetGroupResponse::Forbidden(ErrorMessage::forbidden());
     };
     match st.app.group().get_by_id(&actor, group_id).await {
         Ok(Some(g)) => GetGroupResponse::Ok(GroupRead::from(&g)),
-        Ok(None) => GetGroupResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetGroupResponse::Forbidden,
-        Err(_) => GetGroupResponse::InternalServerError,
+        Ok(None) => GetGroupResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetGroupResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -155,13 +170,15 @@ pub async fn get_group(
     Path(path): Path<GroupPath>,
 ) -> GetGroupResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return GetGroupResponse::NotFound;
+        return GetGroupResponse::NotFound(ErrorMessage::not_found());
     };
     match st.app.group().get_by_id(&actor, group_id).await {
         Ok(Some(g)) => GetGroupResponse::Ok(GroupRead::from(&g)),
-        Ok(None) => GetGroupResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetGroupResponse::Forbidden,
-        Err(_) => GetGroupResponse::InternalServerError,
+        Ok(None) => GetGroupResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetGroupResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -170,13 +187,13 @@ pub enum PatchGroupResponse {
     #[response(status = OK, description = "Group updated")]
     Ok(GroupRead),
     #[response(status = BAD_REQUEST, description = "Invalid input")]
-    BadRequest,
+    BadRequest(ErrorMessage),
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -195,25 +212,33 @@ pub async fn patch_group(
     Json(group): Json<GroupUpdate>,
 ) -> PatchGroupResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return PatchGroupResponse::NotFound;
+        return PatchGroupResponse::NotFound(ErrorMessage::not_found());
     };
     // name の指定が無ければ現状を取得して返す(no-op)。
     let Some(name) = group.name else {
         return match st.app.group().get_by_id(&actor, group_id).await {
             Ok(Some(g)) => PatchGroupResponse::Ok(GroupRead::from(&g)),
-            Ok(None) => PatchGroupResponse::NotFound,
-            Err(ApplicationOperationError::Unauthorized) => PatchGroupResponse::Forbidden,
-            Err(_) => PatchGroupResponse::InternalServerError,
+            Ok(None) => PatchGroupResponse::NotFound(ErrorMessage::not_found()),
+            Err(ApplicationOperationError::Unauthorized) => {
+                PatchGroupResponse::Forbidden(ErrorMessage::forbidden())
+            }
+            Err(_) => {
+                PatchGroupResponse::InternalServerError(ErrorMessage::internal_server_error())
+            }
         };
     };
     match st.app.group().rename_group(&actor, group_id, name).await {
         Ok(g) => PatchGroupResponse::Ok(GroupRead::from(&g)),
-        Err(ApplicationOperationError::Unauthorized) => PatchGroupResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => PatchGroupResponse::BadRequest,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchGroupResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchGroupResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PatchGroupResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchGroupResponse::BadRequest(ErrorMessage::bad_request())
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchGroupResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => PatchGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -222,11 +247,11 @@ pub enum DeleteGroupResponse {
     #[response(status = NO_CONTENT, description = "Group deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -243,15 +268,17 @@ pub async fn delete_group(
     Path(path): Path<GroupPath>,
 ) -> DeleteGroupResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return DeleteGroupResponse::NotFound;
+        return DeleteGroupResponse::NotFound(ErrorMessage::not_found());
     };
     match st.app.group().delete_group(&actor, group_id).await {
         Ok(()) => DeleteGroupResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteGroupResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteGroupResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteGroupResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteGroupResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteGroupResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => DeleteGroupResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -266,11 +293,11 @@ pub enum GetMembersResponse {
     #[response(status = OK)]
     Ok(Vec<MemberRead>),
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -287,13 +314,15 @@ pub async fn get_members(
     Path(path): Path<GroupPath>,
 ) -> GetMembersResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return GetMembersResponse::NotFound;
+        return GetMembersResponse::NotFound(ErrorMessage::not_found());
     };
     match st.app.group().get_members(&actor, group_id).await {
         Ok(Some(members)) => GetMembersResponse::Ok(members.iter().map(MemberRead::from).collect()),
-        Ok(None) => GetMembersResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetMembersResponse::Forbidden,
-        Err(_) => GetMembersResponse::InternalServerError,
+        Ok(None) => GetMembersResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetMembersResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetMembersResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -304,13 +333,13 @@ pub enum PutMemberResponse {
     #[response(status = OK, description = "Member replaced")]
     Ok(MemberRead),
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid for group type")]
-    UnprocessableEntity,
+    UnprocessableEntity(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -329,7 +358,7 @@ pub async fn put_member(
     Json(body): Json<MemberCreate>,
 ) -> PutMemberResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return PutMemberResponse::NotFound;
+        return PutMemberResponse::NotFound(ErrorMessage::not_found());
     };
     let role: DomainRole = (&path.role).into();
     let user_id = UserId::new(body.user_id);
@@ -346,15 +375,19 @@ pub async fn put_member(
             Ok(Some(members)) => match members.iter().find(|m| m.role() == role) {
                 Some(m) if was_replace => PutMemberResponse::Ok(MemberRead::from(m)),
                 Some(m) => PutMemberResponse::Created(MemberRead::from(m)),
-                None => PutMemberResponse::InternalServerError,
+                None => {
+                    PutMemberResponse::InternalServerError(ErrorMessage::internal_server_error())
+                }
             },
-            _ => PutMemberResponse::InternalServerError,
+            _ => PutMemberResponse::InternalServerError(ErrorMessage::internal_server_error()),
         },
-        Err(ApplicationSequentialOperationError::Unauthorized) => PutMemberResponse::Forbidden,
-        Err(ApplicationSequentialOperationError::InvalidInput(_)) => {
-            PutMemberResponse::UnprocessableEntity
+        Err(ApplicationSequentialOperationError::Unauthorized) => {
+            PutMemberResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PutMemberResponse::InternalServerError,
+        Err(ApplicationSequentialOperationError::InvalidInput(_)) => {
+            PutMemberResponse::UnprocessableEntity(ErrorMessage::unprocessable_entity())
+        }
+        Err(_) => PutMemberResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -363,11 +396,11 @@ pub enum DeleteMemberResponse {
     #[response(status = NO_CONTENT, description = "Member deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Group not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -384,7 +417,7 @@ pub async fn delete_member(
     Path(path): Path<MemberPath>,
 ) -> DeleteMemberResponse {
     let Ok(group_id) = GroupId::from_str(&path.id) else {
-        return DeleteMemberResponse::NotFound;
+        return DeleteMemberResponse::NotFound(ErrorMessage::not_found());
     };
     let role: DomainRole = (&path.role).into();
     let tx = SqliteTransaction::new(st.pool.clone());
@@ -395,10 +428,12 @@ pub async fn delete_member(
         .await
     {
         Ok(()) => DeleteMemberResponse::NoContent,
-        Err(ApplicationSequentialOperationError::Unauthorized) => DeleteMemberResponse::Forbidden,
-        Err(ApplicationSequentialOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteMemberResponse::NotFound
+        Err(ApplicationSequentialOperationError::Unauthorized) => {
+            DeleteMemberResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteMemberResponse::InternalServerError,
+        Err(ApplicationSequentialOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteMemberResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => DeleteMemberResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }

@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::dto::{FileDownloadResponse, FileUploadRequest, FileUploadResponse};
 use crate::application::error::ApplicationError;
@@ -15,9 +16,9 @@ pub enum PostFileUploadResponse {
     #[response(status = OK, description = "Returns the presigned upload URL and key")]
     Ok(FileUploadResponse),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -38,8 +39,12 @@ pub async fn post_file_upload(
             presigned_url: ticket.presigned_url,
             key: ticket.key,
         }),
-        Err(ApplicationError::Unauthorized) => PostFileUploadResponse::Forbidden,
-        Err(_) => PostFileUploadResponse::InternalServerError,
+        Err(ApplicationError::Unauthorized) => {
+            PostFileUploadResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => {
+            PostFileUploadResponse::InternalServerError(ErrorMessage::internal_server_error())
+        }
     }
 }
 
@@ -64,8 +69,8 @@ pub struct FileDownloadQuery {
     responses(
         (status = OK, description = "Returns the presigned download URL", body = FileDownloadResponse),
         (status = FOUND, description = "Redirect to the presigned URL (when redirect=true)"),
-        (status = FORBIDDEN, description = "Forbidden"),
-        (status = INTERNAL_SERVER_ERROR, description = "Internal server error"),
+        (status = FORBIDDEN, description = "Forbidden", body = ErrorMessage),
+        (status = INTERNAL_SERVER_ERROR, description = "Internal server error", body = ErrorMessage),
     ),
     tag = super::super::FILES_TAG
 )]
@@ -84,7 +89,11 @@ pub async fn get_file_download(
             if query.redirect {
                 match HeaderValue::from_str(&url) {
                     Ok(loc) => (StatusCode::FOUND, [(header::LOCATION, loc)]).into_response(),
-                    Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+                    Err(_) => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        Json(ErrorMessage::internal_server_error()),
+                    )
+                        .into_response(),
                 }
             } else {
                 (
@@ -94,7 +103,13 @@ pub async fn get_file_download(
                     .into_response()
             }
         }
-        Err(ApplicationError::Unauthorized) => StatusCode::FORBIDDEN.into_response(),
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+        Err(ApplicationError::Unauthorized) => {
+            (StatusCode::FORBIDDEN, Json(ErrorMessage::forbidden())).into_response()
+        }
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorMessage::internal_server_error()),
+        )
+            .into_response(),
     }
 }

@@ -1,3 +1,4 @@
+use super::super::ErrorMessage;
 use super::super::V3State;
 use super::super::notifications::NotificationRead;
 use super::dto::{MAddressUpdate, MAddressUpdated, UserCreate, UserCreated, UserRead, UserUpdate};
@@ -18,9 +19,9 @@ pub enum GetUsersResponse {
     #[response(status = OK)]
     Ok(Vec<UserRead>),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -33,8 +34,10 @@ pub enum GetUsersResponse {
 pub async fn get_users(State(st): State<V3State>, actor: ActorContext) -> GetUsersResponse {
     match st.app.user().get_all(&actor).await {
         Ok(users) => GetUsersResponse::Ok(users.iter().map(UserRead::from).collect()),
-        Err(ApplicationOperationError::Unauthorized) => GetUsersResponse::Forbidden,
-        Err(_) => GetUsersResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetUsersResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetUsersResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -43,13 +46,13 @@ pub enum PostUserResponse {
     #[response(status = CREATED, description = "User created; returns the activation token")]
     Created(UserCreated),
     #[response(status = BAD_REQUEST, description = "Invalid input")]
-    BadRequest,
+    BadRequest(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = CONFLICT, description = "m_address already in use")]
-    Conflict,
+    Conflict(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -67,7 +70,7 @@ pub async fn post_user(
 ) -> PostUserResponse {
     let user_id = UserId::new(Uuid::new_v4());
     let Ok(m_address) = EmailAddress::new(body.m_address) else {
-        return PostUserResponse::BadRequest;
+        return PostUserResponse::BadRequest(ErrorMessage::bad_request());
     };
     match st
         .app
@@ -88,15 +91,21 @@ pub async fn post_user(
                     user: UserRead::from(&user),
                     activation_token: token,
                 }),
-                Err(_) => PostUserResponse::InternalServerError,
+                Err(_) => {
+                    PostUserResponse::InternalServerError(ErrorMessage::internal_server_error())
+                }
             }
         }
-        Err(ApplicationOperationError::Unauthorized) => PostUserResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(InsertError::Conflict)) => {
-            PostUserResponse::Conflict
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostUserResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(ApplicationOperationError::InvalidInput(_)) => PostUserResponse::BadRequest,
-        Err(_) => PostUserResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(InsertError::Conflict)) => {
+            PostUserResponse::Conflict(ErrorMessage::conflict())
+        }
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PostUserResponse::BadRequest(ErrorMessage::bad_request())
+        }
+        Err(_) => PostUserResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -112,11 +121,11 @@ pub enum GetUserResponse {
     #[response(status = OK, description = "User found")]
     Ok(UserRead),
     #[response(status = NOT_FOUND, description = "User not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -136,9 +145,11 @@ pub async fn get_user(
         Ok(Some((u, group))) => {
             GetUserResponse::Ok(UserRead::with_group(&u, group.map(|g| g.to_string())))
         }
-        Ok(None) => GetUserResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetUserResponse::Forbidden,
-        Err(_) => GetUserResponse::InternalServerError,
+        Ok(None) => GetUserResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetUserResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetUserResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -151,15 +162,17 @@ pub async fn get_user(
 )]
 pub async fn get_user_me(State(st): State<V3State>, actor: ActorContext) -> GetUserResponse {
     let Some(user_id) = actor.user_id() else {
-        return GetUserResponse::Forbidden;
+        return GetUserResponse::Forbidden(ErrorMessage::forbidden());
     };
     match st.app.user().get_by_id(&actor, user_id).await {
         Ok(Some((u, group))) => {
             GetUserResponse::Ok(UserRead::with_group(&u, group.map(|g| g.to_string())))
         }
-        Ok(None) => GetUserResponse::NotFound,
-        Err(ApplicationOperationError::Unauthorized) => GetUserResponse::Forbidden,
-        Err(_) => GetUserResponse::InternalServerError,
+        Ok(None) => GetUserResponse::NotFound(ErrorMessage::not_found()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetUserResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetUserResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -168,13 +181,13 @@ pub enum PatchUserResponse {
     #[response(status = OK, description = "User updated")]
     Ok(UserRead),
     #[response(status = BAD_REQUEST, description = "Invalid input")]
-    BadRequest,
+    BadRequest(ErrorMessage),
     #[response(status = NOT_FOUND, description = "User not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -200,12 +213,16 @@ pub async fn patch_user(
         .await
     {
         Ok(u) => PatchUserResponse::Ok(UserRead::from(&u)),
-        Err(ApplicationOperationError::Unauthorized) => PatchUserResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => PatchUserResponse::BadRequest,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PatchUserResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchUserResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => PatchUserResponse::InternalServerError,
+        Err(ApplicationOperationError::InvalidInput(_)) => {
+            PatchUserResponse::BadRequest(ErrorMessage::bad_request())
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PatchUserResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => PatchUserResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -214,11 +231,11 @@ pub enum DeleteUserResponse {
     #[response(status = NO_CONTENT, description = "User deleted")]
     NoContent,
     #[response(status = NOT_FOUND, description = "User not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -236,11 +253,13 @@ pub async fn delete_user(
 ) -> DeleteUserResponse {
     match st.app.user().delete_user(&actor, path.id).await {
         Ok(()) => DeleteUserResponse::NoContent,
-        Err(ApplicationOperationError::Unauthorized) => DeleteUserResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
-            DeleteUserResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteUserResponse::Forbidden(ErrorMessage::forbidden())
         }
-        Err(_) => DeleteUserResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteUserResponse::NotFound(ErrorMessage::not_found())
+        }
+        Err(_) => DeleteUserResponse::InternalServerError(ErrorMessage::internal_server_error()),
     }
 }
 
@@ -249,11 +268,11 @@ pub enum GetUserReadNotificationsResponse {
     #[response(status = OK)]
     Ok(Vec<NotificationRead>),
     #[response(status = NOT_FOUND, description = "User not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -273,13 +292,21 @@ pub async fn get_user_read_notifications(
     // 対象ユーザーの存在確認(authz は介在しない)。
     match st.app.find_user_for_auth(user_id).await {
         Ok(Some(_)) => {}
-        Ok(None) => return GetUserReadNotificationsResponse::NotFound,
-        Err(_) => return GetUserReadNotificationsResponse::InternalServerError,
+        Ok(None) => return GetUserReadNotificationsResponse::NotFound(ErrorMessage::not_found()),
+        Err(_) => {
+            return GetUserReadNotificationsResponse::InternalServerError(
+                ErrorMessage::internal_server_error(),
+            );
+        }
     }
     // 対象ユーザーの認可コンテキスト(所属が無ければ None)。
     let target_ctx = match st.app.build_actor_context(user_id).await {
         Ok(c) => c,
-        Err(_) => return GetUserReadNotificationsResponse::InternalServerError,
+        Err(_) => {
+            return GetUserReadNotificationsResponse::InternalServerError(
+                ErrorMessage::internal_server_error(),
+            );
+        }
     };
     match st
         .app
@@ -295,8 +322,12 @@ pub async fn get_user_read_notifications(
                 .map(|(n, _)| NotificationRead::from(&n))
                 .collect(),
         ),
-        Err(ApplicationOperationError::Unauthorized) => GetUserReadNotificationsResponse::Forbidden,
-        Err(_) => GetUserReadNotificationsResponse::InternalServerError,
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetUserReadNotificationsResponse::Forbidden(ErrorMessage::forbidden())
+        }
+        Err(_) => GetUserReadNotificationsResponse::InternalServerError(
+            ErrorMessage::internal_server_error(),
+        ),
     }
 }
 
@@ -305,13 +336,13 @@ pub enum PostUserMAddressResponse {
     #[response(status = OK, description = "m_address changed; returns a new activation token")]
     Ok(MAddressUpdated),
     #[response(status = BAD_REQUEST, description = "Invalid input")]
-    BadRequest,
+    BadRequest(ErrorMessage),
     #[response(status = NOT_FOUND, description = "User not found")]
-    NotFound,
+    NotFound(ErrorMessage),
     #[response(status = FORBIDDEN, description = "Forbidden")]
-    Forbidden,
+    Forbidden(ErrorMessage),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
-    InternalServerError,
+    InternalServerError(ErrorMessage),
 }
 
 #[utoipa::path(
@@ -331,7 +362,7 @@ pub async fn post_user_m_address(
 ) -> PostUserMAddressResponse {
     let user_id = path.id;
     let Ok(m_address) = EmailAddress::new(body.m_address) else {
-        return PostUserMAddressResponse::BadRequest;
+        return PostUserMAddressResponse::BadRequest(ErrorMessage::new("Invalid email address"));
     };
     match st
         .app
@@ -351,13 +382,19 @@ pub async fn post_user_m_address(
                 Ok(token) => PostUserMAddressResponse::Ok(MAddressUpdated {
                     activation_token: token,
                 }),
-                Err(_) => PostUserMAddressResponse::InternalServerError,
+                Err(_) => PostUserMAddressResponse::InternalServerError(ErrorMessage::new(
+                    "Internal server error",
+                )),
             }
         }
-        Err(ApplicationOperationError::Unauthorized) => PostUserMAddressResponse::Forbidden,
-        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PostUserMAddressResponse::NotFound
+        Err(ApplicationOperationError::Unauthorized) => {
+            PostUserMAddressResponse::Forbidden(ErrorMessage::new("Forbidden"))
         }
-        Err(_) => PostUserMAddressResponse::InternalServerError,
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PostUserMAddressResponse::NotFound(ErrorMessage::new("User not found"))
+        }
+        Err(_) => PostUserMAddressResponse::InternalServerError(ErrorMessage::new(
+            "Internal server error",
+        )),
     }
 }
