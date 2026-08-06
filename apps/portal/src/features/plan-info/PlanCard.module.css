@@ -1,5 +1,5 @@
 .card {
-  background-color: var(--background-secondaly);
+  background-color: white;
   border: 1px solid var(--darkblue);
   border-radius: 10px;
   box-shadow: 4px 4px 0 0 var(--darkblue);
