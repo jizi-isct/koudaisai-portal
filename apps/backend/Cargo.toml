@@ -52,6 +52,8 @@ async-trait = "0.1.89"
 utoipa = { version = "5.5.0", features = ["uuid", "chrono"] }
 utoipa-axum = "0.2.0"
 utoipa-axum-auto-into-response = "0.1.0"
+# `nx generate-rust-client backend` で events26.koudaisai.jp の OpenAPI から生成する。
+events26_api = { path = "generated/events26_api" }
 
 [lib]
 name = "koudaisai_portal_backend"
