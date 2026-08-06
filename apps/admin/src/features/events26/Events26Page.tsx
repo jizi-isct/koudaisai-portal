@@ -24,7 +24,7 @@ import objectHash from 'object-hash';
 import Papa from 'papaparse';
 import { useRef, useState } from 'react';
 import { EVENTS26_API_URL } from 'astro:env/client';
-import { api, $api, $events26Api } from '@/features/api/api';
+import { api, $events26Api } from '@/features/api/api';
 
 type Project = events26Components['schemas']['Project'];
 type Occasion = events26Components['schemas']['Occasion'];
@@ -55,6 +55,31 @@ type ProjectRow = {
   day2_place: string;
   day2_start: string;
   day2_end: string;
+};
+
+/**
+ * 新規作成用 CSV の 1 行。旧 API 時代の列に揃えた暫定の形式で、
+ * ダウンロード・置き換えで使う [`ProjectRow`] とは別物。
+ *
+ * type 列は無く、企画種別は id の接頭辞(M/S/I/L)から決める。
+ * タグの列も無いので、模擬店企画と一般企画のタグは空で作られる。
+ */
+type CreateProjectRow = {
+  id: string;
+  group_name: string;
+  project_name: string;
+  description: string;
+  is_child_friendly: string;
+  is_recommended: string;
+  day1_start_time: string;
+  day1_end_time: string;
+  day2_start_time: string;
+  day2_end_time: string;
+  /** 1 日目・2 日目に共通の実施場所。 */
+  place: string;
+  /** id が `L` で始まる場合のみ必須。 */
+  is_lab_tour: string;
+  icon_url: string;
 };
 
 const CSV_COLUMNS: (keyof ProjectRow)[] = [
@@ -215,6 +240,133 @@ function buildProject(row: ProjectRow): Project {
   }
 }
 
+/** 企画種別は id の接頭辞で決まる(M: 模擬店, S: ステージ, I: 一般, L: 研究室公開)。 */
+const PROJECT_TYPE_BY_ID_PREFIX: Record<string, Project['type']> = {
+  M: 'food-stall',
+  S: 'stage',
+  I: 'general',
+  L: 'laboratory',
+};
+
+function projectTypeFromId(id: string): Project['type'] {
+  const type = PROJECT_TYPE_BY_ID_PREFIX[id.charAt(0).toUpperCase()];
+  if (!type) {
+    throw new Error(
+      `企画番号は M / S / I / L のいずれかで始まる必要があります: ${id}`,
+    );
+  }
+  return type;
+}
+
+function requireField(value: string, column: string, id: string): string {
+  const trimmed = value?.trim() ?? '';
+  if (trimmed === '') {
+    throw new Error(`${column} は必須です(${id || '企画番号不明'})`);
+  }
+  return trimmed;
+}
+
+/** true / false のみ受け付ける。空や別の値は行ごと弾く。 */
+function requireBoolean(value: string, column: string, id: string): boolean {
+  const trimmed = requireField(value, column, id).toLowerCase();
+  if (trimmed !== 'true' && trimmed !== 'false') {
+    throw new Error(
+      `${column} は true か false で指定してください(${id}): ${value}`,
+    );
+  }
+  return trimmed === 'true';
+}
+
+/**
+ * day1 / day2 の時刻列から `occasions` を組み立てる。
+ * 開始・終了は必ず対で、片方だけ入っている日はエラーにする。
+ * 場所は両日に共通の `place` 列を使う。
+ */
+function buildCreateOccasions(row: CreateProjectRow): Occasion[] {
+  const place = row.place?.trim() ?? '';
+  const days: {
+    date: Time['date'];
+    start: string;
+    end: string;
+    startColumn: string;
+    endColumn: string;
+  }[] = [
+    {
+      date: 1,
+      start: row.day1_start_time?.trim() ?? '',
+      end: row.day1_end_time?.trim() ?? '',
+      startColumn: 'day1_start_time',
+      endColumn: 'day1_end_time',
+    },
+    {
+      date: 2,
+      start: row.day2_start_time?.trim() ?? '',
+      end: row.day2_end_time?.trim() ?? '',
+      startColumn: 'day2_start_time',
+      endColumn: 'day2_end_time',
+    },
+  ];
+
+  return days
+    .filter((day) => {
+      if (day.start === '' && day.end === '') return false;
+      if (day.start === '' || day.end === '') {
+        throw new Error(
+          `${day.startColumn} と ${day.endColumn} は同時に指定してください(${row.id})`,
+        );
+      }
+      return true;
+    })
+    .map((day) => ({
+      // place は events26 側の enum。CSV の値をそのまま渡し、妥当性は API に委ねる。
+      // 未指定は null ではなくキーごと省く(spec 上 optional であって nullable ではない)。
+      ...(place === '' ? {} : { place: place as Place }),
+      timeRange: {
+        start: parseTime(day.date, day.start),
+        end: parseTime(day.date, day.end),
+      },
+    }));
+}
+
+/**
+ * 新規作成用 CSV の 1 行を [`Project`] にする。
+ * タグの列が無いため、模擬店企画と一般企画のタグは空になる。
+ */
+function buildCreateProject(row: CreateProjectRow): Project {
+  const id = requireField(row.id, 'id', row.id);
+  const base = {
+    id,
+    groupName: requireField(row.group_name, 'group_name', id),
+    projectName: requireField(row.project_name, 'project_name', id),
+    description: requireField(row.description, 'description', id),
+    isChildFriendly: requireBoolean(
+      row.is_child_friendly,
+      'is_child_friendly',
+      id,
+    ),
+    isRecommended: requireBoolean(row.is_recommended, 'is_recommended', id),
+    occasions: buildCreateOccasions(row),
+  };
+
+  switch (projectTypeFromId(id)) {
+    case 'food-stall':
+      return { ...base, type: 'food-stall', tag: [] };
+    case 'general':
+      return { ...base, type: 'general', tag: [] };
+    case 'stage':
+      return { ...base, type: 'stage' };
+    case 'laboratory':
+      return {
+        ...base,
+        type: 'laboratory',
+        isTour: requireBoolean(row.is_lab_tour, 'is_lab_tour', id),
+      };
+  }
+}
+
+/** 新規作成 1 件分。アイコンは企画を作った後に URL から取ってきて送る。 */
+type CreateEntry = { project: Project; iconUrl: string };
+
 function formatTags(project: Project): string {
   if (project.type === 'food-stall') {
     return project.tag
@@ -281,6 +433,32 @@ function parseCsv(csv: string): Promise<Project[]> {
   });
 }
 
+/** 新規作成用 CSV を 1 行ずつ読む。[`parseCsv`] と同じく 1 行でも壊れていたら全体を捨てる。 */
+function parseCreateCsv(csv: string): Promise<CreateEntry[]> {
+  return new Promise((resolve, reject) => {
+    const entries: CreateEntry[] = [];
+    Papa.parse<CreateProjectRow>(csv, {
+      header: true,
+      skipEmptyLines: true,
+      worker: true,
+      encoding: 'UTF-8',
+      step: (result, parser) => {
+        try {
+          entries.push({
+            project: buildCreateProject(result.data),
+            iconUrl: result.data.icon_url?.trim() ?? '',
+          });
+        } catch (error) {
+          parser.abort();
+          reject(error instanceof Error ? error : new Error(String(error)));
+        }
+      },
+      complete: () => resolve(entries),
+      error: (error: Error) => reject(error),
+    });
+  });
+}
+
 /** events26 がアイコンとして受け付ける形式。ここに無いファイルは送らずに飛ばす。 */
 const ICON_CONTENT_TYPES = [
   'image/png',
@@ -301,22 +479,56 @@ function projectIdFromFileName(fileName: string): string {
 }
 
 /**
+ * 応答が失敗ならエラーにする。
+ *
+ * openapi-fetch は本文の無い応答(`204` や `Content-Length: 0`)を成功・失敗に
+ * かかわらず `{ error: undefined }` で返す。backend の失敗応答(403 / 404 / 415 /
+ * 422 / 500)はいずれも本文が無いので、`error` だけを見ると失敗を成功と取り違える。
+ * ステータスで判定し、本文があれば内容を添える。
+ */
+function ensureOk(
+  result: { error?: unknown; response: Response },
+  label: string,
+): void {
+  if (result.response.ok) return;
+  const detail =
+    result.error === undefined ? '' : `: ${JSON.stringify(result.error)}`;
+  throw new Error(`${label}に失敗しました(${result.response.status})${detail}`);
+}
+
+/**
  * アイコンを 1 件 PUT する。
  *
  * events26 の `/admin/v1` は Cloudflare Access 配下なので backend 中継を通す。
  * ボディは画像そのもので JSON ではないため、openapi-fetch の既定シリアライザを
  * 素通しに差し替え、形式判定に使う `Content-Type` を明示する。
  */
-async function putIcon(projectId: string, file: File): Promise<void> {
-  const { error } = await api.PUT('/events26/projects/{project_id}/icon', {
+async function putIcon(projectId: string, image: Blob): Promise<void> {
+  const result = await api.PUT('/events26/projects/{project_id}/icon', {
     params: { path: { project_id: projectId } },
-    body: file as unknown as string,
+    body: image as unknown as string,
     bodySerializer: (body: unknown) => body as BodyInit,
-    headers: { 'Content-Type': file.type },
+    headers: { 'Content-Type': image.type },
   });
-  if (error) {
-    throw error;
+  ensureOk(result, 'アイコンのアップロード');
+}
+
+/**
+ * URL からアイコンを取ってきて送る。
+ *
+ * events26 のアイコン API は画像そのものを受け取る形で URL インポートが無いため、
+ * ブラウザで一度取得してから中継に流す。取得元が CORS を許可していないと失敗する。
+ */
+async function putIconFromUrl(projectId: string, url: string): Promise<void> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`アイコンの取得に失敗しました(${response.status}): ${url}`);
   }
+  const image = await response.blob();
+  if (!ICON_CONTENT_TYPES.includes(image.type)) {
+    throw new Error(`対応外のアイコン形式です(${image.type}): ${url}`);
+  }
+  await putIcon(projectId, image);
 }
 
 export function Events26Page() {
@@ -337,33 +549,27 @@ function Events26Table() {
     'get',
     '/v1/projects',
   );
-  const { mutateAsync: mutateProjectCreate } = $api.useMutation(
-    'post',
-    '/events26/projects',
-  );
-  const { mutateAsync: mutateProjectReplace } = $api.useMutation(
-    'put',
-    '/events26/projects/{project_id}',
-  );
-  const { mutateAsync: mutateProjectDelete } = $api.useMutation(
-    'delete',
-    '/events26/projects/{project_id}',
-  );
-  const { mutateAsync: mutateIconDelete } = $api.useMutation(
-    'delete',
-    '/events26/projects/{project_id}/icon',
-  );
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
   const iconInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = (id: string) => async () => {
-    await mutateProjectDelete({ params: { path: { project_id: id } } });
+    ensureOk(
+      await api.DELETE('/events26/projects/{project_id}', {
+        params: { path: { project_id: id } },
+      }),
+      '企画情報の削除',
+    );
     await refetch();
   };
 
   const handleIconDelete = (id: string) => async () => {
-    await mutateIconDelete({ params: { path: { project_id: id } } });
+    ensureOk(
+      await api.DELETE('/events26/projects/{project_id}/icon', {
+        params: { path: { project_id: id } },
+      }),
+      'アイコンの削除',
+    );
     setIconVersion((version) => version + 1);
   };
 
@@ -428,16 +634,18 @@ function Events26Table() {
    * CSV の各行を 1 件ずつ送る。events26 には一括投入が無いため。
    * 途中で失敗したらそこで打ち切り、成功した件数を伝える。
    */
-  const applyCsv = async (
+  const applyCsv = async <T,>(
     csv: string,
     label: string,
-    apply: (project: Project) => Promise<unknown>,
+    parse: (csv: string) => Promise<T[]>,
+    idOf: (item: T) => string,
+    apply: (item: T) => Promise<unknown>,
   ) => {
     const hash = objectHash(csv);
 
-    let projects: Project[];
+    let items: T[];
     try {
-      projects = await parseCsv(csv);
+      items = await parse(csv);
     } catch (error) {
       console.error(error);
       messageApi.error({
@@ -447,23 +655,23 @@ function Events26Table() {
       return;
     }
 
-    const total = projects.length;
+    const total = items.length;
     let done = 0;
-    for (const project of projects) {
+    for (const item of items) {
       messageApi.destroy(hash);
       messageApi.loading({
-        content: `${label}(${done + 1}/${total} - ${project.id})... ブラウザを閉じないでください`,
+        content: `${label}(${done + 1}/${total} - ${idOf(item)})... ブラウザを閉じないでください`,
         key: hash,
         duration: 0,
       });
 
       try {
-        await apply(project);
+        await apply(item);
       } catch (err) {
         console.error(err);
         messageApi.destroy(hash);
         messageApi.error({
-          content: `${label}中にエラーが発生しました(${project.id}):${JSON.stringify(err)}。${done}件${label}しました。`,
+          content: `${label}中にエラーが発生しました(${idOf(item)}):${JSON.stringify(err)}。${done}件${label}しました。`,
           key: hash,
         });
         await refetch();
@@ -480,17 +688,56 @@ function Events26Table() {
     await refetch();
   };
 
-  const handleBulkCreate = (csv: string) =>
-    applyCsv(csv, '新規作成', (project) =>
-      mutateProjectCreate({ body: project }),
+  /**
+   * 新規作成は旧 API 時代の列に揃えた CSV を受ける。
+   * アイコンの取得・送信に失敗しても企画自体は作れているので、
+   * そこで打ち切らず最後にまとめて報告する。
+   */
+  const handleBulkCreate = async (csv: string) => {
+    const iconFailures: string[] = [];
+
+    await applyCsv(
+      csv,
+      '新規作成',
+      parseCreateCsv,
+      (entry: CreateEntry) => entry.project.id,
+      async (entry: CreateEntry) => {
+        ensureOk(
+          await api.POST('/events26/projects', { body: entry.project }),
+          '企画情報の新規作成',
+        );
+        if (entry.iconUrl === '') return;
+        try {
+          await putIconFromUrl(entry.project.id, entry.iconUrl);
+        } catch (error) {
+          console.error(error);
+          iconFailures.push(`${entry.project.id}: ${String(error)}`);
+        }
+      },
     );
 
+    setIconVersion((version) => version + 1);
+    if (iconFailures.length > 0) {
+      messageApi.warning(
+        `アイコンの登録に${iconFailures.length}件失敗しました(${iconFailures.join(' / ')})。`,
+      );
+    }
+  };
+
   const handleBulkReplace = (csv: string) =>
-    applyCsv(csv, '更新', (project) =>
-      mutateProjectReplace({
-        params: { path: { project_id: project.id } },
-        body: project,
-      }),
+    applyCsv(
+      csv,
+      '更新',
+      parseCsv,
+      (project: Project) => project.id,
+      async (project) =>
+        ensureOk(
+          await api.PUT('/events26/projects/{project_id}', {
+            params: { path: { project_id: project.id } },
+            body: project,
+          }),
+          '企画情報の更新',
+        ),
     );
 
   const handleDownload = () => {
@@ -700,9 +947,21 @@ function Events26Table() {
           フォルダからアイコンを一括アップロード
         </Button>
       </Flex>
-      <p style={{ marginTop: '-8px', marginBottom: '16px', color: '#888' }}>
+      <p style={{ marginTop: '-8px', marginBottom: '8px', color: '#888' }}>
         アイコンは企画番号をファイル名にしてください（例: <code>M-001.png</code>
         ）。対応形式は png / jpeg / gif / webp / heic、 正方形で 20MB 以下です。
+      </p>
+      <p style={{ marginBottom: '16px', color: '#888' }}>
+        新規追加のCSVの列は <code>id</code>, <code>group_name</code>,{' '}
+        <code>project_name</code>, <code>description</code>,{' '}
+        <code>is_child_friendly</code>, <code>is_recommended</code>,{' '}
+        <code>day1_start_time</code>, <code>day1_end_time</code>,{' '}
+        <code>day2_start_time</code>, <code>day2_end_time</code>,{' '}
+        <code>place</code>, <code>is_lab_tour</code>, <code>icon_url</code>{' '}
+        です。時刻は <code>HH:mm</code> で開始と終了を対で指定し、企画種別は
+        企画番号の接頭辞（M / S / I / L）から決まります。
+        <code>is_lab_tour</code> は <code>L</code>{' '}
+        で始まる企画のみ必須です。置き換え・ダウンロードのCSVは従来の列のままです。
       </p>
 
       <Flex gap={8} vertical>
