@@ -66,8 +66,9 @@ function formatTime(hour: number, minute: number): string {
 /** 開催予定を「8/2 10:00〜16:00」の形にする。日付をまたぐ場合は終了側にも日付を出す。 */
 function formatOccasion(occasion: Occasion): string {
   const { start, end } = occasion.timeRange;
-  const startDate = new Date(start.date);
-  const startLabel = `10/${10 - 1 + startDate.getDate()}`;
+
+  const startLabel = start.date === "1" ? "10/10" : "10/11";
+
   const startTime = formatTime(start.hour, start.minute);
   const endTime = formatTime(end.hour, end.minute);
 
@@ -75,8 +76,8 @@ function formatOccasion(occasion: Occasion): string {
     return `${startLabel} ${startTime}〜${endTime}`;
   }
 
-  const endDate = new Date(end.date);
-  const endLabel = `10/${10 - 1 + endDate.getDate()}`;
+
+  const endLabel = end.date === "1" ? "10/10" : "10/11";
   return `${startLabel} ${startTime}〜${endLabel} ${endTime}`;
 }
 
