@@ -8,13 +8,31 @@
 use super::super::V3State;
 use crate::application::error::{ApplicationOperationError, DeleteError, InsertError, UpdateError};
 use crate::application::events26::Events26App;
+use crate::application::ports::events26_api::UpdateIconError;
 use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
+use axum::body::Bytes;
 use axum::extract::{Path, State};
+use axum::http::HeaderMap;
+use axum::http::header::CONTENT_TYPE;
 use events26_api::models::Project;
 use serde::Deserialize;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
+
+/// アイコンとして受け付けるメディアタイプ。events26 の仕様に合わせる。
+/// ここで弾いておくと、非対応形式を上流まで運ばずに済む。
+const ICON_CONTENT_TYPES: [&str; 5] = [
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+    "image/webp",
+    "image/heic",
+];
+
+/// アイコンの最大サイズ。events26 の上限(20MB)に合わせる。
+/// axum の既定ボディ上限は 2MB なので、アイコンのルートにだけこの値を適用する。
+pub const ICON_MAX_BYTES: usize = 20 * 1024 * 1024;
 
 #[derive(Deserialize, IntoParams)]
 pub struct ProjectPath {
@@ -141,5 +159,106 @@ pub async fn delete_project(
             DeleteProjectResponse::NotFound
         }
         Err(_) => DeleteProjectResponse::InternalServerError,
+    }
+}
+
+#[http_response]
+pub enum PutProjectIconResponse {
+    #[response(status = NO_CONTENT, description = "Icon stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = UNSUPPORTED_MEDIA_TYPE, description = "Unsupported image format")]
+    UnsupportedMediaType,
+    #[response(
+        status = UNPROCESSABLE_ENTITY,
+        description = "Image rejected (empty, too large, or not square)"
+    )]
+    UnprocessableEntity,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    put,
+    description = "Replace a project icon on the events26 API. The body is the raw image; \
+                   it must be square and at most 20MB.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/icon",
+    responses(PutProjectIconResponse),
+    request_body(
+        content = String,
+        content_type = "application/octet-stream",
+        description = "Raw image bytes. Send the actual format in Content-Type \
+                       (image/png, image/jpeg, image/gif, image/webp, image/heic)."
+    ),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn put_project_icon(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+    headers: HeaderMap,
+    body: Bytes,
+) -> PutProjectIconResponse {
+    // events26 は Content-Type で形式を判定するため、指定が無い/対応外なら中継しない。
+    // パラメータ付き(`image/png; charset=...`)でも通るよう `;` の手前だけ見る。
+    let Some(content_type) = headers
+        .get(CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok())
+        .map(|value| value.split(';').next().unwrap_or_default().trim())
+        .filter(|value| ICON_CONTENT_TYPES.contains(value))
+    else {
+        return PutProjectIconResponse::UnsupportedMediaType;
+    };
+
+    match Events26App::new(st.events26.as_ref())
+        .update_project_icon(&actor, &path.project_id, content_type, body.to_vec())
+        .await
+    {
+        Ok(()) => PutProjectIconResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => PutProjectIconResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateIconError::NotFound)) => {
+            PutProjectIconResponse::NotFound
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateIconError::InvalidImage(_))) => {
+            PutProjectIconResponse::UnprocessableEntity
+        }
+        Err(_) => PutProjectIconResponse::InternalServerError,
+    }
+}
+
+#[http_response]
+pub enum DeleteProjectIconResponse {
+    #[response(status = NO_CONTENT, description = "Icon deleted")]
+    NoContent,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    delete,
+    description = "Delete a project icon on the events26 API. Succeeds even if no icon is set.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/icon",
+    responses(DeleteProjectIconResponse),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn delete_project_icon(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+) -> DeleteProjectIconResponse {
+    match Events26App::new(st.events26.as_ref())
+        .delete_project_icon(&actor, &path.project_id)
+        .await
+    {
+        Ok(()) => DeleteProjectIconResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteProjectIconResponse::Forbidden,
+        Err(_) => DeleteProjectIconResponse::InternalServerError,
     }
 }

@@ -1,6 +1,6 @@
 use crate::application::authz;
 use crate::application::error::{ApplicationOperationError, DeleteError, InsertError, UpdateError};
-use crate::application::ports::events26_api::Events26Api;
+use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
 use crate::domain::actor_ctx::ActorContext;
 use events26_api::models::Project;
 
@@ -62,5 +62,39 @@ impl<'a, EA: Events26Api> Events26App<'a, EA> {
             return Err(ApplicationOperationError::Unauthorized);
         }
         Ok(self.events26_api.delete_project(project_id).await?)
+    }
+
+    /// 認可後、企画アイコンの原本を差し替える。
+    ///
+    /// アイコンは企画の一部なので、専用の権限は設けず企画の更新権限で判定する。
+    /// 画像そのものの検証(形式・サイズ・縦横比)は events26 側に委ねる。
+    pub async fn update_project_icon(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+        content_type: &str,
+        image: Vec<u8>,
+    ) -> Result<(), ApplicationOperationError<UpdateIconError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self
+            .events26_api
+            .update_project_icon(project_id, content_type, image)
+            .await?)
+    }
+
+    /// 認可後、企画アイコンの原本を削除する。未登録でも成功する。
+    /// 判定は [`Self::update_project_icon`] と同じく企画の更新権限で行う
+    /// (企画そのものを消すわけではないため削除権限ではない)。
+    pub async fn delete_project_icon(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self.events26_api.delete_project_icon(project_id).await?)
     }
 }

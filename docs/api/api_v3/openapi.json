@@ -825,6 +825,82 @@
         }
       }
     },
+    "/events26/projects/{project_id}/icon": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Replace a project icon on the events26 API. The body is the raw image; it must be square and at most 20MB.",
+        "operationId": "put_project_icon",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Raw image bytes. Send the actual format in Content-Type (image/png, image/jpeg, image/gif, image/webp, image/heic).",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Icon stored"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "415": {
+            "description": "Unsupported image format"
+          },
+          "422": {
+            "description": "Image rejected (empty, too large, or not square)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete a project icon on the events26 API. Succeeds even if no icon is set.",
+        "operationId": "delete_project_icon",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Icon deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/files/download": {
       "get": {
         "tags": ["files"],

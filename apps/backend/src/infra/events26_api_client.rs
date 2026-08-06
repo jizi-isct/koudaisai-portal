@@ -1,13 +1,13 @@
 use crate::application::error::{DeleteError, InsertError, UpdateError};
-use crate::application::ports::events26_api::Events26Api;
+use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
 use anyhow::{Context, anyhow};
 use async_trait::async_trait;
 use events26_api::apis::admin_api::{
-    CreateProjectParams, DeleteProjectParams, UpdateProjectParams, create_project, delete_project,
-    update_project,
+    CreateProjectParams, DeleteProjectIconParams, DeleteProjectParams, UpdateProjectParams,
+    create_project, delete_project, delete_project_icon, update_project,
 };
 use events26_api::apis::configuration::Configuration;
-use events26_api::apis::{Error, ResponseContent};
+use events26_api::apis::{Error, ResponseContent, urlencode};
 use events26_api::models::Project;
 use reqwest::header::{HeaderMap, HeaderValue};
 use tracing::warn;
@@ -145,6 +145,63 @@ impl Events26Api for Events26ApiClient {
         .map_err(|e| match status_code(&e) {
             Some(404) => DeleteError::NotFound,
             _ => DeleteError::InternalError(internal_error("delete_project", e)),
+        })
+    }
+
+    /// 生成クライアントの `update_project_icon` はボディをファイルパスから読む形
+    /// (`std::path::PathBuf`)で、`Content-Type` も付けない。ポータルは受け取った
+    /// リクエストボディをメモリ上でそのまま中継したいので、ここだけ手で組み立てる。
+    async fn update_project_icon(
+        &self,
+        project_id: &str,
+        content_type: &str,
+        image: Vec<u8>,
+    ) -> Result<(), UpdateIconError> {
+        let url = format!(
+            "{}/admin/v1/projects/{}/icon",
+            self.configuration.base_path,
+            urlencode(project_id)
+        );
+
+        let response = self
+            .configuration
+            .client
+            .put(&url)
+            .header(reqwest::header::CONTENT_TYPE, content_type)
+            .body(image)
+            .send()
+            .await
+            .map_err(|e| anyhow!("events26 API update_project_icon failed: {e}"))?;
+
+        let status = response.status();
+        if status.is_success() {
+            return Ok(());
+        }
+
+        // 本文は {"message": "..."} 形式。読めなくても握りつぶさずステータスは返す。
+        let body = response.text().await.unwrap_or_default();
+        match status.as_u16() {
+            404 => Err(UpdateIconError::NotFound),
+            // 400 空 / 413 サイズ超過 / 415 非対応形式 / 422 正方形でない。
+            // いずれも送った画像が悪いので、理由をそのまま呼び出し側へ返す。
+            400 | 413 | 415 | 422 => Err(UpdateIconError::InvalidImage(body)),
+            _ => Err(UpdateIconError::InternalError(anyhow!(
+                "events26 API update_project_icon failed with status {status}: {body}"
+            ))),
+        }
+    }
+
+    async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError> {
+        delete_project_icon(
+            &self.configuration,
+            DeleteProjectIconParams {
+                project_id: project_id.to_string(),
+            },
+        )
+        .await
+        .map_err(|e| match status_code(&e) {
+            Some(404) => DeleteError::NotFound,
+            _ => DeleteError::InternalError(internal_error("delete_project_icon", e)),
         })
     }
 }

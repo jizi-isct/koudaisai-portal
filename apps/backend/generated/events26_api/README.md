@@ -28,11 +28,16 @@ All URIs are relative to *https://events26.koudaisai.jp*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AdminApi* | [**create_project**](docs/AdminApi.md#create_project) | **POST** /admin/v1/projects | 企画の登録
+*AdminApi* | [**create_projects**](docs/AdminApi.md#create_projects) | **POST** /admin/v1/projects/bulk | 企画の一括登録
 *AdminApi* | [**delete_project**](docs/AdminApi.md#delete_project) | **DELETE** /admin/v1/projects/{projectId} | 企画の削除
+*AdminApi* | [**delete_project_icon**](docs/AdminApi.md#delete_project_icon) | **DELETE** /admin/v1/projects/{projectId}/icon | 企画アイコンの削除
 *AdminApi* | [**update_project**](docs/AdminApi.md#update_project) | **PUT** /admin/v1/projects/{projectId} | 企画の更新
+*AdminApi* | [**update_project_description**](docs/AdminApi.md#update_project_description) | **PATCH** /admin/v1/projects/{projectId}/description | 企画説明の更新
+*AdminApi* | [**update_project_icon**](docs/AdminApi.md#update_project_icon) | **PUT** /admin/v1/projects/{projectId}/icon | 企画アイコンの更新
 *PlacesApi* | [**get_place**](docs/PlacesApi.md#get_place) | **GET** /v1/places/{placeId} | 場所の取得
 *PlacesApi* | [**list_places**](docs/PlacesApi.md#list_places) | **GET** /v1/places | 場所の検索
 *ProjectsApi* | [**get_project**](docs/ProjectsApi.md#get_project) | **GET** /v1/projects/{projectId} | 企画の取得
+*ProjectsApi* | [**get_project_icon**](docs/ProjectsApi.md#get_project_icon) | **GET** /v1/projects/{projectId}/icon | 企画アイコンの取得
 *ProjectsApi* | [**list_projects**](docs/ProjectsApi.md#list_projects) | **GET** /v1/projects | 企画の一覧
 
 
@@ -55,6 +60,7 @@ Class | Method | HTTP request | Description
  - [Outdoor](docs/Outdoor.md)
  - [Place](docs/Place.md)
  - [Project](docs/Project.md)
+ - [ProjectDescription](docs/ProjectDescription.md)
  - [Room](docs/Room.md)
  - [Stage](docs/Stage.md)
  - [StageProject](docs/StageProject.md)
