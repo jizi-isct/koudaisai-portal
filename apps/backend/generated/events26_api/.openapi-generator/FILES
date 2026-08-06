@@ -22,6 +22,7 @@ docs/Outdoor.md
 docs/Place.md
 docs/PlacesApi.md
 docs/Project.md
+docs/ProjectDescription.md
 docs/ProjectsApi.md
 docs/Room.md
 docs/Stage.md
@@ -55,6 +56,7 @@ src/models/occasion.rs
 src/models/outdoor.rs
 src/models/place.rs
 src/models/project.rs
+src/models/project_description.rs
 src/models/room.rs
 src/models/stage.rs
 src/models/stage_project.rs

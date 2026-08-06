@@ -14,9 +14,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ListPlaces200ResponseInner {
     #[serde(rename = "id")]
-    pub id: Id,
+    pub id: ListPlaces200ResponseInnerId,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: ListPlaces200ResponseInnerType,
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "displayName")]
@@ -25,8 +25,8 @@ pub struct ListPlaces200ResponseInner {
 
 impl ListPlaces200ResponseInner {
     pub fn new(
-        id: Id,
-        r#type: Type,
+        id: ListPlaces200ResponseInnerId,
+        r#type: ListPlaces200ResponseInnerType,
         name: String,
         display_name: String,
     ) -> ListPlaces200ResponseInner {
@@ -52,8 +52,7 @@ impl ListPlaces200ResponseInner {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = ListPlaces200ResponseInnerId)]
-pub enum Id {
+pub enum ListPlaces200ResponseInnerId {
     #[serde(rename = "east")]
     East,
     #[serde(rename = "east.taki-plaza")]
@@ -586,8 +585,8 @@ pub enum Id {
     IshikawadaiFsIshikawadai7,
 }
 
-impl Default for Id {
-    fn default() -> Id {
+impl Default for ListPlaces200ResponseInnerId {
+    fn default() -> ListPlaces200ResponseInnerId {
         Self::East
     }
 }
@@ -605,8 +604,7 @@ impl Default for Id {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = ListPlaces200ResponseInnerType)]
-pub enum Type {
+pub enum ListPlaces200ResponseInnerType {
     #[serde(rename = "district")]
     District,
     #[serde(rename = "building")]
@@ -623,8 +621,8 @@ pub enum Type {
     FoodStallSlot,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for ListPlaces200ResponseInnerType {
+    fn default() -> ListPlaces200ResponseInnerType {
         Self::District
     }
 }

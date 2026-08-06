@@ -18,7 +18,7 @@ pub struct FoodStallArea {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: FoodStallAreaType,
     #[serde(rename = "slots")]
     pub slots: Vec<models::FoodStallSlot>,
 }
@@ -27,7 +27,7 @@ impl FoodStallArea {
     pub fn new(
         name: String,
         display_name: String,
-        r#type: Type,
+        r#type: FoodStallAreaType,
         slots: Vec<models::FoodStallSlot>,
     ) -> FoodStallArea {
         FoodStallArea {
@@ -52,14 +52,13 @@ impl FoodStallArea {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = FoodStallAreaType)]
-pub enum Type {
+pub enum FoodStallAreaType {
     #[serde(rename = "food_stall_area")]
     FoodStallArea,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for FoodStallAreaType {
+    fn default() -> FoodStallAreaType {
         Self::FoodStallArea
     }
 }

@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Occasion {
     #[serde(rename = "place", skip_serializing_if = "Option::is_none")]
-    pub place: Option<Place>,
+    pub place: Option<OccasionPlace>,
     #[serde(rename = "timeRange")]
     pub time_range: models::TimeRange,
 }
@@ -41,8 +41,7 @@ impl Occasion {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = OccasionPlace)]
-pub enum Place {
+pub enum OccasionPlace {
     #[serde(rename = "east")]
     East,
     #[serde(rename = "east.taki-plaza")]
@@ -575,8 +574,8 @@ pub enum Place {
     IshikawadaiFsIshikawadai7,
 }
 
-impl Default for Place {
-    fn default() -> Place {
+impl Default for OccasionPlace {
+    fn default() -> OccasionPlace {
         Self::East
     }
 }
