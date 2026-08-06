@@ -1,2 +1,2 @@
 export * from './apiClient';
-export * from './plansInfoClient';
+export * from './events26Client';

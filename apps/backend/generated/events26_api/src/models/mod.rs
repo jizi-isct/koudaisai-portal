@@ -32,6 +32,8 @@ pub mod place;
 pub use self::place::Place;
 pub mod project;
 pub use self::project::Project;
+pub mod project_description;
+pub use self::project_description::ProjectDescription;
 pub mod room;
 pub use self::room::Room;
 pub mod stage;

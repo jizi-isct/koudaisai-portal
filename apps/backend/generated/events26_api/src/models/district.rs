@@ -18,7 +18,7 @@ pub struct District {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: DistrictType,
     #[serde(rename = "venues")]
     pub venues: Vec<models::Venue>,
 }
@@ -27,7 +27,7 @@ impl District {
     pub fn new(
         name: String,
         display_name: String,
-        r#type: Type,
+        r#type: DistrictType,
         venues: Vec<models::Venue>,
     ) -> District {
         District {
@@ -52,14 +52,13 @@ impl District {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = DistrictType)]
-pub enum Type {
+pub enum DistrictType {
     #[serde(rename = "district")]
     District,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for DistrictType {
+    fn default() -> DistrictType {
         Self::District
     }
 }

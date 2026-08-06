@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Time {
     #[serde(rename = "date")]
-    pub date: Date,
+    pub date: TimeDate,
     #[serde(rename = "hour")]
     pub hour: f64,
     #[serde(rename = "minute")]
@@ -22,11 +22,12 @@ pub struct Time {
 }
 
 impl Time {
-    pub fn new(date: Date, hour: f64, minute: f64) -> Time {
+    pub fn new(date: TimeDate, hour: f64, minute: f64) -> Time {
         Time { date, hour, minute }
     }
 }
 ///
+#[repr(i64)]
 #[derive(
     Clone,
     Copy,
@@ -36,20 +37,30 @@ impl Time {
     Ord,
     PartialOrd,
     Hash,
-    Serialize,
-    Deserialize,
+    serde_repr::Serialize_repr,
+    serde_repr::Deserialize_repr,
     utoipa::ToSchema,
 )]
-#[schema(as = TimeDate)]
-pub enum Date {
-    #[serde(rename = "1")]
-    Variant1,
-    #[serde(rename = "2")]
-    Variant2,
+pub enum TimeDate {
+    Variant1 = 1,
+    Variant2 = 2,
 }
 
-impl Default for Date {
-    fn default() -> Date {
+impl std::fmt::Display for TimeDate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Variant1 => "1",
+                Self::Variant2 => "2",
+            }
+        )
+    }
+}
+
+impl Default for TimeDate {
+    fn default() -> TimeDate {
         Self::Variant1
     }
 }

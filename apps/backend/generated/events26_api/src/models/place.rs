@@ -39,8 +39,7 @@ impl Default for Place {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = PlaceType)]
-pub enum Type {
+pub enum PlaceType {
     #[serde(rename = "district")]
     District,
     #[serde(rename = "food_stall_area")]
@@ -51,8 +50,8 @@ pub enum Type {
     FoodStallSlot,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for PlaceType {
+    fn default() -> PlaceType {
         Self::District
     }
 }

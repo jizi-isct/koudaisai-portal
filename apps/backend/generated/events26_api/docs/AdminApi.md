@@ -5,8 +5,12 @@ All URIs are relative to *https://events26.koudaisai.jp*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**create_project**](AdminApi.md#create_project) | **POST** /admin/v1/projects | 企画の登録
+[**create_projects**](AdminApi.md#create_projects) | **POST** /admin/v1/projects/bulk | 企画の一括登録
 [**delete_project**](AdminApi.md#delete_project) | **DELETE** /admin/v1/projects/{projectId} | 企画の削除
+[**delete_project_icon**](AdminApi.md#delete_project_icon) | **DELETE** /admin/v1/projects/{projectId}/icon | 企画アイコンの削除
 [**update_project**](AdminApi.md#update_project) | **PUT** /admin/v1/projects/{projectId} | 企画の更新
+[**update_project_description**](AdminApi.md#update_project_description) | **PATCH** /admin/v1/projects/{projectId}/description | 企画説明の更新
+[**update_project_icon**](AdminApi.md#update_project_icon) | **PUT** /admin/v1/projects/{projectId}/icon | 企画アイコンの更新
 
 
 
@@ -40,12 +44,72 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
+## create_projects
+
+> Vec<models::Project> create_projects(project)
+企画の一括登録
+
+企画をまとめて新規登録します。ID は呼び出し側が指定します。一件でも登録できなければ、一件も登録されません。一度に登録できるのは 100 件までです。
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**project** | [**Vec<models::Project>**](Project.md) |  | [required] |
+
+### Return type
+
+[**Vec<models::Project>**](Project.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
 ## delete_project
 
 > delete_project(project_id)
 企画の削除
 
 企画を削除します。タグと開催予定も一緒に消えます。
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**project_id** | **String** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## delete_project_icon
+
+> delete_project_icon(project_id)
+企画アイコンの削除
+
+企画アイコンの原本を削除します。未登録の場合も成功します。
 
 ### Parameters
 
@@ -96,6 +160,68 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_project_description
+
+> models::Project update_project_description(project_id, project_description)
+企画説明の更新
+
+企画の説明だけを書き換えます。他の項目・タグ・開催予定は変わりません。
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**project_id** | **String** |  | [required] |
+**project_description** | [**ProjectDescription**](ProjectDescription.md) |  | [required] |
+
+### Return type
+
+[**models::Project**](Project.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_project_icon
+
+> update_project_icon(project_id, body)
+企画アイコンの更新
+
+Cloudflare Imagesで扱える正方形の画像を、企画アイコンの原本として保存します。
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**project_id** | **String** |  | [required] |
+**body** | **std::path::PathBuf** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: image/png, image/jpeg, image/gif, image/webp, image/heic
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

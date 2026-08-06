@@ -38,14 +38,13 @@ impl Default for FoodStallTag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = FoodStallTagTag)]
-pub enum Tag {
+pub enum FoodStallTagTag {
     #[serde(rename = "drink")]
     Drink,
 }
 
-impl Default for Tag {
-    fn default() -> Tag {
+impl Default for FoodStallTagTag {
+    fn default() -> FoodStallTagTag {
         Self::Drink
     }
 }
@@ -63,8 +62,7 @@ impl Default for Tag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = FoodStallTagTag2)]
-pub enum Tag2 {
+pub enum FoodStallTagTag2 {
     #[serde(rename = "japanese")]
     Japanese,
     #[serde(rename = "western")]
@@ -79,8 +77,8 @@ pub enum Tag2 {
     World,
 }
 
-impl Default for Tag2 {
-    fn default() -> Tag2 {
+impl Default for FoodStallTagTag2 {
+    fn default() -> FoodStallTagTag2 {
         Self::Japanese
     }
 }

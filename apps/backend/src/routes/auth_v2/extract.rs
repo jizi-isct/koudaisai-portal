@@ -52,6 +52,9 @@ fn admin_claims() -> Vec<String> {
         "koudaisai-portal:admin:approval-request:read",
         "koudaisai-portal:admin:approval-request:approve",
         "koudaisai-portal:admin:approval-request:delete",
+        "koudaisai-portal:admin:events26-project:create",
+        "koudaisai-portal:admin:events26-project:update",
+        "koudaisai-portal:admin:events26-project:delete",
     ]
     .iter()
     .map(|s| s.to_string())
