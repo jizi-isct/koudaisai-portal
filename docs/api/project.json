@@ -19,8 +19,7 @@
       },
       "outputs": [
         "{workspaceRoot}/libs/shared-types/src/api_v3.d.ts",
-        "{workspaceRoot}/libs/shared-types/src/auth_v2.d.ts",
-        "{workspaceRoot}/libs/shared-types/src/plans_info_api_v1.d.ts"
+        "{workspaceRoot}/libs/shared-types/src/auth_v2.d.ts"
       ]
     }
   }
