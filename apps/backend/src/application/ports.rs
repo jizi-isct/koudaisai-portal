@@ -1,6 +1,7 @@
 pub mod access_token_issuer;
 pub mod clock;
 pub mod discord;
+pub mod edit_plans_info;
 pub mod email;
 pub mod meta_fetcher;
 pub mod object_storage;

@@ -25,11 +25,12 @@
             sqlx-cli
 
             # Node.js
-            nodejs_25
+            nodejs_24
 
             # Useful tools
             caddy
             git
+            openapi-generator-cli
           ];
 
           shellHook = ''
