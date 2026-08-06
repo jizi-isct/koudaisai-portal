@@ -10,6 +10,7 @@ use events26_api::apis::configuration::Configuration;
 use events26_api::apis::{Error, ResponseContent};
 use events26_api::models::Project;
 use reqwest::header::{HeaderMap, HeaderValue};
+use tracing::warn;
 
 const CF_ACCESS_CLIENT_ID: &str = "CF-Access-Client-Id";
 const CF_ACCESS_CLIENT_SECRET: &str = "CF-Access-Client-Secret";
@@ -25,27 +26,31 @@ pub struct Events26ApiClient {
 
 impl Events26ApiClient {
     /// ベース URL と Cloudflare Access のサービストークンから構築する。
-    /// トークンが空の場合は Access に弾かれるため、その場で失敗させる。
+    ///
+    /// トークン未設定でも構築は成功させ、警告だけ出す(S3 / SES / Discord と同じ扱い)。
+    /// ローカル開発では未設定が普通で、ここで落とすと関係ない機能まで起動しなくなるため。
+    /// 実際の呼び出しは Access に 403 で弾かれ `InternalError` になる。
     pub fn new(
         base_url: impl Into<String>,
         client_id: &str,
         client_secret: &str,
     ) -> anyhow::Result<Self> {
-        if client_id.is_empty() || client_secret.is_empty() {
-            return Err(anyhow!(
-                "events26 API の Cloudflare Access サービストークンが設定されていません"
-            ));
-        }
-
         let mut headers = HeaderMap::new();
-        headers.insert(
-            CF_ACCESS_CLIENT_ID,
-            HeaderValue::from_str(client_id).context("invalid CF-Access-Client-Id")?,
-        );
-        let mut secret =
-            HeaderValue::from_str(client_secret).context("invalid CF-Access-Client-Secret")?;
-        secret.set_sensitive(true);
-        headers.insert(CF_ACCESS_CLIENT_SECRET, secret);
+        if client_id.is_empty() || client_secret.is_empty() {
+            warn!(
+                "events26 API の Cloudflare Access サービストークンが未設定です。\
+                 /admin 配下の呼び出しは失敗します"
+            );
+        } else {
+            headers.insert(
+                CF_ACCESS_CLIENT_ID,
+                HeaderValue::from_str(client_id).context("invalid CF-Access-Client-Id")?,
+            );
+            let mut secret =
+                HeaderValue::from_str(client_secret).context("invalid CF-Access-Client-Secret")?;
+            secret.set_sensitive(true);
+            headers.insert(CF_ACCESS_CLIENT_SECRET, secret);
+        }
 
         let client = reqwest::Client::builder()
             .default_headers(headers)
@@ -150,9 +155,9 @@ mod tests {
     use crate::config::{Events26, Secret, Secrets};
 
     #[test]
-    fn new_rejects_empty_service_token() {
-        assert!(Events26ApiClient::new("https://events26.koudaisai.jp", "", "secret").is_err());
-        assert!(Events26ApiClient::new("https://events26.koudaisai.jp", "id", "").is_err());
+    fn new_tolerates_unset_service_token() {
+        // 未設定でも起動できること(呼び出し時に Access が弾く)。
+        assert!(Events26ApiClient::new("https://events26.koudaisai.jp", "", "").is_ok());
     }
 
     #[test]
