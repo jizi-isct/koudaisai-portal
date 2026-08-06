@@ -124,6 +124,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/admin/v1/projects/bulk': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * 企画の一括登録
+     * @description 企画をまとめて新規登録します。ID は呼び出し側が指定します。一件でも登録できなければ、一件も登録されません。一度に登録できるのは 100 件までです。
+     */
+    post: operations['createProjects'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/admin/v1/projects/{projectId}': {
     parameters: {
       query?: never;
@@ -613,6 +633,7 @@ export interface components {
       | components['schemas']['GeneralProject']
       | components['schemas']['LaboratoryProject']
       | components['schemas']['StageProject'];
+    ProjectList: components['schemas']['Project'][];
     ProjectDescription: {
       description: string;
     };
@@ -1357,6 +1378,59 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['Project'];
+        };
+      };
+      /** @description リクエストボディが不正 */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 同じ ID の企画が既に存在する */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  createProjects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProjectList'];
+      };
+    };
+    responses: {
+      /** @description 登録した企画 */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProjectList'];
         };
       };
       /** @description リクエストボディが不正 */
