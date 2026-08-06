@@ -61,7 +61,7 @@ approval_request_url = ""
 [events26]
 # 企画情報APIの接続先。staging を向ける場合は
 # "https://events26-staging.koudaisai.jp" に変更する。
-base_url = "https://events26.koudaisai.jp"
+base_url = "https://events26-staging.koudaisai.jp"
 
 [secrets]
 # 企画情報API連携が必要な場合は別途設定の必要あり
