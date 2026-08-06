@@ -56,3 +56,5 @@ export type GroupType = apiComponents['schemas']['GroupType'];
 export type UserRead = apiComponents['schemas']['UserRead'];
 export type MemberRead = apiComponents['schemas']['MemberRead'];
 export type Role = apiComponents['schemas']['Role'];
+
+export type PlaceId = apiComponents['schemas']['OccasionPlace'];
