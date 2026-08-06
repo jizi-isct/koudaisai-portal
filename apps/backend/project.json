@@ -55,6 +55,21 @@
         "command": "cargo clippy --all-targets --all-features -- -D warnings",
         "cwd": "apps/backend"
       }
+    },
+    "generate-rust-client": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "apps/backend",
+        "parallel": false,
+        "commands": [
+          "rm -rf generated/events26_api",
+          "curl -sSfL https://events26.koudaisai.jp/openapi.json -o generated/.events26_api.json --create-dirs",
+          "openapi-generator-cli generate -i generated/.events26_api.json -g rust -t openapi-templates/rust -o generated/events26_api --additional-properties=library=reqwest,supportAsync=true,packageName=events26_api,packageVersion=0.1.0,avoidBoxedModels=true,useSingleRequestParameter=true,reqwestDefaultFeatures=rustls",
+          "rm -f generated/.events26_api.json",
+          "cargo fmt --manifest-path generated/events26_api/Cargo.toml --all"
+        ]
+      }
     }
   }
 }

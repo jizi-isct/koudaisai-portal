@@ -11,6 +11,7 @@ mod handlers;
 
 use crate::application::auth::AuthConfig;
 use crate::infra::discord_webhook::WebhookDiscord;
+use crate::infra::events26_api_client::Events26ApiClient;
 use crate::infra::s3_object_storage::S3ObjectStorage;
 use crate::infra::ses_email::SesEmail;
 use crate::infra::sqlite::SqliteApplication;
@@ -66,7 +67,11 @@ pub struct AuthV2State {
     /// admin OIDC のリダイレクト前セッション(CSRF state → PKCE/nonce)。
     pub auth_sessions: Arc<Mutex<HashMap<String, admin::AdminAuthSession>>>,
     /// OIDC トークン交換用 HTTP クライアント。
-    pub http_client: reqwest::Client,
+    pub http_client: openidconnect::reqwest::Client,
+    /// 企画情報API(events26)クライアント。`Application` は 18 個の型引数を持ち
+    /// ここに足すと memory 実装まで巻き込むため、ポート実装を State に直接置く
+    /// (`email` と同じ扱い)。ユースケースはハンドラ側で `Events26App` に包む。
+    pub events26: Arc<Events26ApiClient>,
 }
 
 /// OpenAPI 上の auth タグ。

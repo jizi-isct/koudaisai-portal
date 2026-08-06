@@ -29,6 +29,7 @@ pub mod authz;
 pub mod document;
 pub mod document_category;
 pub mod error;
+pub mod events26;
 pub mod file;
 pub mod form;
 pub mod group;

@@ -26,7 +26,7 @@ axum_gcra = { git = "https://github.com/pasmophobia/axum_gcra.git", branch = "ax
 jsonwebtoken = { version = "10.3.0", features = ["default", "rust_crypto"] }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde_json = "1.0.139"
-reqwest = { version = "0.12.12", features = ["stream"] }
+reqwest = { version = "0.13", features = ["stream", "json", "query"] }
 http = "1.2.0"
 openidconnect = "4.0.0"
 oauth2 = "5.0.0"
@@ -45,12 +45,15 @@ thiserror = "2.0.16"
 aws-smithy-types = "1.3.1"
 axum-extra = "0.10.1"
 hyper = "1.6.0"
+futures = "0.3"
 futures-util = "0.3.31"
 regex = "1.11.1"
 async-trait = "0.1.89"
 utoipa = { version = "5.5.0", features = ["uuid", "chrono"] }
 utoipa-axum = "0.2.0"
 utoipa-axum-auto-into-response = "0.1.0"
+# `nx generate-rust-client backend` で events26.koudaisai.jp の OpenAPI から生成する。
+events26_api = { path = "generated/events26_api" }
 
 [lib]
 name = "koudaisai_portal_backend"
