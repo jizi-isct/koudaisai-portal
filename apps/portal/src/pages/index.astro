@@ -1,6 +1,7 @@
 ---
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
 import {ViewNotifications} from "@/features/notification/ViewNotifications";
+import {PlanSection} from "@/features/plan-info/PlanSection";
 import {ViewUserInfo} from "@/features/user-info/ViewUserInfo";
 import {Heading1} from "@koudaisai/shared-ui";
 ---
@@ -12,11 +13,7 @@ import {Heading1} from "@koudaisai/shared-ui";
     <Heading1 emoji="🔔">実行委員会からのお知らせ</Heading1>
     <ViewNotifications client:load />
 
-    <Heading1 emoji="📄">企画情報</Heading1>
-    <p class="coming-soon">Coming soon...</p>
-
-    <Heading1 emoji="📱">企画詳細情報</Heading1>
-    <p class="coming-soon">Coming soon...</p>
+    <PlanSection client:load />
   </section>
 </DefaultLayout>
 
@@ -26,9 +23,5 @@ import {Heading1} from "@koudaisai/shared-ui";
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-  }
-
-  .coming-soon {
-    text-align: center;
   }
 </style>
