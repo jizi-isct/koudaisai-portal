@@ -217,6 +217,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/events26/projects/{project_id}/icon': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Replace a project icon on the events26 API. The body is the raw image; it must be square and at most 20MB. */
+    put: operations['put_project_icon'];
+    post?: never;
+    /** @description Delete a project icon on the events26 API. Succeeds even if no icon is set. */
+    delete: operations['delete_project_icon'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/files/download': {
     parameters: {
       query?: never;
@@ -2124,6 +2142,102 @@ export interface operations {
       };
       /** @description Project not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  put_project_icon: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    /** @description Raw image bytes. Send the actual format in Content-Type (image/png, image/jpeg, image/gif, image/webp, image/heic). */
+    requestBody: {
+      content: {
+        'application/octet-stream': string;
+      };
+    };
+    responses: {
+      /** @description Icon stored */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unsupported image format */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Image rejected (empty, too large, or not square) */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  delete_project_icon: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Icon deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };

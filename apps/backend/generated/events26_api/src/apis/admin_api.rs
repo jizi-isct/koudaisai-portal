@@ -12,6 +12,8 @@ use super::{configuration, ContentType, Error};
 use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
+use tokio::fs::File as TokioFile;
+use tokio_util::codec::{BytesCodec, FramedRead};
 
 /// struct for passing parameters to the method [`create_project`]
 #[derive(Clone, Debug)]
@@ -19,9 +21,21 @@ pub struct CreateProjectParams {
     pub project: models::Project,
 }
 
+/// struct for passing parameters to the method [`create_projects`]
+#[derive(Clone, Debug)]
+pub struct CreateProjectsParams {
+    pub project: Vec<models::Project>,
+}
+
 /// struct for passing parameters to the method [`delete_project`]
 #[derive(Clone, Debug)]
 pub struct DeleteProjectParams {
+    pub project_id: String,
+}
+
+/// struct for passing parameters to the method [`delete_project_icon`]
+#[derive(Clone, Debug)]
+pub struct DeleteProjectIconParams {
     pub project_id: String,
 }
 
@@ -32,10 +46,34 @@ pub struct UpdateProjectParams {
     pub project: models::Project,
 }
 
+/// struct for passing parameters to the method [`update_project_description`]
+#[derive(Clone, Debug)]
+pub struct UpdateProjectDescriptionParams {
+    pub project_id: String,
+    pub project_description: models::ProjectDescription,
+}
+
+/// struct for passing parameters to the method [`update_project_icon`]
+#[derive(Clone, Debug)]
+pub struct UpdateProjectIconParams {
+    pub project_id: String,
+    pub body: std::path::PathBuf,
+}
+
 /// struct for typed errors of method [`create_project`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CreateProjectError {
+    Status400(),
+    Status401(models::GetPlace404Response),
+    Status409(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`create_projects`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CreateProjectsError {
     Status400(),
     Status401(models::GetPlace404Response),
     Status409(models::GetPlace404Response),
@@ -52,6 +90,14 @@ pub enum DeleteProjectError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`delete_project_icon`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteProjectIconError {
+    Status401(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`update_project`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -59,6 +105,29 @@ pub enum UpdateProjectError {
     Status400(),
     Status401(models::GetPlace404Response),
     Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_project_description`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateProjectDescriptionError {
+    Status400(),
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_project_icon`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateProjectIconError {
+    Status400(models::GetPlace404Response),
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
+    Status413(models::GetPlace404Response),
+    Status415(models::GetPlace404Response),
+    Status422(models::GetPlace404Response),
     UnknownValue(serde_json::Value),
 }
 
@@ -106,6 +175,50 @@ pub async fn create_project(
     }
 }
 
+/// 企画をまとめて新規登録します。ID は呼び出し側が指定します。一件でも登録できなければ、一件も登録されません。一度に登録できるのは 100 件までです。
+pub async fn create_projects(
+    configuration: &configuration::Configuration,
+    params: CreateProjectsParams,
+) -> Result<Vec<models::Project>, Error<CreateProjectsError>> {
+    let uri_str = format!("{}/admin/v1/projects/bulk", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&params.project);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Project&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Project&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateProjectsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 /// 企画を削除します。タグと開催予定も一緒に消えます。
 pub async fn delete_project(
     configuration: &configuration::Configuration,
@@ -134,6 +247,42 @@ pub async fn delete_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<DeleteProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// 企画アイコンの原本を削除します。未登録の場合も成功します。
+pub async fn delete_project_icon(
+    configuration: &configuration::Configuration,
+    params: DeleteProjectIconParams,
+) -> Result<(), Error<DeleteProjectIconError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/icon",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteProjectIconError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -180,6 +329,91 @@ pub async fn update_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<UpdateProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// 企画の説明だけを書き換えます。他の項目・タグ・開催予定は変わりません。
+pub async fn update_project_description(
+    configuration: &configuration::Configuration,
+    params: UpdateProjectDescriptionParams,
+) -> Result<models::Project, Error<UpdateProjectDescriptionError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/description",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::PATCH, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&params.project_description);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Project`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Project`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateProjectDescriptionError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// Cloudflare Imagesで扱える正方形の画像を、企画アイコンの原本として保存します。
+pub async fn update_project_icon(
+    configuration: &configuration::Configuration,
+    params: UpdateProjectIconParams,
+) -> Result<(), Error<UpdateProjectIconError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/icon",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let file = TokioFile::open(params.body).await?;
+    let stream = FramedRead::new(file, BytesCodec::new());
+    req_builder = req_builder.body(reqwest::Body::wrap_stream(stream));
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateProjectIconError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

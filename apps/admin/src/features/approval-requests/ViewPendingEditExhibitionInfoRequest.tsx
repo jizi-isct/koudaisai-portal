@@ -1,17 +1,18 @@
 import type {
   ApprovalRequestRead,
-  BasePlanRead,
+  events26Components,
 } from '@koudaisai/shared-types';
 import { getFilesRedirectUrl } from '@koudaisai/shared-utils';
+import { EVENTS26_API_URL } from 'astro:env/client';
 
 type Props = {
   approvalRequest: ApprovalRequestRead;
-  plan: BasePlanRead;
+  project: events26Components['schemas']['Project'];
 };
 
 export function ViewPendingEditExhibitionInfoRequest({
   approvalRequest,
-  plan,
+  project,
 }: Props) {
   return (
     <div>
@@ -19,7 +20,7 @@ export function ViewPendingEditExhibitionInfoRequest({
       {approvalRequest.description ? (
         <div>
           <h3>変更前</h3>
-          {plan.description}
+          {project.description}
           <h3>変更後</h3>
           {approvalRequest.description}
         </div>
@@ -32,7 +33,7 @@ export function ViewPendingEditExhibitionInfoRequest({
         <div>
           <h3>変更前</h3>
           <img
-            src={`https://api2025.jizi.jp/cdn-cgi/image/width=128,height=128,format=webp,quality=auto/v1/plans/${plan.id}/icon`}
+            src={`${EVENTS26_API_URL}/v1/projects/${encodeURIComponent(project.id)}/icon`}
             alt="現在の企画のアイコン"
             width={128}
             height={128}
