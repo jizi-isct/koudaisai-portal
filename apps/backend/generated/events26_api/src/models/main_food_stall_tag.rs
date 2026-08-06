@@ -14,13 +14,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct MainFoodStallTag {
     #[serde(rename = "tag")]
-    pub tag: Tag,
+    pub tag: MainFoodStallTagTag,
     #[serde(rename = "tag2")]
-    pub tag2: Tag2,
+    pub tag2: MainFoodStallTagTag2,
 }
 
 impl MainFoodStallTag {
-    pub fn new(tag: Tag, tag2: Tag2) -> MainFoodStallTag {
+    pub fn new(tag: MainFoodStallTagTag, tag2: MainFoodStallTagTag2) -> MainFoodStallTag {
         MainFoodStallTag { tag, tag2 }
     }
 }
@@ -38,14 +38,13 @@ impl MainFoodStallTag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = MainFoodStallTagTag)]
-pub enum Tag {
+pub enum MainFoodStallTagTag {
     #[serde(rename = "main")]
     Main,
 }
 
-impl Default for Tag {
-    fn default() -> Tag {
+impl Default for MainFoodStallTagTag {
+    fn default() -> MainFoodStallTagTag {
         Self::Main
     }
 }
@@ -63,8 +62,7 @@ impl Default for Tag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = MainFoodStallTagTag2)]
-pub enum Tag2 {
+pub enum MainFoodStallTagTag2 {
     #[serde(rename = "rice")]
     Rice,
     #[serde(rename = "noodle_flour")]
@@ -79,8 +77,8 @@ pub enum Tag2 {
     World,
 }
 
-impl Default for Tag2 {
-    fn default() -> Tag2 {
+impl Default for MainFoodStallTagTag2 {
+    fn default() -> MainFoodStallTagTag2 {
         Self::Rice
     }
 }

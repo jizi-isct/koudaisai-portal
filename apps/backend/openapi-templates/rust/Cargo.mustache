@@ -38,7 +38,9 @@ serde_with = { version = "^3.8", default-features = false, features = ["base64",
 {{/serdeWith}}
 serde_json = "^1.0"
 serde_repr = "^0.1"
-utoipa = "^5.5"
+# repr: 数値 enum のプロパティ(serde_repr + #[repr(i64)])を、変種名ではなく
+# 実際の数値としてスキーマに出すために要る。
+utoipa = { version = "^5.5", features = ["repr"] }
 {{#useSerdePathToError}}
 serde_path_to_error = "^0.1"
 {{/useSerdePathToError}}

@@ -3414,8 +3414,7 @@
         "required": ["date", "hour", "minute"],
         "properties": {
           "date": {
-            "type": "string",
-            "format": "date"
+            "$ref": "#/components/schemas/TimeDate"
           },
           "hour": {
             "type": "number",
@@ -3426,6 +3425,11 @@
             "format": "double"
           }
         }
+      },
+      "TimeDate": {
+        "type": "integer",
+        "description": "",
+        "enum": [1, 2]
       },
       "TimeRange": {
         "type": "object",

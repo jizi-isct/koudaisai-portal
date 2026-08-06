@@ -28,7 +28,7 @@ pub struct FoodStallProject {
     #[serde(rename = "occasions")]
     pub occasions: Vec<models::Occasion>,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: FoodStallProjectType,
     #[serde(rename = "tag")]
     pub tag: Vec<models::FoodStallTag>,
 }
@@ -42,7 +42,7 @@ impl FoodStallProject {
         is_child_friendly: bool,
         is_recommended: bool,
         occasions: Vec<models::Occasion>,
-        r#type: Type,
+        r#type: FoodStallProjectType,
         tag: Vec<models::FoodStallTag>,
     ) -> FoodStallProject {
         FoodStallProject {
@@ -72,14 +72,13 @@ impl FoodStallProject {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = FoodStallProjectType)]
-pub enum Type {
+pub enum FoodStallProjectType {
     #[serde(rename = "food-stall")]
     FoodStall,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for FoodStallProjectType {
+    fn default() -> FoodStallProjectType {
         Self::FoodStall
     }
 }

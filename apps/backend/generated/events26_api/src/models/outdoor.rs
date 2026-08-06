@@ -18,11 +18,11 @@ pub struct Outdoor {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: OutdoorType,
 }
 
 impl Outdoor {
-    pub fn new(name: String, display_name: String, r#type: Type) -> Outdoor {
+    pub fn new(name: String, display_name: String, r#type: OutdoorType) -> Outdoor {
         Outdoor {
             name,
             display_name,
@@ -44,14 +44,13 @@ impl Outdoor {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = OutdoorType)]
-pub enum Type {
+pub enum OutdoorType {
     #[serde(rename = "outdoor")]
     Outdoor,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for OutdoorType {
+    fn default() -> OutdoorType {
         Self::Outdoor
     }
 }

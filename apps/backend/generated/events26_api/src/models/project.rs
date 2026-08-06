@@ -39,8 +39,7 @@ impl Default for Project {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = ProjectType)]
-pub enum Type {
+pub enum ProjectType {
     #[serde(rename = "food-stall")]
     FoodStall,
     #[serde(rename = "general")]
@@ -51,8 +50,8 @@ pub enum Type {
     Stage,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for ProjectType {
+    fn default() -> ProjectType {
         Self::FoodStall
     }
 }

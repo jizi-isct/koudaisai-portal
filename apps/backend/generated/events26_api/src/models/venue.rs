@@ -39,8 +39,7 @@ impl Default for Venue {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = VenueType)]
-pub enum Type {
+pub enum VenueType {
     #[serde(rename = "building")]
     Building,
     #[serde(rename = "stage")]
@@ -51,8 +50,8 @@ pub enum Type {
     FoodStallArea,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for VenueType {
+    fn default() -> VenueType {
         Self::Building
     }
 }

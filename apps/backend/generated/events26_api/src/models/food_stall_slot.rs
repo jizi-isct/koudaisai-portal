@@ -18,11 +18,11 @@ pub struct FoodStallSlot {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: FoodStallSlotType,
 }
 
 impl FoodStallSlot {
-    pub fn new(name: String, display_name: String, r#type: Type) -> FoodStallSlot {
+    pub fn new(name: String, display_name: String, r#type: FoodStallSlotType) -> FoodStallSlot {
         FoodStallSlot {
             name,
             display_name,
@@ -44,14 +44,13 @@ impl FoodStallSlot {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = FoodStallSlotType)]
-pub enum Type {
+pub enum FoodStallSlotType {
     #[serde(rename = "food_stall_slot")]
     FoodStallSlot,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for FoodStallSlotType {
+    fn default() -> FoodStallSlotType {
         Self::FoodStallSlot
     }
 }

@@ -28,7 +28,7 @@ pub struct GeneralProject {
     #[serde(rename = "occasions")]
     pub occasions: Vec<models::Occasion>,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: GeneralProjectType,
     #[serde(rename = "tag")]
     pub tag: Vec<models::GeneralTag>,
 }
@@ -42,7 +42,7 @@ impl GeneralProject {
         is_child_friendly: bool,
         is_recommended: bool,
         occasions: Vec<models::Occasion>,
-        r#type: Type,
+        r#type: GeneralProjectType,
         tag: Vec<models::GeneralTag>,
     ) -> GeneralProject {
         GeneralProject {
@@ -72,14 +72,13 @@ impl GeneralProject {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = GeneralProjectType)]
-pub enum Type {
+pub enum GeneralProjectType {
     #[serde(rename = "general")]
     General,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for GeneralProjectType {
+    fn default() -> GeneralProjectType {
         Self::General
     }
 }

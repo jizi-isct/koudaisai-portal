@@ -14,13 +14,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SweetFoodStallTag {
     #[serde(rename = "tag")]
-    pub tag: Tag,
+    pub tag: SweetFoodStallTagTag,
     #[serde(rename = "tag2")]
-    pub tag2: Tag2,
+    pub tag2: SweetFoodStallTagTag2,
 }
 
 impl SweetFoodStallTag {
-    pub fn new(tag: Tag, tag2: Tag2) -> SweetFoodStallTag {
+    pub fn new(tag: SweetFoodStallTagTag, tag2: SweetFoodStallTagTag2) -> SweetFoodStallTag {
         SweetFoodStallTag { tag, tag2 }
     }
 }
@@ -38,14 +38,13 @@ impl SweetFoodStallTag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = SweetFoodStallTagTag)]
-pub enum Tag {
+pub enum SweetFoodStallTagTag {
     #[serde(rename = "sweet")]
     Sweet,
 }
 
-impl Default for Tag {
-    fn default() -> Tag {
+impl Default for SweetFoodStallTagTag {
+    fn default() -> SweetFoodStallTagTag {
         Self::Sweet
     }
 }
@@ -63,8 +62,7 @@ impl Default for Tag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = SweetFoodStallTagTag2)]
-pub enum Tag2 {
+pub enum SweetFoodStallTagTag2 {
     #[serde(rename = "japanese")]
     Japanese,
     #[serde(rename = "western")]
@@ -79,8 +77,8 @@ pub enum Tag2 {
     World,
 }
 
-impl Default for Tag2 {
-    fn default() -> Tag2 {
+impl Default for SweetFoodStallTagTag2 {
+    fn default() -> SweetFoodStallTagTag2 {
         Self::Japanese
     }
 }

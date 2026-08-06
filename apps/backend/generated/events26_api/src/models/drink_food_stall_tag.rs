@@ -14,11 +14,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DrinkFoodStallTag {
     #[serde(rename = "tag")]
-    pub tag: Tag,
+    pub tag: DrinkFoodStallTagTag,
 }
 
 impl DrinkFoodStallTag {
-    pub fn new(tag: Tag) -> DrinkFoodStallTag {
+    pub fn new(tag: DrinkFoodStallTagTag) -> DrinkFoodStallTag {
         DrinkFoodStallTag { tag }
     }
 }
@@ -36,14 +36,13 @@ impl DrinkFoodStallTag {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = DrinkFoodStallTagTag)]
-pub enum Tag {
+pub enum DrinkFoodStallTagTag {
     #[serde(rename = "drink")]
     Drink,
 }
 
-impl Default for Tag {
-    fn default() -> Tag {
+impl Default for DrinkFoodStallTagTag {
+    fn default() -> DrinkFoodStallTagTag {
         Self::Drink
     }
 }
