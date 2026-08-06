@@ -4,10 +4,7 @@ import {
   FolderOpenOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import type {
-  apiComponents,
-  events26Components,
-} from '@koudaisai/shared-types';
+import type { events26Components } from '@koudaisai/shared-types';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { useDownload } from '@koudaisai/shared-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -35,16 +32,6 @@ type Place = NonNullable<Occasion['place']>;
 type Time = events26Components['schemas']['Time'];
 type FoodStallTag = events26Components['schemas']['FoodStallTag'];
 type GeneralTag = events26Components['schemas']['GeneralTag'];
-
-/**
- * backend 中継(`/api/v3/events26`)が公開している `Project` スキーマ。
- *
- * 中身は events26 の `Project` と同じものだが、backend 側の生成クライアントで
- * `Time.date` が events26 の `1 | 2` ではなく `string` として公開されており、
- * 型としては一致しない。正本は events26 の spec なのでこちらで組み立て、
- * 送信時だけこの型へ寄せる。backend 側のスキーマが直ったらキャストは外せる。
- */
-type ApiProject = apiComponents['schemas']['Project'];
 
 /** CSV の 1 行。すべての列を文字列として読み書きする。 */
 type ProjectRow = {
@@ -495,14 +482,14 @@ function Events26Table() {
 
   const handleBulkCreate = (csv: string) =>
     applyCsv(csv, '新規作成', (project) =>
-      mutateProjectCreate({ body: project as unknown as ApiProject }),
+      mutateProjectCreate({ body: project }),
     );
 
   const handleBulkReplace = (csv: string) =>
     applyCsv(csv, '更新', (project) =>
       mutateProjectReplace({
         params: { path: { project_id: project.id } },
-        body: project as unknown as ApiProject,
+        body: project,
       }),
     );
 

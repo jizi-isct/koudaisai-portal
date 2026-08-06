@@ -1163,13 +1163,14 @@ export interface components {
       | 'drink'
       | 'world';
     Time: {
-      /** Format: date */
-      date: string;
+      date: components['schemas']['TimeDate'];
       /** Format: double */
       hour: number;
       /** Format: double */
       minute: number;
     };
+    /** @enum {integer} */
+    TimeDate: 1 | 2;
     TimeRange: {
       end: components['schemas']['Time'];
       start: components['schemas']['Time'];

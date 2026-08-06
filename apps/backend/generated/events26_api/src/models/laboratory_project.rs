@@ -28,7 +28,7 @@ pub struct LaboratoryProject {
     #[serde(rename = "occasions")]
     pub occasions: Vec<models::Occasion>,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: LaboratoryProjectType,
     #[serde(rename = "isTour")]
     pub is_tour: bool,
 }
@@ -42,7 +42,7 @@ impl LaboratoryProject {
         is_child_friendly: bool,
         is_recommended: bool,
         occasions: Vec<models::Occasion>,
-        r#type: Type,
+        r#type: LaboratoryProjectType,
         is_tour: bool,
     ) -> LaboratoryProject {
         LaboratoryProject {
@@ -72,14 +72,13 @@ impl LaboratoryProject {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = LaboratoryProjectType)]
-pub enum Type {
+pub enum LaboratoryProjectType {
     #[serde(rename = "laboratory")]
     Laboratory,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for LaboratoryProjectType {
+    fn default() -> LaboratoryProjectType {
         Self::Laboratory
     }
 }

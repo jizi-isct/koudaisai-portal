@@ -18,7 +18,7 @@ pub struct Room {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: RoomType,
     #[serde(rename = "floor")]
     pub floor: String,
     #[serde(rename = "alias", skip_serializing_if = "Option::is_none")]
@@ -26,7 +26,7 @@ pub struct Room {
 }
 
 impl Room {
-    pub fn new(name: String, display_name: String, r#type: Type, floor: String) -> Room {
+    pub fn new(name: String, display_name: String, r#type: RoomType, floor: String) -> Room {
         Room {
             name,
             display_name,
@@ -50,14 +50,13 @@ impl Room {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = RoomType)]
-pub enum Type {
+pub enum RoomType {
     #[serde(rename = "room")]
     Room,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for RoomType {
+    fn default() -> RoomType {
         Self::Room
     }
 }

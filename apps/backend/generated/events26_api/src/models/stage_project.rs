@@ -28,7 +28,7 @@ pub struct StageProject {
     #[serde(rename = "occasions")]
     pub occasions: Vec<models::Occasion>,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: StageProjectType,
 }
 
 impl StageProject {
@@ -40,7 +40,7 @@ impl StageProject {
         is_child_friendly: bool,
         is_recommended: bool,
         occasions: Vec<models::Occasion>,
-        r#type: Type,
+        r#type: StageProjectType,
     ) -> StageProject {
         StageProject {
             id,
@@ -68,14 +68,13 @@ impl StageProject {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = StageProjectType)]
-pub enum Type {
+pub enum StageProjectType {
     #[serde(rename = "stage")]
     Stage,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for StageProjectType {
+    fn default() -> StageProjectType {
         Self::Stage
     }
 }

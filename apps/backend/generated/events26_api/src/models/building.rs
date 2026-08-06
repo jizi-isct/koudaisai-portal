@@ -18,7 +18,7 @@ pub struct Building {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: BuildingType,
     #[serde(rename = "rooms")]
     pub rooms: Vec<models::Room>,
 }
@@ -27,7 +27,7 @@ impl Building {
     pub fn new(
         name: String,
         display_name: String,
-        r#type: Type,
+        r#type: BuildingType,
         rooms: Vec<models::Room>,
     ) -> Building {
         Building {
@@ -52,14 +52,13 @@ impl Building {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = BuildingType)]
-pub enum Type {
+pub enum BuildingType {
     #[serde(rename = "building")]
     Building,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for BuildingType {
+    fn default() -> BuildingType {
         Self::Building
     }
 }

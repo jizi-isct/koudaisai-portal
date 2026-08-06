@@ -18,11 +18,11 @@ pub struct Stage {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "type")]
-    pub r#type: Type,
+    pub r#type: StageType,
 }
 
 impl Stage {
-    pub fn new(name: String, display_name: String, r#type: Type) -> Stage {
+    pub fn new(name: String, display_name: String, r#type: StageType) -> Stage {
         Stage {
             name,
             display_name,
@@ -44,14 +44,13 @@ impl Stage {
     Deserialize,
     utoipa::ToSchema,
 )]
-#[schema(as = StageType)]
-pub enum Type {
+pub enum StageType {
     #[serde(rename = "stage")]
     Stage,
 }
 
-impl Default for Type {
-    fn default() -> Type {
+impl Default for StageType {
+    fn default() -> StageType {
         Self::Stage
     }
 }
