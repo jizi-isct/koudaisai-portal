@@ -54,7 +54,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const { mutateAsync: deleteGroup } = $api.useMutation('delete', '/groups/{id}');
+  const { mutateAsync: deleteGroup } = $api.useMutation(
+    'delete',
+    '/groups/{id}',
+  );
 
   const { data: groupInfo, isLoading: isLoadingGruop } = $api.useQuery(
     'get',
