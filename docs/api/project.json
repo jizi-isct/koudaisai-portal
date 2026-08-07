@@ -2,6 +2,8 @@
   "name": "docs-api",
   "projectType": "library",
   "sourceRoot": "docs/api",
+  "//": "backend:dump-openapi への dependsOn はプロジェクトグラフの辺にならないので、backend の変更だけの PR でも affected に入るよう implicitDependencies で繋ぐ。shared-types は生成先で、手で書き換えられた場合もドリフトとして検知したいので併せて繋ぐ。",
+  "implicitDependencies": ["backend", "@koudaisai/shared-types"],
   "targets": {
     "build": {
       "executor": "nx:run-commands",
@@ -13,6 +15,8 @@
     },
     "update-clients": {
       "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["backend:dump-openapi"],
       "options": {
         "command": "bash update_clients.sh",
         "cwd": "docs/api"
@@ -22,6 +26,15 @@
         "{workspaceRoot}/libs/shared-types/src/auth_v2.d.ts",
         "{workspaceRoot}/libs/shared-types/src/events26.d.ts"
       ]
+    },
+    "check-clients": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "dependsOn": ["backend:dump-openapi"],
+      "options": {
+        "command": "bash update_clients.sh --check",
+        "cwd": "docs/api"
+      }
     }
   }
 }

@@ -1,0 +1,51 @@
+name: Affected OpenAPI Drift Check
+
+# backend(utoipa)の OpenAPI 仕様と、コミット済みの docs/api/*/openapi.json ・
+# libs/shared-types の TypeScript クライアント型が同期しているか検証する。
+# 生成物はコミットして使う運用なので、backend のハンドラだけ変えて再生成を忘れると
+# フロントの型が古いまま気付かれない。ここで再生成 → git diff で検知する。
+#
+# 対象の絞り込みは paths フィルタではなく nx affected に任せる。docs-api は
+# implicitDependencies で backend に繋いであるので、backend の変更でも affected
+# に入る。
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  drift-check:
+    name: nx affected -t check-clients
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup Rust
+        run: rustup default stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Cache Nx local cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Run affected OpenAPI drift check
+        run: npx nx affected -t check-clients

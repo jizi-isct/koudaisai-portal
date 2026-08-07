@@ -31,6 +31,27 @@
         "cwd": "apps/backend"
       }
     },
+    "dump-openapi": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "outputs": [
+        "{workspaceRoot}/docs/api/api_v3/openapi.json",
+        "{workspaceRoot}/docs/api/auth_v2/openapi.json"
+      ],
+      "options": {
+        "cwd": "apps/backend",
+        "parallel": false,
+        "env": {
+          "SQLX_OFFLINE": "true"
+        },
+        "commands": [
+          "cargo run --quiet -- --dump-openapi=api_v3 > ../../docs/api/api_v3/openapi.json",
+          "cargo run --quiet -- --dump-openapi=auth_v2 > ../../docs/api/auth_v2/openapi.json",
+          "npx prettier --write ../../docs/api/api_v3/openapi.json ../../docs/api/auth_v2/openapi.json"
+        ]
+      }
+    },
     "docker-up": {
       "executor": "nx:run-commands",
       "options": {
