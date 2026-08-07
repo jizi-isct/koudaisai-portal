@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, issued_at, issued_by, type, status, description, icon_key, issue_reason,\n                      approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at\n               FROM approval_requests",
+  "query": "SELECT id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason,\n                      approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at\n               FROM approval_requests",
   "describe": {
     "columns": [
       {
@@ -19,63 +19,68 @@
         "type_info": "Text"
       },
       {
-        "name": "type",
+        "name": "group_id",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "status",
+        "name": "type",
         "ordinal": 4,
         "type_info": "Text"
       },
       {
-        "name": "description",
+        "name": "status",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "icon_key",
+        "name": "description",
         "ordinal": 6,
         "type_info": "Text"
       },
       {
-        "name": "issue_reason",
+        "name": "icon_key",
         "ordinal": 7,
         "type_info": "Text"
       },
       {
-        "name": "approved_by",
+        "name": "issue_reason",
         "ordinal": 8,
         "type_info": "Text"
       },
       {
-        "name": "approved_at",
+        "name": "approved_by",
         "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "approved_at",
+        "ordinal": 10,
         "type_info": "Integer"
       },
       {
         "name": "approval_reason",
-        "ordinal": 10,
-        "type_info": "Text"
-      },
-      {
-        "name": "rejected_by",
         "ordinal": 11,
         "type_info": "Text"
       },
       {
-        "name": "rejected_at",
+        "name": "rejected_by",
         "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "rejected_at",
+        "ordinal": 13,
         "type_info": "Integer"
       },
       {
         "name": "rejection_reason",
-        "ordinal": 13,
+        "ordinal": 14,
         "type_info": "Text"
       },
       {
         "name": "closed_at",
-        "ordinal": 14,
+        "ordinal": 15,
         "type_info": "Integer"
       }
     ],
@@ -86,6 +91,7 @@
       false,
       false,
       false,
+      true,
       false,
       false,
       true,
@@ -100,5 +106,5 @@
       true
     ]
   },
-  "hash": "a646cee57878387530436783b4348204783c0e5fe1cf2c4fa0ffab8824c8d360"
+  "hash": "29861d18e23f66a8b56ba7aacf2d20ec625081d5c089e2ee318e4e7515145dc5"
 }

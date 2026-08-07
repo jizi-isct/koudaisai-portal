@@ -19,6 +19,7 @@ use crate::domain::approval_request::{
     ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType,
 };
 use crate::domain::approval_request_id::ApprovalRequestId;
+use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
 
 pub struct ApprovalRequestApp<
@@ -156,9 +157,13 @@ impl<
     }
 
     /// 承認申請を作成
+    ///
+    /// 対象団体は申請者が明示する。1 人が複数の団体に所属しうる仕様なので、
+    /// 申請者から一意には決まらないため。自分が所属していない団体は指定できない。
     pub async fn create(
         &self,
         actor_ctx: &ActorContext,
+        group_id: GroupId,
         request_type: ApprovalRequestType,
         issue_reason: String,
     ) -> Result<ApprovalRequestId, ApplicationOperationError<InsertError>> {
@@ -166,14 +171,32 @@ impl<
             return Err(ApplicationOperationError::Unauthorized);
         }
 
-        let user_id = match actor_ctx {
-            ActorContext::User { user_id, .. } => *user_id,
+        let (user_id, memberships) = match actor_ctx {
+            ActorContext::User {
+                user_id,
+                memberships,
+                ..
+            } => (*user_id, memberships),
             _ => return Err(ApplicationOperationError::Unauthorized),
         };
 
+        if !memberships
+            .iter()
+            .any(|membership| membership.group_id() == group_id)
+        {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+
         let id = ApprovalRequestId::generate();
-        let request = ApprovalRequest::create(id, user_id, request_type, issue_reason, self.clock)
-            .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
+        let request = ApprovalRequest::create(
+            id,
+            user_id,
+            group_id,
+            request_type,
+            issue_reason,
+            self.clock,
+        )
+        .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
 
         self.approval_request_repo.insert(&request).await?;
 
@@ -479,6 +502,8 @@ mod tests {
     use super::*;
     use crate::domain::email_address::EmailAddress;
     use crate::domain::group::GroupType;
+    use crate::domain::group_id::GroupId;
+    use crate::domain::membership::{Membership, Role};
     use crate::domain::user::User;
     use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
     use crate::infra::memory::clock_impl::MemoryClock;
@@ -487,15 +512,28 @@ mod tests {
     use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
     use crate::infra::memory::user_repo_impl::MemoryUserRepo;
     use chrono::{TimeZone, Utc};
+    use std::str::FromStr;
     use uuid::Uuid;
 
     const BASE_URL: &str = "https://portal.koudaisai.jp";
 
+    /// テストで使う対象団体。
+    fn group_id() -> GroupId {
+        GroupId::from_str("I-100").unwrap()
+    }
+
+    /// 申請者役の `ActorContext`。対象団体は申請時に指定するので所属も持たせる。
     fn user_ctx() -> ActorContext {
+        let user_id = UserId::new(Uuid::new_v4());
         ActorContext::User {
-            user_id: UserId::new(Uuid::new_v4()),
+            user_id,
             name: "山田太郎".to_string(),
-            memberships: vec![],
+            memberships: vec![Membership::new(
+                group_id(),
+                user_id,
+                Role::FirstResponsible,
+                &MemoryClock::new(Utc.timestamp_opt(0, 0).unwrap()),
+            )],
             group_type: GroupType::GeneralProject,
         }
     }
@@ -521,6 +559,7 @@ mod tests {
 
         app.create(
             &user_ctx(),
+            group_id(),
             ApprovalRequestType::EditExhibitionInfo {
                 description: Some("新しい紹介文".to_string()),
                 icon_key: None,
@@ -536,13 +575,14 @@ mod tests {
             messages[0].embeds[0].title.as_deref(),
             Some("企画内容訂正申請が出されました")
         );
-        // 申請者名(ActorContext の name)が送信者名・申請者フィールドに反映される。
-        assert_eq!(messages[0].username.as_deref(), Some("山田太郎"));
+        // 申請者名(ActorContext の name)が送信者名に、団体付きのラベルが
+        // 申請者フィールドに反映される。
+        assert_eq!(messages[0].username.as_deref(), Some("I-100の山田太郎"));
         assert!(
             messages[0].embeds[0]
                 .fields
                 .iter()
-                .any(|f| f.name == "申請者" && f.value == "山田太郎")
+                .any(|f| f.name == "申請者" && f.value == "I-100の山田太郎")
         );
         // 詳細リンクが base_url 由来の絶対 URL になっている。
         assert!(
@@ -580,12 +620,18 @@ mod tests {
         let issuer_ctx = ActorContext::User {
             user_id: issuer_id,
             name: "申請花子".to_string(),
-            memberships: vec![],
+            memberships: vec![Membership::new(
+                group_id(),
+                issuer_id,
+                Role::FirstResponsible,
+                &MemoryClock::new(now),
+            )],
             group_type: GroupType::GeneralProject,
         };
         let id = app
             .create(
                 &issuer_ctx,
+                group_id(),
                 ApprovalRequestType::EditExhibitionInfo {
                     description: None,
                     icon_key: None,
@@ -639,6 +685,7 @@ mod tests {
 
         app.create(
             &user_ctx(),
+            group_id(),
             ApprovalRequestType::EditExhibitionInfo {
                 description: None,
                 icon_key: Some("icon-key.png".to_string()),
@@ -669,6 +716,7 @@ mod tests {
 
         app.create(
             &user_ctx(),
+            group_id(),
             ApprovalRequestType::EditExhibitionInfo {
                 description: None,
                 icon_key: None,

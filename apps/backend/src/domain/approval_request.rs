@@ -2,6 +2,7 @@ use crate::application::ports::clock::Clock;
 use crate::domain::admin_id::AdminId;
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::error::{FactoryError, InvalidTransitionError};
+use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
 use chrono::{DateTime, Utc};
 
@@ -41,6 +42,9 @@ pub struct ApprovalRequest {
     id: ApprovalRequestId,
     issued_at: DateTime<Utc>,
     issued_by: UserId,
+    /// 申請の対象となる団体。1 人が複数の団体に所属しうるため、申請者からは
+    /// 一意に定まらない。承認時の反映先(企画番号)もこれで決まる。
+    group_id: GroupId,
     request_type: ApprovalRequestType,
     status: ApprovalRequestStatus,
     issue_reason: String,
@@ -51,6 +55,7 @@ impl ApprovalRequest {
     pub fn create<C: Clock>(
         id: ApprovalRequestId,
         issued_by: UserId,
+        group_id: GroupId,
         request_type: ApprovalRequestType,
         issue_reason: String,
         clock: &C,
@@ -65,6 +70,7 @@ impl ApprovalRequest {
             id,
             issued_at: clock.now(),
             issued_by,
+            group_id,
             request_type,
             status: ApprovalRequestStatus::Pending,
             issue_reason,
@@ -76,6 +82,7 @@ impl ApprovalRequest {
         id: ApprovalRequestId,
         issued_at: DateTime<Utc>,
         issued_by: UserId,
+        group_id: GroupId,
         request_type: ApprovalRequestType,
         status: ApprovalRequestStatus,
         issue_reason: String,
@@ -84,6 +91,7 @@ impl ApprovalRequest {
             id,
             issued_at,
             issued_by,
+            group_id,
             request_type,
             status,
             issue_reason,
@@ -101,6 +109,10 @@ impl ApprovalRequest {
 
     pub fn issued_by(&self) -> UserId {
         self.issued_by
+    }
+
+    pub fn group_id(&self) -> GroupId {
+        self.group_id
     }
 
     pub fn request_type(&self) -> &ApprovalRequestType {
