@@ -67,7 +67,7 @@ function formatTime(hour: number, minute: number): string {
 function formatOccasion(occasion: Occasion): string {
   const { start, end } = occasion.timeRange;
 
-  const startLabel = start.date === "1" ? "10/10" : "10/11";
+  const startLabel = start.date === 1 ? '10/10' : '10/11';
 
   const startTime = formatTime(start.hour, start.minute);
   const endTime = formatTime(end.hour, end.minute);
@@ -76,8 +76,7 @@ function formatOccasion(occasion: Occasion): string {
     return `${startLabel} ${startTime}〜${endTime}`;
   }
 
-
-  const endLabel = end.date === "1" ? "10/10" : "10/11";
+  const endLabel = end.date === 1 ? '10/10' : '10/11';
   return `${startLabel} ${startTime}〜${endLabel} ${endTime}`;
 }
 
