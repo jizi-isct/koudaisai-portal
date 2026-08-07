@@ -1,30 +1,28 @@
-name: OpenAPI drift check
+name: Affected OpenAPI Drift Check
 
 # backend(utoipa)の OpenAPI 仕様と、コミット済みの docs/api/*/openapi.json ・
 # libs/shared-types の TypeScript クライアント型が同期しているか検証する。
 # 生成物はコミットして使う運用なので、backend のハンドラだけ変えて再生成を忘れると
 # フロントの型が古いまま気付かれない。ここで再生成 → git diff で検知する。
+#
+# 対象の絞り込みは paths フィルタではなく nx affected に任せる。docs-api は
+# implicitDependencies で backend に繋いであるので、backend の変更でも affected
+# に入る。
 
 on:
   pull_request:
-    paths:
-      - 'apps/backend/src/**'
-      - 'apps/backend/Cargo.toml'
-      - 'apps/backend/Cargo.lock'
-      - 'apps/backend/project.json'
-      - 'docs/api/**'
-      - 'libs/shared-types/src/**'
-      - '.github/workflows/openapi-drift-check.yml'
 
 permissions:
   contents: read
 
 jobs:
   drift-check:
-    name: nx run docs-api:check-clients
+    name: nx affected -t check-clients
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,19 +33,19 @@ jobs:
       - name: Setup Rust
         run: rustup default stable
 
-      - name: Cache cargo & target
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            apps/backend/target
-          key: ${{ runner.os }}-openapi-drift-${{ hashFiles('apps/backend/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-openapi-drift-
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Check OpenAPI spec & clients are in sync
-        run: npx nx run docs-api:check-clients
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Cache Nx local cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Run affected OpenAPI drift check
+        run: npx nx affected -t check-clients

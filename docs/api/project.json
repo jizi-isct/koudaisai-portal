@@ -2,6 +2,8 @@
   "name": "docs-api",
   "projectType": "library",
   "sourceRoot": "docs/api",
+  "//": "backend:dump-openapi への dependsOn はプロジェクトグラフの辺にならないので、backend の変更だけの PR でも affected に入るよう implicitDependencies で繋ぐ。shared-types は生成先で、手で書き換えられた場合もドリフトとして検知したいので併せて繋ぐ。",
+  "implicitDependencies": ["backend", "@koudaisai/shared-types"],
   "targets": {
     "build": {
       "executor": "nx:run-commands",
