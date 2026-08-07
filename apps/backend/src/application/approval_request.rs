@@ -12,6 +12,7 @@ use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
+use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
@@ -21,6 +22,9 @@ use crate::domain::approval_request::{
 };
 use crate::domain::approval_request_id::ApprovalRequestId;
 use crate::domain::group_id::GroupId;
+use crate::domain::notification::{Notification, NotificationType};
+use crate::domain::notification_id::NotificationId;
+use crate::domain::target_specifier::TargetSpecifier;
 use crate::domain::user_id::UserId;
 
 pub struct ApprovalRequestApp<
@@ -33,6 +37,7 @@ pub struct ApprovalRequestApp<
     D: Discord,
     OS: ObjectStorage,
     EA: Events26Api,
+    NR: NotificationRepo<Tx>,
 > {
     _phantom: PhantomData<&'a Tx>,
     approval_request_repo: &'a AR,
@@ -43,6 +48,8 @@ pub struct ApprovalRequestApp<
     object_storage: &'a OS,
     /// 企画情報API(events26)。承認した編集内容を企画へ反映するために使う。
     events26_api: &'a EA,
+    /// 承認/却下の結果をポータル上の通知として残すために使う。
+    notification_repo: &'a NR,
     base_url: &'a str,
 }
 
@@ -56,7 +63,8 @@ impl<
     D: Discord,
     OS: ObjectStorage,
     EA: Events26Api,
-> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS, EA>
+    NR: NotificationRepo<Tx>,
+> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS, EA, NR>
 {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -67,6 +75,7 @@ impl<
         discord: &'a D,
         object_storage: &'a OS,
         events26_api: &'a EA,
+        notification_repo: &'a NR,
         base_url: &'a str,
     ) -> Self {
         Self {
@@ -78,6 +87,7 @@ impl<
             discord,
             object_storage,
             events26_api,
+            notification_repo,
             base_url,
         }
     }
@@ -160,6 +170,37 @@ impl<
         }
 
         Ok(())
+    }
+
+    /// 承認/却下の結果をポータル上の通知([`NotificationType::ApprovalRequest`])として発行する。
+    ///
+    /// 宛先は申請者本人と申請の対象団体(同じ団体の他の責任者にも見えるように)。
+    /// 申請者が所属する他の団体はこの申請と関係がないので含めない。
+    /// 申請の状態は既に保存済みなので、通知の発行に失敗しても承認/却下自体は
+    /// 成立させ、ログに残すだけにする(Discord 通知と同じ best-effort)。
+    async fn notify_decision(&self, request: &ApprovalRequest, decided_by: AdminId) {
+        let targets = vec![
+            TargetSpecifier::UserId(request.issued_by()),
+            TargetSpecifier::GroupId(request.group_id()),
+        ];
+
+        let notification = match Notification::create(
+            NotificationId::generate(),
+            targets,
+            NotificationType::approval_request(request.id()),
+            Some(decided_by),
+            self.clock,
+        ) {
+            Ok(notification) => notification,
+            Err(error) => {
+                tracing::error!(%error, "承認申請通知の作成に失敗しました");
+                return;
+            }
+        };
+
+        if let Err(error) = self.notification_repo.insert(&notification).await {
+            tracing::error!(%error, "承認申請通知の保存に失敗しました");
+        }
     }
 
     /// 全ての承認申請を取得（管理者用）
@@ -339,6 +380,8 @@ impl<
 
         self.approval_request_repo.update(&request).await?;
 
+        self.notify_decision(&request, approver_id).await;
+
         let issuer_label = self.issuer_label_by_id(request.issued_by()).await;
         let message = build_decision_message(
             self.base_url,
@@ -388,6 +431,8 @@ impl<
             })?;
 
         self.approval_request_repo.update(&request).await?;
+
+        self.notify_decision(&request, rejector_id).await;
 
         let issuer_label = self.issuer_label_by_id(request.issued_by()).await;
         let message = build_decision_message(
@@ -626,6 +671,7 @@ mod tests {
     use crate::infra::memory::discord_impl::MemoryDiscord;
     use crate::infra::memory::events26_api_impl::MemoryEvents26Api;
     use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
+    use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
     use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
     use crate::infra::memory::user_repo_impl::MemoryUserRepo;
     use chrono::{TimeZone, Utc};
@@ -673,7 +719,9 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -722,7 +770,9 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         // 承認通知の申請者名は user_repo から解決されるので、申請者を登録しておく。
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-126").await;
@@ -780,7 +830,9 @@ mod tests {
         // アイコン本体をオブジェクトストレージに用意しておく。
         os.put("icon-key.png", vec![1, 2, 3, 4]);
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -812,7 +864,9 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -884,7 +938,9 @@ mod tests {
             vec![0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, 1, 2],
         );
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-123").await;
         let id = app
@@ -920,7 +976,9 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
 
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-124").await;
         let id = app
@@ -946,5 +1004,81 @@ mod tests {
         assert_eq!(stored.status(), &ApprovalRequestStatus::Pending);
         // 承認通知も送られない(作成時の 1 通だけ)。
         assert_eq!(discord.sent_messages().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn approve_and_reject_issue_approval_request_notifications() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        let e26 = MemoryEvents26Api::new();
+        let nr = MemoryNotificationRepo::new();
+        let app =
+            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+
+        let (issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-125").await;
+        let approved = app
+            .create(
+                &issuer_ctx,
+                issuer_group,
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: Some("新しい紹介文".to_string()),
+                    icon_key: None,
+                },
+                "理由".to_string(),
+            )
+            .await
+            .expect("create should succeed");
+        let rejected = app
+            .create(
+                &issuer_ctx,
+                issuer_group,
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: Some("却下される紹介文".to_string()),
+                    icon_key: None,
+                },
+                "理由".to_string(),
+            )
+            .await
+            .expect("create should succeed");
+
+        app.approve(&admin_ctx(), approved, None)
+            .await
+            .expect("approve should succeed");
+        app.reject(&admin_ctx(), rejected, None)
+            .await
+            .expect("reject should succeed");
+
+        let notifications = nr.find_all().await.unwrap();
+        assert_eq!(notifications.len(), 2);
+
+        // 承認・却下のどちらも申請 ID を指す通知になっている。
+        let ids: Vec<ApprovalRequestId> = notifications
+            .iter()
+            .map(|n| match n.notification_type() {
+                NotificationType::ApprovalRequest {
+                    approval_request_id,
+                } => *approval_request_id,
+                other => panic!("unexpected notification type: {other:?}"),
+            })
+            .collect();
+        assert!(ids.contains(&approved));
+        assert!(ids.contains(&rejected));
+
+        // 宛先は申請者本人と所属団体の両方。
+        for notification in &notifications {
+            assert!(
+                notification
+                    .targets()
+                    .contains(&TargetSpecifier::UserId(issuer_id))
+            );
+            assert!(notification.targets().contains(&TargetSpecifier::GroupId(
+                GroupId::from_str("I-125").unwrap()
+            )));
+        }
     }
 }

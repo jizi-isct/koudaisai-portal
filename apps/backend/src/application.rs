@@ -164,7 +164,7 @@ impl<
 
     pub fn approval_request(
         &'_ self,
-    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS, EA> {
+    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS, EA, NR> {
         approval_request::ApprovalRequestApp::new(
             &self.approval_request_repo,
             &self.membership_repo,
@@ -173,6 +173,7 @@ impl<
             &self.discord,
             &self.object_storage,
             &self.events26_api,
+            &self.notification_repo,
             &self.base_url,
         )
     }
