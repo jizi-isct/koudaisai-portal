@@ -64,6 +64,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/projects/{projectId}/details': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * 企画詳細情報の取得
+     * @description IDで指定した企画の詳細情報を返します。
+     */
+    get: operations['getProjectDetails'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/projects/{projectId}': {
     parameters: {
       query?: never;
@@ -207,6 +227,54 @@ export interface paths {
      * @description 企画アイコンの原本を削除します。未登録の場合も成功します。
      */
     delete: operations['deleteProjectIcon'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/admin/v1/projects/{projectId}/details/menu': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * 企画メニューの登録・更新
+     * @description 指定した企画のメニューを保存します。追加情報は変更しません。
+     */
+    put: operations['updateProjectMenu'];
+    post?: never;
+    /**
+     * 企画メニューの削除
+     * @description 指定した企画のメニューを削除します。追加情報は変更しません。
+     */
+    delete: operations['deleteProjectMenu'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/admin/v1/projects/{projectId}/details/additionalInfo': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * 企画追加情報の登録・更新
+     * @description 指定した企画の追加情報を保存します。メニューは変更しません。
+     */
+    put: operations['updateProjectAdditionalInfo'];
+    post?: never;
+    /**
+     * 企画追加情報の削除
+     * @description 指定した企画の追加情報を削除します。メニューは変更しません。
+     */
+    delete: operations['deleteProjectAdditionalInfo'];
     options?: never;
     head?: never;
     patch?: never;
@@ -1281,6 +1349,52 @@ export interface operations {
       };
     };
   };
+  getProjectDetails: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 指定した企画の詳細情報 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            additionalInfo?: string;
+            menu?: {
+              items: {
+                name: string;
+                price?: number;
+                options: {
+                  name: string;
+                  price?: number;
+                }[];
+              }[];
+              description: string;
+            };
+          };
+        };
+      };
+      /** @description 指定した企画の詳細情報が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
   getProject: {
     parameters: {
       query?: never;
@@ -1737,6 +1851,206 @@ export interface operations {
       };
       /** @description Access の認証を通っていない */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  updateProjectMenu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          items: {
+            name: string;
+            price?: number;
+            options: {
+              name: string;
+              price?: number;
+            }[];
+          }[];
+          description: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 保存に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description リクエストボディが不正 */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  deleteProjectMenu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 削除に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  updateProjectAdditionalInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': string;
+      };
+    };
+    responses: {
+      /** @description 保存に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description リクエストボディが不正 */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  deleteProjectAdditionalInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 削除に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
         headers: {
           [name: string]: unknown;
         };
