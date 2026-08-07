@@ -576,9 +576,9 @@ function UserInfo({ userId }: { userId: string }) {
       messageApi.success('有効化URLをコピーしました');
     } catch (error) {
       setIsCopying(false);
-      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`)
+      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`);
     }
-  }
+  };
 
   const editableValue = (
     field: 'name' | 'email',
@@ -685,11 +685,7 @@ function UserInfo({ userId }: { userId: string }) {
         <Button type="default" href="/manage-users/" style={{ width: '5rem' }}>
           戻る
         </Button>
-        <Button
-          danger
-          type="primary"
-          onClick={() => setOpenDeleteModal(true)}
-        >
+        <Button danger type="primary" onClick={() => setOpenDeleteModal(true)}>
           削除
         </Button>
       </Flex>

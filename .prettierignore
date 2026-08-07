@@ -6,3 +6,8 @@
 **/target
 
 .nx/self-healing
+
+# 機械生成物(sqlx のオフラインクエリキャッシュ、openapi-generator の Rust クライアント)。
+# 生成ツールの出力そのままをコミットするので prettier の対象外にする。
+/apps/backend/.sqlx
+/apps/backend/generated
