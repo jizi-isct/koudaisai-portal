@@ -4,8 +4,9 @@ import ViewDocumentsWrapper from "@/features/documents/ViewDocumentsWrapper";
 import DefaultLayout from "@/layouts/DefaultLayout.astro";
 import {Heading1} from "@koudaisai/shared-ui";
 import {API_URL} from "astro:env/client";
+import { env } from "cloudflare:workers";
 
-const fetchClient = getApiFetchClient(API_URL);
+const fetchClient = getApiFetchClient(env.API_URL ?? API_URL);
 const {data, error} = await fetchClient.GET("/documents/by-category", {cache: "no-store"});
 
 if (error || !data) {
@@ -17,7 +18,7 @@ if (error || !data) {
     <section class="documents-page">
         <Heading1 emoji="📚">資料</Heading1>
         <div class="documents-page-container">
-            <ViewDocumentsWrapper documents={data} apiUrl={API_URL} client:load/>
+            <ViewDocumentsWrapper documents={data} apiUrl={env.API_URL ?? API_URL} client:load/>
         </div>
     </section>
 </DefaultLayout>
