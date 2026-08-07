@@ -1,0 +1,8 @@
+.icon {
+  border: thin solid var(--darkblue);
+  border-radius: 12px;
+  flex-shrink: 0;
+  height: 64px;
+  object-fit: cover;
+  width: 64px;
+}

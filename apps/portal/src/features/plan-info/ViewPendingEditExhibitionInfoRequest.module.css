@@ -1,0 +1,27 @@
+.root {
+  text-align: left;
+}
+
+.root h2 {
+  font-size: 16px;
+  margin: 16px 0 8px;
+}
+
+.root h3 {
+  font-size: 13px;
+  margin: 12px 0 4px;
+}
+
+.description {
+  font-size: 14px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.icon {
+  border: thin solid var(--darkblue);
+  border-radius: 15px;
+  height: 128px;
+  object-fit: cover;
+  width: 128px;
+}
