@@ -94,6 +94,7 @@ export function PlanSection() {
           />
           <EditPlanInfoModal
             project={project}
+            groupId={group.id}
             isOpen={isEditPlanOpen}
             setOpen={setIsEditPlanOpen}
           />

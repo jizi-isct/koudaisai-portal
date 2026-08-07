@@ -8,6 +8,8 @@ import type { Project } from './types';
 
 type Props = {
   project: Project;
+  /** 企画を持つ団体の ID。申請の対象団体として送り、審査中の申請の絞り込みにも使う。 */
+  groupId: string;
   isOpen: boolean;
   setOpen: (isOpen: boolean) => void;
 };
@@ -16,7 +18,12 @@ type Props = {
  * 企画情報の訂正申請モーダル。
  * 審査中の申請があればその内容と取り下げ、なければ新規申請フォームを出す。
  */
-export function EditPlanInfoModal({ project, isOpen, setOpen }: Props) {
+export function EditPlanInfoModal({
+  project,
+  groupId,
+  isOpen,
+  setOpen,
+}: Props) {
   const [approvalRequests, setApprovalRequests] = useState<
     ApprovalRequestRead[] | null
   >(null);
@@ -34,9 +41,13 @@ export function EditPlanInfoModal({ project, isOpen, setOpen }: Props) {
     fetchApprovalRequests().catch(() => setApprovalRequests([]));
   }, [isOpen, fetchApprovalRequests]);
 
+  // 同じ団体の申請だけを見る。申請者が複数の団体に所属していると、
+  // 別の団体宛ての申請まで混ざるため。
   const pendingRequest = approvalRequests?.find(
     (request) =>
-      request.type === 'edit_exhibition_info' && request.status === 'pending',
+      request.group_id === groupId &&
+      request.type === 'edit_exhibition_info' &&
+      request.status === 'pending',
   );
 
   return (
@@ -52,6 +63,7 @@ export function EditPlanInfoModal({ project, isOpen, setOpen }: Props) {
       ) : (
         <EditIssueForm
           initDescription={project.description}
+          groupId={groupId}
           refetch={fetchApprovalRequests}
         />
       )}

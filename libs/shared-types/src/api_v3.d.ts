@@ -545,10 +545,14 @@ export interface components {
       reason?: string | null;
     };
     ApprovalRequestCreate: components['schemas']['ApprovalRequestType'] & {
+      /** @description 申請の対象団体(`M-001` 形式)。申請者は複数の団体に所属しうるため必須。 */
+      group_id: string;
       issue_reason: string;
     };
     ApprovalRequestRead: components['schemas']['ApprovalRequestType'] &
       components['schemas']['ApprovalRequestStatus'] & {
+        /** @description 申請の対象団体(`M-001` 形式)。承認時の企画情報の反映先でもある。 */
+        group_id: string;
         /** Format: uuid */
         id: string;
         issue_reason: string;
@@ -2044,19 +2048,23 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Invalid project */
+      /** @description Invalid project. The body carries the reason. */
       422: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
-      /** @description Internal server error */
+      /** @description Internal server error. The body carries the upstream status and message. */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
     };
   };
@@ -2099,19 +2107,23 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Invalid project */
+      /** @description Invalid project. The body carries the reason. */
       422: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
-      /** @description Internal server error */
+      /** @description Internal server error. The body carries the upstream status and message. */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
     };
   };
@@ -2148,12 +2160,14 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Internal server error */
+      /** @description Internal server error. The body carries the upstream status and message. */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
     };
   };
@@ -2195,26 +2209,32 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Unsupported image format */
+      /** @description Unsupported image format. The body carries the received Content-Type. */
       415: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
-      /** @description Image rejected (empty, too large, or not square) */
+      /** @description Image rejected (empty, too large, or not square). The body carries the reason. */
       422: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
-      /** @description Internal server error */
+      /** @description Internal server error. The body carries the upstream status and message. */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
     };
   };
@@ -2244,12 +2264,14 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Internal server error */
+      /** @description Internal server error. The body carries the upstream status and message. */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain': string;
+        };
       };
     };
   };

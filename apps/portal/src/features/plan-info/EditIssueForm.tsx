@@ -6,6 +6,8 @@ import styles from './planForm.module.css';
 type Props = {
   refetch: () => Promise<void>;
   initDescription: string;
+  /** 申請の対象団体。1 人が複数の団体に所属しうるので申請時に明示する。 */
+  groupId: string;
 };
 
 /** presigned URL を発行してアイコン画像を S3 に置き、申請に載せるキーを返す。 */
@@ -30,7 +32,7 @@ async function uploadIcon(file: File): Promise<string> {
   return data.key;
 }
 
-export function EditIssueForm({ refetch, initDescription }: Props) {
+export function EditIssueForm({ refetch, initDescription, groupId }: Props) {
   const [description, setDescription] = useState(initDescription);
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [issueReason, setIssueReason] = useState('');
@@ -47,6 +49,7 @@ export function EditIssueForm({ refetch, initDescription }: Props) {
       const { error: createError } = await api.POST('/approval-requests', {
         body: {
           type: 'edit_exhibition_info',
+          group_id: groupId,
           description:
             description === initDescription ? undefined : description,
           icon_key: iconKey,
