@@ -3,12 +3,13 @@ use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
 use anyhow::{Context, anyhow};
 use async_trait::async_trait;
 use events26_api::apis::admin_api::{
-    CreateProjectParams, DeleteProjectIconParams, DeleteProjectParams, UpdateProjectParams,
-    create_project, delete_project, delete_project_icon, update_project,
+    CreateProjectParams, DeleteProjectIconParams, DeleteProjectParams,
+    UpdateProjectDescriptionParams, UpdateProjectParams, create_project, delete_project,
+    delete_project_icon, update_project, update_project_description,
 };
 use events26_api::apis::configuration::Configuration;
 use events26_api::apis::{Error, ResponseContent, urlencode};
-use events26_api::models::Project;
+use events26_api::models::{Project, ProjectDescription};
 use reqwest::header::{HeaderMap, HeaderValue};
 use tracing::warn;
 
@@ -131,6 +132,28 @@ impl Events26Api for Events26ApiClient {
         .map_err(|e| match status_code(&e) {
             Some(404) => UpdateError::NotFound,
             _ => UpdateError::InternalError(internal_error("update_project", e)),
+        })
+    }
+
+    async fn update_project_description(
+        &self,
+        project_id: &str,
+        description: &str,
+    ) -> Result<(), UpdateError> {
+        update_project_description(
+            &self.configuration,
+            UpdateProjectDescriptionParams {
+                project_id: project_id.to_string(),
+                project_description: ProjectDescription {
+                    description: description.to_string(),
+                },
+            },
+        )
+        .await
+        .map(|_| ())
+        .map_err(|e| match status_code(&e) {
+            Some(404) => UpdateError::NotFound,
+            _ => UpdateError::InternalError(internal_error("update_project_description", e)),
         })
     }
 

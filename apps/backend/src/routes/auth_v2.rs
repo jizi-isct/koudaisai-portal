@@ -29,7 +29,8 @@ use utoipa_axum::routes;
 
 /// 本番構成の具体 [`Application`](crate::application::Application)。
 /// auth 関連ポートは [`SqliteApplication`] が argon2 / HMAC / JWT 実装で固定する。
-pub type ProdApplication = SqliteApplication<SesEmail, S3ObjectStorage, WebhookDiscord>;
+pub type ProdApplication =
+    SqliteApplication<SesEmail, S3ObjectStorage, WebhookDiscord, Arc<Events26ApiClient>>;
 
 /// リフレッシュトークン Cookie の属性。`__Host-` 前提(Secure・Domain なし・Path=/)。
 #[derive(Clone)]
@@ -68,10 +69,6 @@ pub struct AuthV2State {
     pub auth_sessions: Arc<Mutex<HashMap<String, admin::AdminAuthSession>>>,
     /// OIDC トークン交換用 HTTP クライアント。
     pub http_client: openidconnect::reqwest::Client,
-    /// 企画情報API(events26)クライアント。`Application` は 18 個の型引数を持ち
-    /// ここに足すと memory 実装まで巻き込むため、ポート実装を State に直接置く
-    /// (`email` と同じ扱い)。ユースケースはハンドラ側で `Events26App` に包む。
-    pub events26: Arc<Events26ApiClient>,
 }
 
 /// OpenAPI 上の auth タグ。

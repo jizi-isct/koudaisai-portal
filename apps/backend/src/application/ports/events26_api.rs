@@ -41,6 +41,17 @@ pub trait Events26Api {
         project: &Project,
     ) -> Result<Project, UpdateError>;
 
+    /// 企画紹介文だけを差し替える。他の項目には触れない。
+    /// 指定 ID の企画が無い場合は [`UpdateError::NotFound`]。
+    ///
+    /// 企画情報の編集申請の承認では紹介文しか変わらないため、企画を丸ごと
+    /// 置き換える [`Self::update_project`] ではなくこちらを使う。
+    async fn update_project_description(
+        &self,
+        project_id: &str,
+        description: &str,
+    ) -> Result<(), UpdateError>;
+
     /// 企画を削除する。タグと開催予定も一緒に消える。
     /// 指定 ID の企画が無い場合は [`DeleteError::NotFound`]。
     async fn delete_project(&self, project_id: &str) -> Result<(), DeleteError>;
@@ -56,4 +67,53 @@ pub trait Events26Api {
 
     /// 企画アイコンの原本を削除する。未登録でも成功する。
     async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError>;
+}
+
+/// `Arc` 越しでもポートとして扱えるようにする。
+///
+/// 合成ルートは events26 クライアントを 1 つだけ作り、`Application` と
+/// (必要なら)他の利用箇所で共有したい。`Application` はポートを値で持つので、
+/// 共有するには `Arc` 自身がポートである必要がある。
+#[async_trait::async_trait]
+impl<T: Events26Api + Send + Sync + ?Sized> Events26Api for std::sync::Arc<T> {
+    async fn create_project(&self, project: &Project) -> Result<Project, InsertError> {
+        (**self).create_project(project).await
+    }
+
+    async fn update_project(
+        &self,
+        project_id: &str,
+        project: &Project,
+    ) -> Result<Project, UpdateError> {
+        (**self).update_project(project_id, project).await
+    }
+
+    async fn update_project_description(
+        &self,
+        project_id: &str,
+        description: &str,
+    ) -> Result<(), UpdateError> {
+        (**self)
+            .update_project_description(project_id, description)
+            .await
+    }
+
+    async fn delete_project(&self, project_id: &str) -> Result<(), DeleteError> {
+        (**self).delete_project(project_id).await
+    }
+
+    async fn update_project_icon(
+        &self,
+        project_id: &str,
+        content_type: &str,
+        image: Vec<u8>,
+    ) -> Result<(), UpdateIconError> {
+        (**self)
+            .update_project_icon(project_id, content_type, image)
+            .await
+    }
+
+    async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError> {
+        (**self).delete_project_icon(project_id).await
+    }
 }

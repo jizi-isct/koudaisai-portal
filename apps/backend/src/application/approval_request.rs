@@ -8,6 +8,7 @@ use crate::application::ports::clock::Clock;
 use crate::application::ports::discord::{
     Discord, DiscordAttachment, DiscordEmbed, DiscordEmbedField, DiscordMessage,
 };
+use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
@@ -31,6 +32,7 @@ pub struct ApprovalRequestApp<
     C: Clock,
     D: Discord,
     OS: ObjectStorage,
+    EA: Events26Api,
 > {
     _phantom: PhantomData<&'a Tx>,
     approval_request_repo: &'a AR,
@@ -39,6 +41,8 @@ pub struct ApprovalRequestApp<
     clock: &'a C,
     discord: &'a D,
     object_storage: &'a OS,
+    /// 企画情報API(events26)。承認した編集内容を企画へ反映するために使う。
+    events26_api: &'a EA,
     base_url: &'a str,
 }
 
@@ -51,8 +55,10 @@ impl<
     C: Clock,
     D: Discord,
     OS: ObjectStorage,
-> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS>
+    EA: Events26Api,
+> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS, EA>
 {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         approval_request_repo: &'a AR,
         membership_repo: &'a MR,
@@ -60,6 +66,7 @@ impl<
         clock: &'a C,
         discord: &'a D,
         object_storage: &'a OS,
+        events26_api: &'a EA,
         base_url: &'a str,
     ) -> Self {
         Self {
@@ -70,6 +77,7 @@ impl<
             clock,
             discord,
             object_storage,
+            events26_api,
             base_url,
         }
     }
@@ -92,6 +100,66 @@ impl<
             (None, Some(name)) => name,
             (None, None) => user_id.to_string(),
         }
+    }
+
+    /// 承認された申請の内容を events26 の企画へ反映する。
+    ///
+    /// 企画は申請の対象団体そのもの(団体 ID = 企画番号)。申請者は複数の団体に
+    /// 所属しうるので、申請者からではなく申請が持つ団体から反映先を決める。
+    ///
+    /// 紹介文とアイコンはそれぞれ指定があるものだけを送る。企画を丸ごと
+    /// 置き換えるとタグや開催予定まで巻き込むため、紹介文は専用の
+    /// [`Events26Api::update_project_description`] を使う。
+    async fn apply_to_events26(
+        &self,
+        request: &ApprovalRequest,
+    ) -> Result<(), ApplicationOperationError<UpdateError>> {
+        let ApprovalRequestType::EditExhibitionInfo {
+            description,
+            icon_key,
+        } = request.request_type();
+
+        if description.is_none() && icon_key.is_none() {
+            return Ok(());
+        }
+
+        let project_id = request.group_id().to_string();
+
+        if let Some(description) = description {
+            self.events26_api
+                .update_project_description(&project_id, description)
+                .await?;
+        }
+
+        if let Some(key) = icon_key {
+            let image = self
+                .object_storage
+                .get_object(key)
+                .await
+                .map_err(|e| ApplicationOperationError::InternalError(e.into()))?;
+            let content_type = icon_content_type(key, &image).ok_or_else(|| {
+                ApplicationOperationError::InvalidInput(format!(
+                    "Cannot determine the icon format \
+                     (supported: png, jpeg, gif, webp, heic): {key}"
+                ))
+            })?;
+            self.events26_api
+                .update_project_icon(&project_id, content_type, image)
+                .await
+                .map_err(|e| match e {
+                    UpdateIconError::NotFound => {
+                        ApplicationOperationError::OperationFailed(UpdateError::NotFound)
+                    }
+                    UpdateIconError::InvalidImage(reason) => {
+                        ApplicationOperationError::InvalidInput(reason)
+                    }
+                    UpdateIconError::InternalError(error) => {
+                        ApplicationOperationError::InternalError(error)
+                    }
+                })?;
+        }
+
+        Ok(())
     }
 
     /// 全ての承認申請を取得（管理者用）
@@ -229,7 +297,11 @@ impl<
         Ok(id)
     }
 
-    /// 承認申請を承認
+    /// 承認申請を承認し、申請内容を events26 の企画へ反映する。
+    ///
+    /// 反映は承認済みとして保存する**前**に行う。失敗したらエラーを返して申請を
+    /// 審査中のまま残し、「承認したのに反映されていない」状態を作らない。
+    /// Discord 通知だけは従来どおり best-effort。
     pub async fn approve(
         &self,
         actor_ctx: &ActorContext,
@@ -254,6 +326,7 @@ impl<
                 UpdateError::NotFound,
             ))?;
 
+        // 状態遷移の検査を先に済ませる(審査中でない申請を反映してしまわないため)。
         request
             .approve(approver_id, approval_reason, self.clock)
             .map_err(|_| {
@@ -261,6 +334,8 @@ impl<
                     "Cannot approve non-pending request".to_string(),
                 )
             })?;
+
+        self.apply_to_events26(&request).await?;
 
         self.approval_request_repo.update(&request).await?;
 
@@ -382,6 +457,47 @@ fn issuer_label_from_actor(actor_ctx: &ActorContext) -> String {
             None => name.clone(),
         },
         _ => "不明な申請者".to_string(),
+    }
+}
+
+/// アイコンのメディアタイプを判別する。events26 は `Content-Type` で形式を見るため、
+/// 中身から決める必要がある。
+///
+/// オブジェクトストレージのキーは申請時に呼び出し側が決めており拡張子がある保証は
+/// ないので、まずマジックバイトで判定し、それで決まらないときだけ拡張子に頼る。
+/// events26 が受け付けない形式は `None`(承認を通さない)。
+fn icon_content_type(key: &str, image: &[u8]) -> Option<&'static str> {
+    let by_magic = if image.starts_with(b"\x89PNG\r\n\x1a\n") {
+        Some("image/png")
+    } else if image.starts_with(&[0xFF, 0xD8, 0xFF]) {
+        Some("image/jpeg")
+    } else if image.starts_with(b"GIF87a") || image.starts_with(b"GIF89a") {
+        Some("image/gif")
+    } else if image.len() >= 12 && image.starts_with(b"RIFF") && &image[8..12] == b"WEBP" {
+        Some("image/webp")
+    } else if image.len() >= 12
+        && &image[4..8] == b"ftyp"
+        && matches!(
+            &image[8..12],
+            b"heic" | b"heix" | b"hevc" | b"heim" | b"heis" | b"mif1" | b"msf1"
+        )
+    {
+        Some("image/heic")
+    } else {
+        None
+    };
+    if by_magic.is_some() {
+        return by_magic;
+    }
+
+    let extension = key.rsplit_once('.')?.1.to_ascii_lowercase();
+    match extension.as_str() {
+        "png" => Some("image/png"),
+        "jpg" | "jpeg" => Some("image/jpeg"),
+        "gif" => Some("image/gif"),
+        "webp" => Some("image/webp"),
+        "heic" | "heif" => Some("image/heic"),
+        _ => None,
     }
 }
 
@@ -508,6 +624,7 @@ mod tests {
     use crate::infra::memory::approval_request_repo_impl::MemoryApprovalRequestRepo;
     use crate::infra::memory::clock_impl::MemoryClock;
     use crate::infra::memory::discord_impl::MemoryDiscord;
+    use crate::infra::memory::events26_api_impl::MemoryEvents26Api;
     use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
     use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
     use crate::infra::memory::user_repo_impl::MemoryUserRepo;
@@ -517,12 +634,7 @@ mod tests {
 
     const BASE_URL: &str = "https://portal.koudaisai.jp";
 
-    /// テストで使う対象団体。
-    fn group_id() -> GroupId {
-        GroupId::from_str("I-100").unwrap()
-    }
-
-    /// 申請者役の `ActorContext`。対象団体は申請時に指定するので所属も持たせる。
+    /// 申請者役の `ActorContext`。対象団体は申請時に指定するので、所属も持たせる。
     fn user_ctx() -> ActorContext {
         let user_id = UserId::new(Uuid::new_v4());
         ActorContext::User {
@@ -536,6 +648,11 @@ mod tests {
             )],
             group_type: GroupType::GeneralProject,
         }
+    }
+
+    /// テストで使う対象団体。
+    fn group_id() -> GroupId {
+        GroupId::from_str("I-100").unwrap()
     }
 
     fn admin_ctx() -> ActorContext {
@@ -555,7 +672,8 @@ mod tests {
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -603,35 +721,15 @@ mod tests {
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
 
         // 承認通知の申請者名は user_repo から解決されるので、申請者を登録しておく。
-        let issuer_id = UserId::new(Uuid::new_v4());
-        let email = EmailAddress::new(format!("{}@example.com", Uuid::new_v4())).unwrap();
-        let issuer = User::register(
-            issuer_id,
-            "申請花子".to_string(),
-            email,
-            MemoryClock::new(now),
-        )
-        .unwrap();
-        ur.insert(&issuer).await.unwrap();
-
-        let issuer_ctx = ActorContext::User {
-            user_id: issuer_id,
-            name: "申請花子".to_string(),
-            memberships: vec![Membership::new(
-                group_id(),
-                issuer_id,
-                Role::FirstResponsible,
-                &MemoryClock::new(now),
-            )],
-            group_type: GroupType::GeneralProject,
-        };
+        let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-126").await;
         let id = app
             .create(
                 &issuer_ctx,
-                group_id(),
+                issuer_group,
                 ApprovalRequestType::EditExhibitionInfo {
                     description: None,
                     icon_key: None,
@@ -681,7 +779,8 @@ mod tests {
         let os = MemoryObjectStorage::new();
         // アイコン本体をオブジェクトストレージに用意しておく。
         os.put("icon-key.png", vec![1, 2, 3, 4]);
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -712,7 +811,8 @@ mod tests {
         let clock = MemoryClock::new(now);
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
-        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, BASE_URL);
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
 
         app.create(
             &user_ctx(),
@@ -728,5 +828,123 @@ mod tests {
 
         let messages = discord.sent_messages();
         assert!(messages[0].attachments.is_empty());
+    }
+
+    /// 申請者を user_repo と membership_repo に登録し、`ActorContext` を返す。
+    /// 承認時の反映先(企画番号)は所属団体の ID から決まるため、所属も要る。
+    async fn setup_issuer(
+        ur: &MemoryUserRepo,
+        mr: &MemoryMembershipRepo,
+        now: chrono::DateTime<Utc>,
+        group_id: &str,
+    ) -> (UserId, GroupId, ActorContext) {
+        let issuer_id = UserId::new(Uuid::new_v4());
+        let email = EmailAddress::new(format!("{}@example.com", Uuid::new_v4())).unwrap();
+        let issuer = User::register(
+            issuer_id,
+            "申請花子".to_string(),
+            email,
+            MemoryClock::new(now),
+        )
+        .unwrap();
+        ur.insert(&issuer).await.unwrap();
+        let group_id = GroupId::from_str(group_id).unwrap();
+        let membership = Membership::new(
+            group_id,
+            issuer_id,
+            Role::FirstResponsible,
+            &MemoryClock::new(now),
+        );
+        mr.insert(membership.clone()).await.unwrap();
+
+        (
+            issuer_id,
+            group_id,
+            ActorContext::User {
+                user_id: issuer_id,
+                name: "申請花子".to_string(),
+                memberships: vec![membership],
+                group_type: GroupType::GeneralProject,
+            },
+        )
+    }
+
+    #[tokio::test]
+    async fn approve_applies_description_and_icon_to_events26() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        // 拡張子の無いキーでも中身(PNG のマジックバイト)から形式を決められること。
+        os.put(
+            "icon-key",
+            vec![0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, 1, 2],
+        );
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+
+        let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-123").await;
+        let id = app
+            .create(
+                &issuer_ctx,
+                issuer_group,
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: Some("新しい紹介文".to_string()),
+                    icon_key: Some("icon-key".to_string()),
+                },
+                "理由".to_string(),
+            )
+            .await
+            .expect("create should succeed");
+
+        app.approve(&admin_ctx(), id, None)
+            .await
+            .expect("approve should succeed");
+
+        assert_eq!(e26.description("I-123").as_deref(), Some("新しい紹介文"));
+        let (content_type, image) = e26.icon("I-123").expect("icon should be applied");
+        assert_eq!(content_type, "image/png");
+        assert_eq!(image.len(), 10);
+    }
+
+    #[tokio::test]
+    async fn approve_keeps_request_pending_when_events26_fails() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        let e26 = MemoryEvents26Api::new();
+        let app = ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, BASE_URL);
+
+        let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-124").await;
+        let id = app
+            .create(
+                &issuer_ctx,
+                issuer_group,
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: Some("新しい紹介文".to_string()),
+                    icon_key: None,
+                },
+                "理由".to_string(),
+            )
+            .await
+            .expect("create should succeed");
+
+        e26.fail_writes();
+
+        let result = app.approve(&admin_ctx(), id, None).await;
+        assert!(result.is_err(), "approve should fail when events26 rejects");
+
+        // 反映できなかった申請は審査中のまま残り、やり直せること。
+        let stored = ar.find_by_id(id).await.unwrap().unwrap();
+        assert_eq!(stored.status(), &ApprovalRequestStatus::Pending);
+        // 承認通知も送られない(作成時の 1 通だけ)。
+        assert_eq!(discord.sent_messages().len(), 1);
     }
 }

@@ -24,6 +24,7 @@ mod tests;
 use crate::application::Application;
 use crate::application::ports::discord::Discord;
 use crate::application::ports::email::Email;
+use crate::application::ports::events26_api::Events26Api;
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::infra::argon2_password_hasher::Argon2PasswordHasher;
 use crate::infra::clock_impl::ClockImpl;
@@ -48,7 +49,7 @@ use std::str::FromStr;
 /// SQLite バックエンドで構成した [`Application`]。
 /// メール送信ポート `E`・Discord 通知ポート `D` は外部サービス実装
 /// (SendGrid / webhook 等)を注入する。
-pub type SqliteApplication<E, OS, D> = Application<
+pub type SqliteApplication<E, OS, D, EA> = Application<
     SqliteTransaction,
     SqliteApprovalRequestRepo,
     SqliteGroupRepo,
@@ -68,6 +69,7 @@ pub type SqliteApplication<E, OS, D> = Application<
     JwtAccessTokenIssuer,
     SqliteNotificationRepo,
     ReqwestMetaFetcher,
+    EA,
 >;
 
 /// SQLite プールを生成し，マイグレーションを適用する。
@@ -85,16 +87,17 @@ pub async fn connect_and_migrate(database_url: &str) -> anyhow::Result<SqlitePoo
 /// プールと外部サービス実装(メール・Discord)、公開ベース URL から
 /// [`SqliteApplication`] を組み立てる。
 #[allow(clippy::too_many_arguments)]
-pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
+pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord, EA: Events26Api>(
     pool: SqlitePool,
     email: E,
     object_storage: OS,
     discord: D,
+    events26_api: EA,
     base_url: String,
     password_hasher: Argon2PasswordHasher,
     secret_generator: RandomSecretGenerator,
     access_token_issuer: JwtAccessTokenIssuer,
-) -> SqliteApplication<E, OS, D> {
+) -> SqliteApplication<E, OS, D, EA> {
     Application::new(
         SqliteApprovalRequestRepo::new(pool.clone()),
         SqliteGroupRepo::new(pool.clone()),
@@ -114,6 +117,7 @@ pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord>(
         access_token_issuer,
         SqliteNotificationRepo::new(pool.clone()),
         ReqwestMetaFetcher::from_config(),
+        events26_api,
         base_url,
     )
 }

@@ -94,11 +94,17 @@ async fn main() {
         password_hasher.hash(&plain).await.expect("hash dummy phc")
     };
 
+    let events26_api = Arc::new(
+        Events26ApiClient::from_config(&config.events26, &config.secrets)
+            .expect("build events26 api client"),
+    );
+
     let prod_app = new_sqlite_application(
         pool.clone(),
         SesEmail::from_config(&config.ses).await,
         S3ObjectStorage::from_config(&config.s3).await,
         WebhookDiscord::from_config(&config.discord),
+        events26_api,
         config.web.server.base_url.clone(),
         password_hasher,
         secret_generator,
@@ -130,10 +136,6 @@ async fn main() {
         oidc_client: Arc::new(oidc_client),
         auth_sessions: Arc::new(tokio::sync::Mutex::new(std::collections::HashMap::new())),
         http_client: openidconnect::reqwest::Client::new(),
-        events26: Arc::new(
-            Events26ApiClient::from_config(&config.events26, &config.secrets)
-                .expect("build events26 api client"),
-        ),
     };
 
     // credentials 付き CORS(`*` は使えないため origin は許可リスト)。
