@@ -16,7 +16,7 @@ const canonical = new URL(Astro.url.pathname, "https://join.koudaisai.jp").toStr
 const gaInlineScript = env.GA_MEASUREMENT_ID ?? GA_MEASUREMENT_ID
   ? `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});`
+gtag('config', ${JSON.stringify(env.GA_MEASUREMENT_ID ?? GA_MEASUREMENT_ID)});`
   : "";
 
 const isProduction = import.meta.env.PROD;
@@ -29,11 +29,11 @@ const isProduction = import.meta.env.PROD;
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
-    {isProduction && GA_MEASUREMENT_ID && (
+    {isProduction && (env.GA_MEASUREMENT_ID ?? GA_MEASUREMENT_ID) && (
       <>
         <script
           async
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          src={`https://www.googletagmanager.com/gtag/js?id=${env.GA_MEASUREMENT_ID ?? GA_MEASUREMENT_ID}`}
         />
         <script is:inline set:html={gaInlineScript} />
       </>
