@@ -7,9 +7,7 @@
   "paths": {
     "/approval-requests": {
       "get": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Get all approval requests, optionally filtered by group.",
         "operationId": "get_approval_requests",
         "parameters": [
@@ -46,9 +44,7 @@
         }
       },
       "post": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Create an approval request.",
         "operationId": "post_approval_request",
         "requestBody": {
@@ -86,9 +82,7 @@
     },
     "/approval-requests/{id}": {
       "get": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Get an approval request by id.",
         "operationId": "get_approval_request",
         "parameters": [
@@ -125,9 +119,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Delete an approval request by id.",
         "operationId": "delete_approval_request",
         "parameters": [
@@ -159,9 +151,7 @@
     },
     "/approval-requests/{id}/approve": {
       "post": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Approve an approval request by id.",
         "operationId": "approve_approval_request",
         "parameters": [
@@ -213,9 +203,7 @@
     },
     "/approval-requests/{id}/close": {
       "post": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Close an approval request by id.",
         "operationId": "close_approval_request",
         "parameters": [
@@ -257,9 +245,7 @@
     },
     "/approval-requests/{id}/reject": {
       "post": {
-        "tags": [
-          "approval-requests"
-        ],
+        "tags": ["approval-requests"],
         "description": "Reject an approval request by id.",
         "operationId": "reject_approval_request",
         "parameters": [
@@ -311,9 +297,7 @@
     },
     "/document-categories": {
       "get": {
-        "tags": [
-          "document-categories"
-        ],
+        "tags": ["document-categories"],
         "description": "Get all document categories.",
         "operationId": "get_document_categories",
         "responses": {
@@ -339,9 +323,7 @@
         }
       },
       "post": {
-        "tags": [
-          "document-categories"
-        ],
+        "tags": ["document-categories"],
         "description": "Create a document category.",
         "operationId": "post_document_category",
         "requestBody": {
@@ -379,9 +361,7 @@
     },
     "/document-categories/{id}": {
       "get": {
-        "tags": [
-          "document-categories"
-        ],
+        "tags": ["document-categories"],
         "description": "Get a document category by id.",
         "operationId": "get_document_category",
         "parameters": [
@@ -418,9 +398,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "document-categories"
-        ],
+        "tags": ["document-categories"],
         "description": "Delete a document category by id.",
         "operationId": "delete_document_category",
         "parameters": [
@@ -450,9 +428,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "document-categories"
-        ],
+        "tags": ["document-categories"],
         "description": "Edit a document category by id.",
         "operationId": "patch_document_category",
         "parameters": [
@@ -504,9 +480,7 @@
     },
     "/documents": {
       "get": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Get all documents visible to the caller.",
         "operationId": "get_documents",
         "parameters": [
@@ -540,9 +514,7 @@
         }
       },
       "post": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Create a document.",
         "operationId": "post_document",
         "requestBody": {
@@ -580,9 +552,7 @@
     },
     "/documents/by-category": {
       "get": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Get documents visible to the caller, grouped by category.",
         "operationId": "get_documents_by_category",
         "parameters": [
@@ -618,9 +588,7 @@
     },
     "/documents/{id}": {
       "get": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Get a document by id.",
         "operationId": "get_document",
         "parameters": [
@@ -654,9 +622,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Delete a document by id.",
         "operationId": "delete_document",
         "parameters": [
@@ -686,9 +652,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "documents"
-        ],
+        "tags": ["documents"],
         "description": "Edit a document by id.",
         "operationId": "patch_document",
         "parameters": [
@@ -740,9 +704,7 @@
     },
     "/events26/projects": {
       "post": {
-        "tags": [
-          "events26"
-        ],
+        "tags": ["events26"],
         "description": "Create a project on the events26 API. The id is supplied by the caller.",
         "operationId": "post_project",
         "requestBody": {
@@ -797,9 +759,7 @@
     },
     "/events26/projects/{project_id}": {
       "put": {
-        "tags": [
-          "events26"
-        ],
+        "tags": ["events26"],
         "description": "Replace a project on the events26 API. Tags and occasions are replaced wholesale, not merged.",
         "operationId": "put_project",
         "parameters": [
@@ -863,9 +823,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "events26"
-        ],
+        "tags": ["events26"],
         "description": "Delete a project on the events26 API. Tags and occasions are removed with it.",
         "operationId": "delete_project",
         "parameters": [
@@ -904,9 +862,7 @@
     },
     "/events26/projects/{project_id}/icon": {
       "put": {
-        "tags": [
-          "events26"
-        ],
+        "tags": ["events26"],
         "description": "Replace a project icon on the events26 API. The body is the raw image; it must be square and at most 20MB.",
         "operationId": "put_project_icon",
         "parameters": [
@@ -974,9 +930,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "events26"
-        ],
+        "tags": ["events26"],
         "description": "Delete a project icon on the events26 API. Succeeds even if no icon is set.",
         "operationId": "delete_project_icon",
         "parameters": [
@@ -1012,9 +966,7 @@
     },
     "/files/download": {
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "description": "Issue a presigned URL for downloading a file.",
         "operationId": "get_file_download",
         "parameters": [
@@ -1069,9 +1021,7 @@
     },
     "/files/upload": {
       "post": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "description": "Issue a presigned URL for uploading a file.",
         "operationId": "post_file_upload",
         "requestBody": {
@@ -1106,9 +1056,7 @@
     },
     "/forms": {
       "get": {
-        "tags": [
-          "forms"
-        ],
+        "tags": ["forms"],
         "description": "Get all forms visible to the caller.",
         "operationId": "get_forms",
         "responses": {
@@ -1131,9 +1079,7 @@
         }
       },
       "post": {
-        "tags": [
-          "forms"
-        ],
+        "tags": ["forms"],
         "description": "Create a form.",
         "operationId": "post_form",
         "requestBody": {
@@ -1171,9 +1117,7 @@
     },
     "/forms/{id}": {
       "get": {
-        "tags": [
-          "forms"
-        ],
+        "tags": ["forms"],
         "description": "Get a form by id.",
         "operationId": "get_form",
         "parameters": [
@@ -1207,9 +1151,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "forms"
-        ],
+        "tags": ["forms"],
         "description": "Delete a form by id.",
         "operationId": "delete_form",
         "parameters": [
@@ -1239,9 +1181,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "forms"
-        ],
+        "tags": ["forms"],
         "description": "Edit a form by id.",
         "operationId": "patch_form",
         "parameters": [
@@ -1293,9 +1233,7 @@
     },
     "/groups": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Get all groups.",
         "operationId": "get_groups",
         "responses": {
@@ -1323,9 +1261,7 @@
     },
     "/groups/us": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Get the group the current user belongs to.",
         "operationId": "get_group_us",
         "responses": {
@@ -1353,9 +1289,7 @@
     },
     "/groups/{id}": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Get a group by id.",
         "operationId": "get_group",
         "parameters": [
@@ -1391,9 +1325,7 @@
         }
       },
       "put": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Create a group by id or replace an existing one.",
         "operationId": "put_group",
         "parameters": [
@@ -1449,9 +1381,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Delete a group by id.",
         "operationId": "delete_group",
         "parameters": [
@@ -1480,9 +1410,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Edit a group by id.",
         "operationId": "patch_group",
         "parameters": [
@@ -1533,9 +1461,7 @@
     },
     "/groups/{id}/members": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Get all members of a group.",
         "operationId": "get_members",
         "parameters": [
@@ -1576,9 +1502,7 @@
     },
     "/groups/{id}/members/{role}": {
       "put": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Assign a member to a role in a group or replace an existing one.",
         "operationId": "put_member",
         "parameters": [
@@ -1645,9 +1569,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "description": "Remove a member from a role in a group.",
         "operationId": "delete_member",
         "parameters": [
@@ -1686,9 +1608,7 @@
     },
     "/notifications": {
       "get": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "description": "Get all notifications visible to the caller.",
         "operationId": "get_notifications",
         "responses": {
@@ -1711,9 +1631,7 @@
         }
       },
       "post": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "description": "Create a notification.",
         "operationId": "post_notification",
         "requestBody": {
@@ -1751,9 +1669,7 @@
     },
     "/notifications/{id}": {
       "get": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "description": "Get a notification by id.",
         "operationId": "get_notification",
         "parameters": [
@@ -1787,9 +1703,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "description": "Delete a notification by id.",
         "operationId": "delete_notification",
         "parameters": [
@@ -1819,9 +1733,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "description": "Edit a notification by id.",
         "operationId": "patch_notification",
         "parameters": [
@@ -1873,9 +1785,7 @@
     },
     "/users": {
       "get": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Get all users.",
         "operationId": "get_users",
         "responses": {
@@ -1901,9 +1811,7 @@
         }
       },
       "post": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Create a new user (id is generated server-side); returns the activation token.",
         "operationId": "post_user",
         "requestBody": {
@@ -1944,9 +1852,7 @@
     },
     "/users/me": {
       "get": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Get the currently authenticated user.",
         "operationId": "get_user_me",
         "responses": {
@@ -1974,9 +1880,7 @@
     },
     "/users/{id}": {
       "get": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Get a user by id.",
         "operationId": "get_user",
         "parameters": [
@@ -2013,9 +1917,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Delete a user by id.",
         "operationId": "delete_user",
         "parameters": [
@@ -2045,9 +1947,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Edit a user's name by id (m_address is changed via its own endpoint).",
         "operationId": "patch_user",
         "parameters": [
@@ -2099,9 +1999,7 @@
     },
     "/users/{id}/m_address": {
       "post": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Change a user's m_address and re-issue an activation token.",
         "operationId": "post_user_m_address",
         "parameters": [
@@ -2153,9 +2051,7 @@
     },
     "/users/{id}/read-notifications": {
       "get": {
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "description": "Get the notifications the user has marked as read.",
         "operationId": "get_user_read_notifications",
         "parameters": [
@@ -2197,9 +2093,7 @@
     },
     "/util/meta": {
       "get": {
-        "tags": [
-          "util"
-        ],
+        "tags": ["util"],
         "description": "Fetch OpenGraph/HTML metadata (title, description) for a URL.",
         "operationId": "get_meta",
         "parameters": [
@@ -2240,10 +2134,7 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
@@ -2254,10 +2145,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "group_id",
-              "issue_reason"
-            ],
+            "required": ["group_id", "issue_reason"],
             "properties": {
               "group_id": {
                 "type": "string",
@@ -2315,31 +2203,20 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "status"
-            ],
+            "required": ["status"],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending"
-                ]
+                "enum": ["pending"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "approved_by",
-              "approved_at",
-              "status"
-            ],
+            "required": ["approved_by", "approved_at", "status"],
             "properties": {
               "approval_reason": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "approved_at": {
                 "type": "string",
@@ -2351,19 +2228,13 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "approved"
-                ]
+                "enum": ["approved"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "rejected_by",
-              "rejected_at",
-              "status"
-            ],
+            "required": ["rejected_by", "rejected_at", "status"],
             "properties": {
               "rejected_at": {
                 "type": "string",
@@ -2374,25 +2245,17 @@
                 "format": "uuid"
               },
               "rejection_reason": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "rejected"
-                ]
+                "enum": ["rejected"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "closed_at",
-              "status"
-            ],
+            "required": ["closed_at", "status"],
             "properties": {
               "closed_at": {
                 "type": "string",
@@ -2400,9 +2263,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "closed"
-                ]
+                "enum": ["closed"]
               }
             }
           }
@@ -2412,27 +2273,17 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "type"
-            ],
+            "required": ["type"],
             "properties": {
               "description": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "icon_key": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "edit_exhibition_info"
-                ]
+                "enum": ["edit_exhibition_info"]
               }
             }
           }
@@ -2440,15 +2291,10 @@
       },
       "DocumentCategoryCreate": {
         "type": "object",
-        "required": [
-          "title"
-        ],
+        "required": ["title"],
         "properties": {
           "emoji": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "title": {
             "type": "string"
@@ -2457,22 +2303,14 @@
       },
       "DocumentCategoryRead": {
         "type": "object",
-        "required": [
-          "id",
-          "created_at",
-          "updated_at",
-          "title"
-        ],
+        "required": ["id", "created_at", "updated_at", "title"],
         "properties": {
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "emoji": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "id": {
             "type": "string",
@@ -2491,16 +2329,10 @@
         "type": "object",
         "properties": {
           "emoji": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "title": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
@@ -2511,16 +2343,10 @@
           },
           {
             "type": "object",
-            "required": [
-              "title",
-              "targets"
-            ],
+            "required": ["title", "targets"],
             "properties": {
               "category": {
-                "type": [
-                  "string",
-                  "null"
-                ],
+                "type": ["string", "null"],
                 "format": "uuid"
               },
               "targets": {
@@ -2540,29 +2366,20 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "content",
-              "format"
-            ],
+            "required": ["content", "format"],
             "properties": {
               "content": {
                 "type": "string"
               },
               "format": {
                 "type": "string",
-                "enum": [
-                  "markdown"
-                ]
+                "enum": ["markdown"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "file_key",
-              "file_name",
-              "format"
-            ],
+            "required": ["file_key", "file_name", "format"],
             "properties": {
               "file_key": {
                 "type": "string"
@@ -2572,19 +2389,13 @@
               },
               "format": {
                 "type": "string",
-                "enum": [
-                  "pdf"
-                ]
+                "enum": ["pdf"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "file_key",
-              "file_name",
-              "format"
-            ],
+            "required": ["file_key", "file_name", "format"],
             "properties": {
               "file_key": {
                 "type": "string"
@@ -2594,9 +2405,7 @@
               },
               "format": {
                 "type": "string",
-                "enum": [
-                  "misc"
-                ]
+                "enum": ["misc"]
               }
             }
           }
@@ -2619,10 +2428,7 @@
             ],
             "properties": {
               "category": {
-                "type": [
-                  "string",
-                  "null"
-                ],
+                "type": ["string", "null"],
                 "format": "uuid"
               },
               "created_at": {
@@ -2658,10 +2464,7 @@
         "type": "object",
         "properties": {
           "category": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "format": "uuid"
           },
           "format": {
@@ -2675,28 +2478,20 @@
             ]
           },
           "targets": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": ["array", "null"],
             "items": {
               "type": "string"
             }
           },
           "title": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
       "DocumentsByCategoryEntry": {
         "type": "object",
         "description": "`GET /documents/by-category` の 1 カテゴリ分のエントリ。\n`category` が `None` のときは未分類ドキュメントを表す。",
-        "required": [
-          "documents"
-        ],
+        "required": ["documents"],
         "properties": {
           "category": {
             "oneOf": [
@@ -2718,9 +2513,7 @@
       },
       "DrinkFoodStallTag": {
         "type": "object",
-        "required": [
-          "tag"
-        ],
+        "required": ["tag"],
         "properties": {
           "tag": {
             "$ref": "#/components/schemas/DrinkFoodStallTagTag"
@@ -2730,16 +2523,12 @@
       "DrinkFoodStallTagTag": {
         "type": "string",
         "description": "",
-        "enum": [
-          "drink"
-        ]
+        "enum": ["drink"]
       },
       "FileDownloadResponse": {
         "type": "object",
         "description": "ダウンロード用に発行した presigned URL。",
-        "required": [
-          "presigned_url"
-        ],
+        "required": ["presigned_url"],
         "properties": {
           "presigned_url": {
             "type": "string"
@@ -2749,9 +2538,7 @@
       "FileUploadRequest": {
         "type": "object",
         "description": "アップロード用 presigned URL のリクエストボディ。",
-        "required": [
-          "file_name"
-        ],
+        "required": ["file_name"],
         "properties": {
           "file_name": {
             "type": "string"
@@ -2761,10 +2548,7 @@
       "FileUploadResponse": {
         "type": "object",
         "description": "アップロード用に発行した presigned URL とストレージキー。",
-        "required": [
-          "presigned_url",
-          "key"
-        ],
+        "required": ["presigned_url", "key"],
         "properties": {
           "key": {
             "type": "string"
@@ -2826,9 +2610,7 @@
       "FoodStallProjectType": {
         "type": "string",
         "description": "",
-        "enum": [
-          "food-stall"
-        ]
+        "enum": ["food-stall"]
       },
       "FoodStallTag": {
         "oneOf": [
@@ -2850,12 +2632,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "targets",
-              "name",
-              "summary",
-              "due_date"
-            ],
+            "required": ["targets", "name", "summary", "due_date"],
             "properties": {
               "due_date": {
                 "type": "string",
@@ -2899,10 +2676,7 @@
                 "format": "date-time"
               },
               "created_by": {
-                "type": [
-                  "string",
-                  "null"
-                ],
+                "type": ["string", "null"],
                 "format": "uuid"
               },
               "due_date": {
@@ -2937,19 +2711,14 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "form_url",
-              "type"
-            ],
+            "required": ["form_url", "type"],
             "properties": {
               "form_url": {
                 "type": "string"
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "external"
-                ]
+                "enum": ["external"]
               }
             }
           }
@@ -2959,29 +2728,17 @@
         "type": "object",
         "properties": {
           "due_date": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "format": "date-time"
           },
           "name": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "summary": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "targets": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": ["array", "null"],
             "items": {
               "type": "string"
             }
@@ -3040,27 +2797,16 @@
       "GeneralProjectType": {
         "type": "string",
         "description": "",
-        "enum": [
-          "general"
-        ]
+        "enum": ["general"]
       },
       "GeneralTag": {
         "type": "string",
         "description": "",
-        "enum": [
-          "experience",
-          "display",
-          "performance",
-          "food",
-          "lecture"
-        ]
+        "enum": ["experience", "display", "performance", "food", "lecture"]
       },
       "GroupCreate": {
         "type": "object",
-        "required": [
-          "name",
-          "type"
-        ],
+        "required": ["name", "type"],
         "properties": {
           "name": {
             "type": "string"
@@ -3072,13 +2818,7 @@
       },
       "GroupRead": {
         "type": "object",
-        "required": [
-          "id",
-          "created_at",
-          "updated_at",
-          "name",
-          "type"
-        ],
+        "required": ["id", "created_at", "updated_at", "name", "type"],
         "properties": {
           "created_at": {
             "type": "string",
@@ -3113,10 +2853,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
@@ -3169,16 +2906,12 @@
       "LaboratoryProjectType": {
         "type": "string",
         "description": "",
-        "enum": [
-          "laboratory"
-        ]
+        "enum": ["laboratory"]
       },
       "MAddressUpdate": {
         "type": "object",
         "description": "`POST /users/{id}/m_address` のリクエストボディ。",
-        "required": [
-          "m_address"
-        ],
+        "required": ["m_address"],
         "properties": {
           "m_address": {
             "type": "string"
@@ -3188,9 +2921,7 @@
       "MAddressUpdated": {
         "type": "object",
         "description": "m アドレス変更時に再発行される activation token を含むレスポンス。",
-        "required": [
-          "activation_token"
-        ],
+        "required": ["activation_token"],
         "properties": {
           "activation_token": {
             "type": "string"
@@ -3199,10 +2930,7 @@
       },
       "MainFoodStallTag": {
         "type": "object",
-        "required": [
-          "tag",
-          "tag2"
-        ],
+        "required": ["tag", "tag2"],
         "properties": {
           "tag": {
             "$ref": "#/components/schemas/MainFoodStallTagTag"
@@ -3215,9 +2943,7 @@
       "MainFoodStallTagTag": {
         "type": "string",
         "description": "",
-        "enum": [
-          "main"
-        ]
+        "enum": ["main"]
       },
       "MainFoodStallTagTag2": {
         "type": "string",
@@ -3233,9 +2959,7 @@
       },
       "MemberCreate": {
         "type": "object",
-        "required": [
-          "user_id"
-        ],
+        "required": ["user_id"],
         "properties": {
           "user_id": {
             "type": "string",
@@ -3245,11 +2969,7 @@
       },
       "MemberRead": {
         "type": "object",
-        "required": [
-          "user_id",
-          "role",
-          "created_at"
-        ],
+        "required": ["user_id", "role", "created_at"],
         "properties": {
           "created_at": {
             "type": "string",
@@ -3269,16 +2989,10 @@
         "description": "取得先 URL の OpenGraph / HTML メタ情報（リンクプレビュー用）。",
         "properties": {
           "description": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "title": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
@@ -3289,9 +3003,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "targets"
-            ],
+            "required": ["targets"],
             "properties": {
               "targets": {
                 "type": "array",
@@ -3310,22 +3022,14 @@
           },
           {
             "type": "object",
-            "required": [
-              "id",
-              "created_at",
-              "updated_at",
-              "targets"
-            ],
+            "required": ["id", "created_at", "updated_at", "targets"],
             "properties": {
               "created_at": {
                 "type": "string",
                 "format": "date-time"
               },
               "created_by": {
-                "type": [
-                  "string",
-                  "null"
-                ],
+                "type": ["string", "null"],
                 "format": "uuid"
               },
               "id": {
@@ -3350,11 +3054,7 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "title",
-              "content",
-              "type"
-            ],
+            "required": ["title", "content", "type"],
             "properties": {
               "content": {
                 "type": "string"
@@ -3364,18 +3064,13 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "markdown"
-                ]
+                "enum": ["markdown"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "approval_request_id",
-              "type"
-            ],
+            "required": ["approval_request_id", "type"],
             "properties": {
               "approval_request_id": {
                 "type": "string",
@@ -3383,9 +3078,7 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "approval_request"
-                ]
+                "enum": ["approval_request"]
               }
             }
           }
@@ -3395,33 +3088,22 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "targets": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": ["array", "null"],
             "items": {
               "type": "string"
             }
           },
           "title": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       },
       "Occasion": {
         "type": "object",
-        "required": [
-          "timeRange"
-        ],
+        "required": ["timeRange"],
         "properties": {
           "place": {
             "oneOf": [
@@ -3780,16 +3462,11 @@
       "StageProjectType": {
         "type": "string",
         "description": "",
-        "enum": [
-          "stage"
-        ]
+        "enum": ["stage"]
       },
       "SweetFoodStallTag": {
         "type": "object",
-        "required": [
-          "tag",
-          "tag2"
-        ],
+        "required": ["tag", "tag2"],
         "properties": {
           "tag": {
             "$ref": "#/components/schemas/SweetFoodStallTagTag"
@@ -3802,29 +3479,16 @@
       "SweetFoodStallTagTag": {
         "type": "string",
         "description": "",
-        "enum": [
-          "sweet"
-        ]
+        "enum": ["sweet"]
       },
       "SweetFoodStallTagTag2": {
         "type": "string",
         "description": "",
-        "enum": [
-          "japanese",
-          "western",
-          "cold",
-          "snack",
-          "drink",
-          "world"
-        ]
+        "enum": ["japanese", "western", "cold", "snack", "drink", "world"]
       },
       "Time": {
         "type": "object",
-        "required": [
-          "date",
-          "hour",
-          "minute"
-        ],
+        "required": ["date", "hour", "minute"],
         "properties": {
           "date": {
             "$ref": "#/components/schemas/TimeDate"
@@ -3842,17 +3506,11 @@
       "TimeDate": {
         "type": "integer",
         "description": "",
-        "enum": [
-          1,
-          2
-        ]
+        "enum": [1, 2]
       },
       "TimeRange": {
         "type": "object",
-        "required": [
-          "start",
-          "end"
-        ],
+        "required": ["start", "end"],
         "properties": {
           "end": {
             "$ref": "#/components/schemas/Time"
@@ -3864,10 +3522,7 @@
       },
       "UserCreate": {
         "type": "object",
-        "required": [
-          "name",
-          "m_address"
-        ],
+        "required": ["name", "m_address"],
         "properties": {
           "m_address": {
             "type": "string"
@@ -3884,9 +3539,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "activation_token"
-            ],
+            "required": ["activation_token"],
             "properties": {
               "activation_token": {
                 "type": "string"
@@ -3903,23 +3556,14 @@
           },
           {
             "type": "object",
-            "required": [
-              "id",
-              "created_at",
-              "updated_at",
-              "name",
-              "m_address"
-            ],
+            "required": ["id", "created_at", "updated_at", "name", "m_address"],
             "properties": {
               "created_at": {
                 "type": "string",
                 "format": "date-time"
               },
               "group_id": {
-                "type": [
-                  "string",
-                  "null"
-                ],
+                "type": ["string", "null"],
                 "description": "所属する代表グループ ID(`\"G-001\"` 形式)。単体取得時のみ付与され、\n一覧/作成/更新では省略される(所属が無い場合も省略)。"
               },
               "id": {
@@ -3944,39 +3588,27 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "status"
-            ],
+            "required": ["status"],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": [
-                  "registered"
-                ]
+                "enum": ["registered"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "status"
-            ],
+            "required": ["status"],
             "properties": {
               "status": {
                 "type": "string",
-                "enum": [
-                  "active"
-                ]
+                "enum": ["active"]
               }
             }
           },
           {
             "type": "object",
-            "required": [
-              "deactivated_at",
-              "reason",
-              "status"
-            ],
+            "required": ["deactivated_at", "reason", "status"],
             "properties": {
               "deactivated_at": {
                 "type": "string",
@@ -3987,9 +3619,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "deactivated"
-                ]
+                "enum": ["deactivated"]
               }
             }
           }
@@ -4001,10 +3631,7 @@
         "description": "`PATCH /users/{id}` のリクエストボディ。氏名のみ変更可能\n(m アドレス変更は専用エンドポイント `POST /users/{id}/m_address`)。",
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       }
