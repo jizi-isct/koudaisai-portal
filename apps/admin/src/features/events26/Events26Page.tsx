@@ -1,10 +1,10 @@
 import {
   DeleteOutlined,
   DownloadOutlined,
+  EditOutlined,
   FolderOpenOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import type { events26Components } from '@koudaisai/shared-types';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { useDownload } from '@koudaisai/shared-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -23,15 +23,26 @@ import type { TableProps } from 'antd';
 import objectHash from 'object-hash';
 import Papa from 'papaparse';
 import { useRef, useState } from 'react';
-import { EVENTS26_API_URL } from 'astro:env/client';
 import { api, $events26Api } from '@/features/api/api';
-
-type Project = events26Components['schemas']['Project'];
-type Occasion = events26Components['schemas']['Occasion'];
-type Place = NonNullable<Occasion['place']>;
-type Time = events26Components['schemas']['Time'];
-type FoodStallTag = events26Components['schemas']['FoodStallTag'];
-type GeneralTag = events26Components['schemas']['GeneralTag'];
+import {
+  ensureOk,
+  formatTags,
+  formatTime,
+  GENERAL_TAGS,
+  ICON_CONTENT_TYPES,
+  iconUrl,
+  parseTime,
+  PROJECT_TYPE_LABEL,
+  putIcon,
+} from './project';
+import type {
+  FoodStallTag,
+  GeneralTag,
+  Occasion,
+  Place,
+  Project,
+  Time,
+} from './project';
 
 /** CSV の 1 行。すべての列を文字列として読み書きする。 */
 type ProjectRow = {
@@ -100,44 +111,8 @@ const CSV_COLUMNS: (keyof ProjectRow)[] = [
   'day2_end',
 ];
 
-const PROJECT_TYPE_LABEL: Record<
-  Project['type'],
-  { text: string; color: string }
-> = {
-  'food-stall': { text: '模擬店企画', color: 'red' },
-  general: { text: '一般企画', color: 'blue' },
-  stage: { text: 'ステージ企画', color: 'green' },
-  laboratory: { text: '研究室公開企画', color: 'orange' },
-};
-
-const GENERAL_TAGS: GeneralTag[] = [
-  'experience',
-  'display',
-  'performance',
-  'food',
-  'lecture',
-];
-
 function parseBoolean(value: string): boolean {
   return value.trim().toLowerCase() === 'true';
-}
-
-/** `HH:MM` を `date` 日目の [`Time`] に変換する。 */
-function parseTime(date: Time['date'], value: string): Time {
-  const match = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
-  if (!match) {
-    throw new Error(`時刻は HH:MM 形式で指定してください: ${value}`);
-  }
-  const hour = Number(match[1]);
-  const minute = Number(match[2]);
-  if (hour > 23 || minute > 59) {
-    throw new Error(`時刻の範囲が不正です: ${value}`);
-  }
-  return { date, hour, minute };
-}
-
-function formatTime(time: Time): string {
-  return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
 }
 
 /**
@@ -367,18 +342,6 @@ function buildCreateProject(row: CreateProjectRow): Project {
 /** 新規作成 1 件分。アイコンは企画を作った後に URL から取ってきて送る。 */
 type CreateEntry = { project: Project; iconUrl: string };
 
-function formatTags(project: Project): string {
-  if (project.type === 'food-stall') {
-    return project.tag
-      .map((tag) => ('tag2' in tag ? `${tag.tag}:${tag.tag2}` : tag.tag))
-      .join(';');
-  }
-  if (project.type === 'general') {
-    return project.tag.join(';');
-  }
-  return '';
-}
-
 function toRow(project: Project): ProjectRow {
   const day1 = project.occasions.find(
     (occasion) => occasion.timeRange.start.date === 1,
@@ -459,58 +422,9 @@ function parseCreateCsv(csv: string): Promise<CreateEntry[]> {
   });
 }
 
-/** events26 がアイコンとして受け付ける形式。ここに無いファイルは送らずに飛ばす。 */
-const ICON_CONTENT_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/gif',
-  'image/webp',
-  'image/heic',
-];
-
-/** アイコン原本の公開 URL。events26 が認証なしで配信している。 */
-function iconUrl(projectId: string, cacheBuster: number): string {
-  return `${EVENTS26_API_URL}/v1/projects/${encodeURIComponent(projectId)}/icon?v=${cacheBuster}`;
-}
-
 /** `M-001.png` のようなファイル名から企画 ID(`M-001`)を取り出す。 */
 function projectIdFromFileName(fileName: string): string {
   return fileName.replace(/\.[^.]+$/, '');
-}
-
-/**
- * 応答が失敗ならエラーにする。
- *
- * openapi-fetch は本文の無い応答(`204` や `Content-Length: 0`)を成功・失敗に
- * かかわらず `{ error: undefined }` で返す。backend の失敗応答(403 / 404 / 415 /
- * 422 / 500)はいずれも本文が無いので、`error` だけを見ると失敗を成功と取り違える。
- * ステータスで判定し、本文があれば内容を添える。
- */
-function ensureOk(
-  result: { error?: unknown; response: Response },
-  label: string,
-): void {
-  if (result.response.ok) return;
-  const detail =
-    result.error === undefined ? '' : `: ${JSON.stringify(result.error)}`;
-  throw new Error(`${label}に失敗しました(${result.response.status})${detail}`);
-}
-
-/**
- * アイコンを 1 件 PUT する。
- *
- * events26 の `/admin/v1` は Cloudflare Access 配下なので backend 中継を通す。
- * ボディは画像そのもので JSON ではないため、openapi-fetch の既定シリアライザを
- * 素通しに差し替え、形式判定に使う `Content-Type` を明示する。
- */
-async function putIcon(projectId: string, image: Blob): Promise<void> {
-  const result = await api.PUT('/events26/projects/{project_id}/icon', {
-    params: { path: { project_id: projectId } },
-    body: image as unknown as string,
-    bodySerializer: (body: unknown) => body as BodyInit,
-    headers: { 'Content-Type': image.type },
-  });
-  ensureOk(result, 'アイコンのアップロード');
 }
 
 /**
@@ -814,6 +728,14 @@ function Events26Table() {
       title: <Tooltip title="projectName">企画名</Tooltip>,
       dataIndex: 'projectName',
       rowScope: 'row',
+      render: (value: string, record) => (
+        <a
+          style={{ textDecoration: 'underline' }}
+          href={`/events26/edit?project_id=${encodeURIComponent(record.id)}`}
+        >
+          {value}
+        </a>
+      ),
     },
     {
       key: 'description',
@@ -868,6 +790,13 @@ function Events26Table() {
       fixed: 'right',
       render: (value: string) => (
         <Flex gap={5}>
+          <Tooltip title="編集">
+            <Button
+              href={`/events26/edit?project_id=${encodeURIComponent(value)}`}
+            >
+              <EditOutlined />
+            </Button>
+          </Tooltip>
           <Popconfirm
             title="企画情報を削除"
             description="あなたは本当にこの企画情報を削除する気ですか！？"
