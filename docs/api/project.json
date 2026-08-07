@@ -13,6 +13,8 @@
     },
     "update-clients": {
       "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["backend:dump-openapi"],
       "options": {
         "command": "bash update_clients.sh",
         "cwd": "docs/api"
@@ -22,6 +24,15 @@
         "{workspaceRoot}/libs/shared-types/src/auth_v2.d.ts",
         "{workspaceRoot}/libs/shared-types/src/events26.d.ts"
       ]
+    },
+    "check-clients": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "dependsOn": ["backend:dump-openapi"],
+      "options": {
+        "command": "bash update_clients.sh --check",
+        "cwd": "docs/api"
+      }
     }
   }
 }
