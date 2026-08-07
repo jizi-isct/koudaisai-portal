@@ -534,6 +534,7 @@ mod tests {
         ApprovalRequest::create(
             ApprovalRequestId::generate(),
             issued_by,
+            create_group_id(),
             ApprovalRequestType::EditExhibitionInfo {
                 description: None,
                 icon_key: None,

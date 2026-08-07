@@ -3,9 +3,11 @@ use super::dto::{ApprovalActionBody, ApprovalRequestCreate, ApprovalRequestRead}
 use crate::application::error::{ApplicationOperationError, DeleteError, UpdateError};
 use crate::domain::actor_ctx::ActorContext;
 use crate::domain::approval_request_id::ApprovalRequestId;
+use crate::domain::group_id::GroupId;
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use serde::Deserialize;
+use std::str::FromStr;
 use utoipa::IntoParams;
 use utoipa_axum_auto_into_response::http_response;
 use uuid::Uuid;
@@ -91,10 +93,13 @@ pub async fn post_approval_request(
     Json(body): Json<ApprovalRequestCreate>,
 ) -> PostApprovalRequestResponse {
     let r#type = (&body.r#type).into();
+    let Ok(group_id) = GroupId::from_str(&body.group_id) else {
+        return PostApprovalRequestResponse::UnprocessableEntity;
+    };
     match st
         .app
         .approval_request()
-        .create(&actor, r#type, body.issue_reason)
+        .create(&actor, group_id, r#type, body.issue_reason)
         .await
     {
         Ok(id) => match st.app.approval_request().get_by_id(&actor, id).await {

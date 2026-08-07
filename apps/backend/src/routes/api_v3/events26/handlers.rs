@@ -7,7 +7,6 @@
 
 use super::super::V3State;
 use crate::application::error::{ApplicationOperationError, DeleteError, InsertError, UpdateError};
-use crate::application::events26::Events26App;
 use crate::application::ports::events26_api::UpdateIconError;
 use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
@@ -88,10 +87,7 @@ pub async fn post_project(
     actor: ActorContext,
     Json(body): Json<Project>,
 ) -> PostProjectResponse {
-    match Events26App::new(st.events26.as_ref())
-        .create_project(&actor, &body)
-        .await
-    {
+    match st.app.events26().create_project(&actor, &body).await {
         Ok(project) => PostProjectResponse::Created(project),
         Err(ApplicationOperationError::Unauthorized) => PostProjectResponse::Forbidden,
         Err(ApplicationOperationError::InvalidInput(reason)) => {
@@ -139,7 +135,9 @@ pub async fn put_project(
     Path(path): Path<ProjectPath>,
     Json(body): Json<Project>,
 ) -> PutProjectResponse {
-    match Events26App::new(st.events26.as_ref())
+    match st
+        .app
+        .events26()
         .update_project(&actor, &path.project_id, &body)
         .await
     {
@@ -183,7 +181,9 @@ pub async fn delete_project(
     actor: ActorContext,
     Path(path): Path<ProjectPath>,
 ) -> DeleteProjectResponse {
-    match Events26App::new(st.events26.as_ref())
+    match st
+        .app
+        .events26()
         .delete_project(&actor, &path.project_id)
         .await
     {
@@ -261,7 +261,9 @@ pub async fn put_project_icon(
         ));
     };
 
-    match Events26App::new(st.events26.as_ref())
+    match st
+        .app
+        .events26()
         .update_project_icon(&actor, &path.project_id, content_type, body.to_vec())
         .await
     {
@@ -305,7 +307,9 @@ pub async fn delete_project_icon(
     actor: ActorContext,
     Path(path): Path<ProjectPath>,
 ) -> DeleteProjectIconResponse {
-    match Events26App::new(st.events26.as_ref())
+    match st
+        .app
+        .events26()
         .delete_project_icon(&actor, &path.project_id)
         .await
     {

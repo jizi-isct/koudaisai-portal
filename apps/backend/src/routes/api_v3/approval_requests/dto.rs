@@ -97,6 +97,8 @@ pub struct ApprovalRequestRead {
     id: Uuid,
     issued_at: DateTime<Utc>,
     issued_by: Uuid,
+    /// 申請の対象団体(`M-001` 形式)。承認時の企画情報の反映先でもある。
+    group_id: String,
     issue_reason: String,
     #[serde(flatten)]
     r#type: ApprovalRequestType,
@@ -110,6 +112,7 @@ impl From<&ApprovalRequest> for ApprovalRequestRead {
             id: ar.id().as_uuid(),
             issued_at: *ar.issued_at(),
             issued_by: ar.issued_by().into(),
+            group_id: ar.group_id().to_string(),
             issue_reason: ar.issue_reason().to_string(),
             r#type: ar.request_type().into(),
             status: ar.status().into(),
@@ -121,6 +124,8 @@ impl From<&ApprovalRequest> for ApprovalRequestRead {
 pub struct ApprovalRequestCreate {
     #[serde(flatten)]
     pub r#type: ApprovalRequestType,
+    /// 申請の対象団体(`M-001` 形式)。申請者は複数の団体に所属しうるため必須。
+    pub group_id: String,
     pub issue_reason: String,
 }
 

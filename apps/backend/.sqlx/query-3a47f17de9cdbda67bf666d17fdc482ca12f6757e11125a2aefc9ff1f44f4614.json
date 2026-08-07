@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE approval_requests SET issued_at = ?, issued_by = ?, group_id = ?, type = ?, status = ?, description = ?, icon_key = ?, issue_reason = ?, approved_by = ?, approved_at = ?, approval_reason = ?, rejected_by = ?, rejected_at = ?, rejection_reason = ?, closed_at = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 16
+    },
+    "nullable": []
+  },
+  "hash": "3a47f17de9cdbda67bf666d17fdc482ca12f6757e11125a2aefc9ff1f44f4614"
+}
