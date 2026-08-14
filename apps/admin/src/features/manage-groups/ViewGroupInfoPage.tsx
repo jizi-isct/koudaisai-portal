@@ -1,5 +1,5 @@
 import { $api } from '@/features/api/api';
-import { type GroupRead } from '@koudaisai/shared-types';
+import { type GroupRead, type Role } from '@koudaisai/shared-types';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -51,6 +51,7 @@ export function ViewGroupInfoPage() {
 
 function GroupInfo({ groupId }: { groupId: string }) {
   const [messageApi, contextHolder] = message.useMessage();
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
   const { data: groupInfo, isLoading: isLoadingGruop } = $api.useQuery(
     'get',
@@ -313,6 +314,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
             currentUserId={filteredMemberByRole.representative}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'representative'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('representative')}
+            onStopEditing={() => setEditingRole(null)}
           />
         ),
       },
@@ -327,6 +332,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
             currentUserId={filteredMemberByRole.operator}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'operator'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('operator')}
+            onStopEditing={() => setEditingRole(null)}
           />
         ),
       },
@@ -364,6 +373,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
             currentUserId={filteredMemberByRole.first_responsible}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'first_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('first_responsible')}
+            onStopEditing={() => setEditingRole(null)}
           />
         ),
       },
@@ -378,6 +391,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
             currentUserId={filteredMemberByRole.second_responsible}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'second_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('second_responsible')}
+            onStopEditing={() => setEditingRole(null)}
           />
         ),
       },
@@ -392,6 +409,10 @@ function GroupInfo({ groupId }: { groupId: string }) {
             currentUserId={filteredMemberByRole.third_responsible}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'third_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('third_responsible')}
+            onStopEditing={() => setEditingRole(null)}
           />
         ),
       },

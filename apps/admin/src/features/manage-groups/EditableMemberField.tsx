@@ -8,9 +8,9 @@ import type { MessageInstance } from 'antd/es/message/interface';
 const roleLabels: Record<Role, string> = {
   representative: '企画責任者',
   operator: '企画実施担当者',
-  first_responsible: '第1責任者',
-  second_responsible: '第2責任者',
-  third_responsible: '第3責任者',
+  first_responsible: '第一責任者',
+  second_responsible: '第二責任者',
+  third_responsible: '第三責任者',
 };
 
 export function EditableMemberField({
@@ -20,6 +20,10 @@ export function EditableMemberField({
   currentUserId,
   messageApi,
   onSaved,
+  isEditing,
+  disabled,
+  onStartEditing,
+  onStopEditing,
 }: {
   groupId: string;
   role: Role;
@@ -27,8 +31,11 @@ export function EditableMemberField({
   currentUserId: string;
   messageApi: MessageInstance;
   onSaved: () => Promise<unknown>;
+  isEditing: boolean;
+  disabled: boolean;
+  onStartEditing: () => void;
+  onStopEditing: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [isSavingMember, setIsSavingMember] = useState(false);
 
@@ -81,13 +88,13 @@ export function EditableMemberField({
   const roleLabel = roleLabels[role];
 
   const startEditing = () => {
-    setIsEditing(true);
     setSelectedUserId(currentUserId);
+    onStartEditing();
   };
 
   const cancelEditing = () => {
-    setIsEditing(false);
     setSelectedUserId('');
+    onStopEditing();
   };
 
   const handleSaveMember = async () => {
@@ -117,7 +124,7 @@ export function EditableMemberField({
     return (
       <Flex gap={8} align="center" justify="space-between">
         <span>{displayNode}</span>
-        <Button size="small" onClick={startEditing}>
+        <Button size="small" onClick={startEditing} disabled={disabled}>
           編集
         </Button>
       </Flex>
