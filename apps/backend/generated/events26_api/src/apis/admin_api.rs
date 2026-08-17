@@ -33,9 +33,21 @@ pub struct DeleteProjectParams {
     pub project_id: String,
 }
 
+/// struct for passing parameters to the method [`delete_project_additional_info`]
+#[derive(Clone, Debug)]
+pub struct DeleteProjectAdditionalInfoParams {
+    pub project_id: String,
+}
+
 /// struct for passing parameters to the method [`delete_project_icon`]
 #[derive(Clone, Debug)]
 pub struct DeleteProjectIconParams {
+    pub project_id: String,
+}
+
+/// struct for passing parameters to the method [`delete_project_menu`]
+#[derive(Clone, Debug)]
+pub struct DeleteProjectMenuParams {
     pub project_id: String,
 }
 
@@ -44,6 +56,13 @@ pub struct DeleteProjectIconParams {
 pub struct UpdateProjectParams {
     pub project_id: String,
     pub project: models::Project,
+}
+
+/// struct for passing parameters to the method [`update_project_additional_info`]
+#[derive(Clone, Debug)]
+pub struct UpdateProjectAdditionalInfoParams {
+    pub project_id: String,
+    pub body: String,
 }
 
 /// struct for passing parameters to the method [`update_project_description`]
@@ -58,6 +77,13 @@ pub struct UpdateProjectDescriptionParams {
 pub struct UpdateProjectIconParams {
     pub project_id: String,
     pub body: std::path::PathBuf,
+}
+
+/// struct for passing parameters to the method [`update_project_menu`]
+#[derive(Clone, Debug)]
+pub struct UpdateProjectMenuParams {
+    pub project_id: String,
+    pub get_project_details200_response_menu: models::GetProjectDetails200ResponseMenu,
 }
 
 /// struct for typed errors of method [`create_project`]
@@ -90,6 +116,15 @@ pub enum DeleteProjectError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`delete_project_additional_info`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteProjectAdditionalInfoError {
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`delete_project_icon`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -98,10 +133,29 @@ pub enum DeleteProjectIconError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`delete_project_menu`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteProjectMenuError {
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`update_project`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UpdateProjectError {
+    Status400(),
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_project_additional_info`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateProjectAdditionalInfoError {
     Status400(),
     Status401(models::GetPlace404Response),
     Status404(models::GetPlace404Response),
@@ -128,6 +182,16 @@ pub enum UpdateProjectIconError {
     Status413(models::GetPlace404Response),
     Status415(models::GetPlace404Response),
     Status422(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_project_menu`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateProjectMenuError {
+    Status400(),
+    Status401(models::GetPlace404Response),
+    Status404(models::GetPlace404Response),
     UnknownValue(serde_json::Value),
 }
 
@@ -255,6 +319,42 @@ pub async fn delete_project(
     }
 }
 
+/// 指定した企画の追加情報を削除します。メニューは変更しません。
+pub async fn delete_project_additional_info(
+    configuration: &configuration::Configuration,
+    params: DeleteProjectAdditionalInfoParams,
+) -> Result<(), Error<DeleteProjectAdditionalInfoError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/details/additionalInfo",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteProjectAdditionalInfoError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 /// 企画アイコンの原本を削除します。未登録の場合も成功します。
 pub async fn delete_project_icon(
     configuration: &configuration::Configuration,
@@ -283,6 +383,42 @@ pub async fn delete_project_icon(
     } else {
         let content = resp.text().await?;
         let entity: Option<DeleteProjectIconError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// 指定した企画のメニューを削除します。追加情報は変更しません。
+pub async fn delete_project_menu(
+    configuration: &configuration::Configuration,
+    params: DeleteProjectMenuParams,
+) -> Result<(), Error<DeleteProjectMenuError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/details/menu",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteProjectMenuError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -329,6 +465,41 @@ pub async fn update_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<UpdateProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// 指定した企画の追加情報を保存します。メニューは変更しません。
+pub async fn update_project_additional_info(
+    configuration: &configuration::Configuration,
+    params: UpdateProjectAdditionalInfoParams,
+) -> Result<(), Error<UpdateProjectAdditionalInfoError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/details/additionalInfo",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&params.body);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateProjectAdditionalInfoError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -414,6 +585,41 @@ pub async fn update_project_icon(
     } else {
         let content = resp.text().await?;
         let entity: Option<UpdateProjectIconError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// 指定した企画のメニューを保存します。追加情報は変更しません。
+pub async fn update_project_menu(
+    configuration: &configuration::Configuration,
+    params: UpdateProjectMenuParams,
+) -> Result<(), Error<UpdateProjectMenuError>> {
+    let uri_str = format!(
+        "{}/admin/v1/projects/{projectId}/details/menu",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&params.get_project_details200_response_menu);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateProjectMenuError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

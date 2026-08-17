@@ -25,6 +25,8 @@ pub struct StageProject {
     pub is_child_friendly: bool,
     #[serde(rename = "isRecommended")]
     pub is_recommended: bool,
+    #[serde(rename = "category", skip_serializing_if = "Option::is_none")]
+    pub category: Option<models::Category>,
     #[serde(rename = "occasions")]
     pub occasions: Vec<models::Occasion>,
     #[serde(rename = "type")]
@@ -49,6 +51,7 @@ impl StageProject {
             description,
             is_child_friendly,
             is_recommended,
+            category: None,
             occasions,
             r#type,
         }

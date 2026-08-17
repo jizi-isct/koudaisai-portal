@@ -64,6 +64,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/projects/{projectId}/details': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * 企画詳細情報の取得
+     * @description IDで指定した企画の詳細情報を返します。
+     */
+    get: operations['getProjectDetails'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/projects/{projectId}': {
     parameters: {
       query?: never;
@@ -212,6 +232,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/admin/v1/projects/{projectId}/details/menu': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * 企画メニューの登録・更新
+     * @description 指定した企画のメニューを保存します。追加情報は変更しません。
+     */
+    put: operations['updateProjectMenu'];
+    post?: never;
+    /**
+     * 企画メニューの削除
+     * @description 指定した企画のメニューを削除します。追加情報は変更しません。
+     */
+    delete: operations['deleteProjectMenu'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/admin/v1/projects/{projectId}/details/additionalInfo': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * 企画追加情報の登録・更新
+     * @description 指定した企画の追加情報を保存します。メニューは変更しません。
+     */
+    put: operations['updateProjectAdditionalInfo'];
+    post?: never;
+    /**
+     * 企画追加情報の削除
+     * @description 指定した企画の追加情報を削除します。メニューは変更しません。
+     */
+    delete: operations['deleteProjectAdditionalInfo'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -273,6 +341,16 @@ export interface components {
       | components['schemas']['Venue']
       | components['schemas']['Room']
       | components['schemas']['FoodStallSlot'];
+    /** @enum {string} */
+    Category:
+      | 'hearty'
+      | 'street_food'
+      | 'sweets'
+      | 'performance'
+      | 'play'
+      | 'cafe'
+      | 'laboratory'
+      | 'display';
     Time: {
       /** @enum {number} */
       date: 1 | 2;
@@ -290,6 +368,7 @@ export interface components {
         | 'east.taki-plaza'
         | 'east.taki-plaza.tp-b1-event'
         | 'east.taki-plaza.tp-b2-event'
+        | 'east.taki-plaza.tp-1'
         | 'east.centennial-hall'
         | 'east.centennial-hall.centennial-hall-1f'
         | 'east.taki-plaza-stage'
@@ -333,6 +412,7 @@ export interface components {
         | 'main.m.m-102'
         | 'main.m.m-107'
         | 'main.m.m-112'
+        | 'main.m.m-119'
         | 'main.m.m-123'
         | 'main.m.m-134'
         | 'main.m.m-135'
@@ -484,6 +564,7 @@ export interface components {
         | 'west.w3.w3-707'
         | 'west.w3.w3-505'
         | 'west.w5'
+        | 'west.w5.w5-104'
         | 'west.w5.w5-105'
         | 'west.w5.w5-106'
         | 'west.w5.w5-107'
@@ -507,6 +588,7 @@ export interface components {
         | 'west.w9.w9-325'
         | 'west.w9.w9-326'
         | 'west.w9.w9-327'
+        | 'west.w9.w9-606a'
         | 'west.w9.w9-706'
         | 'west.w9.w9-707'
         | 'west.w9.w9-716'
@@ -586,6 +668,7 @@ export interface components {
       description: string;
       isChildFriendly: boolean;
       isRecommended: boolean;
+      category?: components['schemas']['Category'];
       occasions: components['schemas']['Occasion'][];
       /** @enum {string} */
       type: 'food-stall';
@@ -600,6 +683,7 @@ export interface components {
       description: string;
       isChildFriendly: boolean;
       isRecommended: boolean;
+      category?: components['schemas']['Category'];
       occasions: components['schemas']['Occasion'][];
       /** @enum {string} */
       type: 'general';
@@ -612,6 +696,7 @@ export interface components {
       description: string;
       isChildFriendly: boolean;
       isRecommended: boolean;
+      category?: components['schemas']['Category'];
       occasions: components['schemas']['Occasion'][];
       /** @enum {string} */
       type: 'laboratory';
@@ -624,6 +709,7 @@ export interface components {
       description: string;
       isChildFriendly: boolean;
       isRecommended: boolean;
+      category?: components['schemas']['Category'];
       occasions: components['schemas']['Occasion'][];
       /** @enum {string} */
       type: 'stage';
@@ -679,6 +765,7 @@ export interface operations {
               | 'east.taki-plaza'
               | 'east.taki-plaza.tp-b1-event'
               | 'east.taki-plaza.tp-b2-event'
+              | 'east.taki-plaza.tp-1'
               | 'east.centennial-hall'
               | 'east.centennial-hall.centennial-hall-1f'
               | 'east.taki-plaza-stage'
@@ -722,6 +809,7 @@ export interface operations {
               | 'main.m.m-102'
               | 'main.m.m-107'
               | 'main.m.m-112'
+              | 'main.m.m-119'
               | 'main.m.m-123'
               | 'main.m.m-134'
               | 'main.m.m-135'
@@ -873,6 +961,7 @@ export interface operations {
               | 'west.w3.w3-707'
               | 'west.w3.w3-505'
               | 'west.w5'
+              | 'west.w5.w5-104'
               | 'west.w5.w5-105'
               | 'west.w5.w5-106'
               | 'west.w5.w5-107'
@@ -896,6 +985,7 @@ export interface operations {
               | 'west.w9.w9-325'
               | 'west.w9.w9-326'
               | 'west.w9.w9-327'
+              | 'west.w9.w9-606a'
               | 'west.w9.w9-706'
               | 'west.w9.w9-707'
               | 'west.w9.w9-716'
@@ -973,6 +1063,7 @@ export interface operations {
           | 'east.taki-plaza'
           | 'east.taki-plaza.tp-b1-event'
           | 'east.taki-plaza.tp-b2-event'
+          | 'east.taki-plaza.tp-1'
           | 'east.centennial-hall'
           | 'east.centennial-hall.centennial-hall-1f'
           | 'east.taki-plaza-stage'
@@ -1016,6 +1107,7 @@ export interface operations {
           | 'main.m.m-102'
           | 'main.m.m-107'
           | 'main.m.m-112'
+          | 'main.m.m-119'
           | 'main.m.m-123'
           | 'main.m.m-134'
           | 'main.m.m-135'
@@ -1167,6 +1259,7 @@ export interface operations {
           | 'west.w3.w3-707'
           | 'west.w3.w3-505'
           | 'west.w5'
+          | 'west.w5.w5-104'
           | 'west.w5.w5-105'
           | 'west.w5.w5-106'
           | 'west.w5.w5-107'
@@ -1190,6 +1283,7 @@ export interface operations {
           | 'west.w9.w9-325'
           | 'west.w9.w9-326'
           | 'west.w9.w9-327'
+          | 'west.w9.w9-606a'
           | 'west.w9.w9-706'
           | 'west.w9.w9-707'
           | 'west.w9.w9-716'
@@ -1277,6 +1371,52 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['Project'][];
+        };
+      };
+    };
+  };
+  getProjectDetails: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 指定した企画の詳細情報 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            additionalInfo?: string;
+            menu?: {
+              items: {
+                name: string;
+                price?: number;
+                options: {
+                  name: string;
+                  price?: number;
+                }[];
+              }[];
+              description: string;
+            };
+          };
+        };
+      };
+      /** @description 指定した企画の詳細情報が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
         };
       };
     };
@@ -1737,6 +1877,206 @@ export interface operations {
       };
       /** @description Access の認証を通っていない */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  updateProjectMenu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          items: {
+            name: string;
+            price?: number;
+            options: {
+              name: string;
+              price?: number;
+            }[];
+          }[];
+          description: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 保存に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description リクエストボディが不正 */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  deleteProjectMenu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 削除に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  updateProjectAdditionalInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': string;
+      };
+    };
+    responses: {
+      /** @description 保存に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description リクエストボディが不正 */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  deleteProjectAdditionalInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 削除に成功 */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access の認証を通っていない */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message: string;
+          };
+        };
+      };
+      /** @description 指定したIDの企画が存在しない */
+      404: {
         headers: {
           [name: string]: unknown;
         };

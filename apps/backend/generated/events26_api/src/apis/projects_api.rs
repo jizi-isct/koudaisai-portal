@@ -19,6 +19,12 @@ pub struct GetProjectParams {
     pub project_id: String,
 }
 
+/// struct for passing parameters to the method [`get_project_details`]
+#[derive(Clone, Debug)]
+pub struct GetProjectDetailsParams {
+    pub project_id: String,
+}
+
 /// struct for passing parameters to the method [`get_project_icon`]
 #[derive(Clone, Debug)]
 pub struct GetProjectIconParams {
@@ -29,6 +35,14 @@ pub struct GetProjectIconParams {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetProjectError {
+    Status404(models::GetPlace404Response),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`get_project_details`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetProjectDetailsError {
     Status404(models::GetPlace404Response),
     UnknownValue(serde_json::Value),
 }
@@ -85,6 +99,51 @@ pub async fn get_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<GetProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// IDで指定した企画の詳細情報を返します。
+pub async fn get_project_details(
+    configuration: &configuration::Configuration,
+    params: GetProjectDetailsParams,
+) -> Result<models::GetProjectDetails200Response, Error<GetProjectDetailsError>> {
+    let uri_str = format!(
+        "{}/v1/projects/{projectId}/details",
+        configuration.base_path,
+        projectId = crate::apis::urlencode(params.project_id)
+    );
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::GetProjectDetails200Response`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::GetProjectDetails200Response`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetProjectDetailsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

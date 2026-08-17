@@ -61,6 +61,8 @@ pub enum ListPlaces200ResponseInnerId {
     EastTakiPlazaTpB1Event,
     #[serde(rename = "east.taki-plaza.tp-b2-event")]
     EastTakiPlazaTpB2Event,
+    #[serde(rename = "east.taki-plaza.tp-1")]
+    EastTakiPlazaTp1,
     #[serde(rename = "east.centennial-hall")]
     EastCentennialHall,
     #[serde(rename = "east.centennial-hall.centennial-hall-1f")]
@@ -147,6 +149,8 @@ pub enum ListPlaces200ResponseInnerId {
     MainMM107,
     #[serde(rename = "main.m.m-112")]
     MainMM112,
+    #[serde(rename = "main.m.m-119")]
+    MainMM119,
     #[serde(rename = "main.m.m-123")]
     MainMM123,
     #[serde(rename = "main.m.m-134")]
@@ -449,6 +453,8 @@ pub enum ListPlaces200ResponseInnerId {
     WestW3W3505,
     #[serde(rename = "west.w5")]
     WestW5,
+    #[serde(rename = "west.w5.w5-104")]
+    WestW5W5104,
     #[serde(rename = "west.w5.w5-105")]
     WestW5W5105,
     #[serde(rename = "west.w5.w5-106")]
@@ -495,6 +501,8 @@ pub enum ListPlaces200ResponseInnerId {
     WestW9W9326,
     #[serde(rename = "west.w9.w9-327")]
     WestW9W9327,
+    #[serde(rename = "west.w9.w9-606a")]
+    WestW9W9606a,
     #[serde(rename = "west.w9.w9-706")]
     WestW9W9706,
     #[serde(rename = "west.w9.w9-707")]
