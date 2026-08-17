@@ -2289,6 +2289,20 @@
           }
         ]
       },
+      "Category": {
+        "type": "string",
+        "description": "",
+        "enum": [
+          "hearty",
+          "street_food",
+          "sweets",
+          "performance",
+          "play",
+          "cafe",
+          "laboratory",
+          "display"
+        ]
+      },
       "DocumentCategoryCreate": {
         "type": "object",
         "required": ["title"],
@@ -2572,6 +2586,16 @@
           "tag"
         ],
         "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
           "description": {
             "type": "string"
           },
@@ -2759,6 +2783,16 @@
           "tag"
         ],
         "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
           "description": {
             "type": "string"
           },
@@ -2871,6 +2905,16 @@
           "isTour"
         ],
         "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
           "description": {
             "type": "string"
           },
@@ -3128,6 +3172,7 @@
           "east.taki-plaza",
           "east.taki-plaza.tp-b1-event",
           "east.taki-plaza.tp-b2-event",
+          "east.taki-plaza.tp-1",
           "east.centennial-hall",
           "east.centennial-hall.centennial-hall-1f",
           "east.taki-plaza-stage",
@@ -3171,6 +3216,7 @@
           "main.m.m-102",
           "main.m.m-107",
           "main.m.m-112",
+          "main.m.m-119",
           "main.m.m-123",
           "main.m.m-134",
           "main.m.m-135",
@@ -3322,6 +3368,7 @@
           "west.w3.w3-707",
           "west.w3.w3-505",
           "west.w5",
+          "west.w5.w5-104",
           "west.w5.w5-105",
           "west.w5.w5-106",
           "west.w5.w5-107",
@@ -3345,6 +3392,7 @@
           "west.w9.w9-325",
           "west.w9.w9-326",
           "west.w9.w9-327",
+          "west.w9.w9-606a",
           "west.w9.w9-706",
           "west.w9.w9-707",
           "west.w9.w9-716",
@@ -3430,6 +3478,16 @@
           "type"
         ],
         "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
           "description": {
             "type": "string"
           },

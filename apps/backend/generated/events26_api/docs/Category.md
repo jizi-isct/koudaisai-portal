@@ -1,14 +1,17 @@
-# GeneralTag
+# Category
 
 ## Enum Variants
 
 | Name | Value |
 |---- | -----|
-| Experience | experience |
-| Display | display |
+| Hearty | hearty |
+| StreetFood | street_food |
+| Sweets | sweets |
 | Performance | performance |
-| Food | food |
-| Lecture | lecture |
+| Play | play |
+| Cafe | cafe |
+| Laboratory | laboratory |
+| Display | display |
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

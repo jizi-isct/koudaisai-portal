@@ -596,6 +596,16 @@ export interface components {
       /** @enum {string} */
       type: 'edit_exhibition_info';
     };
+    /** @enum {string} */
+    Category:
+      | 'hearty'
+      | 'street_food'
+      | 'sweets'
+      | 'performance'
+      | 'play'
+      | 'cafe'
+      | 'laboratory'
+      | 'display';
     DocumentCategoryCreate: {
       emoji?: string | null;
       title: string;
@@ -686,6 +696,7 @@ export interface components {
       presigned_url: string;
     };
     FoodStallProject: {
+      category?: null | components['schemas']['Category'];
       description: string;
       groupName: string;
       id: string;
@@ -737,6 +748,7 @@ export interface components {
       targets?: string[] | null;
     };
     GeneralProject: {
+      category?: null | components['schemas']['Category'];
       description: string;
       groupName: string;
       id: string;
@@ -775,6 +787,7 @@ export interface components {
       name?: string | null;
     };
     LaboratoryProject: {
+      category?: null | components['schemas']['Category'];
       description: string;
       groupName: string;
       id: string;
@@ -867,6 +880,7 @@ export interface components {
       | 'east.taki-plaza'
       | 'east.taki-plaza.tp-b1-event'
       | 'east.taki-plaza.tp-b2-event'
+      | 'east.taki-plaza.tp-1'
       | 'east.centennial-hall'
       | 'east.centennial-hall.centennial-hall-1f'
       | 'east.taki-plaza-stage'
@@ -910,6 +924,7 @@ export interface components {
       | 'main.m.m-102'
       | 'main.m.m-107'
       | 'main.m.m-112'
+      | 'main.m.m-119'
       | 'main.m.m-123'
       | 'main.m.m-134'
       | 'main.m.m-135'
@@ -1061,6 +1076,7 @@ export interface components {
       | 'west.w3.w3-707'
       | 'west.w3.w3-505'
       | 'west.w5'
+      | 'west.w5.w5-104'
       | 'west.w5.w5-105'
       | 'west.w5.w5-106'
       | 'west.w5.w5-107'
@@ -1084,6 +1100,7 @@ export interface components {
       | 'west.w9.w9-325'
       | 'west.w9.w9-326'
       | 'west.w9.w9-327'
+      | 'west.w9.w9-606a'
       | 'west.w9.w9-706'
       | 'west.w9.w9-707'
       | 'west.w9.w9-716'
@@ -1141,6 +1158,7 @@ export interface components {
       | 'second_responsible'
       | 'third_responsible';
     StageProject: {
+      category?: null | components['schemas']['Category'];
       description: string;
       groupName: string;
       id: string;

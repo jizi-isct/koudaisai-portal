@@ -1,10 +1,11 @@
-# ProjectDescription
+# GetProjectDetails200ResponseMenuItemsInnerOptionsInner
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**description** | **String** |  | 
+**name** | **String** |  | 
+**price** | Option<**f64**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

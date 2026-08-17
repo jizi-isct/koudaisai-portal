@@ -5,6 +5,7 @@ Cargo.toml
 README.md
 docs/AdminApi.md
 docs/Building.md
+docs/Category.md
 docs/District.md
 docs/DrinkFoodStallTag.md
 docs/FoodStallArea.md
@@ -14,6 +15,10 @@ docs/FoodStallTag.md
 docs/GeneralProject.md
 docs/GeneralTag.md
 docs/GetPlace404Response.md
+docs/GetProjectDetails200Response.md
+docs/GetProjectDetails200ResponseMenu.md
+docs/GetProjectDetails200ResponseMenuItemsInner.md
+docs/GetProjectDetails200ResponseMenuItemsInnerOptionsInner.md
 docs/LaboratoryProject.md
 docs/ListPlaces200ResponseInner.md
 docs/MainFoodStallTag.md
@@ -39,6 +44,7 @@ src/apis/places_api.rs
 src/apis/projects_api.rs
 src/lib.rs
 src/models/building.rs
+src/models/category.rs
 src/models/district.rs
 src/models/drink_food_stall_tag.rs
 src/models/food_stall_area.rs
@@ -48,6 +54,10 @@ src/models/food_stall_tag.rs
 src/models/general_project.rs
 src/models/general_tag.rs
 src/models/get_place_404_response.rs
+src/models/get_project_details_200_response.rs
+src/models/get_project_details_200_response_menu.rs
+src/models/get_project_details_200_response_menu_items_inner.rs
+src/models/get_project_details_200_response_menu_items_inner_options_inner.rs
 src/models/laboratory_project.rs
 src/models/list_places_200_response_inner.rs
 src/models/main_food_stall_tag.rs
