@@ -11,6 +11,8 @@ jobs:
   deploy:
     name: Deploy Frontend
     runs-on: ubuntu-latest
+    env:
+      NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
     steps:
       - uses: actions/checkout@v4
         with:
