@@ -380,7 +380,6 @@ function parseCsv(csv: string): Promise<Project[]> {
     Papa.parse<ProjectRow>(csv, {
       header: true,
       skipEmptyLines: true,
-      worker: true,
       encoding: 'UTF-8',
       step: (result, parser) => {
         try {
@@ -403,7 +402,6 @@ function parseCreateCsv(csv: string): Promise<CreateEntry[]> {
     Papa.parse<CreateProjectRow>(csv, {
       header: true,
       skipEmptyLines: true,
-      worker: true,
       encoding: 'UTF-8',
       step: (result, parser) => {
         try {
