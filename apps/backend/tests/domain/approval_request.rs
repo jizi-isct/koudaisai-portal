@@ -3,6 +3,7 @@ use koudaisai_portal_backend::domain::{
     admin_id::AdminId,
     approval_request::{ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType},
     approval_request_id::ApprovalRequestId,
+    group_id::GroupId,
     user_id::UserId,
 };
 use serde::Deserialize;
@@ -13,6 +14,7 @@ fn make_pending() -> ApprovalRequest {
     ApprovalRequest::create(
         ApprovalRequestId::generate(),
         UserId::new(Uuid::new_v4()),
+        GroupId::new('I', 1).unwrap(),
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: None,
@@ -36,6 +38,7 @@ pub fn test_create(_path: &Path, contents: String) -> datatest_stable::Result<()
     let result = ApprovalRequest::create(
         ApprovalRequestId::generate(),
         UserId::new(Uuid::new_v4()),
+        GroupId::new('I', 1).unwrap(),
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: None,

@@ -702,6 +702,268 @@
         }
       }
     },
+    "/events26/projects": {
+      "post": {
+        "tags": ["events26"],
+        "description": "Create a project on the events26 API. The id is supplied by the caller.",
+        "operationId": "post_project",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Project created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Project id already exists"
+          },
+          "422": {
+            "description": "Invalid project. The body carries the reason.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events26/projects/{project_id}": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Replace a project on the events26 API. Tags and occasions are replaced wholesale, not merged.",
+        "operationId": "put_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Project replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "422": {
+            "description": "Invalid project. The body carries the reason.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete a project on the events26 API. Tags and occasions are removed with it.",
+        "operationId": "delete_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Project deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events26/projects/{project_id}/icon": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Replace a project icon on the events26 API. The body is the raw image; it must be square and at most 20MB.",
+        "operationId": "put_project_icon",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Raw image bytes. Send the actual format in Content-Type (image/png, image/jpeg, image/gif, image/webp, image/heic).",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Icon stored"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "415": {
+            "description": "Unsupported image format. The body carries the received Content-Type.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Image rejected (empty, too large, or not square). The body carries the reason.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete a project icon on the events26 API. Succeeds even if no icon is set.",
+        "operationId": "delete_project_icon",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Icon deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/files/download": {
       "get": {
         "tags": ["files"],
@@ -1883,8 +2145,12 @@
           },
           {
             "type": "object",
-            "required": ["issue_reason"],
+            "required": ["group_id", "issue_reason"],
             "properties": {
+              "group_id": {
+                "type": "string",
+                "description": "申請の対象団体(`M-001` 形式)。申請者は複数の団体に所属しうるため必須。"
+              },
               "issue_reason": {
                 "type": "string"
               }
@@ -1902,8 +2168,18 @@
           },
           {
             "type": "object",
-            "required": ["id", "issued_at", "issued_by", "issue_reason"],
+            "required": [
+              "id",
+              "issued_at",
+              "issued_by",
+              "group_id",
+              "issue_reason"
+            ],
             "properties": {
+              "group_id": {
+                "type": "string",
+                "description": "申請の対象団体(`M-001` 形式)。承認時の企画情報の反映先でもある。"
+              },
               "id": {
                 "type": "string",
                 "format": "uuid"
@@ -2011,6 +2287,20 @@
               }
             }
           }
+        ]
+      },
+      "Category": {
+        "type": "string",
+        "description": "",
+        "enum": [
+          "hearty",
+          "street_food",
+          "sweets",
+          "performance",
+          "play",
+          "cafe",
+          "laboratory",
+          "display"
         ]
       },
       "DocumentCategoryCreate": {
@@ -2235,6 +2525,20 @@
           }
         }
       },
+      "DrinkFoodStallTag": {
+        "type": "object",
+        "required": ["tag"],
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/DrinkFoodStallTagTag"
+          }
+        }
+      },
+      "DrinkFoodStallTagTag": {
+        "type": "string",
+        "description": "",
+        "enum": ["drink"]
+      },
       "FileDownloadResponse": {
         "type": "object",
         "description": "ダウンロード用に発行した presigned URL。",
@@ -2267,6 +2571,83 @@
             "type": "string"
           }
         }
+      },
+      "FoodStallProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupName",
+          "projectName",
+          "description",
+          "isChildFriendly",
+          "isRecommended",
+          "occasions",
+          "type",
+          "tag"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isChildFriendly": {
+            "type": "boolean"
+          },
+          "isRecommended": {
+            "type": "boolean"
+          },
+          "occasions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occasion"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FoodStallTag"
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/FoodStallProjectType"
+          }
+        }
+      },
+      "FoodStallProjectType": {
+        "type": "string",
+        "description": "",
+        "enum": ["food-stall"]
+      },
+      "FoodStallTag": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/MainFoodStallTag"
+          },
+          {
+            "$ref": "#/components/schemas/SweetFoodStallTag"
+          },
+          {
+            "$ref": "#/components/schemas/DrinkFoodStallTag"
+          }
+        ]
       },
       "FormCreate": {
         "allOf": [
@@ -2388,6 +2769,75 @@
           }
         }
       },
+      "GeneralProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupName",
+          "projectName",
+          "description",
+          "isChildFriendly",
+          "isRecommended",
+          "occasions",
+          "type",
+          "tag"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isChildFriendly": {
+            "type": "boolean"
+          },
+          "isRecommended": {
+            "type": "boolean"
+          },
+          "occasions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occasion"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneralTag"
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/GeneralProjectType"
+          }
+        }
+      },
+      "GeneralProjectType": {
+        "type": "string",
+        "description": "",
+        "enum": ["general"]
+      },
+      "GeneralTag": {
+        "type": "string",
+        "description": "",
+        "enum": ["experience", "display", "performance", "food", "lecture"]
+      },
       "GroupCreate": {
         "type": "object",
         "required": ["name", "type"],
@@ -2441,6 +2891,67 @@
           }
         }
       },
+      "LaboratoryProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupName",
+          "projectName",
+          "description",
+          "isChildFriendly",
+          "isRecommended",
+          "occasions",
+          "type",
+          "isTour"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isChildFriendly": {
+            "type": "boolean"
+          },
+          "isRecommended": {
+            "type": "boolean"
+          },
+          "isTour": {
+            "type": "boolean"
+          },
+          "occasions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occasion"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/LaboratoryProjectType"
+          }
+        }
+      },
+      "LaboratoryProjectType": {
+        "type": "string",
+        "description": "",
+        "enum": ["laboratory"]
+      },
       "MAddressUpdate": {
         "type": "object",
         "description": "`POST /users/{id}/m_address` のリクエストボディ。",
@@ -2460,6 +2971,35 @@
             "type": "string"
           }
         }
+      },
+      "MainFoodStallTag": {
+        "type": "object",
+        "required": ["tag", "tag2"],
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/MainFoodStallTagTag"
+          },
+          "tag2": {
+            "$ref": "#/components/schemas/MainFoodStallTagTag2"
+          }
+        }
+      },
+      "MainFoodStallTagTag": {
+        "type": "string",
+        "description": "",
+        "enum": ["main"]
+      },
+      "MainFoodStallTagTag2": {
+        "type": "string",
+        "description": "",
+        "enum": [
+          "rice",
+          "noodle_flour",
+          "skewer_grill",
+          "snack",
+          "soup",
+          "world"
+        ]
       },
       "MemberCreate": {
         "type": "object",
@@ -2605,6 +3145,316 @@
           }
         }
       },
+      "Occasion": {
+        "type": "object",
+        "required": ["timeRange"],
+        "properties": {
+          "place": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/OccasionPlace"
+              }
+            ]
+          },
+          "timeRange": {
+            "$ref": "#/components/schemas/TimeRange"
+          }
+        }
+      },
+      "OccasionPlace": {
+        "type": "string",
+        "description": "",
+        "enum": [
+          "east",
+          "east.taki-plaza",
+          "east.taki-plaza.tp-b1-event",
+          "east.taki-plaza.tp-b2-event",
+          "east.taki-plaza.tp-1",
+          "east.centennial-hall",
+          "east.centennial-hall.centennial-hall-1f",
+          "east.taki-plaza-stage",
+          "east.wood-deck",
+          "east.outdoor-stage",
+          "east.fs-east-icho",
+          "east.fs-east-icho.1",
+          "east.fs-east-icho.2",
+          "east.fs-east-icho.3",
+          "east.fs-east-icho.4",
+          "east.fs-east-icho.5",
+          "east.fs-east-icho.6",
+          "east.fs-east-icho.7",
+          "east.fs-east-icho.8",
+          "east.fs-east-icho.9",
+          "east.fs-east-icho.10",
+          "east.fs-east-icho.11",
+          "east.fs-east-icho.12",
+          "east.fs-east-icho.13",
+          "east.fs-east-icho.14",
+          "east.fs-east-icho.15",
+          "east.fs-east-icho.16",
+          "east.fs-east-deck",
+          "east.fs-east-deck.1",
+          "east.fs-east-deck.2",
+          "east.fs-east-deck.3",
+          "east.fs-east-deck.4",
+          "east.fs-east-deck.5",
+          "east.fs-east-deck.6",
+          "east.fs-east-deck.7",
+          "east.fs-east-deck.8",
+          "east.fs-east-deck.9",
+          "east.fs-east-deck.10",
+          "east.fs-east-deck.11",
+          "main",
+          "main.m",
+          "main.m.m-b07",
+          "main.m.m-b45",
+          "main.m.m-b43",
+          "main.m.m-101",
+          "main.m.m-102",
+          "main.m.m-107",
+          "main.m.m-112",
+          "main.m.m-119",
+          "main.m.m-123",
+          "main.m.m-134",
+          "main.m.m-135",
+          "main.m.m-143a",
+          "main.m.m-143b",
+          "main.m.m-155",
+          "main.m.m-156",
+          "main.m.m-157",
+          "main.m.m-178",
+          "main.m.m-278",
+          "main.m.m-356",
+          "main.m.m-b61",
+          "main.m.m-290",
+          "main.m.m-124",
+          "main.m.m-220",
+          "main.m.m-225",
+          "main.m.m-374",
+          "main.mb",
+          "main.mb.m-b101",
+          "main.mb.m-b104",
+          "main.mb.m-b107",
+          "main.fs-honkan-main",
+          "main.fs-honkan-main.1",
+          "main.fs-honkan-main.2",
+          "main.fs-honkan-main.3",
+          "main.fs-honkan-main.4",
+          "main.fs-honkan-main.5",
+          "main.fs-honkan-main.6",
+          "main.fs-honkan-main.7",
+          "main.fs-honkan-main.8",
+          "main.fs-honkan-main.9",
+          "main.fs-honkan-main.10",
+          "main.fs-honkan-main.11",
+          "main.fs-honkan-main.12",
+          "main.fs-honkan-main.13",
+          "main.fs-honkan-main.14",
+          "main.fs-honkan-west",
+          "main.fs-honkan-west.1",
+          "main.fs-honkan-west.2",
+          "south",
+          "south.s1",
+          "south.s1.s1-101",
+          "south.s2",
+          "south.s2.s2-201",
+          "south.s2.s2-202",
+          "south.s2.s2-203",
+          "south.s2.s2-204",
+          "south.s2.s2-101",
+          "south.s2.s2-109",
+          "south.s2.mono",
+          "south.s3",
+          "south.s3.s3-206",
+          "south.s3.s3-207",
+          "south.s3.s3-215",
+          "south.s3.s3-300",
+          "south.s3.s3-310",
+          "south.s3.s3-403",
+          "south.s3.s3-413",
+          "south.s3.s3-414",
+          "south.s3.s3-510",
+          "south.s3.s3-601",
+          "south.s3.s3-611",
+          "south.s3.s3-906",
+          "south.s3.s3-914",
+          "south.s4",
+          "south.s4.s4-201",
+          "south.s4.s4-202",
+          "south.s4.s4-203",
+          "south.s7",
+          "south.s7.s7-201",
+          "south.s7.s7-202",
+          "south.s7.s7-207",
+          "south.s7.s7-512",
+          "south.s7.s7-605",
+          "south.s7.s7-701",
+          "south.s7.s7-702",
+          "south.s7.s7-703",
+          "south.s7.s7-707",
+          "south.s7.s7-804",
+          "south.s7.s7-807",
+          "south.s8",
+          "south.s8.s8-101",
+          "south.s8.s8-107",
+          "south.s8.s8-501",
+          "south.s8.s8-516",
+          "south.s8.s8-518",
+          "south.s8.s8-entrance",
+          "south.sl",
+          "south.sl.sl-101",
+          "south.circle-1",
+          "south.circle-1.c1-212",
+          "south.lab2",
+          "south.lab2.lab2-storage",
+          "south.waste-station",
+          "south.seven-front",
+          "south.fs-south-east",
+          "south.fs-south-east.1",
+          "south.fs-south-east.2",
+          "south.fs-south-east.3",
+          "south.fs-south-east.4",
+          "south.fs-south-east.5",
+          "south.fs-south-east.6",
+          "south.fs-south-east.7",
+          "south.fs-south-east.8",
+          "south.fs-south-east.9",
+          "south.fs-south-east.10",
+          "south.fs-south-east.11",
+          "south.fs-south-east.12",
+          "south.fs-south-east.13",
+          "south.fs-south-east.14",
+          "south.fs-south-east.15",
+          "south.fs-south-east.16",
+          "south.fs-south-east.17",
+          "south.fs-south-east.18",
+          "south.fs-south-east.19",
+          "south.fs-south-east.20",
+          "south.fs-south-east.21",
+          "south.fs-south-east.22",
+          "south.fs-south-east.23",
+          "south.fs-south-east.24",
+          "south.fs-south-west",
+          "south.fs-south-west.1",
+          "south.fs-south-west.2",
+          "south.fs-south-west.3",
+          "south.fs-south-west.4",
+          "south.fs-south-west.5",
+          "south.fs-south-west.6",
+          "south.fs-south-west.7",
+          "south.fs-south-west.8",
+          "south.fs-south-west.9",
+          "south.fs-south-west.10",
+          "south.fs-south-west.11",
+          "south.fs-south-west.12",
+          "south.fs-south-west.13",
+          "south.fs-south-west.14",
+          "south.fs-south-west.15",
+          "south.fs-south-west.16",
+          "west",
+          "west.w2",
+          "west.w2.w2-401",
+          "west.w2.w2-402",
+          "west.w3",
+          "west.w3.w3-201",
+          "west.w3.w3-205",
+          "west.w3.w3-207",
+          "west.w3.w3-301",
+          "west.w3.w3-305",
+          "west.w3.w3-501",
+          "west.w3.w3-707",
+          "west.w3.w3-505",
+          "west.w5",
+          "west.w5.w5-104",
+          "west.w5.w5-105",
+          "west.w5.w5-106",
+          "west.w5.w5-107",
+          "west.w5.tsubame",
+          "west.w8",
+          "west.w8.w8-404",
+          "west.w8.w8-407",
+          "west.w8.w8-509",
+          "west.w8.w8-601",
+          "west.w8.w8-604",
+          "west.w8.w8-609",
+          "west.w8.w8-7rf",
+          "west.w8.w8-901",
+          "west.w9",
+          "west.w9.w9-201",
+          "west.w9.w9-202",
+          "west.w9.w9-321",
+          "west.w9.w9-322",
+          "west.w9.w9-323",
+          "west.w9.w9-324",
+          "west.w9.w9-325",
+          "west.w9.w9-326",
+          "west.w9.w9-327",
+          "west.w9.w9-606a",
+          "west.w9.w9-706",
+          "west.w9.w9-707",
+          "west.w9.w9-716",
+          "west.wl1",
+          "west.wl1.wl1-201",
+          "west.wl1.wl1-401",
+          "west.wl2",
+          "west.wl2.wl2-101",
+          "west.wl2.wl2-201",
+          "west.wl2.wl2-301",
+          "west.wl2.wl2-401",
+          "west.lecture-hall-70",
+          "west.digital-hall",
+          "west.gym",
+          "west.gym.gym-arena",
+          "west.gym.gym-dojo",
+          "west.circle-2",
+          "west.circle-2.c2-102",
+          "west.circle-2.c2-201",
+          "north",
+          "north.n1",
+          "north.n1.n1-158",
+          "north.n1.n1-parking",
+          "north.n3",
+          "north.n3.n3-lab",
+          "midorigaoka",
+          "midorigaoka.mi6",
+          "midorigaoka.mi6.mi6-302",
+          "ishikawadai",
+          "ishikawadai.i1",
+          "ishikawadai.i1.i1-254",
+          "ishikawadai.i1.i1-255",
+          "ishikawadai.i1.i1-256",
+          "ishikawadai.i1.i1-751",
+          "ishikawadai.i7",
+          "ishikawadai.i7.i7-mishima",
+          "ishikawadai.fs-ishikawadai",
+          "ishikawadai.fs-ishikawadai.1",
+          "ishikawadai.fs-ishikawadai.2",
+          "ishikawadai.fs-ishikawadai.3",
+          "ishikawadai.fs-ishikawadai.4",
+          "ishikawadai.fs-ishikawadai.5",
+          "ishikawadai.fs-ishikawadai.6",
+          "ishikawadai.fs-ishikawadai.7"
+        ]
+      },
+      "Project": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FoodStallProject"
+          },
+          {
+            "$ref": "#/components/schemas/GeneralProject"
+          },
+          {
+            "$ref": "#/components/schemas/LaboratoryProject"
+          },
+          {
+            "$ref": "#/components/schemas/StageProject"
+          }
+        ]
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -2614,6 +3464,119 @@
           "second_responsible",
           "third_responsible"
         ]
+      },
+      "StageProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupName",
+          "projectName",
+          "description",
+          "isChildFriendly",
+          "isRecommended",
+          "occasions",
+          "type"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isChildFriendly": {
+            "type": "boolean"
+          },
+          "isRecommended": {
+            "type": "boolean"
+          },
+          "occasions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occasion"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/StageProjectType"
+          }
+        }
+      },
+      "StageProjectType": {
+        "type": "string",
+        "description": "",
+        "enum": ["stage"]
+      },
+      "SweetFoodStallTag": {
+        "type": "object",
+        "required": ["tag", "tag2"],
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/SweetFoodStallTagTag"
+          },
+          "tag2": {
+            "$ref": "#/components/schemas/SweetFoodStallTagTag2"
+          }
+        }
+      },
+      "SweetFoodStallTagTag": {
+        "type": "string",
+        "description": "",
+        "enum": ["sweet"]
+      },
+      "SweetFoodStallTagTag2": {
+        "type": "string",
+        "description": "",
+        "enum": ["japanese", "western", "cold", "snack", "drink", "world"]
+      },
+      "Time": {
+        "type": "object",
+        "required": ["date", "hour", "minute"],
+        "properties": {
+          "date": {
+            "$ref": "#/components/schemas/TimeDate"
+          },
+          "hour": {
+            "type": "number",
+            "format": "double"
+          },
+          "minute": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TimeDate": {
+        "type": "integer",
+        "description": "",
+        "enum": [1, 2]
+      },
+      "TimeRange": {
+        "type": "object",
+        "required": ["start", "end"],
+        "properties": {
+          "end": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "start": {
+            "$ref": "#/components/schemas/Time"
+          }
+        }
       },
       "UserCreate": {
         "type": "object",

@@ -1,5 +1,4 @@
 import type { components as apiComponents } from './api_v3';
-import type { components as plansInfoComponents } from './plans_info_api_v1';
 
 export type FormItemType =
   | 'question_text'
@@ -58,6 +57,4 @@ export type UserRead = apiComponents['schemas']['UserRead'];
 export type MemberRead = apiComponents['schemas']['MemberRead'];
 export type Role = apiComponents['schemas']['Role'];
 
-export type ProductsCreate = plansInfoComponents['schemas']['ProductsCreate'];
-export type ProductsRead = plansInfoComponents['schemas']['ProductsRead'];
-export type ProductsUpdate = plansInfoComponents['schemas']['ProductsUpdate'];
+export type PlaceId = apiComponents['schemas']['OccasionPlace'];

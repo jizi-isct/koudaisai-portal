@@ -3,6 +3,7 @@ use crate::application::ports::access_token_issuer::AccessTokenIssuer;
 use crate::application::ports::clock::Clock;
 use crate::application::ports::discord::Discord;
 use crate::application::ports::email::Email;
+use crate::application::ports::events26_api::Events26Api;
 use crate::application::ports::meta_fetcher::MetaFetcher;
 use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::password_hasher::PasswordHasher;
@@ -29,6 +30,7 @@ pub mod authz;
 pub mod document;
 pub mod document_category;
 pub mod error;
+pub mod events26;
 pub mod file;
 pub mod form;
 pub mod group;
@@ -58,6 +60,7 @@ pub struct Application<
     ATI: AccessTokenIssuer,
     NR: NotificationRepo<Tx>,
     MF: MetaFetcher,
+    EA: Events26Api,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -80,6 +83,9 @@ pub struct Application<
     access_token_issuer: ATI,
     notification_repo: NR,
     meta_fetcher: MF,
+    /// 企画情報API(events26)クライアント。企画情報の編集申請を承認したときに
+    /// 企画へ反映するため、承認のユースケースから使う。
+    events26_api: EA,
     /// 通知の本文などで使う公開ベース URL(例: `https://portal.koudaisai.jp`)。
     base_url: String,
 }
@@ -104,7 +110,8 @@ impl<
     ATI: AccessTokenIssuer,
     NR: NotificationRepo<Tx>,
     MF: MetaFetcher,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF>
+    EA: Events26Api,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF, EA>
 {
     // 全リポジトリ/ポートを束ねる合成ルート。引数が多いのは設計上不可避。
     #[allow(clippy::too_many_arguments)]
@@ -127,6 +134,7 @@ impl<
         access_token_issuer: ATI,
         notification_repo: NR,
         meta_fetcher: MF,
+        events26_api: EA,
         base_url: String,
     ) -> Self {
         Self {
@@ -149,13 +157,14 @@ impl<
             access_token_issuer,
             notification_repo,
             meta_fetcher,
+            events26_api,
             base_url,
         }
     }
 
     pub fn approval_request(
         &'_ self,
-    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS> {
+    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS, EA, NR> {
         approval_request::ApprovalRequestApp::new(
             &self.approval_request_repo,
             &self.membership_repo,
@@ -163,8 +172,14 @@ impl<
             &self.clock,
             &self.discord,
             &self.object_storage,
+            &self.events26_api,
+            &self.notification_repo,
             &self.base_url,
         )
+    }
+
+    pub fn events26(&'_ self) -> events26::Events26App<'_, EA> {
+        events26::Events26App::new(&self.events26_api)
     }
 
     pub fn group(&'_ self) -> group::GroupApp<'_, Tx, GR, MR, UR, C> {

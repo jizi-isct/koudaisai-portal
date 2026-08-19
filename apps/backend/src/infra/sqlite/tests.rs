@@ -251,6 +251,14 @@ async fn form_round_trip() {
 }
 
 /// FK(issued_by -> users)を満たすための発行ユーザーを作成して返す。
+/// 申請の対象団体。approval_requests.group_id は groups を参照するので先に作る。
+async fn seed_group(repo: &SqliteGroupRepo, group_id: GroupId, c: &FixedClock) -> GroupId {
+    let group =
+        Group::register(group_id, "企画".to_string(), GroupType::GeneralProject, c).unwrap();
+    repo.insert(group.clone()).await.unwrap();
+    group_id
+}
+
 async fn seed_user(repo: &SqliteUserRepo, addr: &str, c: &FixedClock) -> UserId {
     let id = UserId::new(Uuid::new_v4());
     let user = User::register(
@@ -268,16 +276,19 @@ async fn seed_user(repo: &SqliteUserRepo, addr: &str, c: &FixedClock) -> UserId 
 async fn approval_request_lifecycle_and_find_by_user_ids() {
     let pool = test_pool().await;
     let user_repo = SqliteUserRepo::new(pool.clone());
+    let group_repo = SqliteGroupRepo::new(pool.clone());
     let repo = SqliteApprovalRequestRepo::new(pool);
     let c = clock();
 
     let issuer = seed_user(&user_repo, "issuer@example.com", &c).await;
     let other = seed_user(&user_repo, "other@example.com", &c).await;
+    let group = seed_group(&group_repo, GroupId::new('I', 1).unwrap(), &c).await;
 
     let id = ApprovalRequestId::generate();
     let mut request = ApprovalRequest::create(
         id,
         issuer,
+        group,
         ApprovalRequestType::EditExhibitionInfo {
             description: Some("説明".to_string()),
             icon_key: None,
@@ -329,15 +340,18 @@ async fn approval_request_lifecycle_and_find_by_user_ids() {
 async fn approval_request_rejected_and_closed_round_trip() {
     let pool = test_pool().await;
     let user_repo = SqliteUserRepo::new(pool.clone());
+    let group_repo = SqliteGroupRepo::new(pool.clone());
     let repo = SqliteApprovalRequestRepo::new(pool);
     let c = clock();
     let issuer = seed_user(&user_repo, "issuer2@example.com", &c).await;
+    let group = seed_group(&group_repo, GroupId::new('I', 2).unwrap(), &c).await;
 
     // rejected
     let rid = ApprovalRequestId::generate();
     let mut rejected = ApprovalRequest::create(
         rid,
         issuer,
+        group,
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: Some("icon".to_string()),
@@ -357,6 +371,7 @@ async fn approval_request_rejected_and_closed_round_trip() {
     let mut closed = ApprovalRequest::create(
         cid,
         issuer,
+        group,
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: None,
@@ -404,16 +419,19 @@ async fn notification_markdown_with_null_author_round_trip() {
 async fn notification_approval_request_variant_round_trip() {
     let pool = test_pool().await;
     let user_repo = SqliteUserRepo::new(pool.clone());
+    let group_repo = SqliteGroupRepo::new(pool.clone());
     let ar_repo = SqliteApprovalRequestRepo::new(pool.clone());
     let repo = SqliteNotificationRepo::new(pool);
     let c = clock();
 
     // approval_request_id は approval_requests への FK のため先に作る
     let issuer = seed_user(&user_repo, "issuer3@example.com", &c).await;
+    let group = seed_group(&group_repo, GroupId::new('I', 3).unwrap(), &c).await;
     let ar_id = ApprovalRequestId::generate();
     let ar = ApprovalRequest::create(
         ar_id,
         issuer,
+        group,
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: None,

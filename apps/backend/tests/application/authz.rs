@@ -34,6 +34,7 @@ fn make_request(issued_by: UserId) -> ApprovalRequest {
         ApprovalRequestId::generate(),
         Utc::now(),
         issued_by,
+        GroupId::new('I', 1).unwrap(),
         ApprovalRequestType::EditExhibitionInfo {
             description: None,
             icon_key: None,

@@ -18,7 +18,7 @@
     "@koudaisai/shared-types": "0.0.1",
     "@koudaisai/shared-utils": "0.0.1",
     "@koudaisai/shared-ui": "0.0.1",
-    "astro": "^6.2.1",
+    "astro": "^7.1.1",
     "react-markdown": "^10.1.0"
   }
 }

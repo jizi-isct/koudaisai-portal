@@ -35,7 +35,7 @@ pub type OIDCClient = Client<
 /// Keycloak 設定からプロバイダメタデータを discovery して OIDC クライアントを構築する。
 #[instrument(skip(keycloak))]
 pub async fn from_config(keycloak: &KeyCloak, redirect_url: String) -> OIDCClient {
-    let http_client = reqwest::Client::new();
+    let http_client = openidconnect::reqwest::Client::new();
 
     let provider_metadata = CoreProviderMetadata::discover_async(
         IssuerUrl::new(keycloak.issuer.clone()).unwrap(),

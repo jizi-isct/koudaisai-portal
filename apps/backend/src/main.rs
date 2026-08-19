@@ -6,6 +6,7 @@ use crate::config::{Logging, init_config};
 use crate::domain::plaintext_password::PlaintextPassword;
 use crate::infra::argon2_password_hasher::Argon2PasswordHasher;
 use crate::infra::discord_webhook::WebhookDiscord;
+use crate::infra::events26_api_client::Events26ApiClient;
 use crate::infra::jwt_access_token_issuer::JwtAccessTokenIssuer;
 use crate::infra::random_secret_generator::RandomSecretGenerator;
 use crate::infra::s3_object_storage::S3ObjectStorage;
@@ -73,7 +74,7 @@ async fn main() {
     // main は config を読み、構築結果を合成(composition root)するだけ。
     let oidc_client = crate::util::oidc::from_config(
         &config.web.auth.keycloak,
-        format!("{}{}", &config.web.server.base_url, "/login"),
+        format!("{}{}", config.web.server.base_url, "/login"),
     )
     .await;
 
@@ -93,11 +94,17 @@ async fn main() {
         password_hasher.hash(&plain).await.expect("hash dummy phc")
     };
 
+    let events26_api = Arc::new(
+        Events26ApiClient::from_config(&config.events26, &config.secrets)
+            .expect("build events26 api client"),
+    );
+
     let prod_app = new_sqlite_application(
         pool.clone(),
         SesEmail::from_config(&config.ses).await,
         S3ObjectStorage::from_config(&config.s3).await,
         WebhookDiscord::from_config(&config.discord),
+        events26_api,
         config.web.server.base_url.clone(),
         password_hasher,
         secret_generator,
@@ -128,7 +135,7 @@ async fn main() {
         allowed_origins: Arc::new(v3.cors_allowed_origins.clone()),
         oidc_client: Arc::new(oidc_client),
         auth_sessions: Arc::new(tokio::sync::Mutex::new(std::collections::HashMap::new())),
-        http_client: reqwest::Client::new(),
+        http_client: openidconnect::reqwest::Client::new(),
     };
 
     // credentials 付き CORS(`*` は使えないため origin は許可リスト)。
@@ -163,7 +170,7 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",
-        &config.web.server.host, &config.web.server.port
+        config.web.server.host, config.web.server.port
     ))
     .await
     .unwrap();
