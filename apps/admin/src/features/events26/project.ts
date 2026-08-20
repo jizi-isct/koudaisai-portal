@@ -45,6 +45,13 @@ export const CATEGORIES: Category[] = [
   'display',
 ];
 
+/** 空欄は未設定として扱い、それ以外は API に渡して検証する。 */
+export function parseCategory(value: string | undefined): Category | undefined {
+  const category = value?.trim() ?? '';
+  if (category === '') return undefined;
+  return category as Category;
+}
+
 export const CATEGORY_LABEL: Record<Category, string> = {
   hearty: 'ガッツリ',
   street_food: '食べ歩き',
@@ -120,7 +127,9 @@ export function ensureOk(
 ): void {
   if (result.response.ok) return;
   const detail =
-    result.error === undefined ? '' : `: ${JSON.stringify(result.error)}`;
+    result.error === undefined
+      ? ''
+      : `: ${typeof result.error === 'string' ? result.error : JSON.stringify(result.error)}`;
   throw new Error(`${label}に失敗しました(${result.response.status})${detail}`);
 }
 
