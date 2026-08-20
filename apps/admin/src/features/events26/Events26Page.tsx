@@ -220,7 +220,7 @@ function Events26Table() {
     applyCsv(
       csv,
       '編集',
-      parseEditCsv,
+      (contents) => parseEditCsv(contents, data ?? []),
       (project: Project) => project.id,
       async (project) =>
         ensureOk(
@@ -464,7 +464,8 @@ function Events26Table() {
         で開始と終了を対で指定し、企画種別は 企画番号の接頭辞（M / S / I /
         L）から決まります。
         <code>is_lab_tour</code> は <code>L</code>{' '}
-        で始まる企画のみ必須です。編集CSVは新規追加CSVと同じスキーマで、
+        で始まる企画のみ必須です。編集CSVは <code>id</code>{' '}
+        だけが必須で、それ以外は新規追加CSVと同じ列を任意に指定できます。存在する列だけを編集します。
         ダウンロードCSVは一覧確認用の別スキーマです。
       </p>
 
