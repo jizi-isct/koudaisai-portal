@@ -432,6 +432,41 @@ export interface paths {
     patch: operations['patch_notification'];
     trace?: never;
   };
+  '/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get all global settings. Requires the settings:read admin permission. */
+    get: operations['get_settings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/settings/show-occasions-on-portal': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get whether occasion locations are visible to groups. */
+    get: operations['get_show_occasions_on_portal'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description Change whether occasion locations are visible to groups. Requires the settings:write admin permission. */
+    patch: operations['patch_show_occasions_on_portal'];
+    trace?: never;
+  };
   '/users': {
     parameters: {
       query?: never;
@@ -1158,6 +1193,18 @@ export interface components {
       | 'first_responsible'
       | 'second_responsible'
       | 'third_responsible';
+    /** @description 管理者向けのグローバル設定全体。 */
+    SettingsRead: {
+      show_occasions_on_portal: boolean;
+    };
+    /** @description 参加団体へ公開してよい企画実施場所の表示設定。 */
+    ShowOccasionsOnPortalRead: {
+      show_occasions_on_portal: boolean;
+    };
+    /** @description 企画実施場所の表示設定を変更するリクエスト。 */
+    ShowOccasionsOnPortalUpdate: {
+      show_occasions_on_portal: boolean;
+    };
     StageProject: {
       category?: null | components['schemas']['Category'];
       description: string;
@@ -3180,6 +3227,112 @@ export interface operations {
       };
       /** @description Invalid notification */
       422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_settings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Global settings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SettingsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_show_occasions_on_portal: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Whether occasion locations are visible to groups */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ShowOccasionsOnPortalRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  patch_show_occasions_on_portal: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ShowOccasionsOnPortalUpdate'];
+      };
+    };
+    responses: {
+      /** @description Occasion location visibility updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ShowOccasionsOnPortalRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };
