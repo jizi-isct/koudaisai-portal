@@ -703,6 +703,7 @@ export interface components {
       isChildFriendly: boolean;
       isRecommended: boolean;
       occasions: components['schemas']['Occasion'][];
+      offering?: string | null;
       projectName: string;
       tag: components['schemas']['FoodStallTag'][];
       type: components['schemas']['FoodStallProjectType'];

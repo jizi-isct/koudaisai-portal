@@ -33,6 +33,8 @@ pub struct FoodStallProject {
     pub r#type: FoodStallProjectType,
     #[serde(rename = "tag")]
     pub tag: Vec<models::FoodStallTag>,
+    #[serde(rename = "offering", skip_serializing_if = "Option::is_none")]
+    pub offering: Option<String>,
 }
 
 impl FoodStallProject {
@@ -58,6 +60,7 @@ impl FoodStallProject {
             occasions,
             r#type,
             tag,
+            offering: None,
         }
     }
 }
