@@ -25,6 +25,7 @@ import Papa from 'papaparse';
 import { useRef, useState } from 'react';
 import { api, $events26Api } from '@/features/api/api';
 import {
+  CATEGORIES,
   ensureOk,
   formatTags,
   formatTime,
@@ -36,6 +37,7 @@ import {
   putIcon,
 } from './project';
 import type {
+  Category,
   FoodStallTag,
   GeneralTag,
   Occasion,
@@ -55,6 +57,10 @@ type ProjectRow = {
   is_recommended: string;
   /** 研究室公開企画のみ。ラボツアーかどうか。 */
   is_tour: string;
+  /** 模擬店企画のみ。提供するメニュー・商品など。 */
+  offering: string;
+  /** 全企画種別で指定できる任意項目。 */
+  category: string;
   /**
    * 模擬店企画は `main:rice;sweet:western`、一般企画は `experience;display`。
    * ステージ企画と研究室公開企画にタグは無いので空。
@@ -90,6 +96,10 @@ type CreateProjectRow = {
   place: string;
   /** id が `L` で始まる場合のみ必須。 */
   is_lab_tour: string;
+  /** id が `M` で始まる場合に使う任意項目。 */
+  offering: string;
+  /** 全企画種別で使う任意項目。 */
+  category: string;
   icon_url: string;
 };
 
@@ -102,6 +112,8 @@ const CSV_COLUMNS: (keyof ProjectRow)[] = [
   'is_child_friendly',
   'is_recommended',
   'is_tour',
+  'offering',
+  'category',
   'tags',
   'day1_place',
   'day1_start',
@@ -188,6 +200,35 @@ function buildGeneralTags(tags: string): GeneralTag[] {
     });
 }
 
+/** 空欄は未設定として扱い、それ以外は events26 のカテゴリー列挙値に限定する。 */
+function parseCategory(
+  value: string | undefined,
+  id: string,
+): Category | undefined {
+  const category = value?.trim() ?? '';
+  if (category === '') return undefined;
+  if (!CATEGORIES.includes(category as Category)) {
+    throw new Error(`不明なカテゴリーです(${id}): ${value}`);
+  }
+  return category as Category;
+}
+
+function categoryField(
+  category: string | undefined,
+  id: string,
+): Pick<Project, 'category'> {
+  const parsedCategory = parseCategory(category, id);
+  return parsedCategory ? { category: parsedCategory } : {};
+}
+
+function foodStallOptionalFields(
+  offering: string | undefined,
+): Pick<Extract<Project, { type: 'food-stall' }>, 'offering'> {
+  return {
+    ...(offering?.trim() ? { offering: offering.trim() } : {}),
+  };
+}
+
 function buildProject(row: ProjectRow): Project {
   const base = {
     id: row.id.trim(),
@@ -197,11 +238,17 @@ function buildProject(row: ProjectRow): Project {
     isChildFriendly: parseBoolean(row.is_child_friendly),
     isRecommended: parseBoolean(row.is_recommended),
     occasions: buildOccasions(row),
+    ...categoryField(row.category, row.id.trim()),
   };
 
   switch (row.type.trim()) {
     case 'food-stall':
-      return { ...base, type: 'food-stall', tag: buildFoodStallTags(row.tags) };
+      return {
+        ...base,
+        type: 'food-stall',
+        tag: buildFoodStallTags(row.tags),
+        ...foodStallOptionalFields(row.offering),
+      };
     case 'general':
       return { ...base, type: 'general', tag: buildGeneralTags(row.tags) };
     case 'stage':
@@ -321,11 +368,17 @@ function buildCreateProject(row: CreateProjectRow): Project {
     ),
     isRecommended: requireBoolean(row.is_recommended, 'is_recommended', id),
     occasions: buildCreateOccasions(row),
+    ...categoryField(row.category, id),
   };
 
   switch (projectTypeFromId(id)) {
     case 'food-stall':
-      return { ...base, type: 'food-stall', tag: [] };
+      return {
+        ...base,
+        type: 'food-stall',
+        tag: [],
+        ...foodStallOptionalFields(row.offering),
+      };
     case 'general':
       return { ...base, type: 'general', tag: [] };
     case 'stage':
@@ -360,6 +413,8 @@ function toRow(project: Project): ProjectRow {
     is_recommended: project.isRecommended ? 'true' : 'false',
     is_tour:
       project.type === 'laboratory' ? (project.isTour ? 'true' : 'false') : '',
+    offering: project.type === 'food-stall' ? (project.offering ?? '') : '',
+    category: project.category ?? '',
     tags: formatTags(project),
     day1_place: day1?.place ?? '',
     day1_start: day1 ? formatTime(day1.timeRange.start) : '',
@@ -371,19 +426,64 @@ function toRow(project: Project): ProjectRow {
 }
 
 /**
- * CSV を 1 行ずつ [`Project`] にする。
- * 1 行でも壊れていたら全体を捨てる(部分適用されると原因を追いにくいため)。
+ * `id,offering,category` のような部分 CSV を、一覧から取得済みの企画情報へ重ねる。
+ * events26 の更新 API は PUT による全置換なので、指定されていない項目を消さないために
+ * 既存値を送る。空欄の offering / category はそのプロパティを削除する指定になる。
  */
-function parseCsv(csv: string): Promise<Project[]> {
+function applyPartialProjectRow(
+  row: Partial<ProjectRow>,
+  projectsById: Map<string, Project>,
+): Project {
+  const id = requireField(row.id ?? '', 'id', row.id ?? '');
+  const project = projectsById.get(id);
+  if (!project) {
+    throw new Error(`既存の企画が見つかりません: ${id}`);
+  }
+
+  const hasOffering = Object.hasOwn(row, 'offering');
+  const hasCategory = Object.hasOwn(row, 'category');
+  if (!hasOffering && !hasCategory) {
+    throw new Error(
+      `部分更新CSVには offering または category の列が必要です: ${id}`,
+    );
+  }
+
+  const withCategory = hasCategory
+    ? { ...project, category: parseCategory(row.category, id) }
+    : project;
+
+  if (!hasOffering) return withCategory;
+  if (withCategory.type !== 'food-stall') {
+    throw new Error(`offering は模擬店企画のみ指定できます: ${id}`);
+  }
+  return {
+    ...withCategory,
+    offering: row.offering?.trim() || undefined,
+  };
+}
+
+function parseReplacementCsv(
+  csv: string,
+  existingProjects: Project[],
+): Promise<Project[]> {
+  const projectsById = new Map(
+    existingProjects.map((project) => [project.id, project]),
+  );
+
   return new Promise((resolve, reject) => {
     const projects: Project[] = [];
-    Papa.parse<ProjectRow>(csv, {
+    Papa.parse<Partial<ProjectRow>>(csv, {
       header: true,
       skipEmptyLines: true,
       encoding: 'UTF-8',
       step: (result, parser) => {
         try {
-          projects.push(buildProject(result.data));
+          // `type` 列があれば従来どおり全置換 CSV として扱う。
+          projects.push(
+            Object.hasOwn(result.data, 'type')
+              ? buildProject(result.data as ProjectRow)
+              : applyPartialProjectRow(result.data, projectsById),
+          );
         } catch (error) {
           parser.abort();
           reject(error instanceof Error ? error : new Error(String(error)));
@@ -395,7 +495,7 @@ function parseCsv(csv: string): Promise<Project[]> {
   });
 }
 
-/** 新規作成用 CSV を 1 行ずつ読む。[`parseCsv`] と同じく 1 行でも壊れていたら全体を捨てる。 */
+/** 新規作成用 CSV を 1 行ずつ読み、1 行でも壊れていたら全体を捨てる。 */
 function parseCreateCsv(csv: string): Promise<CreateEntry[]> {
   return new Promise((resolve, reject) => {
     const entries: CreateEntry[] = [];
@@ -640,7 +740,7 @@ function Events26Table() {
     applyCsv(
       csv,
       '更新',
-      parseCsv,
+      (contents) => parseReplacementCsv(contents, data ?? []),
       (project: Project) => project.id,
       async (project) =>
         ensureOk(
