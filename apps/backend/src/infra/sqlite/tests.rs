@@ -13,6 +13,7 @@ use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
+use crate::application::ports::repositories::settings_repo::SettingsRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::admin_id::AdminId;
@@ -34,6 +35,7 @@ use crate::domain::one_time_token_id::OneTimeTokenId;
 use crate::domain::password_credentials::PasswordCredentials;
 use crate::domain::session::{RevocationReason, Session, TokenStatus};
 use crate::domain::session_id::SessionId;
+use crate::domain::settings::Settings;
 use crate::domain::target_specifier::TargetSpecifier;
 use crate::domain::token_id::TokenId;
 use crate::domain::user::{User, UserStatus};
@@ -47,6 +49,7 @@ use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
 use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::one_time_token_repo_impl::SqliteOneTimeTokenRepo;
 use crate::infra::sqlite::session_repo_impl::SqliteSessionRepo;
+use crate::infra::sqlite::settings_repo_impl::SqliteSettingsRepo;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -57,6 +60,25 @@ use uuid::Uuid;
 
 struct FixedClock {
     now: DateTime<Utc>,
+}
+
+#[tokio::test]
+async fn settings_round_trip_and_singleton_constraint() {
+    let pool = test_pool().await;
+    let repo = SqliteSettingsRepo::new(pool.clone());
+
+    assert!(!repo.get().await.unwrap().show_occasions_on_portal());
+
+    let settings = Settings::restore(true);
+    repo.save(&settings).await.unwrap();
+    assert_eq!(repo.get().await.unwrap(), settings);
+
+    assert!(
+        sqlx::query("INSERT INTO settings (singleton, show_occasions_on_portal) VALUES (2, 0)")
+            .execute(&pool)
+            .await
+            .is_err()
+    );
 }
 impl Clock for FixedClock {
     fn now(&self) -> DateTime<Utc> {

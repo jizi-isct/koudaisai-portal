@@ -6,10 +6,8 @@ pub struct Settings {
 
 impl Settings {
     /// 初期化用コンストラクタ
-    pub fn new(show_occasions_on_portal: bool) -> Self {
-        Self {
-            show_occasions_on_portal,
-        }
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// db 復元用コンストラクタ
@@ -27,5 +25,13 @@ impl Settings {
     /// 企画情報の企画実施場所を参加団体に表示するかどうかを変更
     pub fn change_show_occasions_on_portal(&mut self, new_value: bool) {
         self.show_occasions_on_portal = new_value;
+    }
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            show_occasions_on_portal: false,
+        }
     }
 }

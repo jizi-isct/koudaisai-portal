@@ -14,6 +14,7 @@ pub mod membership_repo_impl;
 pub mod notification_repo_impl;
 pub mod one_time_token_repo_impl;
 pub mod session_repo_impl;
+pub mod settings_repo_impl;
 pub mod transaction_impl;
 pub mod user_repo_impl;
 mod util;
@@ -40,6 +41,7 @@ use crate::infra::sqlite::membership_repo_impl::SqliteMembershipRepo;
 use crate::infra::sqlite::notification_repo_impl::SqliteNotificationRepo;
 use crate::infra::sqlite::one_time_token_repo_impl::SqliteOneTimeTokenRepo;
 use crate::infra::sqlite::session_repo_impl::SqliteSessionRepo;
+use crate::infra::sqlite::settings_repo_impl::SqliteSettingsRepo;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::user_repo_impl::SqliteUserRepo;
 use sqlx::SqlitePool;
@@ -70,6 +72,7 @@ pub type SqliteApplication<E, OS, D, EA> = Application<
     SqliteNotificationRepo,
     ReqwestMetaFetcher,
     EA,
+    SqliteSettingsRepo,
 >;
 
 /// SQLite プールを生成し，マイグレーションを適用する。
@@ -118,6 +121,7 @@ pub fn new_sqlite_application<E: Email, OS: ObjectStorage, D: Discord, EA: Event
         SqliteNotificationRepo::new(pool.clone()),
         ReqwestMetaFetcher::from_config(),
         events26_api,
+        SqliteSettingsRepo::new(pool.clone()),
         base_url,
     )
 }
