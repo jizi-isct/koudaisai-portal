@@ -59,7 +59,7 @@ impl<'a, STR: SettingsRepo> SettingsApp<'a, STR> {
         &self,
         actor_ctx: &ActorContext,
     ) -> Result<bool, ApplicationOperationError<FindError>> {
-        if !authz::can_get_show_occasions_on_portal(actor_ctx) {
+        if !authz::can_get_accept_correction_requests(actor_ctx) {
             return Err(ApplicationOperationError::Unauthorized);
         }
         Ok(self.settings_repo.get().await?.accept_correction_requests())
