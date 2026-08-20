@@ -36,17 +36,9 @@ import {
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
-import type {
-  Category,
-  FoodStallTag,
-  GeneralTag,
-  Occasion,
-  Place,
-  Project,
-  Time,
-} from './project';
+import type { Category, Occasion, Place, Project, Time } from './project';
 
-/** CSV の 1 行。すべての列を文字列として読み書きする。 */
+/** ダウンロード CSV の 1 行。すべての列を文字列として読み書きする。 */
 type ProjectRow = {
   id: string;
   type: string;
@@ -75,8 +67,20 @@ type ProjectRow = {
 };
 
 /**
+ * 既存企画を編集する CSV の 1 行。
+ * ダウンロード CSV とは別スキーマで、指定した列だけを既存の企画情報に反映する。
+ */
+type EditProjectRow = {
+  id: string;
+  /** 模擬店企画のみ。空欄なら未設定に戻す。 */
+  offering?: string;
+  /** 全企画種別で指定できる任意項目。空欄なら未設定に戻す。 */
+  category?: string;
+};
+
+/**
  * 新規作成用 CSV の 1 行。旧 API 時代の列に揃えた暫定の形式で、
- * ダウンロード・置き換えで使う [`ProjectRow`] とは別物。
+ * ダウンロード CSV・編集 CSV とは別物。
  *
  * type 列は無く、企画種別は id の接頭辞(M/S/I/L)から決める。
  * タグの列も無いので、模擬店企画と一般企画のタグは空で作られる。
@@ -123,83 +127,6 @@ const CSV_COLUMNS: (keyof ProjectRow)[] = [
   'day2_end',
 ];
 
-function parseBoolean(value: string): boolean {
-  return value.trim().toLowerCase() === 'true';
-}
-
-/**
- * day1 / day2 の列から `occasions` を組み立てる。
- * 開始・終了の両方が入っている日だけを要素にするので、片方だけの日は落ちる。
- */
-function buildOccasions(row: ProjectRow): Occasion[] {
-  const days: {
-    date: Time['date'];
-    place: string;
-    start: string;
-    end: string;
-  }[] = [
-    {
-      date: 1,
-      place: row.day1_place,
-      start: row.day1_start,
-      end: row.day1_end,
-    },
-    {
-      date: 2,
-      place: row.day2_place,
-      start: row.day2_start,
-      end: row.day2_end,
-    },
-  ];
-
-  return days
-    .filter((day) => day.start.trim() !== '' && day.end.trim() !== '')
-    .map((day) => ({
-      // place は events26 側の enum。CSV の値をそのまま渡し、妥当性は API に委ねる。
-      // 未指定は null ではなくキーごと省く(spec 上 optional であって nullable ではない)。
-      ...(day.place.trim() === '' ? {} : { place: day.place.trim() as Place }),
-      timeRange: {
-        start: parseTime(day.date, day.start),
-        end: parseTime(day.date, day.end),
-      },
-    }));
-}
-
-function buildFoodStallTags(tags: string): FoodStallTag[] {
-  return tags
-    .split(';')
-    .map((tag) => tag.trim())
-    .filter((tag) => tag !== '')
-    .map((tag) => {
-      const [head, tail] = tag.split(':').map((part) => part.trim());
-      switch (head) {
-        case 'main':
-        case 'sweet':
-          if (!tail) {
-            throw new Error(`模擬店タグ ${head} には tag2 が必要です: ${tag}`);
-          }
-          return { tag: head, tag2: tail } as FoodStallTag;
-        case 'drink':
-          return { tag: 'drink' } as FoodStallTag;
-        default:
-          throw new Error(`不明な模擬店タグです: ${tag}`);
-      }
-    });
-}
-
-function buildGeneralTags(tags: string): GeneralTag[] {
-  return tags
-    .split(';')
-    .map((tag) => tag.trim())
-    .filter((tag) => tag !== '')
-    .map((tag) => {
-      if (!GENERAL_TAGS.includes(tag as GeneralTag)) {
-        throw new Error(`不明な一般企画タグです: ${tag}`);
-      }
-      return tag as GeneralTag;
-    });
-}
-
 /** 空欄は未設定として扱い、それ以外は events26 のカテゴリー列挙値に限定する。 */
 function parseCategory(
   value: string | undefined,
@@ -227,39 +154,6 @@ function foodStallOptionalFields(
   return {
     ...(offering?.trim() ? { offering: offering.trim() } : {}),
   };
-}
-
-function buildProject(row: ProjectRow): Project {
-  const base = {
-    id: row.id.trim(),
-    groupName: row.group_name,
-    projectName: row.project_name,
-    description: row.description,
-    isChildFriendly: parseBoolean(row.is_child_friendly),
-    isRecommended: parseBoolean(row.is_recommended),
-    occasions: buildOccasions(row),
-    ...categoryField(row.category, row.id.trim()),
-  };
-
-  switch (row.type.trim()) {
-    case 'food-stall':
-      return {
-        ...base,
-        type: 'food-stall',
-        tag: buildFoodStallTags(row.tags),
-        ...foodStallOptionalFields(row.offering),
-      };
-    case 'general':
-      return { ...base, type: 'general', tag: buildGeneralTags(row.tags) };
-    case 'stage':
-      return { ...base, type: 'stage' };
-    case 'laboratory':
-      return { ...base, type: 'laboratory', isTour: parseBoolean(row.is_tour) };
-    default:
-      throw new Error(
-        `type は food-stall, general, stage, laboratory のいずれかである必要があります: ${row.type}`,
-      );
-  }
 }
 
 /** 企画種別は id の接頭辞で決まる(M: 模擬店, S: ステージ, I: 一般, L: 研究室公開)。 */
@@ -427,11 +321,11 @@ function toRow(project: Project): ProjectRow {
 
 /**
  * `id,offering,category` のような部分 CSV を、一覧から取得済みの企画情報へ重ねる。
- * events26 の更新 API は PUT による全置換なので、指定されていない項目を消さないために
+ * events26 の編集 API は PUT による全置換なので、指定されていない項目を消さないために
  * 既存値を送る。空欄の offering / category はそのプロパティを削除する指定になる。
  */
-function applyPartialProjectRow(
-  row: Partial<ProjectRow>,
+function applyEditProjectRow(
+  row: EditProjectRow,
   projectsById: Map<string, Project>,
 ): Project {
   const id = requireField(row.id ?? '', 'id', row.id ?? '');
@@ -444,7 +338,7 @@ function applyPartialProjectRow(
   const hasCategory = Object.hasOwn(row, 'category');
   if (!hasOffering && !hasCategory) {
     throw new Error(
-      `部分更新CSVには offering または category の列が必要です: ${id}`,
+      `編集CSVには offering または category の列が必要です: ${id}`,
     );
   }
 
@@ -462,7 +356,7 @@ function applyPartialProjectRow(
   };
 }
 
-function parseReplacementCsv(
+function parseEditCsv(
   csv: string,
   existingProjects: Project[],
 ): Promise<Project[]> {
@@ -472,18 +366,13 @@ function parseReplacementCsv(
 
   return new Promise((resolve, reject) => {
     const projects: Project[] = [];
-    Papa.parse<Partial<ProjectRow>>(csv, {
+    Papa.parse<EditProjectRow>(csv, {
       header: true,
       skipEmptyLines: true,
       encoding: 'UTF-8',
       step: (result, parser) => {
         try {
-          // `type` 列があれば従来どおり全置換 CSV として扱う。
-          projects.push(
-            Object.hasOwn(result.data, 'type')
-              ? buildProject(result.data as ProjectRow)
-              : applyPartialProjectRow(result.data, projectsById),
-          );
+          projects.push(applyEditProjectRow(result.data, projectsById));
         } catch (error) {
           parser.abort();
           reject(error instanceof Error ? error : new Error(String(error)));
@@ -736,11 +625,11 @@ function Events26Table() {
     }
   };
 
-  const handleBulkReplace = (csv: string) =>
+  const handleBulkEdit = (csv: string) =>
     applyCsv(
       csv,
-      '更新',
-      (contents) => parseReplacementCsv(contents, data ?? []),
+      '編集',
+      (contents) => parseEditCsv(contents, data ?? []),
       (project: Project) => project.id,
       async (project) =>
         ensureOk(
@@ -748,7 +637,7 @@ function Events26Table() {
             params: { path: { project_id: project.id } },
             body: project,
           }),
-          '企画情報の更新',
+          '企画情報の編集',
         ),
     );
 
@@ -935,13 +824,11 @@ function Events26Table() {
           maxCount={1}
           accept=".csv"
           beforeUpload={async (file) => {
-            await handleBulkReplace(await file.text());
+            await handleBulkEdit(await file.text());
             return false;
           }}
         >
-          <Button icon={<UploadOutlined />}>
-            CSVから既存の企画情報を置き換え
-          </Button>
+          <Button icon={<UploadOutlined />}>CSVから既存の企画情報を編集</Button>
         </Upload>
         <Button onClick={handleDownload} icon={<DownloadOutlined />}>
           企画情報をCSVとしてダウンロード
@@ -984,11 +871,15 @@ function Events26Table() {
         <code>is_child_friendly</code>, <code>is_recommended</code>,{' '}
         <code>day1_start_time</code>, <code>day1_end_time</code>,{' '}
         <code>day2_start_time</code>, <code>day2_end_time</code>,{' '}
-        <code>place</code>, <code>is_lab_tour</code>, <code>icon_url</code>{' '}
-        です。時刻は <code>HH:mm</code> で開始と終了を対で指定し、企画種別は
+        <code>place</code>, <code>is_lab_tour</code>, <code>offering</code>,{' '}
+        <code>category</code>, <code>icon_url</code> です。時刻は{' '}
+        <code>HH:mm</code> で開始と終了を対で指定し、企画種別は
         企画番号の接頭辞（M / S / I / L）から決まります。
         <code>is_lab_tour</code> は <code>L</code>{' '}
-        で始まる企画のみ必須です。置き換え・ダウンロードのCSVは従来の列のままです。
+        で始まる企画のみ必須です。編集CSVは <code>id</code> と、任意の{' '}
+        <code>offering</code>、<code>category</code>{' '}
+        列を使用します。指定しない列は変更せず、
+        空欄は値を未設定に戻します。ダウンロードCSVは一覧確認用の別スキーマです。
       </p>
 
       <Flex gap={8} vertical>
