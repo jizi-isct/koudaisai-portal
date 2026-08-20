@@ -1,5 +1,8 @@
 use super::super::V3State;
-use super::dto::{SettingsRead, ShowOccasionsOnPortalRead, ShowOccasionsOnPortalUpdate};
+use super::dto::{
+    AcceptCorrectionRequestsRead, AcceptCorrectionRequestsUpdate, SettingsRead,
+    ShowOccasionsOnPortalRead, ShowOccasionsOnPortalUpdate,
+};
 use crate::application::error::ApplicationOperationError;
 use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
@@ -95,5 +98,79 @@ pub async fn patch_show_occasions_on_portal(
             PatchShowOccasionsOnPortalResponse::Forbidden
         }
         Err(_) => PatchShowOccasionsOnPortalResponse::InternalServerError,
+    }
+}
+
+#[http_response]
+pub enum GetAcceptCorrectionRequestsResponse {
+    #[response(status = OK, description = "Whether groups can submit correction requests")]
+    Ok(AcceptCorrectionRequestsRead),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    get,
+    description = "Get whether groups can submit correction requests.",
+    path = "/accept-correction-requests",
+    responses(GetAcceptCorrectionRequestsResponse),
+    tag = super::super::SETTINGS_TAG
+)]
+pub async fn get_accept_correction_requests(
+    State(st): State<V3State>,
+    actor: ActorContext,
+) -> GetAcceptCorrectionRequestsResponse {
+    match st
+        .app
+        .settings()
+        .get_accept_correction_requests(&actor)
+        .await
+    {
+        Ok(value) => GetAcceptCorrectionRequestsResponse::Ok(value.into()),
+        Err(ApplicationOperationError::Unauthorized) => {
+            GetAcceptCorrectionRequestsResponse::Forbidden
+        }
+        Err(_) => GetAcceptCorrectionRequestsResponse::InternalServerError,
+    }
+}
+
+#[http_response]
+pub enum PatchAcceptCorrectionRequestsResponse {
+    #[response(status = OK, description = "Correction request availability updated")]
+    Ok(AcceptCorrectionRequestsRead),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
+    InternalServerError,
+}
+
+#[utoipa::path(
+    patch,
+    description = "Change whether groups can submit correction requests. Requires the settings:write admin permission.",
+    path = "/accept-correction-requests",
+    responses(PatchAcceptCorrectionRequestsResponse),
+    request_body = AcceptCorrectionRequestsUpdate,
+    tag = super::super::SETTINGS_TAG
+)]
+pub async fn patch_accept_correction_requests(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Json(body): Json<AcceptCorrectionRequestsUpdate>,
+) -> PatchAcceptCorrectionRequestsResponse {
+    match st
+        .app
+        .settings()
+        .change_accept_correction_requests(&actor, body.accept_correction_requests)
+        .await
+    {
+        Ok(settings) => {
+            PatchAcceptCorrectionRequestsResponse::Ok(settings.accept_correction_requests().into())
+        }
+        Err(ApplicationOperationError::Unauthorized) => {
+            PatchAcceptCorrectionRequestsResponse::Forbidden
+        }
+        Err(_) => PatchAcceptCorrectionRequestsResponse::InternalServerError,
     }
 }

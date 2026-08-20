@@ -1808,6 +1808,64 @@
         }
       }
     },
+    "/settings/accept-correction-requests": {
+      "get": {
+        "tags": ["settings"],
+        "description": "Get whether groups can submit correction requests.",
+        "operationId": "get_accept_correction_requests",
+        "responses": {
+          "200": {
+            "description": "Whether groups can submit correction requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptCorrectionRequestsRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["settings"],
+        "description": "Change whether groups can submit correction requests. Requires the settings:write admin permission.",
+        "operationId": "patch_accept_correction_requests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptCorrectionRequestsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correction request availability updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptCorrectionRequestsRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/settings/show-occasions-on-portal": {
       "get": {
         "tags": ["settings"],
@@ -2213,6 +2271,26 @@
   },
   "components": {
     "schemas": {
+      "AcceptCorrectionRequestsRead": {
+        "type": "object",
+        "description": "参加団体が企画情報の訂正申請を出せるかどうか。",
+        "required": ["accept_correction_requests"],
+        "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AcceptCorrectionRequestsUpdate": {
+        "type": "object",
+        "description": "訂正申請の受付状態を変更するリクエスト。",
+        "required": ["accept_correction_requests"],
+        "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          }
+        }
+      },
       "ApprovalActionBody": {
         "type": "object",
         "properties": {
@@ -3554,8 +3632,11 @@
       "SettingsRead": {
         "type": "object",
         "description": "管理者向けのグローバル設定全体。",
-        "required": ["show_occasions_on_portal"],
+        "required": ["show_occasions_on_portal", "accept_correction_requests"],
         "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          },
           "show_occasions_on_portal": {
             "type": "boolean"
           }

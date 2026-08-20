@@ -24,6 +24,10 @@ function SettingsContent() {
     'patch',
     '/settings/show-occasions-on-portal',
   );
+  const { mutateAsync: updateAcceptCorrectionRequests } = $api.useMutation(
+    'patch',
+    '/settings/accept-correction-requests',
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleShowOccasionsChange = async (checked: boolean) => {
@@ -31,6 +35,21 @@ function SettingsContent() {
     try {
       await updateShowOccasions({
         body: { show_occasions_on_portal: checked },
+      });
+      await refetch();
+      messageApi.success('設定を保存しました。');
+    } catch (caughtError) {
+      messageApi.error(`設定の保存に失敗しました: ${String(caughtError)}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAcceptCorrectionRequestsChange = async (checked: boolean) => {
+    setIsSaving(true);
+    try {
+      await updateAcceptCorrectionRequests({
+        body: { accept_correction_requests: checked },
       });
       await refetch();
       messageApi.success('設定を保存しました。');
@@ -71,6 +90,21 @@ function SettingsContent() {
             unCheckedChildren="非表示"
             loading={isSaving}
             onChange={handleShowOccasionsChange}
+          />
+        </Flex>
+        <Flex align="center" justify="space-between" gap={24} style={{ marginTop: 24 }}>
+          <div>
+            <Typography.Text strong>企画情報の訂正申請を受け付ける</Typography.Text>
+            <Typography.Paragraph type="secondary" style={{ margin: '4px 0 0' }}>
+              無効にすると、参加団体ポータルから新しい訂正申請を出せなくなります。
+            </Typography.Paragraph>
+          </div>
+          <Switch
+            checked={settings.accept_correction_requests}
+            checkedChildren="受付中"
+            unCheckedChildren="締切"
+            loading={isSaving}
+            onChange={handleAcceptCorrectionRequestsChange}
           />
         </Flex>
       </Card>

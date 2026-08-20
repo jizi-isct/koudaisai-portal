@@ -449,6 +449,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/settings/accept-correction-requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get whether groups can submit correction requests. */
+    get: operations['get_accept_correction_requests'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description Change whether groups can submit correction requests. Requires the settings:write admin permission. */
+    patch: operations['patch_accept_correction_requests'];
+    trace?: never;
+  };
   '/settings/show-occasions-on-portal': {
     parameters: {
       query?: never;
@@ -576,6 +594,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** @description 参加団体が企画情報の訂正申請を出せるかどうか。 */
+    AcceptCorrectionRequestsRead: {
+      accept_correction_requests: boolean;
+    };
+    /** @description 訂正申請の受付状態を変更するリクエスト。 */
+    AcceptCorrectionRequestsUpdate: {
+      accept_correction_requests: boolean;
+    };
     ApprovalActionBody: {
       reason?: string | null;
     };
@@ -1195,6 +1221,7 @@ export interface components {
       | 'third_responsible';
     /** @description 管理者向けのグローバル設定全体。 */
     SettingsRead: {
+      accept_correction_requests: boolean;
       show_occasions_on_portal: boolean;
     };
     /** @description 参加団体へ公開してよい企画実施場所の表示設定。 */
@@ -3257,6 +3284,78 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['SettingsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_accept_correction_requests: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Whether groups can submit correction requests */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AcceptCorrectionRequestsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  patch_accept_correction_requests: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AcceptCorrectionRequestsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Correction request availability updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AcceptCorrectionRequestsRead'];
         };
       };
       /** @description Forbidden */
