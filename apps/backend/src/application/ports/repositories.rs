@@ -7,4 +7,5 @@ pub mod membership_repo;
 pub mod notification_repo;
 pub mod one_time_token_repo;
 pub mod session_repo;
+pub mod settings_repo;
 pub mod user_repo;

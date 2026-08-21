@@ -33,6 +33,8 @@ fn admin_claims() -> Vec<String> {
         "koudaisai-portal:admin:group:create",
         "koudaisai-portal:admin:group:update",
         "koudaisai-portal:admin:group:delete",
+        "koudaisai-portal:admin:settings:read",
+        "koudaisai-portal:admin:settings:write",
         "koudaisai-portal:admin:form:read",
         "koudaisai-portal:admin:form:create",
         "koudaisai-portal:admin:form:update",

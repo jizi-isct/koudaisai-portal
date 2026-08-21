@@ -9,5 +9,6 @@ pub mod group;
 pub mod group_id;
 pub mod membership;
 pub mod password_credentials;
+pub mod settings;
 pub mod target_specifier;
 pub mod user;

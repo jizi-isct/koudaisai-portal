@@ -135,6 +135,37 @@ pub fn can_delete_group(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+/// グローバル設定全体を取得できるか。
+pub fn can_get_all_settings(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:settings:read".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// 企画実施場所の表示設定を取得できるか。
+pub fn can_get_show_occasions_on_portal(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:settings:read".to_string())
+        }
+        ActorContext::User { .. } => true,
+        ActorContext::NoLogin => false,
+    }
+}
+
+/// グローバル設定を変更できるか。
+pub fn can_write_settings(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:settings:write".to_string())
+        }
+        _ => false,
+    }
+}
+
 /// グループのメンバー（所属・役職）を追加・削除できるか．
 // TODO: 現状は管理者(group:update クレーム)のみ許可．団体メンバー自身による管理を許す場合はここを拡張する．
 pub fn can_manage_group_members(actor_ctx: &ActorContext) -> bool {

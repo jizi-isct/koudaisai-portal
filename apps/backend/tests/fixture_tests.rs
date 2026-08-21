@@ -34,6 +34,8 @@ datatest_stable::harness! {
     { test = domain::membership::test_validate_set, root = "tests/fixtures/domain", pattern = r"membership/validate_set/[^/]+\.json" },
     // password_credentials
     { test = domain::password_credentials::test_new, root = "tests/fixtures/domain", pattern = r"password_credentials/new/[^/]+\.json" },
+    // settings
+    { test = domain::settings::test_default, root = "tests/fixtures/domain", pattern = r"settings/default/[^/]+\.json" },
     // user
     { test = domain::user::test_register,          root = "tests/fixtures/domain", pattern = r"user/register/[^/]+\.json" },
     { test = domain::user::test_rename,            root = "tests/fixtures/domain", pattern = r"user/rename/[^/]+\.json" },
@@ -47,6 +49,9 @@ datatest_stable::harness! {
     { test = application::authz::test_can_get_all_users,                      root = "tests/fixtures/application", pattern = r"authz/can_get_all_users/[^/]+\.json" },
     { test = application::authz::test_can_get_user_by_id,                     root = "tests/fixtures/application", pattern = r"authz/can_get_user_by_id/[^/]+\.json" },
     { test = application::authz::test_can_update_user,                        root = "tests/fixtures/application", pattern = r"authz/can_update_user/[^/]+\.json" },
+    { test = application::authz::test_can_get_all_settings,                    root = "tests/fixtures/application", pattern = r"authz/can_get_all_settings/[^/]+\.json" },
+    { test = application::authz::test_can_get_show_occasions_on_portal,        root = "tests/fixtures/application", pattern = r"authz/can_get_show_occasions_on_portal/[^/]+\.json" },
+    { test = application::authz::test_can_write_settings,                      root = "tests/fixtures/application", pattern = r"authz/can_write_settings/[^/]+\.json" },
     { test = application::authz::test_can_change_m_address_of_the_user,       root = "tests/fixtures/application", pattern = r"authz/can_change_m_address_of_the_user/[^/]+\.json" },
     { test = application::authz::test_can_get_all_groups,                     root = "tests/fixtures/application", pattern = r"authz/can_get_all_groups/[^/]+\.json" },
     { test = application::authz::test_can_get_group_by_id,                    root = "tests/fixtures/application", pattern = r"authz/can_get_group_by_id/[^/]+\.json" },
@@ -94,4 +99,8 @@ datatest_stable::harness! {
     { test = application::document_category::test_get_by_id, root = "tests/fixtures/application", pattern = r"document_category/get_by_id/[^/]+\.json" },
     { test = application::document_category::test_update,    root = "tests/fixtures/application", pattern = r"document_category/update/[^/]+\.json" },
     { test = application::document_category::test_delete,    root = "tests/fixtures/application", pattern = r"document_category/delete/[^/]+\.json" },
+    // application::settings
+    { test = application::settings::test_get_all,                         root = "tests/fixtures/application", pattern = r"settings/get_all/[^/]+\.json" },
+    { test = application::settings::test_get_show_occasions_on_portal,    root = "tests/fixtures/application", pattern = r"settings/get_show_occasions_on_portal/[^/]+\.json" },
+    { test = application::settings::test_change_show_occasions_on_portal, root = "tests/fixtures/application", pattern = r"settings/change_show_occasions_on_portal/[^/]+\.json" },
 }

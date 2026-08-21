@@ -1,0 +1,5 @@
+{
+  "actor": { "Admin": { "claims": [] } },
+  "enabled": true,
+  "expected": "unauthorized"
+}
