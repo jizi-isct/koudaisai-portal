@@ -2617,6 +2617,9 @@
               "$ref": "#/components/schemas/Occasion"
             }
           },
+          "offering": {
+            "type": ["string", "null"]
+          },
           "projectName": {
             "type": "string"
           },

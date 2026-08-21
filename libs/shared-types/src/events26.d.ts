@@ -673,6 +673,7 @@ export interface components {
       /** @enum {string} */
       type: 'food-stall';
       tag: components['schemas']['FoodStallTag'][];
+      offering?: string;
     };
     /** @enum {string} */
     GeneralTag: 'experience' | 'display' | 'performance' | 'food' | 'lecture';

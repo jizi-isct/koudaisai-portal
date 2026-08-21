@@ -13,6 +13,7 @@ export type Place = NonNullable<Occasion['place']>;
 export type Time = events26Components['schemas']['Time'];
 export type FoodStallTag = events26Components['schemas']['FoodStallTag'];
 export type GeneralTag = events26Components['schemas']['GeneralTag'];
+export type Category = events26Components['schemas']['Category'];
 
 export const PROJECT_TYPE_LABEL: Record<
   Project['type'],
@@ -31,6 +32,36 @@ export const GENERAL_TAGS: GeneralTag[] = [
   'food',
   'lecture',
 ];
+
+/** events26 が企画カテゴリーとして受け付ける値。 */
+export const CATEGORIES: Category[] = [
+  'hearty',
+  'street_food',
+  'sweets',
+  'performance',
+  'play',
+  'cafe',
+  'laboratory',
+  'display',
+];
+
+/** 空欄は未設定として扱い、それ以外は API に渡して検証する。 */
+export function parseCategory(value: string | undefined): Category | undefined {
+  const category = value?.trim() ?? '';
+  if (category === '') return undefined;
+  return category as Category;
+}
+
+export const CATEGORY_LABEL: Record<Category, string> = {
+  hearty: 'ガッツリ',
+  street_food: '食べ歩き',
+  sweets: 'スイーツ',
+  performance: 'パフォーマンス',
+  play: '遊び',
+  cafe: 'カフェ',
+  laboratory: '研究室',
+  display: '展示',
+};
 
 /** 模擬店タグの `tag` ごとに選べる `tag2`。`drink` は `tag2` を持たない。 */
 export const FOOD_STALL_TAG2: Record<'main' | 'sweet', string[]> = {
@@ -96,7 +127,9 @@ export function ensureOk(
 ): void {
   if (result.response.ok) return;
   const detail =
-    result.error === undefined ? '' : `: ${JSON.stringify(result.error)}`;
+    result.error === undefined
+      ? ''
+      : `: ${typeof result.error === 'string' ? result.error : JSON.stringify(result.error)}`;
   throw new Error(`${label}に失敗しました(${result.response.status})${detail}`);
 }
 
