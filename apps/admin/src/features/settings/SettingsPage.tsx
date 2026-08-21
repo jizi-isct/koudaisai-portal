@@ -16,10 +16,12 @@ export default function SettingsPage() {
 
 function SettingsContent() {
   const [messageApi, contextHolder] = message.useMessage();
-  const { data: settings, isLoading, error, refetch } = $api.useQuery(
-    'get',
-    '/settings',
-  );
+  const {
+    data: settings,
+    isLoading,
+    error,
+    refetch,
+  } = $api.useQuery('get', '/settings');
   const { mutateAsync: updateShowOccasions } = $api.useMutation(
     'patch',
     '/settings/show-occasions-on-portal',
@@ -79,8 +81,13 @@ function SettingsContent() {
       <Card title="企画情報" style={{ maxWidth: 720 }}>
         <Flex align="center" justify="space-between" gap={24}>
           <div>
-            <Typography.Text strong>企画実施予定を参加団体に表示</Typography.Text>
-            <Typography.Paragraph type="secondary" style={{ margin: '4px 0 0' }}>
+            <Typography.Text strong>
+              企画実施予定を参加団体に表示
+            </Typography.Text>
+            <Typography.Paragraph
+              type="secondary"
+              style={{ margin: '4px 0 0' }}
+            >
               有効にすると、参加団体ポータルの企画情報に実施日時と場所を表示します。
             </Typography.Paragraph>
           </div>
@@ -92,10 +99,20 @@ function SettingsContent() {
             onChange={handleShowOccasionsChange}
           />
         </Flex>
-        <Flex align="center" justify="space-between" gap={24} style={{ marginTop: 24 }}>
+        <Flex
+          align="center"
+          justify="space-between"
+          gap={24}
+          style={{ marginTop: 24 }}
+        >
           <div>
-            <Typography.Text strong>企画情報の訂正申請を受け付ける</Typography.Text>
-            <Typography.Paragraph type="secondary" style={{ margin: '4px 0 0' }}>
+            <Typography.Text strong>
+              企画情報の訂正申請を受け付ける
+            </Typography.Text>
+            <Typography.Paragraph
+              type="secondary"
+              style={{ margin: '4px 0 0' }}
+            >
               無効にすると、参加団体ポータルから新しい訂正申請を出せなくなります。
             </Typography.Paragraph>
           </div>
