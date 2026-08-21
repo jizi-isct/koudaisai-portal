@@ -26,7 +26,8 @@ export function PlanSection() {
   const [project, setProject] = useState<Project | null>(null);
   const [placeLabels, setPlaceLabels] = useState<Record<string, string>>({});
   const [showOccasionsOnPortal, setShowOccasionsOnPortal] = useState(false);
-  const [acceptCorrectionRequests, setAcceptCorrectionRequests] = useState(true);
+  const [acceptCorrectionRequests, setAcceptCorrectionRequests] =
+    useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
@@ -61,9 +62,7 @@ export function PlanSection() {
         correctionsResult.error ||
         !correctionsResult.data
       ) {
-        setError(
-          '企画情報の設定を取得できませんでした。',
-        );
+        setError('企画情報の設定を取得できませんでした。');
         setIsLoading(false);
         return;
       }
