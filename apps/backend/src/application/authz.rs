@@ -156,6 +156,17 @@ pub fn can_get_show_occasions_on_portal(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+/// 訂正申請の受付設定を取得できるか。
+pub fn can_get_accept_correction_requests(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:settings:read".to_string())
+        }
+        ActorContext::User { .. } => true,
+        ActorContext::NoLogin => false,
+    }
+}
+
 /// グローバル設定を変更できるか。
 pub fn can_write_settings(actor_ctx: &ActorContext) -> bool {
     match actor_ctx {

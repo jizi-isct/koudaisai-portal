@@ -26,6 +26,7 @@ export function PlanSection() {
   const [project, setProject] = useState<Project | null>(null);
   const [placeLabels, setPlaceLabels] = useState<Record<string, string>>({});
   const [showOccasionsOnPortal, setShowOccasionsOnPortal] = useState(false);
+  const [acceptCorrectionRequests, setAcceptCorrectionRequests] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
@@ -49,21 +50,29 @@ export function PlanSection() {
         return;
       }
 
-      const { data: settings, error: settingsError } = await api.GET(
-        '/settings/show-occasions-on-portal',
-      );
+      const [occasionsResult, correctionsResult] = await Promise.all([
+        api.GET('/settings/show-occasions-on-portal'),
+        api.GET('/settings/accept-correction-requests'),
+      ]);
 
-      if (settingsError || !settings) {
+      if (
+        occasionsResult.error ||
+        !occasionsResult.data ||
+        correctionsResult.error ||
+        !correctionsResult.data
+      ) {
         setError(
-          settingsError
-            ? `${settingsError}`
-            : '企画実施予定の表示設定を取得できませんでした。',
+          '企画情報の設定を取得できませんでした。',
         );
         setIsLoading(false);
         return;
       }
 
+      const settings = occasionsResult.data;
       setShowOccasionsOnPortal(settings.show_occasions_on_portal);
+      setAcceptCorrectionRequests(
+        correctionsResult.data.accept_correction_requests,
+      );
 
       const project = await getProject(group.id);
       setProject(project);
@@ -112,7 +121,7 @@ export function PlanSection() {
             placeLabels={placeLabels}
             showOccasions={showOccasionsOnPortal}
             openModal={() => setIsEditPlanOpen(true)}
-            disableEdit={false}
+            disableEdit={!acceptCorrectionRequests}
           />
           <EditPlanInfoModal
             project={project}

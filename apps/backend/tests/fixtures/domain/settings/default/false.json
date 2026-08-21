@@ -1,3 +1,4 @@
 {
-  "show_occasions_on_portal": false
+  "show_occasions_on_portal": false,
+  "accept_correction_requests": true
 }

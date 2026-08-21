@@ -52,6 +52,8 @@ pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
     settings::SettingsRead,
     settings::ShowOccasionsOnPortalRead,
     settings::ShowOccasionsOnPortalUpdate,
+    settings::AcceptCorrectionRequestsRead,
+    settings::AcceptCorrectionRequestsUpdate,
 )))]
 struct ApiV3Schemas;
 

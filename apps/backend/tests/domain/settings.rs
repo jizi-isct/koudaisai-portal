@@ -5,6 +5,7 @@ use std::path::Path;
 #[derive(Deserialize)]
 struct DefaultCase {
     show_occasions_on_portal: bool,
+    accept_correction_requests: bool,
 }
 
 pub fn test_default(_path: &Path, contents: String) -> datatest_stable::Result<()> {
@@ -13,6 +14,10 @@ pub fn test_default(_path: &Path, contents: String) -> datatest_stable::Result<(
     assert_eq!(
         Settings::default().show_occasions_on_portal(),
         c.show_occasions_on_portal
+    );
+    assert_eq!(
+        Settings::default().accept_correction_requests(),
+        c.accept_correction_requests
     );
     Ok(())
 }

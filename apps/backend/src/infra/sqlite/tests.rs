@@ -69,7 +69,7 @@ async fn settings_round_trip_and_singleton_constraint() {
 
     assert!(!repo.get().await.unwrap().show_occasions_on_portal());
 
-    let settings = Settings::restore(true);
+    let settings = Settings::restore(true, false);
     repo.save(&settings).await.unwrap();
     assert_eq!(repo.get().await.unwrap(), settings);
 

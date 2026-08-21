@@ -51,6 +51,7 @@ datatest_stable::harness! {
     { test = application::authz::test_can_update_user,                        root = "tests/fixtures/application", pattern = r"authz/can_update_user/[^/]+\.json" },
     { test = application::authz::test_can_get_all_settings,                    root = "tests/fixtures/application", pattern = r"authz/can_get_all_settings/[^/]+\.json" },
     { test = application::authz::test_can_get_show_occasions_on_portal,        root = "tests/fixtures/application", pattern = r"authz/can_get_show_occasions_on_portal/[^/]+\.json" },
+    { test = application::authz::test_can_get_accept_correction_requests,      root = "tests/fixtures/application", pattern = r"authz/can_get_accept_correction_requests/[^/]+\.json" },
     { test = application::authz::test_can_write_settings,                      root = "tests/fixtures/application", pattern = r"authz/can_write_settings/[^/]+\.json" },
     { test = application::authz::test_can_change_m_address_of_the_user,       root = "tests/fixtures/application", pattern = r"authz/can_change_m_address_of_the_user/[^/]+\.json" },
     { test = application::authz::test_can_get_all_groups,                     root = "tests/fixtures/application", pattern = r"authz/can_get_all_groups/[^/]+\.json" },

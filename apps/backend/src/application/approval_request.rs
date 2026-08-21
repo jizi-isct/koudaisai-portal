@@ -13,6 +13,7 @@ use crate::application::ports::object_storage::ObjectStorage;
 use crate::application::ports::repositories::approval_request_repo::ApprovalRequestRepo;
 use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
+use crate::application::ports::repositories::settings_repo::SettingsRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::transaction::Transaction;
 use crate::domain::actor_ctx::ActorContext;
@@ -38,6 +39,7 @@ pub struct ApprovalRequestApp<
     OS: ObjectStorage,
     EA: Events26Api,
     NR: NotificationRepo<Tx>,
+    STR: SettingsRepo,
 > {
     _phantom: PhantomData<&'a Tx>,
     approval_request_repo: &'a AR,
@@ -50,6 +52,7 @@ pub struct ApprovalRequestApp<
     events26_api: &'a EA,
     /// 承認/却下の結果をポータル上の通知として残すために使う。
     notification_repo: &'a NR,
+    settings_repo: &'a STR,
     base_url: &'a str,
 }
 
@@ -64,7 +67,8 @@ impl<
     OS: ObjectStorage,
     EA: Events26Api,
     NR: NotificationRepo<Tx>,
-> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS, EA, NR>
+    STR: SettingsRepo,
+> ApprovalRequestApp<'a, Tx, AR, MR, UR, C, D, OS, EA, NR, STR>
 {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -76,6 +80,7 @@ impl<
         object_storage: &'a OS,
         events26_api: &'a EA,
         notification_repo: &'a NR,
+        settings_repo: &'a STR,
         base_url: &'a str,
     ) -> Self {
         Self {
@@ -88,6 +93,7 @@ impl<
             object_storage,
             events26_api,
             notification_repo,
+            settings_repo,
             base_url,
         }
     }
@@ -278,6 +284,19 @@ impl<
     ) -> Result<ApprovalRequestId, ApplicationOperationError<InsertError>> {
         if !authz::can_create_approval_request(actor_ctx) {
             return Err(ApplicationOperationError::Unauthorized);
+        }
+
+        if matches!(request_type, ApprovalRequestType::EditExhibitionInfo { .. })
+            && !self
+                .settings_repo
+                .get()
+                .await
+                .map_err(|e| ApplicationOperationError::InternalError(e.into()))?
+                .accept_correction_requests()
+        {
+            return Err(ApplicationOperationError::InvalidInput(
+                "訂正申請の受付は終了しています".to_string(),
+            ));
         }
 
         let (user_id, memberships) = match actor_ctx {
@@ -661,6 +680,7 @@ fn review_link(base_url: &str, id: ApprovalRequestId) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::application::ports::repositories::settings_repo::SettingsRepo;
     use crate::domain::email_address::EmailAddress;
     use crate::domain::group::GroupType;
     use crate::domain::group_id::GroupId;
@@ -673,6 +693,7 @@ mod tests {
     use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
     use crate::infra::memory::notification_repo_impl::MemoryNotificationRepo;
     use crate::infra::memory::object_storage_impl::MemoryObjectStorage;
+    use crate::infra::memory::settings_repo_impl::MemorySettingsRepo;
     use crate::infra::memory::user_repo_impl::MemoryUserRepo;
     use chrono::{TimeZone, Utc};
     use std::str::FromStr;
@@ -720,8 +741,10 @@ mod tests {
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         app.create(
             &user_ctx(),
@@ -761,6 +784,44 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn create_edit_exhibition_info_fails_when_correction_requests_are_closed() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        let e26 = MemoryEvents26Api::new();
+        let nr = MemoryNotificationRepo::new();
+        let settings = MemorySettingsRepo::new();
+        let mut current_settings = settings.get().await.unwrap();
+        current_settings.change_accept_correction_requests(false);
+        settings.save(&current_settings).await.unwrap();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
+
+        let result = app
+            .create(
+                &user_ctx(),
+                group_id(),
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: Some("新しい紹介文".to_string()),
+                    icon_key: None,
+                },
+                "理由".to_string(),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::InvalidInput(_))
+        ));
+        assert!(discord.sent_messages().is_empty());
+    }
+
+    #[tokio::test]
     async fn approve_sends_decision_notification_with_reason() {
         let now = Utc.timestamp_opt(0, 0).unwrap();
         let ar = MemoryApprovalRequestRepo::new();
@@ -771,8 +832,10 @@ mod tests {
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         // 承認通知の申請者名は user_repo から解決されるので、申請者を登録しておく。
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-126").await;
@@ -831,8 +894,10 @@ mod tests {
         os.put("icon-key.png", vec![1, 2, 3, 4]);
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         app.create(
             &user_ctx(),
@@ -865,8 +930,10 @@ mod tests {
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         app.create(
             &user_ctx(),
@@ -939,8 +1006,10 @@ mod tests {
         );
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-123").await;
         let id = app
@@ -977,8 +1046,10 @@ mod tests {
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         let (_issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-124").await;
         let id = app
@@ -1017,8 +1088,10 @@ mod tests {
         let os = MemoryObjectStorage::new();
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
-        let app =
-            ApprovalRequestApp::new(&ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, BASE_URL);
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
 
         let (issuer_id, issuer_group, issuer_ctx) = setup_issuer(&ur, &mr, now, "I-125").await;
         let approved = app

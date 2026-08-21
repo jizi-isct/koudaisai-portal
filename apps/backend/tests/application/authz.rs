@@ -134,6 +134,16 @@ pub fn test_can_get_show_occasions_on_portal(
     Ok(())
 }
 
+pub fn test_can_get_accept_correction_requests(
+    _path: &Path,
+    contents: String,
+) -> datatest_stable::Result<()> {
+    let c: BoolCase = serde_json::from_str(&contents)?;
+    let (_, ctx) = build_actor(c.actor);
+    assert_eq!(can_get_accept_correction_requests(&ctx), c.expected);
+    Ok(())
+}
+
 pub fn test_can_write_settings(_path: &Path, contents: String) -> datatest_stable::Result<()> {
     let c: BoolCase = serde_json::from_str(&contents)?;
     let (_, ctx) = build_actor(c.actor);
