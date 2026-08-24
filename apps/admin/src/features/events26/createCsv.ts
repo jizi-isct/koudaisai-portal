@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { parseCategory, parseTime } from './project';
-import type { Occasion, Place, Project, Time } from './project';
+import type { Occasion, PlaceId, Project, Time } from './project';
 
 type CreateProjectRow = {
   id: string;
@@ -90,7 +90,7 @@ function buildOccasions(row: CreateProjectRow): Occasion[] {
       return true;
     })
     .map((day) => ({
-      ...(place === '' ? {} : { place: place as Place }),
+      ...(place === '' ? {} : { place: place as PlaceId }),
       timeRange: {
         start: parseTime(day.date, day.start),
         end: parseTime(day.date, day.end),

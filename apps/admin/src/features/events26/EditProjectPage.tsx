@@ -28,7 +28,6 @@ import {
   CATEGORY_LABEL,
   ensureOk,
   FOOD_STALL_TAG2,
-  formatTime,
   GENERAL_TAGS,
   ICON_CONTENT_TYPES,
   iconUrl,
@@ -36,12 +35,13 @@ import {
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
+import { formatTime } from './util';
 import type {
   Category,
   FoodStallTag,
   GeneralTag,
   Occasion,
-  Place,
+  PlaceId,
   Project,
   Time,
 } from './project';
@@ -49,7 +49,7 @@ import type {
 /** 開催予定 1 件分。時刻は CSV と同じ `HH:mm` の文字列で持つ。 */
 type OccasionValues = {
   date: Time['date'];
-  place?: Place;
+  place?: PlaceId;
   start: string;
   end: string;
 };

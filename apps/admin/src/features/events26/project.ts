@@ -9,7 +9,9 @@ import { api } from '@/features/api/api';
 
 export type Project = events26Components['schemas']['Project'];
 export type Occasion = events26Components['schemas']['Occasion'];
-export type Place = NonNullable<Occasion['place']>;
+export type TimeRange = events26Components['schemas']['TimeRange'];
+export type PlaceId = NonNullable<Occasion['place']>;
+export type Place = events26Components['schemas']['Place'];
 export type Time = events26Components['schemas']['Time'];
 export type FoodStallTag = events26Components['schemas']['FoodStallTag'];
 export type GeneralTag = events26Components['schemas']['GeneralTag'];
@@ -68,10 +70,6 @@ export const FOOD_STALL_TAG2: Record<'main' | 'sweet', string[]> = {
   main: ['rice', 'noodle_flour', 'skewer_grill', 'snack', 'soup', 'world'],
   sweet: ['japanese', 'western', 'cold', 'snack', 'drink', 'world'],
 };
-
-export function formatTime(time: Time): string {
-  return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
-}
 
 /** `HH:MM` を `date` 日目の [`Time`] に変換する。 */
 export function parseTime(date: Time['date'], value: string): Time {

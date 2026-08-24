@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { parseCategory, parseTime } from './project';
-import type { Occasion, Place, Project, Time } from './project';
+import type { Occasion, PlaceId, Project, Time } from './project';
 
 type EditProjectRow = {
   id: string;
@@ -76,7 +76,7 @@ function editOccasions(row: EditProjectRow, project: Project): Occasion[] {
     const place = hasPlace ? row.place?.trim() : existing?.place;
     return [
       {
-        ...(place ? { place: place as Place } : {}),
+        ...(place ? { place: place as PlaceId } : {}),
         timeRange: { start, end },
       },
     ];

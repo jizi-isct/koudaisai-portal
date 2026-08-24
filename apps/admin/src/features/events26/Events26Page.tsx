@@ -29,7 +29,6 @@ import { parseEditCsv } from './editCsv';
 import {
   ensureOk,
   formatTags,
-  formatTime,
   GENERAL_TAGS,
   ICON_CONTENT_TYPES,
   iconUrl,
@@ -37,6 +36,7 @@ import {
   putIcon,
 } from './project';
 import type { Project } from './project';
+import { formatTime } from './util';
 
 /** `M-001.png` のようなファイル名から企画 ID(`M-001`)を取り出す。 */
 function projectIdFromFileName(fileName: string): string {
@@ -60,6 +60,10 @@ function Events26Table() {
   const { data, isLoading, refetch } = $events26Api.useQuery(
     'get',
     '/v1/projects',
+  );
+  const { data: places, isLoading: isPlacesLoading } = $events26Api.useQuery(
+    'get',
+    '/v1/places',
   );
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
@@ -233,7 +237,7 @@ function Events26Table() {
     );
 
   const handleDownload = () => {
-    const csv = createDownloadCsv(data ?? []);
+    const csv = createDownloadCsv(data ?? [], places ?? []);
     const bom = '\uFEFF';
     const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
     download(URL.createObjectURL(blob), 'projects.csv');
@@ -390,7 +394,7 @@ function Events26Table() {
     },
   ];
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading || isPlacesLoading) return <LoadingScreen />;
   if (!data) return <Heading1 emoji="⚠️">エラーです</Heading1>;
 
   return (
