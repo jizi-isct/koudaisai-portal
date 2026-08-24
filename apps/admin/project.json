@@ -62,6 +62,13 @@
         "command": "astro dev --host 127.0.0.1 --port 3001",
         "cwd": "apps/admin"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run",
+        "cwd": "apps/admin"
+      }
     }
   }
 }
