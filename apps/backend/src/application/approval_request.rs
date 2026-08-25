@@ -671,7 +671,7 @@ fn build_decision_message(
 /// 管理画面のレビューページへの絶対リンク文字列(Markdown)。
 fn review_link(base_url: &str, id: ApprovalRequestId) -> String {
     format!(
-        "[詳細を閲覧]({}/admin/approval_requests/review?approval_request_id={})",
+        "[詳細を閲覧]({}/approval_requests/review?approval_request_id={})",
         base_url.trim_end_matches('/'),
         id
     )
