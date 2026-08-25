@@ -23,6 +23,8 @@
             clippy
             cargo-watch
             sqlx-cli
+            pkg-config
+            openssl
 
             # Node.js
             nodejs_24
