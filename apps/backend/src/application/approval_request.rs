@@ -779,7 +779,7 @@ mod tests {
                 .description
                 .as_deref()
                 .unwrap()
-                .contains("https://portal.koudaisai.jp/admin/approval_requests/review")
+                .contains("https://admin.koudaisai.jp/approval_requests/review")
         );
     }
 
