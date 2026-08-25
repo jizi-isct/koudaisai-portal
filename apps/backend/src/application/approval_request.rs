@@ -671,7 +671,7 @@ fn build_decision_message(
 /// 管理画面のレビューページへの絶対リンク文字列(Markdown)。
 fn review_link(base_url: &str, id: ApprovalRequestId) -> String {
     format!(
-        "[詳細を閲覧]({}/admin/approval_requests/review?approval_request_id={})",
+        "[詳細を閲覧]({}/approval_requests/review?approval_request_id={})",
         base_url.trim_end_matches('/'),
         id
     )
@@ -699,7 +699,7 @@ mod tests {
     use std::str::FromStr;
     use uuid::Uuid;
 
-    const BASE_URL: &str = "https://portal.koudaisai.jp";
+    const BASE_URL: &str = "https://admin.koudaisai.jp";
 
     /// 申請者役の `ActorContext`。対象団体は申請時に指定するので、所属も持たせる。
     fn user_ctx() -> ActorContext {
@@ -779,7 +779,7 @@ mod tests {
                 .description
                 .as_deref()
                 .unwrap()
-                .contains("https://portal.koudaisai.jp/admin/approval_requests/review")
+                .contains("https://admin.koudaisai.jp/approval_requests/review")
         );
     }
 
