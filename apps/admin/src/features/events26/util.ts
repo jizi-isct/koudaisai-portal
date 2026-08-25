@@ -29,7 +29,9 @@ export async function enrichPlaceFloors(
   );
   const floorsById = new Map(
     await Promise.all(
-      [...roomIds].map(async (placeId) => [placeId, await getFloor(placeId)]),
+      [...roomIds].map(
+        async (placeId) => [placeId, await getFloor(placeId)] as const,
+      ),
     ),
   );
 
