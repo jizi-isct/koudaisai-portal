@@ -69,6 +69,8 @@ pub enum ListPlaces200ResponseInnerId {
     EastCentennialHallCentennialHall1f,
     #[serde(rename = "east.taki-plaza-stage")]
     EastTakiPlazaStage,
+    #[serde(rename = "east.wood-deck-stage")]
+    EastWoodDeckStage,
     #[serde(rename = "east.wood-deck")]
     EastWoodDeck,
     #[serde(rename = "east.outdoor-stage")]
@@ -95,18 +97,20 @@ pub enum ListPlaces200ResponseInnerId {
     EastFsEastIcho9,
     #[serde(rename = "east.fs-east-icho.10")]
     EastFsEastIcho10,
-    #[serde(rename = "east.fs-east-icho.11")]
-    EastFsEastIcho11,
-    #[serde(rename = "east.fs-east-icho.12")]
-    EastFsEastIcho12,
-    #[serde(rename = "east.fs-east-icho.13")]
-    EastFsEastIcho13,
-    #[serde(rename = "east.fs-east-icho.14")]
-    EastFsEastIcho14,
-    #[serde(rename = "east.fs-east-icho.15")]
-    EastFsEastIcho15,
-    #[serde(rename = "east.fs-east-icho.16")]
-    EastFsEastIcho16,
+    #[serde(rename = "east.fs-behind-taki-plaza")]
+    EastFsBehindTakiPlaza,
+    #[serde(rename = "east.fs-behind-taki-plaza.1")]
+    EastFsBehindTakiPlaza1,
+    #[serde(rename = "east.fs-behind-taki-plaza.2")]
+    EastFsBehindTakiPlaza2,
+    #[serde(rename = "east.fs-behind-taki-plaza.3")]
+    EastFsBehindTakiPlaza3,
+    #[serde(rename = "east.fs-behind-taki-plaza.4")]
+    EastFsBehindTakiPlaza4,
+    #[serde(rename = "east.fs-behind-taki-plaza.5")]
+    EastFsBehindTakiPlaza5,
+    #[serde(rename = "east.fs-behind-taki-plaza.6")]
+    EastFsBehindTakiPlaza6,
     #[serde(rename = "east.fs-east-deck")]
     EastFsEastDeck,
     #[serde(rename = "east.fs-east-deck.1")]
@@ -175,6 +179,8 @@ pub enum ListPlaces200ResponseInnerId {
     MainMM356,
     #[serde(rename = "main.m.m-b61")]
     MainMMB61,
+    #[serde(rename = "main.m.m-213")]
+    MainMM213,
     #[serde(rename = "main.m.m-290")]
     MainMM290,
     #[serde(rename = "main.m.m-124")]
@@ -269,6 +275,8 @@ pub enum ListPlaces200ResponseInnerId {
     SouthS3S3413,
     #[serde(rename = "south.s3.s3-414")]
     SouthS3S3414,
+    #[serde(rename = "south.s3.s3-505")]
+    SouthS3S3505,
     #[serde(rename = "south.s3.s3-510")]
     SouthS3S3510,
     #[serde(rename = "south.s3.s3-601")]
@@ -319,10 +327,14 @@ pub enum ListPlaces200ResponseInnerId {
     SouthS8S8107,
     #[serde(rename = "south.s8.s8-501")]
     SouthS8S8501,
+    #[serde(rename = "south.s8.s8-512")]
+    SouthS8S8512,
     #[serde(rename = "south.s8.s8-516")]
     SouthS8S8516,
     #[serde(rename = "south.s8.s8-518")]
     SouthS8S8518,
+    #[serde(rename = "south.s8.s8-520")]
+    SouthS8S8520,
     #[serde(rename = "south.s8.s8-entrance")]
     SouthS8S8Entrance,
     #[serde(rename = "south.sl")]
@@ -481,6 +493,8 @@ pub enum ListPlaces200ResponseInnerId {
     WestW8W87rf,
     #[serde(rename = "west.w8.w8-901")]
     WestW8W8901,
+    #[serde(rename = "west.w8.w8-5ev")]
+    WestW8W85ev,
     #[serde(rename = "west.w9")]
     WestW9,
     #[serde(rename = "west.w9.w9-201")]
@@ -509,6 +523,8 @@ pub enum ListPlaces200ResponseInnerId {
     WestW9W9707,
     #[serde(rename = "west.w9.w9-716")]
     WestW9W9716,
+    #[serde(rename = "west.w9.w9-733")]
+    WestW9W9733,
     #[serde(rename = "west.wl1")]
     WestWl1,
     #[serde(rename = "west.wl1.wl1-201")]
@@ -559,6 +575,8 @@ pub enum ListPlaces200ResponseInnerId {
     MidorigaokaMi6,
     #[serde(rename = "midorigaoka.mi6.mi6-302")]
     MidorigaokaMi6Mi6302,
+    #[serde(rename = "midorigaoka.mi6.mi6-303")]
+    MidorigaokaMi6Mi6303,
     #[serde(rename = "ishikawadai")]
     Ishikawadai,
     #[serde(rename = "ishikawadai.i1")]
@@ -575,6 +593,10 @@ pub enum ListPlaces200ResponseInnerId {
     IshikawadaiI7,
     #[serde(rename = "ishikawadai.i7.i7-mishima")]
     IshikawadaiI7I7Mishima,
+    #[serde(rename = "ishikawadai.i9")]
+    IshikawadaiI9,
+    #[serde(rename = "ishikawadai.i9.i9-207")]
+    IshikawadaiI9I9207,
     #[serde(rename = "ishikawadai.fs-ishikawadai")]
     IshikawadaiFsIshikawadai,
     #[serde(rename = "ishikawadai.fs-ishikawadai.1")]
