@@ -2,9 +2,43 @@ import { describe, expect, it } from 'vitest';
 import {
   compactTimeRanges,
   compareTime,
+  enrichPlaceFloors,
   formatPlace,
   formatTime,
 } from './util';
+
+describe('enrichPlaceFloors', () => {
+  it('企画が使用するroomだけfloorを個別取得して補完する', async () => {
+    const places = [
+      { id: 'south.s2', type: 'building', displayName: '南2号館' },
+      { id: 'south.s2.s2-203', type: 'room', displayName: 'S2-203' },
+      { id: 'south.s2.s2-204', type: 'room', displayName: 'S2-204' },
+    ];
+    const requested: string[] = [];
+
+    const result = await enrichPlaceFloors(
+      [
+        {
+          occasions: [
+            { place: 'south.s2.s2-203' },
+            { place: 'south.s2.s2-203' },
+          ],
+        },
+      ],
+      places,
+      async (placeId) => {
+        requested.push(placeId);
+        return '2F';
+      },
+    );
+
+    expect(requested).toEqual(['south.s2.s2-203']);
+    expect(formatPlace('south.s2.s2-203', result)).toBe('南2号館 2F S2-203');
+    expect(result.find(({ id }) => id === 'south.s2.s2-204')?.floor).toBe(
+      undefined,
+    );
+  });
+});
 
 describe('formatPlace', () => {
   const places = [

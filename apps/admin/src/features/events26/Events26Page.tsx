@@ -22,7 +22,7 @@ import {
 import type { TableProps } from 'antd';
 import objectHash from 'object-hash';
 import { useRef, useState } from 'react';
-import { api, $events26Api } from '@/features/api/api';
+import { api, events26Api, $events26Api } from '@/features/api/api';
 import { parseCreateCsv } from './createCsv';
 import { createDownloadCsv } from './downloadCsv';
 import { parseEditCsv } from './editCsv';
@@ -35,8 +35,8 @@ import {
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
-import type { Project } from './project';
-import { formatTime } from './util';
+import type { Occasion, Project } from './project';
+import { enrichPlaceFloors, formatTime } from './util';
 
 /** `M-001.png` のようなファイル名から企画 ID(`M-001`)を取り出す。 */
 function projectIdFromFileName(fileName: string): string {
@@ -67,6 +67,7 @@ function Events26Table() {
   );
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
   const iconInputRef = useRef<HTMLInputElement>(null);
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : String(error);
@@ -236,11 +237,48 @@ function Events26Table() {
         ),
     );
 
-  const handleDownload = () => {
-    const csv = createDownloadCsv(data ?? [], places ?? []);
-    const bom = '\uFEFF';
-    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
-    download(URL.createObjectURL(blob), 'projects.csv');
+  const handleDownload = async () => {
+    const key = 'download-events26-csv';
+    setIsDownloading(true);
+    messageApi.loading({
+      content: '場所の階数情報を取得しています…',
+      key,
+      duration: 0,
+    });
+
+    try {
+      const placeInfos = await enrichPlaceFloors(
+        data ?? [],
+        places ?? [],
+        async (placeId) => {
+          const result = await events26Api.GET('/v1/places/{placeId}', {
+            params: {
+              path: {
+                placeId: placeId as NonNullable<Occasion['place']>,
+              },
+            },
+          });
+          ensureOk(result, `場所情報(${placeId})の取得`);
+          if (!result.data) {
+            throw new Error(`場所情報(${placeId})の取得結果が空です`);
+          }
+          return 'floor' in result.data ? result.data.floor : undefined;
+        },
+      );
+      const csv = createDownloadCsv(data ?? [], placeInfos);
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+      download(URL.createObjectURL(blob), 'projects.csv');
+      messageApi.destroy(key);
+    } catch (error) {
+      console.error(error);
+      messageApi.error({
+        content: `CSVの作成中にエラーが発生しました：${errorMessage(error)}`,
+        key,
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const columns: TableProps<Project>['columns'] = [
@@ -422,7 +460,11 @@ function Events26Table() {
         >
           <Button icon={<UploadOutlined />}>CSVから既存の企画情報を編集</Button>
         </Upload>
-        <Button onClick={handleDownload} icon={<DownloadOutlined />}>
+        <Button
+          onClick={handleDownload}
+          icon={<DownloadOutlined />}
+          loading={isDownloading}
+        >
           企画情報をCSVとしてダウンロード
         </Button>
         {/*

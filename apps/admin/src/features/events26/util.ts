@@ -2,9 +2,42 @@ import type { Time, TimeRange } from './project';
 
 export type PlaceInfo = {
   id: string;
+  type?: string;
   displayName: string;
   floor?: string;
 };
+
+type ProjectPlaces = {
+  occasions: readonly { place?: string }[];
+};
+
+/**
+ * 一覧 API に含まれない room の `floor` を、使用中の場所だけ個別 API から補完する。
+ */
+export async function enrichPlaceFloors(
+  projects: readonly ProjectPlaces[],
+  places: readonly PlaceInfo[],
+  getFloor: (placeId: string) => Promise<string | undefined>,
+): Promise<PlaceInfo[]> {
+  const placesById = new Map(places.map((place) => [place.id, place]));
+  const roomIds = new Set(
+    projects.flatMap((project) =>
+      project.occasions.flatMap(({ place }) =>
+        place && placesById.get(place)?.type === 'room' ? [place] : [],
+      ),
+    ),
+  );
+  const floorsById = new Map(
+    await Promise.all(
+      [...roomIds].map(async (placeId) => [placeId, await getFloor(placeId)]),
+    ),
+  );
+
+  return places.map((place) => {
+    const floor = floorsById.get(place.id);
+    return floor ? { ...place, floor } : place;
+  });
+}
 
 /**
  * 階層 ID に対応する表示名を 2 階層目から半角スペースで結合する。
