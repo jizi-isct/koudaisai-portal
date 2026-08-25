@@ -699,7 +699,7 @@ mod tests {
     use std::str::FromStr;
     use uuid::Uuid;
 
-    const BASE_URL: &str = "https://portal.koudaisai.jp";
+    const BASE_URL: &str = "https://admin.koudaisai.jp";
 
     /// 申請者役の `ActorContext`。対象団体は申請時に指定するので、所属も持たせる。
     fn user_ctx() -> ActorContext {
