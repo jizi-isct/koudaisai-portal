@@ -1196,6 +1196,8 @@ export interface components {
       | 'north.n1.n1-parking'
       | 'north.n3'
       | 'north.n3.n3-lab'
+      | 'north.lab1'
+      | 'north.lab1.lab1-1f'
       | 'midorigaoka'
       | 'midorigaoka.mi6'
       | 'midorigaoka.mi6.mi6-302'
