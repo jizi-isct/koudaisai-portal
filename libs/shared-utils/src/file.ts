@@ -15,6 +15,10 @@ export async function getDownloadUrl(
   });
 }
 
-export function getFilesRedirectUrl(fileKey: string) {
-  return `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/download?key=${fileKey}&file_name=${fileKey}&redirect=true`;
+export function getFilesRedirectUrl(apiBaseUrl: string, fileKey: string) {
+  const url = new URL(`${apiBaseUrl.replace(/\/$/, '')}/files/download`);
+  url.searchParams.set('key', fileKey);
+  url.searchParams.set('file_name', fileKey);
+  url.searchParams.set('redirect', 'true');
+  return url.toString();
 }
