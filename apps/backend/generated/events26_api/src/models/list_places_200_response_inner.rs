@@ -569,6 +569,10 @@ pub enum ListPlaces200ResponseInnerId {
     NorthN3,
     #[serde(rename = "north.n3.n3-lab")]
     NorthN3N3Lab,
+    #[serde(rename = "north.lab1")]
+    NorthLab1,
+    #[serde(rename = "north.lab1.lab1-1f")]
+    NorthLab1Lab11f,
     #[serde(rename = "midorigaoka")]
     Midorigaoka,
     #[serde(rename = "midorigaoka.mi6")]
