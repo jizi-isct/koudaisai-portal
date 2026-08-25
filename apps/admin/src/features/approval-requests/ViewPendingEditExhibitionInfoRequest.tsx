@@ -3,7 +3,7 @@ import type {
   events26Components,
 } from '@koudaisai/shared-types';
 import { getFilesRedirectUrl } from '@koudaisai/shared-utils';
-import { EVENTS26_API_URL } from 'astro:env/client';
+import { API_URL, EVENTS26_API_URL } from 'astro:env/client';
 
 type Props = {
   approvalRequest: ApprovalRequestRead;
@@ -40,7 +40,7 @@ export function ViewPendingEditExhibitionInfoRequest({
           />
           <h3>変更後</h3>
           <img
-            src={getFilesRedirectUrl(approvalRequest.icon_key)}
+            src={getFilesRedirectUrl(API_URL, approvalRequest.icon_key)}
             alt="新しい企画アイコン"
             width={128}
             height={128}
