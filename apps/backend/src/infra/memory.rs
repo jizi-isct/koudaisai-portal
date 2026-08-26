@@ -16,6 +16,7 @@ pub mod one_time_token_repo_impl;
 pub mod password_hasher_impl;
 pub mod secret_generator_impl;
 pub mod session_repo_impl;
+pub mod settings_repo_impl;
 pub mod transaction_impl;
 pub mod user_repo_impl;
 
@@ -38,6 +39,7 @@ use crate::infra::memory::one_time_token_repo_impl::MemoryOneTimeTokenRepo;
 use crate::infra::memory::password_hasher_impl::MemoryPasswordHasher;
 use crate::infra::memory::secret_generator_impl::MemorySecretGenerator;
 use crate::infra::memory::session_repo_impl::MemorySessionRepo;
+use crate::infra::memory::settings_repo_impl::MemorySettingsRepo;
 use crate::infra::memory::transaction_impl::MemoryTransaction;
 use crate::infra::memory::user_repo_impl::MemoryUserRepo;
 
@@ -62,6 +64,7 @@ pub type MemoryApplication = Application<
     MemoryNotificationRepo,
     MemoryMetaFetcher,
     MemoryEvents26Api,
+    MemorySettingsRepo,
 >;
 
 impl MemoryApplication {
@@ -89,6 +92,7 @@ impl MemoryApplication {
             MemoryNotificationRepo::new(),
             MemoryMetaFetcher::new(),
             MemoryEvents26Api::new(),
+            MemorySettingsRepo::new(),
             "http://localhost".to_string(),
         )
     }

@@ -21,426 +21,26 @@ import {
 } from 'antd';
 import type { TableProps } from 'antd';
 import objectHash from 'object-hash';
-import Papa from 'papaparse';
 import { useRef, useState } from 'react';
-import { api, $events26Api } from '@/features/api/api';
+import { api, events26Api, $events26Api } from '@/features/api/api';
+import { parseCreateCsv } from './createCsv';
+import { createDownloadCsv } from './downloadCsv';
+import { parseEditCsv } from './editCsv';
 import {
   ensureOk,
   formatTags,
-  formatTime,
   GENERAL_TAGS,
   ICON_CONTENT_TYPES,
   iconUrl,
-  parseTime,
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
-import type {
-  FoodStallTag,
-  GeneralTag,
-  Occasion,
-  Place,
-  Project,
-  Time,
-} from './project';
-
-/** CSV の 1 行。すべての列を文字列として読み書きする。 */
-type ProjectRow = {
-  id: string;
-  type: string;
-  group_name: string;
-  project_name: string;
-  description: string;
-  is_child_friendly: string;
-  is_recommended: string;
-  /** 研究室公開企画のみ。ラボツアーかどうか。 */
-  is_tour: string;
-  /**
-   * 模擬店企画は `main:rice;sweet:western`、一般企画は `experience;display`。
-   * ステージ企画と研究室公開企画にタグは無いので空。
-   */
-  tags: string;
-  day1_place: string;
-  day1_start: string;
-  day1_end: string;
-  day2_place: string;
-  day2_start: string;
-  day2_end: string;
-};
-
-/**
- * 新規作成用 CSV の 1 行。旧 API 時代の列に揃えた暫定の形式で、
- * ダウンロード・置き換えで使う [`ProjectRow`] とは別物。
- *
- * type 列は無く、企画種別は id の接頭辞(M/S/I/L)から決める。
- * タグの列も無いので、模擬店企画と一般企画のタグは空で作られる。
- */
-type CreateProjectRow = {
-  id: string;
-  group_name: string;
-  project_name: string;
-  description: string;
-  is_child_friendly: string;
-  is_recommended: string;
-  day1_start_time: string;
-  day1_end_time: string;
-  day2_start_time: string;
-  day2_end_time: string;
-  /** 1 日目・2 日目に共通の実施場所。 */
-  place: string;
-  /** id が `L` で始まる場合のみ必須。 */
-  is_lab_tour: string;
-  icon_url: string;
-};
-
-const CSV_COLUMNS: (keyof ProjectRow)[] = [
-  'id',
-  'type',
-  'group_name',
-  'project_name',
-  'description',
-  'is_child_friendly',
-  'is_recommended',
-  'is_tour',
-  'tags',
-  'day1_place',
-  'day1_start',
-  'day1_end',
-  'day2_place',
-  'day2_start',
-  'day2_end',
-];
-
-function parseBoolean(value: string): boolean {
-  return value.trim().toLowerCase() === 'true';
-}
-
-/**
- * day1 / day2 の列から `occasions` を組み立てる。
- * 開始・終了の両方が入っている日だけを要素にするので、片方だけの日は落ちる。
- */
-function buildOccasions(row: ProjectRow): Occasion[] {
-  const days: {
-    date: Time['date'];
-    place: string;
-    start: string;
-    end: string;
-  }[] = [
-    {
-      date: 1,
-      place: row.day1_place,
-      start: row.day1_start,
-      end: row.day1_end,
-    },
-    {
-      date: 2,
-      place: row.day2_place,
-      start: row.day2_start,
-      end: row.day2_end,
-    },
-  ];
-
-  return days
-    .filter((day) => day.start.trim() !== '' && day.end.trim() !== '')
-    .map((day) => ({
-      // place は events26 側の enum。CSV の値をそのまま渡し、妥当性は API に委ねる。
-      // 未指定は null ではなくキーごと省く(spec 上 optional であって nullable ではない)。
-      ...(day.place.trim() === '' ? {} : { place: day.place.trim() as Place }),
-      timeRange: {
-        start: parseTime(day.date, day.start),
-        end: parseTime(day.date, day.end),
-      },
-    }));
-}
-
-function buildFoodStallTags(tags: string): FoodStallTag[] {
-  return tags
-    .split(';')
-    .map((tag) => tag.trim())
-    .filter((tag) => tag !== '')
-    .map((tag) => {
-      const [head, tail] = tag.split(':').map((part) => part.trim());
-      switch (head) {
-        case 'main':
-        case 'sweet':
-          if (!tail) {
-            throw new Error(`模擬店タグ ${head} には tag2 が必要です: ${tag}`);
-          }
-          return { tag: head, tag2: tail } as FoodStallTag;
-        case 'drink':
-          return { tag: 'drink' } as FoodStallTag;
-        default:
-          throw new Error(`不明な模擬店タグです: ${tag}`);
-      }
-    });
-}
-
-function buildGeneralTags(tags: string): GeneralTag[] {
-  return tags
-    .split(';')
-    .map((tag) => tag.trim())
-    .filter((tag) => tag !== '')
-    .map((tag) => {
-      if (!GENERAL_TAGS.includes(tag as GeneralTag)) {
-        throw new Error(`不明な一般企画タグです: ${tag}`);
-      }
-      return tag as GeneralTag;
-    });
-}
-
-function buildProject(row: ProjectRow): Project {
-  const base = {
-    id: row.id.trim(),
-    groupName: row.group_name,
-    projectName: row.project_name,
-    description: row.description,
-    isChildFriendly: parseBoolean(row.is_child_friendly),
-    isRecommended: parseBoolean(row.is_recommended),
-    occasions: buildOccasions(row),
-  };
-
-  switch (row.type.trim()) {
-    case 'food-stall':
-      return { ...base, type: 'food-stall', tag: buildFoodStallTags(row.tags) };
-    case 'general':
-      return { ...base, type: 'general', tag: buildGeneralTags(row.tags) };
-    case 'stage':
-      return { ...base, type: 'stage' };
-    case 'laboratory':
-      return { ...base, type: 'laboratory', isTour: parseBoolean(row.is_tour) };
-    default:
-      throw new Error(
-        `type は food-stall, general, stage, laboratory のいずれかである必要があります: ${row.type}`,
-      );
-  }
-}
-
-/** 企画種別は id の接頭辞で決まる(M: 模擬店, S: ステージ, I: 一般, L: 研究室公開)。 */
-const PROJECT_TYPE_BY_ID_PREFIX: Record<string, Project['type']> = {
-  M: 'food-stall',
-  S: 'stage',
-  I: 'general',
-  L: 'laboratory',
-};
-
-function projectTypeFromId(id: string): Project['type'] {
-  const type = PROJECT_TYPE_BY_ID_PREFIX[id.charAt(0).toUpperCase()];
-  if (!type) {
-    throw new Error(
-      `企画番号は M / S / I / L のいずれかで始まる必要があります: ${id}`,
-    );
-  }
-  return type;
-}
-
-function requireField(value: string, column: string, id: string): string {
-  const trimmed = value?.trim() ?? '';
-  if (trimmed === '') {
-    throw new Error(`${column} は必須です(${id || '企画番号不明'})`);
-  }
-  return trimmed;
-}
-
-/** true / false のみ受け付ける。空や別の値は行ごと弾く。 */
-function requireBoolean(value: string, column: string, id: string): boolean {
-  const trimmed = requireField(value, column, id).toLowerCase();
-  if (trimmed !== 'true' && trimmed !== 'false') {
-    throw new Error(
-      `${column} は true か false で指定してください(${id}): ${value}`,
-    );
-  }
-  return trimmed === 'true';
-}
-
-/**
- * day1 / day2 の時刻列から `occasions` を組み立てる。
- * 開始・終了は必ず対で、片方だけ入っている日はエラーにする。
- * 場所は両日に共通の `place` 列を使う。
- */
-function buildCreateOccasions(row: CreateProjectRow): Occasion[] {
-  const place = row.place?.trim() ?? '';
-  const days: {
-    date: Time['date'];
-    start: string;
-    end: string;
-    startColumn: string;
-    endColumn: string;
-  }[] = [
-    {
-      date: 1,
-      start: row.day1_start_time?.trim() ?? '',
-      end: row.day1_end_time?.trim() ?? '',
-      startColumn: 'day1_start_time',
-      endColumn: 'day1_end_time',
-    },
-    {
-      date: 2,
-      start: row.day2_start_time?.trim() ?? '',
-      end: row.day2_end_time?.trim() ?? '',
-      startColumn: 'day2_start_time',
-      endColumn: 'day2_end_time',
-    },
-  ];
-
-  return days
-    .filter((day) => {
-      if (day.start === '' && day.end === '') return false;
-      if (day.start === '' || day.end === '') {
-        throw new Error(
-          `${day.startColumn} と ${day.endColumn} は同時に指定してください(${row.id})`,
-        );
-      }
-      return true;
-    })
-    .map((day) => ({
-      // place は events26 側の enum。CSV の値をそのまま渡し、妥当性は API に委ねる。
-      // 未指定は null ではなくキーごと省く(spec 上 optional であって nullable ではない)。
-      ...(place === '' ? {} : { place: place as Place }),
-      timeRange: {
-        start: parseTime(day.date, day.start),
-        end: parseTime(day.date, day.end),
-      },
-    }));
-}
-
-/**
- * 新規作成用 CSV の 1 行を [`Project`] にする。
- * タグの列が無いため、模擬店企画と一般企画のタグは空になる。
- */
-function buildCreateProject(row: CreateProjectRow): Project {
-  const id = requireField(row.id, 'id', row.id);
-  const base = {
-    id,
-    groupName: requireField(row.group_name, 'group_name', id),
-    projectName: requireField(row.project_name, 'project_name', id),
-    description: requireField(row.description, 'description', id),
-    isChildFriendly: requireBoolean(
-      row.is_child_friendly,
-      'is_child_friendly',
-      id,
-    ),
-    isRecommended: requireBoolean(row.is_recommended, 'is_recommended', id),
-    occasions: buildCreateOccasions(row),
-  };
-
-  switch (projectTypeFromId(id)) {
-    case 'food-stall':
-      return { ...base, type: 'food-stall', tag: [] };
-    case 'general':
-      return { ...base, type: 'general', tag: [] };
-    case 'stage':
-      return { ...base, type: 'stage' };
-    case 'laboratory':
-      return {
-        ...base,
-        type: 'laboratory',
-        isTour: requireBoolean(row.is_lab_tour, 'is_lab_tour', id),
-      };
-  }
-}
-
-/** 新規作成 1 件分。アイコンは企画を作った後に URL から取ってきて送る。 */
-type CreateEntry = { project: Project; iconUrl: string };
-
-function toRow(project: Project): ProjectRow {
-  const day1 = project.occasions.find(
-    (occasion) => occasion.timeRange.start.date === 1,
-  );
-  const day2 = project.occasions.find(
-    (occasion) => occasion.timeRange.start.date === 2,
-  );
-
-  return {
-    id: project.id,
-    type: project.type,
-    group_name: project.groupName,
-    project_name: project.projectName,
-    description: project.description,
-    is_child_friendly: project.isChildFriendly ? 'true' : 'false',
-    is_recommended: project.isRecommended ? 'true' : 'false',
-    is_tour:
-      project.type === 'laboratory' ? (project.isTour ? 'true' : 'false') : '',
-    tags: formatTags(project),
-    day1_place: day1?.place ?? '',
-    day1_start: day1 ? formatTime(day1.timeRange.start) : '',
-    day1_end: day1 ? formatTime(day1.timeRange.end) : '',
-    day2_place: day2?.place ?? '',
-    day2_start: day2 ? formatTime(day2.timeRange.start) : '',
-    day2_end: day2 ? formatTime(day2.timeRange.end) : '',
-  };
-}
-
-/**
- * CSV を 1 行ずつ [`Project`] にする。
- * 1 行でも壊れていたら全体を捨てる(部分適用されると原因を追いにくいため)。
- */
-function parseCsv(csv: string): Promise<Project[]> {
-  return new Promise((resolve, reject) => {
-    const projects: Project[] = [];
-    Papa.parse<ProjectRow>(csv, {
-      header: true,
-      skipEmptyLines: true,
-      encoding: 'UTF-8',
-      step: (result, parser) => {
-        try {
-          projects.push(buildProject(result.data));
-        } catch (error) {
-          parser.abort();
-          reject(error instanceof Error ? error : new Error(String(error)));
-        }
-      },
-      complete: () => resolve(projects),
-      error: (error: Error) => reject(error),
-    });
-  });
-}
-
-/** 新規作成用 CSV を 1 行ずつ読む。[`parseCsv`] と同じく 1 行でも壊れていたら全体を捨てる。 */
-function parseCreateCsv(csv: string): Promise<CreateEntry[]> {
-  return new Promise((resolve, reject) => {
-    const entries: CreateEntry[] = [];
-    Papa.parse<CreateProjectRow>(csv, {
-      header: true,
-      skipEmptyLines: true,
-      encoding: 'UTF-8',
-      step: (result, parser) => {
-        try {
-          entries.push({
-            project: buildCreateProject(result.data),
-            iconUrl: result.data.icon_url?.trim() ?? '',
-          });
-        } catch (error) {
-          parser.abort();
-          reject(error instanceof Error ? error : new Error(String(error)));
-        }
-      },
-      complete: () => resolve(entries),
-      error: (error: Error) => reject(error),
-    });
-  });
-}
+import type { Occasion, Project } from './project';
+import { enrichPlaceFloors, formatTime } from './util';
 
 /** `M-001.png` のようなファイル名から企画 ID(`M-001`)を取り出す。 */
 function projectIdFromFileName(fileName: string): string {
   return fileName.replace(/\.[^.]+$/, '');
-}
-
-/**
- * URL からアイコンを取ってきて送る。
- *
- * events26 のアイコン API は画像そのものを受け取る形で URL インポートが無いため、
- * ブラウザで一度取得してから中継に流す。取得元が CORS を許可していないと失敗する。
- */
-async function putIconFromUrl(projectId: string, url: string): Promise<void> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`アイコンの取得に失敗しました(${response.status}): ${url}`);
-  }
-  const image = await response.blob();
-  if (!ICON_CONTENT_TYPES.includes(image.type)) {
-    throw new Error(`対応外のアイコン形式です(${image.type}): ${url}`);
-  }
-  await putIcon(projectId, image);
 }
 
 export function Events26Page() {
@@ -461,9 +61,16 @@ function Events26Table() {
     'get',
     '/v1/projects',
   );
+  const { data: places, isLoading: isPlacesLoading } = $events26Api.useQuery(
+    'get',
+    '/v1/places',
+  );
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
   const iconInputRef = useRef<HTMLInputElement>(null);
+  const errorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : String(error);
 
   const handleDelete = (id: string) => async () => {
     ensureOk(
@@ -561,7 +168,7 @@ function Events26Table() {
     } catch (error) {
       console.error(error);
       messageApi.error({
-        content: `CSVの読み込み中にエラーが発生しました：${String(error)}`,
+        content: `CSVの読み込み中にエラーが発生しました：${errorMessage(error)}`,
         key: hash,
       });
       return;
@@ -583,7 +190,7 @@ function Events26Table() {
         console.error(err);
         messageApi.destroy(hash);
         messageApi.error({
-          content: `${label}中にエラーが発生しました(${idOf(item)}):${JSON.stringify(err)}。${done}件${label}しました。`,
+          content: `${label}中にエラーが発生しました(${idOf(item)}): ${errorMessage(err)}。${done}件${label}しました。`,
           key: hash,
         });
         await refetch();
@@ -600,47 +207,25 @@ function Events26Table() {
     await refetch();
   };
 
-  /**
-   * 新規作成は旧 API 時代の列に揃えた CSV を受ける。
-   * アイコンの取得・送信に失敗しても企画自体は作れているので、
-   * そこで打ち切らず最後にまとめて報告する。
-   */
-  const handleBulkCreate = async (csv: string) => {
-    const iconFailures: string[] = [];
-
-    await applyCsv(
+  const handleBulkCreate = (csv: string) =>
+    applyCsv(
       csv,
       '新規作成',
       parseCreateCsv,
-      (entry: CreateEntry) => entry.project.id,
-      async (entry: CreateEntry) => {
+      (project: Project) => project.id,
+      async (project) => {
         ensureOk(
-          await api.POST('/events26/projects', { body: entry.project }),
+          await api.POST('/events26/projects', { body: project }),
           '企画情報の新規作成',
         );
-        if (entry.iconUrl === '') return;
-        try {
-          await putIconFromUrl(entry.project.id, entry.iconUrl);
-        } catch (error) {
-          console.error(error);
-          iconFailures.push(`${entry.project.id}: ${String(error)}`);
-        }
       },
     );
 
-    setIconVersion((version) => version + 1);
-    if (iconFailures.length > 0) {
-      messageApi.warning(
-        `アイコンの登録に${iconFailures.length}件失敗しました(${iconFailures.join(' / ')})。`,
-      );
-    }
-  };
-
-  const handleBulkReplace = (csv: string) =>
+  const handleBulkEdit = (csv: string) =>
     applyCsv(
       csv,
-      '更新',
-      parseCsv,
+      '編集',
+      (contents) => parseEditCsv(contents, data ?? []),
       (project: Project) => project.id,
       async (project) =>
         ensureOk(
@@ -648,18 +233,52 @@ function Events26Table() {
             params: { path: { project_id: project.id } },
             body: project,
           }),
-          '企画情報の更新',
+          '企画情報の編集',
         ),
     );
 
-  const handleDownload = () => {
-    const csv = Papa.unparse(data?.map(toRow) ?? [], {
-      columns: CSV_COLUMNS,
-      newline: '\r\n',
+  const handleDownload = async () => {
+    const key = 'download-events26-csv';
+    setIsDownloading(true);
+    messageApi.loading({
+      content: '場所の階数情報を取得しています…',
+      key,
+      duration: 0,
     });
-    const bom = '\uFEFF';
-    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
-    download(URL.createObjectURL(blob), 'projects.csv');
+
+    try {
+      const placeInfos = await enrichPlaceFloors(
+        data ?? [],
+        places ?? [],
+        async (placeId) => {
+          const result = await events26Api.GET('/v1/places/{placeId}', {
+            params: {
+              path: {
+                placeId: placeId as NonNullable<Occasion['place']>,
+              },
+            },
+          });
+          ensureOk(result, `場所情報(${placeId})の取得`);
+          if (!result.data) {
+            throw new Error(`場所情報(${placeId})の取得結果が空です`);
+          }
+          return 'floor' in result.data ? result.data.floor : undefined;
+        },
+      );
+      const csv = createDownloadCsv(data ?? [], placeInfos);
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+      download(URL.createObjectURL(blob), 'projects.csv');
+      messageApi.destroy(key);
+    } catch (error) {
+      console.error(error);
+      messageApi.error({
+        content: `CSVの作成中にエラーが発生しました：${errorMessage(error)}`,
+        key,
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const columns: TableProps<Project>['columns'] = [
@@ -813,7 +432,7 @@ function Events26Table() {
     },
   ];
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading || isPlacesLoading) return <LoadingScreen />;
   if (!data) return <Heading1 emoji="⚠️">エラーです</Heading1>;
 
   return (
@@ -835,15 +454,17 @@ function Events26Table() {
           maxCount={1}
           accept=".csv"
           beforeUpload={async (file) => {
-            await handleBulkReplace(await file.text());
+            await handleBulkEdit(await file.text());
             return false;
           }}
         >
-          <Button icon={<UploadOutlined />}>
-            CSVから既存の企画情報を置き換え
-          </Button>
+          <Button icon={<UploadOutlined />}>CSVから既存の企画情報を編集</Button>
         </Upload>
-        <Button onClick={handleDownload} icon={<DownloadOutlined />}>
+        <Button
+          onClick={handleDownload}
+          icon={<DownloadOutlined />}
+          loading={isDownloading}
+        >
           企画情報をCSVとしてダウンロード
         </Button>
         {/*
@@ -884,11 +505,14 @@ function Events26Table() {
         <code>is_child_friendly</code>, <code>is_recommended</code>,{' '}
         <code>day1_start_time</code>, <code>day1_end_time</code>,{' '}
         <code>day2_start_time</code>, <code>day2_end_time</code>,{' '}
-        <code>place</code>, <code>is_lab_tour</code>, <code>icon_url</code>{' '}
-        です。時刻は <code>HH:mm</code> で開始と終了を対で指定し、企画種別は
-        企画番号の接頭辞（M / S / I / L）から決まります。
+        <code>place</code>, <code>is_lab_tour</code>, <code>offering</code>,{' '}
+        <code>category</code> です。時刻は <code>HH:mm</code>{' '}
+        で開始と終了を対で指定し、企画種別は 企画番号の接頭辞（M / S / I /
+        L）から決まります。
         <code>is_lab_tour</code> は <code>L</code>{' '}
-        で始まる企画のみ必須です。置き換え・ダウンロードのCSVは従来の列のままです。
+        で始まる企画のみ必須です。編集CSVは <code>id</code>{' '}
+        だけが必須で、それ以外は新規追加CSVと同じ列を任意に指定できます。存在する列だけを編集します。
+        ダウンロードCSVは一覧確認用の別スキーマです。
       </p>
 
       <Flex gap={8} vertical>

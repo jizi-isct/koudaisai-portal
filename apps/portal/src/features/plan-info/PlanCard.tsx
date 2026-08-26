@@ -6,6 +6,7 @@ type Props = {
   project: Project;
   /** 場所の階層 ID から表示名への対応。未解決の ID はそのまま表示する。 */
   placeLabels: Record<string, string>;
+  showOccasions: boolean;
   openModal: () => void;
   disableEdit: boolean;
 };
@@ -83,6 +84,7 @@ function formatOccasion(occasion: Occasion): string {
 export function PlanCard({
   project,
   placeLabels,
+  showOccasions,
   openModal,
   disableEdit,
 }: Props) {
@@ -139,23 +141,25 @@ export function PlanCard({
         </ul>
       )}
 
-      <dl className={styles.occasions}>
-        <dt>開催予定</dt>
-        {project.occasions.length === 0 ? (
-          <dd>未定</dd>
-        ) : (
-          project.occasions.map((occasion, index) => (
-            <dd key={index}>
-              {formatOccasion(occasion)}
-              {occasion.place && (
-                <span className={styles.place}>
-                  {placeLabels[occasion.place] ?? occasion.place}
-                </span>
-              )}
-            </dd>
-          ))
-        )}
-      </dl>
+      {showOccasions && (
+        <dl className={styles.occasions}>
+          <dt>開催予定</dt>
+          {project.occasions.length === 0 ? (
+            <dd>未定</dd>
+          ) : (
+            project.occasions.map((occasion, index) => (
+              <dd key={index}>
+                {formatOccasion(occasion)}
+                {occasion.place && (
+                  <span className={styles.place}>
+                    {placeLabels[occasion.place] ?? occasion.place}
+                  </span>
+                )}
+              </dd>
+            ))
+          )}
+        </dl>
+      )}
 
       <button
         type="button"

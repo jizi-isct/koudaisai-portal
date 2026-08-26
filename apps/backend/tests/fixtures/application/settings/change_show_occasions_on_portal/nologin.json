@@ -1,0 +1,5 @@
+{
+  "actor": "Nologin",
+  "enabled": true,
+  "expected": "unauthorized"
+}

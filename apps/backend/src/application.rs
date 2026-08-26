@@ -16,6 +16,7 @@ use crate::application::ports::repositories::membership_repo::MembershipRepo;
 use crate::application::ports::repositories::notification_repo::NotificationRepo;
 use crate::application::ports::repositories::one_time_token_repo::OneTimeTokenRepo;
 use crate::application::ports::repositories::session_repo::SessionRepo;
+use crate::application::ports::repositories::settings_repo::SettingsRepo;
 use crate::application::ports::repositories::user_repo::UserRepo;
 use crate::application::ports::secret_generator::SecretGenerator;
 use crate::application::transaction::Transaction;
@@ -37,6 +38,7 @@ pub mod group;
 pub mod meta;
 pub mod notification;
 pub mod ports;
+pub mod settings;
 pub mod transaction;
 pub mod user;
 
@@ -61,6 +63,7 @@ pub struct Application<
     NR: NotificationRepo<Tx>,
     MF: MetaFetcher,
     EA: Events26Api,
+    STR: SettingsRepo,
 > {
     _phantom: std::marker::PhantomData<Tx>,
     approval_request_repo: AR,
@@ -83,6 +86,7 @@ pub struct Application<
     access_token_issuer: ATI,
     notification_repo: NR,
     meta_fetcher: MF,
+    settings_repo: STR,
     /// 企画情報API(events26)クライアント。企画情報の編集申請を承認したときに
     /// 企画へ反映するため、承認のユースケースから使う。
     events26_api: EA,
@@ -111,7 +115,8 @@ impl<
     NR: NotificationRepo<Tx>,
     MF: MetaFetcher,
     EA: Events26Api,
-> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF, EA>
+    STR: SettingsRepo,
+> Application<Tx, AR, GR, MR, UR, DR, DCR, FR, C, E, OS, D, SR, OTR, PH, SG, ATI, NR, MF, EA, STR>
 {
     // 全リポジトリ/ポートを束ねる合成ルート。引数が多いのは設計上不可避。
     #[allow(clippy::too_many_arguments)]
@@ -135,6 +140,7 @@ impl<
         notification_repo: NR,
         meta_fetcher: MF,
         events26_api: EA,
+        settings_repo: STR,
         base_url: String,
     ) -> Self {
         Self {
@@ -158,13 +164,14 @@ impl<
             notification_repo,
             meta_fetcher,
             events26_api,
+            settings_repo,
             base_url,
         }
     }
 
     pub fn approval_request(
         &'_ self,
-    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS, EA, NR> {
+    ) -> approval_request::ApprovalRequestApp<'_, Tx, AR, MR, UR, C, D, OS, EA, NR, STR> {
         approval_request::ApprovalRequestApp::new(
             &self.approval_request_repo,
             &self.membership_repo,
@@ -174,6 +181,7 @@ impl<
             &self.object_storage,
             &self.events26_api,
             &self.notification_repo,
+            &self.settings_repo,
             &self.base_url,
         )
     }
@@ -217,6 +225,10 @@ impl<
 
     pub fn meta(&'_ self) -> meta::MetaApp<'_, MF> {
         meta::MetaApp::new(&self.meta_fetcher)
+    }
+
+    pub fn settings(&'_ self) -> settings::SettingsApp<'_, STR> {
+        settings::SettingsApp::new(&self.settings_repo)
     }
 
     /// 認証ユースケース。`config` と定数時間ログイン用ダミー PHC は

@@ -24,9 +24,10 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { api, $events26Api } from '@/features/api/api';
 import {
+  CATEGORIES,
+  CATEGORY_LABEL,
   ensureOk,
   FOOD_STALL_TAG2,
-  formatTime,
   GENERAL_TAGS,
   ICON_CONTENT_TYPES,
   iconUrl,
@@ -34,11 +35,13 @@ import {
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
+import { formatTime } from './util';
 import type {
+  Category,
   FoodStallTag,
   GeneralTag,
   Occasion,
-  Place,
+  PlaceId,
   Project,
   Time,
 } from './project';
@@ -46,7 +49,7 @@ import type {
 /** 開催予定 1 件分。時刻は CSV と同じ `HH:mm` の文字列で持つ。 */
 type OccasionValues = {
   date: Time['date'];
-  place?: Place;
+  place?: PlaceId;
   start: string;
   end: string;
 };
@@ -64,8 +67,12 @@ type FormValues = {
   description: string;
   isChildFriendly: boolean;
   isRecommended: boolean;
+  /** 全企画種別で指定できる任意項目。 */
+  category?: Category;
   /** 研究室公開企画のみ。 */
   isTour?: boolean;
+  /** 模擬店企画のみ。 */
+  offering?: string;
   /** 模擬店企画のみ。 */
   foodStallTags?: FoodStallTagValues[];
   /** 一般企画のみ。 */
@@ -97,7 +104,9 @@ function toFormValues(project: Project): FormValues {
     description: project.description,
     isChildFriendly: project.isChildFriendly,
     isRecommended: project.isRecommended,
+    category: project.category,
     isTour: project.type === 'laboratory' ? project.isTour : undefined,
+    offering: project.type === 'food-stall' ? project.offering : undefined,
     foodStallTags:
       project.type === 'food-stall'
         ? project.tag.map((tag) =>
@@ -150,6 +159,7 @@ function buildProject(id: string, values: FormValues): Project {
     isChildFriendly: values.isChildFriendly ?? false,
     isRecommended: values.isRecommended ?? false,
     occasions: buildOccasions(values.occasions ?? []),
+    ...(values.category ? { category: values.category } : {}),
   };
 
   switch (values.type) {
@@ -158,6 +168,9 @@ function buildProject(id: string, values: FormValues): Project {
         ...base,
         type: 'food-stall',
         tag: buildFoodStallTags(values.foodStallTags ?? []),
+        ...(values.offering?.trim()
+          ? { offering: values.offering.trim() }
+          : {}),
       };
     case 'general':
       return { ...base, type: 'general', tag: values.generalTags ?? [] };
@@ -351,6 +364,16 @@ function EditProjectForm({ projectId }: { projectId: string }) {
         <Form.Item name="isRecommended" valuePropName="checked">
           <Checkbox>おすすめ企画</Checkbox>
         </Form.Item>
+        <Form.Item name="category" label="カテゴリー">
+          <Select
+            allowClear
+            options={CATEGORIES.map((category) => ({
+              value: category,
+              label: CATEGORY_LABEL[category],
+            }))}
+            placeholder="カテゴリーを選択（任意）"
+          />
+        </Form.Item>
 
         {type === 'laboratory' && (
           <Form.Item name="isTour" valuePropName="checked">
@@ -370,81 +393,99 @@ function EditProjectForm({ projectId }: { projectId: string }) {
         )}
 
         {type === 'food-stall' && (
-          <Form.Item label="タグ">
-            <Form.List name="foodStallTags">
-              {(fields, { add, remove }) => (
-                <Flex gap={8} vertical>
-                  {fields.map((field) => (
-                    <Space key={field.key} align="baseline">
-                      <Form.Item
-                        name={[field.name, 'tag']}
-                        noStyle
-                        rules={[{ required: true, message: 'tag は必須です' }]}
-                      >
-                        <Select
-                          style={{ width: 180 }}
-                          options={FOOD_STALL_TAG_OPTIONS}
-                          placeholder="tag"
-                          onChange={() => {
-                            // tag を変えると選べる tag2 も変わるので、古い値を残さない。
-                            const tags =
-                              form.getFieldValue('foodStallTags') ?? [];
-                            tags[field.name] = {
-                              ...tags[field.name],
-                              tag2: undefined,
-                            };
-                            form.setFieldValue('foodStallTags', [...tags]);
+          <>
+            <Form.Item name="offering" label="提供品目">
+              <Input placeholder="提供するメニュー・商品など（任意）" />
+            </Form.Item>
+            <Form.Item label="タグ">
+              <Form.List name="foodStallTags">
+                {(fields, { add, remove }) => (
+                  <Flex gap={8} vertical>
+                    {fields.map((field) => (
+                      <Space key={field.key} align="baseline">
+                        <Form.Item
+                          name={[field.name, 'tag']}
+                          noStyle
+                          rules={[
+                            { required: true, message: 'tag は必須です' },
+                          ]}
+                        >
+                          <Select
+                            style={{ width: 180 }}
+                            options={FOOD_STALL_TAG_OPTIONS}
+                            placeholder="tag"
+                            onChange={() => {
+                              // tag を変えると選べる tag2 も変わるので、古い値を残さない。
+                              const tags =
+                                form.getFieldValue('foodStallTags') ?? [];
+                              tags[field.name] = {
+                                ...tags[field.name],
+                                tag2: undefined,
+                              };
+                              form.setFieldValue('foodStallTags', [...tags]);
+                            }}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          noStyle
+                          shouldUpdate={(prev, next) =>
+                            prev.foodStallTags?.[field.name]?.tag !==
+                            next.foodStallTags?.[field.name]?.tag
+                          }
+                        >
+                          {({ getFieldValue }) => {
+                            const tag: FoodStallTag['tag'] | undefined =
+                              getFieldValue([
+                                'foodStallTags',
+                                field.name,
+                                'tag',
+                              ]);
+                            if (!tag || tag === 'drink') return null;
+                            return (
+                              <Form.Item
+                                name={[field.name, 'tag2']}
+                                noStyle
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: 'tag2 は必須です',
+                                  },
+                                ]}
+                              >
+                                <Select
+                                  style={{ width: 180 }}
+                                  options={FOOD_STALL_TAG2[tag].map(
+                                    (value) => ({
+                                      value,
+                                      label: value,
+                                    }),
+                                  )}
+                                  placeholder="tag2"
+                                />
+                              </Form.Item>
+                            );
                           }}
+                        </Form.Item>
+                        <MinusCircleOutlined
+                          onClick={() => remove(field.name)}
                         />
-                      </Form.Item>
-                      <Form.Item
-                        noStyle
-                        shouldUpdate={(prev, next) =>
-                          prev.foodStallTags?.[field.name]?.tag !==
-                          next.foodStallTags?.[field.name]?.tag
-                        }
+                      </Space>
+                    ))}
+                    <Form.Item noStyle>
+                      <Button
+                        type="dashed"
+                        onClick={() => add({ tag: 'main' })}
+                        block
+                        icon={<PlusOutlined />}
                       >
-                        {({ getFieldValue }) => {
-                          const tag: FoodStallTag['tag'] | undefined =
-                            getFieldValue(['foodStallTags', field.name, 'tag']);
-                          if (!tag || tag === 'drink') return null;
-                          return (
-                            <Form.Item
-                              name={[field.name, 'tag2']}
-                              noStyle
-                              rules={[
-                                { required: true, message: 'tag2 は必須です' },
-                              ]}
-                            >
-                              <Select
-                                style={{ width: 180 }}
-                                options={FOOD_STALL_TAG2[tag].map((value) => ({
-                                  value,
-                                  label: value,
-                                }))}
-                                placeholder="tag2"
-                              />
-                            </Form.Item>
-                          );
-                        }}
-                      </Form.Item>
-                      <MinusCircleOutlined onClick={() => remove(field.name)} />
-                    </Space>
-                  ))}
-                  <Form.Item noStyle>
-                    <Button
-                      type="dashed"
-                      onClick={() => add({ tag: 'main' })}
-                      block
-                      icon={<PlusOutlined />}
-                    >
-                      タグを追加
-                    </Button>
-                  </Form.Item>
-                </Flex>
-              )}
-            </Form.List>
-          </Form.Item>
+                        タグを追加
+                      </Button>
+                    </Form.Item>
+                  </Flex>
+                )}
+              </Form.List>
+            </Form.Item>
+          </>
         )}
 
         <Form.Item label="開催予定">

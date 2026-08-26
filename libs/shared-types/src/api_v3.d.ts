@@ -432,6 +432,59 @@ export interface paths {
     patch: operations['patch_notification'];
     trace?: never;
   };
+  '/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get all global settings. Requires the settings:read admin permission. */
+    get: operations['get_settings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/settings/accept-correction-requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get whether groups can submit correction requests. */
+    get: operations['get_accept_correction_requests'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description Change whether groups can submit correction requests. Requires the settings:write admin permission. */
+    patch: operations['patch_accept_correction_requests'];
+    trace?: never;
+  };
+  '/settings/show-occasions-on-portal': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get whether occasion locations are visible to groups. */
+    get: operations['get_show_occasions_on_portal'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description Change whether occasion locations are visible to groups. Requires the settings:write admin permission. */
+    patch: operations['patch_show_occasions_on_portal'];
+    trace?: never;
+  };
   '/users': {
     parameters: {
       query?: never;
@@ -541,6 +594,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** @description 参加団体が企画情報の訂正申請を出せるかどうか。 */
+    AcceptCorrectionRequestsRead: {
+      accept_correction_requests: boolean;
+    };
+    /** @description 訂正申請の受付状態を変更するリクエスト。 */
+    AcceptCorrectionRequestsUpdate: {
+      accept_correction_requests: boolean;
+    };
     ApprovalActionBody: {
       reason?: string | null;
     };
@@ -703,6 +764,7 @@ export interface components {
       isChildFriendly: boolean;
       isRecommended: boolean;
       occasions: components['schemas']['Occasion'][];
+      offering?: string | null;
       projectName: string;
       tag: components['schemas']['FoodStallTag'][];
       type: components['schemas']['FoodStallProjectType'];
@@ -884,6 +946,7 @@ export interface components {
       | 'east.centennial-hall'
       | 'east.centennial-hall.centennial-hall-1f'
       | 'east.taki-plaza-stage'
+      | 'east.wood-deck-stage'
       | 'east.wood-deck'
       | 'east.outdoor-stage'
       | 'east.fs-east-icho'
@@ -897,12 +960,13 @@ export interface components {
       | 'east.fs-east-icho.8'
       | 'east.fs-east-icho.9'
       | 'east.fs-east-icho.10'
-      | 'east.fs-east-icho.11'
-      | 'east.fs-east-icho.12'
-      | 'east.fs-east-icho.13'
-      | 'east.fs-east-icho.14'
-      | 'east.fs-east-icho.15'
-      | 'east.fs-east-icho.16'
+      | 'east.fs-behind-taki-plaza'
+      | 'east.fs-behind-taki-plaza.1'
+      | 'east.fs-behind-taki-plaza.2'
+      | 'east.fs-behind-taki-plaza.3'
+      | 'east.fs-behind-taki-plaza.4'
+      | 'east.fs-behind-taki-plaza.5'
+      | 'east.fs-behind-taki-plaza.6'
       | 'east.fs-east-deck'
       | 'east.fs-east-deck.1'
       | 'east.fs-east-deck.2'
@@ -937,6 +1001,7 @@ export interface components {
       | 'main.m.m-278'
       | 'main.m.m-356'
       | 'main.m.m-b61'
+      | 'main.m.m-213'
       | 'main.m.m-290'
       | 'main.m.m-124'
       | 'main.m.m-220'
@@ -984,6 +1049,7 @@ export interface components {
       | 'south.s3.s3-403'
       | 'south.s3.s3-413'
       | 'south.s3.s3-414'
+      | 'south.s3.s3-505'
       | 'south.s3.s3-510'
       | 'south.s3.s3-601'
       | 'south.s3.s3-611'
@@ -1009,8 +1075,10 @@ export interface components {
       | 'south.s8.s8-101'
       | 'south.s8.s8-107'
       | 'south.s8.s8-501'
+      | 'south.s8.s8-512'
       | 'south.s8.s8-516'
       | 'south.s8.s8-518'
+      | 'south.s8.s8-520'
       | 'south.s8.s8-entrance'
       | 'south.sl'
       | 'south.sl.sl-101'
@@ -1090,6 +1158,7 @@ export interface components {
       | 'west.w8.w8-609'
       | 'west.w8.w8-7rf'
       | 'west.w8.w8-901'
+      | 'west.w8.w8-5ev'
       | 'west.w9'
       | 'west.w9.w9-201'
       | 'west.w9.w9-202'
@@ -1104,6 +1173,7 @@ export interface components {
       | 'west.w9.w9-706'
       | 'west.w9.w9-707'
       | 'west.w9.w9-716'
+      | 'west.w9.w9-733'
       | 'west.wl1'
       | 'west.wl1.wl1-201'
       | 'west.wl1.wl1-401'
@@ -1126,9 +1196,12 @@ export interface components {
       | 'north.n1.n1-parking'
       | 'north.n3'
       | 'north.n3.n3-lab'
+      | 'north.lab1'
+      | 'north.lab1.lab1-1f'
       | 'midorigaoka'
       | 'midorigaoka.mi6'
       | 'midorigaoka.mi6.mi6-302'
+      | 'midorigaoka.mi6.mi6-303'
       | 'ishikawadai'
       | 'ishikawadai.i1'
       | 'ishikawadai.i1.i1-254'
@@ -1137,6 +1210,8 @@ export interface components {
       | 'ishikawadai.i1.i1-751'
       | 'ishikawadai.i7'
       | 'ishikawadai.i7.i7-mishima'
+      | 'ishikawadai.i9'
+      | 'ishikawadai.i9.i9-207'
       | 'ishikawadai.fs-ishikawadai'
       | 'ishikawadai.fs-ishikawadai.1'
       | 'ishikawadai.fs-ishikawadai.2'
@@ -1157,6 +1232,19 @@ export interface components {
       | 'first_responsible'
       | 'second_responsible'
       | 'third_responsible';
+    /** @description 管理者向けのグローバル設定全体。 */
+    SettingsRead: {
+      accept_correction_requests: boolean;
+      show_occasions_on_portal: boolean;
+    };
+    /** @description 参加団体へ公開してよい企画実施場所の表示設定。 */
+    ShowOccasionsOnPortalRead: {
+      show_occasions_on_portal: boolean;
+    };
+    /** @description 企画実施場所の表示設定を変更するリクエスト。 */
+    ShowOccasionsOnPortalUpdate: {
+      show_occasions_on_portal: boolean;
+    };
     StageProject: {
       category?: null | components['schemas']['Category'];
       description: string;
@@ -3179,6 +3267,184 @@ export interface operations {
       };
       /** @description Invalid notification */
       422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_settings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Global settings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SettingsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_accept_correction_requests: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Whether groups can submit correction requests */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AcceptCorrectionRequestsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  patch_accept_correction_requests: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AcceptCorrectionRequestsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Correction request availability updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AcceptCorrectionRequestsRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_show_occasions_on_portal: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Whether occasion locations are visible to groups */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ShowOccasionsOnPortalRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  patch_show_occasions_on_portal: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ShowOccasionsOnPortalUpdate'];
+      };
+    };
+    responses: {
+      /** @description Occasion location visibility updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ShowOccasionsOnPortalRead'];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };

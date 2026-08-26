@@ -6,6 +6,7 @@ mod files;
 mod forms;
 mod groups;
 mod notifications;
+mod settings;
 mod users;
 mod util;
 
@@ -19,6 +20,7 @@ const FILES_TAG: &str = "files";
 const FORMS_TAG: &str = "forms";
 const GROUPS_TAG: &str = "groups";
 const NOTIFICATIONS_TAG: &str = "notifications";
+const SETTINGS_TAG: &str = "settings";
 const USERS_TAG: &str = "users";
 const UTIL_TAG: &str = "util";
 
@@ -47,6 +49,11 @@ pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
     files::FileDownloadResponse,
     util::MetaInfo,
     events26_api::models::Project,
+    settings::SettingsRead,
+    settings::ShowOccasionsOnPortalRead,
+    settings::ShowOccasionsOnPortalUpdate,
+    settings::AcceptCorrectionRequestsRead,
+    settings::AcceptCorrectionRequestsUpdate,
 )))]
 struct ApiV3Schemas;
 
@@ -61,6 +68,7 @@ pub fn router() -> OpenApiRouter<V3State> {
         .nest("/approval-requests", approval_requests::router())
         .nest("/files", files::router())
         .nest("/events26", events26::router())
+        .nest("/settings", settings::router())
         .nest("/util", util::router())
 }
 

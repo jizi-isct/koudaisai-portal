@@ -1783,6 +1783,147 @@
         }
       }
     },
+    "/settings": {
+      "get": {
+        "tags": ["settings"],
+        "description": "Get all global settings. Requires the settings:read admin permission.",
+        "operationId": "get_settings",
+        "responses": {
+          "200": {
+            "description": "Global settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/settings/accept-correction-requests": {
+      "get": {
+        "tags": ["settings"],
+        "description": "Get whether groups can submit correction requests.",
+        "operationId": "get_accept_correction_requests",
+        "responses": {
+          "200": {
+            "description": "Whether groups can submit correction requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptCorrectionRequestsRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["settings"],
+        "description": "Change whether groups can submit correction requests. Requires the settings:write admin permission.",
+        "operationId": "patch_accept_correction_requests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptCorrectionRequestsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correction request availability updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptCorrectionRequestsRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/settings/show-occasions-on-portal": {
+      "get": {
+        "tags": ["settings"],
+        "description": "Get whether occasion locations are visible to groups.",
+        "operationId": "get_show_occasions_on_portal",
+        "responses": {
+          "200": {
+            "description": "Whether occasion locations are visible to groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShowOccasionsOnPortalRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["settings"],
+        "description": "Change whether occasion locations are visible to groups. Requires the settings:write admin permission.",
+        "operationId": "patch_show_occasions_on_portal",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShowOccasionsOnPortalUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Occasion location visibility updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShowOccasionsOnPortalRead"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/users": {
       "get": {
         "tags": ["users"],
@@ -2130,6 +2271,26 @@
   },
   "components": {
     "schemas": {
+      "AcceptCorrectionRequestsRead": {
+        "type": "object",
+        "description": "参加団体が企画情報の訂正申請を出せるかどうか。",
+        "required": ["accept_correction_requests"],
+        "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AcceptCorrectionRequestsUpdate": {
+        "type": "object",
+        "description": "訂正申請の受付状態を変更するリクエスト。",
+        "required": ["accept_correction_requests"],
+        "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          }
+        }
+      },
       "ApprovalActionBody": {
         "type": "object",
         "properties": {
@@ -2616,6 +2777,9 @@
             "items": {
               "$ref": "#/components/schemas/Occasion"
             }
+          },
+          "offering": {
+            "type": ["string", "null"]
           },
           "projectName": {
             "type": "string"
@@ -3176,6 +3340,7 @@
           "east.centennial-hall",
           "east.centennial-hall.centennial-hall-1f",
           "east.taki-plaza-stage",
+          "east.wood-deck-stage",
           "east.wood-deck",
           "east.outdoor-stage",
           "east.fs-east-icho",
@@ -3189,12 +3354,13 @@
           "east.fs-east-icho.8",
           "east.fs-east-icho.9",
           "east.fs-east-icho.10",
-          "east.fs-east-icho.11",
-          "east.fs-east-icho.12",
-          "east.fs-east-icho.13",
-          "east.fs-east-icho.14",
-          "east.fs-east-icho.15",
-          "east.fs-east-icho.16",
+          "east.fs-behind-taki-plaza",
+          "east.fs-behind-taki-plaza.1",
+          "east.fs-behind-taki-plaza.2",
+          "east.fs-behind-taki-plaza.3",
+          "east.fs-behind-taki-plaza.4",
+          "east.fs-behind-taki-plaza.5",
+          "east.fs-behind-taki-plaza.6",
           "east.fs-east-deck",
           "east.fs-east-deck.1",
           "east.fs-east-deck.2",
@@ -3229,6 +3395,7 @@
           "main.m.m-278",
           "main.m.m-356",
           "main.m.m-b61",
+          "main.m.m-213",
           "main.m.m-290",
           "main.m.m-124",
           "main.m.m-220",
@@ -3276,6 +3443,7 @@
           "south.s3.s3-403",
           "south.s3.s3-413",
           "south.s3.s3-414",
+          "south.s3.s3-505",
           "south.s3.s3-510",
           "south.s3.s3-601",
           "south.s3.s3-611",
@@ -3301,8 +3469,10 @@
           "south.s8.s8-101",
           "south.s8.s8-107",
           "south.s8.s8-501",
+          "south.s8.s8-512",
           "south.s8.s8-516",
           "south.s8.s8-518",
+          "south.s8.s8-520",
           "south.s8.s8-entrance",
           "south.sl",
           "south.sl.sl-101",
@@ -3382,6 +3552,7 @@
           "west.w8.w8-609",
           "west.w8.w8-7rf",
           "west.w8.w8-901",
+          "west.w8.w8-5ev",
           "west.w9",
           "west.w9.w9-201",
           "west.w9.w9-202",
@@ -3396,6 +3567,7 @@
           "west.w9.w9-706",
           "west.w9.w9-707",
           "west.w9.w9-716",
+          "west.w9.w9-733",
           "west.wl1",
           "west.wl1.wl1-201",
           "west.wl1.wl1-401",
@@ -3418,9 +3590,12 @@
           "north.n1.n1-parking",
           "north.n3",
           "north.n3.n3-lab",
+          "north.lab1",
+          "north.lab1.lab1-1f",
           "midorigaoka",
           "midorigaoka.mi6",
           "midorigaoka.mi6.mi6-302",
+          "midorigaoka.mi6.mi6-303",
           "ishikawadai",
           "ishikawadai.i1",
           "ishikawadai.i1.i1-254",
@@ -3429,6 +3604,8 @@
           "ishikawadai.i1.i1-751",
           "ishikawadai.i7",
           "ishikawadai.i7.i7-mishima",
+          "ishikawadai.i9",
+          "ishikawadai.i9.i9-207",
           "ishikawadai.fs-ishikawadai",
           "ishikawadai.fs-ishikawadai.1",
           "ishikawadai.fs-ishikawadai.2",
@@ -3464,6 +3641,39 @@
           "second_responsible",
           "third_responsible"
         ]
+      },
+      "SettingsRead": {
+        "type": "object",
+        "description": "管理者向けのグローバル設定全体。",
+        "required": ["show_occasions_on_portal", "accept_correction_requests"],
+        "properties": {
+          "accept_correction_requests": {
+            "type": "boolean"
+          },
+          "show_occasions_on_portal": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ShowOccasionsOnPortalRead": {
+        "type": "object",
+        "description": "参加団体へ公開してよい企画実施場所の表示設定。",
+        "required": ["show_occasions_on_portal"],
+        "properties": {
+          "show_occasions_on_portal": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ShowOccasionsOnPortalUpdate": {
+        "type": "object",
+        "description": "企画実施場所の表示設定を変更するリクエスト。",
+        "required": ["show_occasions_on_portal"],
+        "properties": {
+          "show_occasions_on_portal": {
+            "type": "boolean"
+          }
+        }
       },
       "StageProject": {
         "type": "object",

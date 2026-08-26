@@ -25,6 +25,9 @@ export function PlanSection() {
   const [group, setGroup] = useState<GroupRead | null>(null);
   const [project, setProject] = useState<Project | null>(null);
   const [placeLabels, setPlaceLabels] = useState<Record<string, string>>({});
+  const [showOccasionsOnPortal, setShowOccasionsOnPortal] = useState(false);
+  const [acceptCorrectionRequests, setAcceptCorrectionRequests] =
+    useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
@@ -48,9 +51,35 @@ export function PlanSection() {
         return;
       }
 
+      const [occasionsResult, correctionsResult] = await Promise.all([
+        api.GET('/settings/show-occasions-on-portal'),
+        api.GET('/settings/accept-correction-requests'),
+      ]);
+
+      if (
+        occasionsResult.error ||
+        !occasionsResult.data ||
+        correctionsResult.error ||
+        !correctionsResult.data
+      ) {
+        setError('企画情報の設定を取得できませんでした。');
+        setIsLoading(false);
+        return;
+      }
+
+      const settings = occasionsResult.data;
+      setShowOccasionsOnPortal(settings.show_occasions_on_portal);
+      setAcceptCorrectionRequests(
+        correctionsResult.data.accept_correction_requests,
+      );
+
       const project = await getProject(group.id);
       setProject(project);
       setIsLoading(false);
+
+      if (!settings.show_occasions_on_portal) {
+        return;
+      }
 
       // 場所は階層 ID でしか入っていないので、表示名に引き直す。
       const placeIds = [
@@ -89,8 +118,9 @@ export function PlanSection() {
           <PlanCard
             project={project}
             placeLabels={placeLabels}
+            showOccasions={showOccasionsOnPortal}
             openModal={() => setIsEditPlanOpen(true)}
-            disableEdit={false}
+            disableEdit={!acceptCorrectionRequests}
           />
           <EditPlanInfoModal
             project={project}

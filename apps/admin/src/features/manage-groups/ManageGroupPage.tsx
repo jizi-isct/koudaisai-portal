@@ -1,10 +1,11 @@
 import { useState, type ChangeEvent } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { formatDate } from '@koudaisai/shared-utils';
 import { $api } from '@/features/api/api';
 import type { GroupRead } from '@koudaisai/shared-types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Table, type TableProps, Tag, Flex, Input } from 'antd';
+import { Button, Table, type TableProps, Tag, Flex, Input } from 'antd';
 
 export default function ManageGroupPage() {
   const [queryClient] = useState(() => new QueryClient());
@@ -94,6 +95,10 @@ function GroupTable() {
 
   return (
     <Flex gap={8} vertical>
+      <Button style={{ width: 'fit-content' }} href="/manage-groups/add">
+        <PlusOutlined />
+        新規作成
+      </Button>
       <Input
         placeholder="団体IDを検索"
         onChange={handleOnChange}

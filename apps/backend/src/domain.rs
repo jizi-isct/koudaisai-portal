@@ -19,6 +19,7 @@ pub mod password_credentials;
 pub mod plaintext_password;
 pub mod session;
 pub mod session_id;
+pub mod settings;
 pub mod target_specifier;
 pub mod token_id;
 pub mod user;
