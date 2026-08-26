@@ -72,7 +72,14 @@
             "description": "Forbidden"
           },
           "422": {
-            "description": "Invalid approval request"
+            "description": "Invalid approval request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"

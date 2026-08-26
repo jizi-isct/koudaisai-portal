@@ -10,6 +10,10 @@ type Props = {
   groupId: string;
 };
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 /** presigned URL を発行してアイコン画像を S3 に置き、申請に載せるキーを返す。 */
 async function uploadIcon(file: File): Promise<string> {
   const { data, error } = await api.POST('/files/upload', {
@@ -63,7 +67,7 @@ export function EditIssueForm({ refetch, initDescription, groupId }: Props) {
 
       await refetch();
     } catch (caughtError) {
-      setError(`${caughtError}`);
+      setError(errorMessage(caughtError));
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +93,9 @@ export function EditIssueForm({ refetch, initDescription, groupId }: Props) {
             accept="image/*"
             onChange={(event) => setIconFile(event.target.files?.[0] ?? null)}
           />
-          <p className={styles.note}>変更しない場合は選択しないでください。</p>
+          <p className={styles.note}>
+            正方形の画像を選択してください。変更しない場合は選択不要です。
+          </p>
         </div>
         <div className={styles.field}>
           <p className={styles.label}>訂正理由</p>
@@ -101,14 +107,20 @@ export function EditIssueForm({ refetch, initDescription, groupId }: Props) {
             onChange={(event) => setIssueReason(event.target.value)}
           />
         </div>
-        {error && <p className={styles.error}>{error}</p>}
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
         <div className={styles.actions}>
           <button
             type="button"
             className={`${styles.button} ${styles.primary}`}
             disabled={isSubmitting || issueReason === ''}
             onClick={() => {
-              handleSubmit().catch((caughtError) => setError(`${caughtError}`));
+              handleSubmit().catch((caughtError) =>
+                setError(errorMessage(caughtError)),
+              );
             }}
           >
             {isSubmitting ? '送信中...' : '企画情報の訂正を申請する'}

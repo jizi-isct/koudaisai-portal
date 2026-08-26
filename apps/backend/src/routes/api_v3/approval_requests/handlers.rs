@@ -74,7 +74,7 @@ pub enum PostApprovalRequestResponse {
     #[response(status = FORBIDDEN, description = "Forbidden")]
     Forbidden,
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid approval request")]
-    UnprocessableEntity,
+    UnprocessableEntity(String),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Internal server error")]
     InternalServerError,
 }
@@ -94,7 +94,7 @@ pub async fn post_approval_request(
 ) -> PostApprovalRequestResponse {
     let r#type = (&body.r#type).into();
     let Ok(group_id) = GroupId::from_str(&body.group_id) else {
-        return PostApprovalRequestResponse::UnprocessableEntity;
+        return PostApprovalRequestResponse::UnprocessableEntity("団体IDが不正です".to_string());
     };
     match st
         .app
@@ -107,8 +107,8 @@ pub async fn post_approval_request(
             _ => PostApprovalRequestResponse::InternalServerError,
         },
         Err(ApplicationOperationError::Unauthorized) => PostApprovalRequestResponse::Forbidden,
-        Err(ApplicationOperationError::InvalidInput(_)) => {
-            PostApprovalRequestResponse::UnprocessableEntity
+        Err(ApplicationOperationError::InvalidInput(reason)) => {
+            PostApprovalRequestResponse::UnprocessableEntity(reason)
         }
         Err(_) => PostApprovalRequestResponse::InternalServerError,
     }
