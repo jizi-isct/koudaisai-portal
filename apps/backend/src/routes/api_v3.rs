@@ -1,6 +1,7 @@
 mod approval_requests;
 mod document_categories;
 mod documents;
+mod events26;
 mod files;
 mod forms;
 mod groups;
@@ -13,6 +14,7 @@ use utoipa_axum::router::OpenApiRouter;
 const APPROVAL_REQUESTS_TAG: &str = "approval-requests";
 const DOCUMENTS_TAG: &str = "documents";
 const DOCUMENT_CATEGORIES_TAG: &str = "document-categories";
+const EVENTS26_TAG: &str = "events26";
 const FILES_TAG: &str = "files";
 const FORMS_TAG: &str = "forms";
 const GROUPS_TAG: &str = "groups";
@@ -44,6 +46,7 @@ pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
     files::FileUploadResponse,
     files::FileDownloadResponse,
     util::MetaInfo,
+    events26_api::models::Project,
 )))]
 struct ApiV3Schemas;
 
@@ -57,6 +60,7 @@ pub fn router() -> OpenApiRouter<V3State> {
         .nest("/documents", documents::router())
         .nest("/approval-requests", approval_requests::router())
         .nest("/files", files::router())
+        .nest("/events26", events26::router())
         .nest("/util", util::router())
 }
 

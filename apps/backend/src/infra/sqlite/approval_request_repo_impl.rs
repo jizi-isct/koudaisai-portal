@@ -5,11 +5,13 @@ use crate::domain::approval_request::{
     ApprovalRequest, ApprovalRequestStatus, ApprovalRequestType,
 };
 use crate::domain::approval_request_id::ApprovalRequestId;
+use crate::domain::group_id::GroupId;
 use crate::domain::user_id::UserId;
 use crate::infra::sqlite::transaction_impl::SqliteTransaction;
 use crate::infra::sqlite::util::{dt_to_ms, ms_to_dt, to_insert_error};
 use async_trait::async_trait;
 use sqlx::{Sqlite, SqlitePool};
+use std::str::FromStr;
 use uuid::Uuid;
 
 pub struct SqliteApprovalRequestRepo {
@@ -97,6 +99,16 @@ fn status_cols(request: &ApprovalRequest) -> StatusCols {
     }
 }
 
+/// group_id 列から `GroupId` を復元する。
+///
+/// 列は SQLite の制約で nullable にしてあるが(既存表へ not null 列を足せない)、
+/// 値はマイグレーションで補完済みで、以降の行はアプリが必ず設定する。
+/// それでも NULL なら復元できないデータなのでエラーにする。
+fn group_id_from_col(group_id: Option<String>) -> anyhow::Result<GroupId> {
+    let group_id = group_id.ok_or_else(|| anyhow::anyhow!("approval request has no group_id"))?;
+    GroupId::from_str(&group_id).map_err(|e| anyhow::anyhow!(e.to_string()))
+}
+
 /// type / description / icon_key 列から `ApprovalRequestType` を復元する。
 fn request_type_from_cols(
     type_: String,
@@ -172,14 +184,16 @@ where
     let issued_at = dt_to_ms(*request.issued_at());
     let issued_by = Uuid::from(request.issued_by()).to_string();
     let issue_reason = request.issue_reason().to_string();
+    let group_id = request.group_id().to_string();
     sqlx::query!(
         "INSERT INTO approval_requests \
-         (id, issued_at, issued_by, type, status, description, icon_key, issue_reason, \
+         (id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason, \
           approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at) \
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         id,
         issued_at,
         issued_by,
+        group_id,
         t.type_,
         s.status,
         t.description,
@@ -208,13 +222,15 @@ where
     let issued_at = dt_to_ms(*request.issued_at());
     let issued_by = Uuid::from(request.issued_by()).to_string();
     let issue_reason = request.issue_reason().to_string();
+    let group_id = request.group_id().to_string();
     let res = sqlx::query!(
         "UPDATE approval_requests SET \
-         issued_at = ?, issued_by = ?, type = ?, status = ?, description = ?, icon_key = ?, issue_reason = ?, \
+         issued_at = ?, issued_by = ?, group_id = ?, type = ?, status = ?, description = ?, icon_key = ?, issue_reason = ?, \
          approved_by = ?, approved_at = ?, approval_reason = ?, rejected_by = ?, rejected_at = ?, rejection_reason = ?, closed_at = ? \
          WHERE id = ?",
         issued_at,
         issued_by,
+        group_id,
         t.type_,
         s.status,
         t.description,
@@ -253,7 +269,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
     ) -> Result<Option<ApprovalRequest>, FindError> {
         let id = id.as_uuid().to_string();
         let row = sqlx::query!(
-            r#"SELECT id, issued_at, issued_by, type, status, description, icon_key, issue_reason,
+            r#"SELECT id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason,
                       approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at
                FROM approval_requests WHERE id = ?"#,
             id,
@@ -266,6 +282,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
                 ApprovalRequestId::new(Uuid::parse_str(&r.id)?),
                 ms_to_dt(r.issued_at)?,
                 UserId::new(Uuid::parse_str(&r.issued_by)?),
+                group_id_from_col(r.group_id)?,
                 request_type_from_cols(r.r#type, r.description, r.icon_key)?,
                 request_status_from_cols(
                     r.status,
@@ -286,7 +303,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
 
     async fn find_all(&self) -> Result<Vec<ApprovalRequest>, FindError> {
         let rows = sqlx::query!(
-            r#"SELECT id, issued_at, issued_by, type, status, description, icon_key, issue_reason,
+            r#"SELECT id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason,
                       approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at
                FROM approval_requests"#,
         )
@@ -299,6 +316,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
                     ApprovalRequestId::new(Uuid::parse_str(&r.id)?),
                     ms_to_dt(r.issued_at)?,
                     UserId::new(Uuid::parse_str(&r.issued_by)?),
+                    group_id_from_col(r.group_id)?,
                     request_type_from_cols(r.r#type, r.description, r.icon_key)?,
                     request_status_from_cols(
                         r.status,
@@ -332,7 +350,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
         let ids_json =
             serde_json::to_string(&ids).map_err(|e| FindError::InternalError(e.into()))?;
         let rows = sqlx::query!(
-            r#"SELECT id, issued_at, issued_by, type, status, description, icon_key, issue_reason,
+            r#"SELECT id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason,
                       approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at
                FROM approval_requests
                WHERE issued_by IN (SELECT value FROM json_each(?))"#,
@@ -347,6 +365,7 @@ impl ApprovalRequestRepo<SqliteTransaction> for SqliteApprovalRequestRepo {
                     ApprovalRequestId::new(Uuid::parse_str(&r.id)?),
                     ms_to_dt(r.issued_at)?,
                     UserId::new(Uuid::parse_str(&r.issued_by)?),
+                    group_id_from_col(r.group_id)?,
                     request_type_from_cols(r.r#type, r.description, r.icon_key)?,
                     request_status_from_cols(
                         r.status,

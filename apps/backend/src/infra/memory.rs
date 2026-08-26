@@ -5,6 +5,7 @@ pub mod discord_impl;
 pub mod document_category_repo_impl;
 pub mod document_repo_impl;
 pub mod email_impl;
+pub mod events26_api_impl;
 pub mod form_repo_impl;
 pub mod group_repo_impl;
 pub mod membership_repo_impl;
@@ -26,6 +27,7 @@ use crate::infra::memory::discord_impl::MemoryDiscord;
 use crate::infra::memory::document_category_repo_impl::MemoryDocumentCategoryRepo;
 use crate::infra::memory::document_repo_impl::MemoryDocumentRepo;
 use crate::infra::memory::email_impl::MemoryEmail;
+use crate::infra::memory::events26_api_impl::MemoryEvents26Api;
 use crate::infra::memory::form_repo_impl::MemoryFormRepo;
 use crate::infra::memory::group_repo_impl::MemoryGroupRepo;
 use crate::infra::memory::membership_repo_impl::MemoryMembershipRepo;
@@ -59,6 +61,7 @@ pub type MemoryApplication = Application<
     MemoryAccessTokenIssuer,
     MemoryNotificationRepo,
     MemoryMetaFetcher,
+    MemoryEvents26Api,
 >;
 
 impl MemoryApplication {
@@ -85,6 +88,7 @@ impl MemoryApplication {
             MemoryAccessTokenIssuer::new(),
             MemoryNotificationRepo::new(),
             MemoryMetaFetcher::new(),
+            MemoryEvents26Api::new(),
             "http://localhost".to_string(),
         )
     }

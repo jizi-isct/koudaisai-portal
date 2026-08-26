@@ -16,7 +16,9 @@ use oauth2::{
 };
 use openidconnect::Nonce;
 use openidconnect::core::CoreAuthenticationFlow;
-use reqwest::Client;
+// OIDC 系は openidconnect/oauth2 が依存する reqwest(0.12) の Client を使う。
+// クレート直下の `reqwest` は 0.13 で、生成クライアント(events26_api)と共用しているため別物。
+use openidconnect::reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};

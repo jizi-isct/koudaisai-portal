@@ -79,6 +79,8 @@ function UserInfo({ userId }: { userId: string }) {
   const [isPendSaving, setIsPendSaving] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCopying, setIsCopying] = useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [openNameModal, setOpenNameModal] = useState<boolean>(false);
   const [openEmailModal, setOpenEmailModal] = useState<boolean>(false);
@@ -88,6 +90,8 @@ function UserInfo({ userId }: { userId: string }) {
   const [stateOfMailModal, setStateOfMailModal] = useState<StateOfModal>(
     'pendingSaveUserEmail',
   );
+
+  const { mutateAsync: deleteUser } = $api.useMutation('delete', '/users/{id}');
 
   const {
     data: userInfo,
@@ -543,6 +547,27 @@ function UserInfo({ userId }: { userId: string }) {
     }
   };
 
+  const handleCloseDeleteModal = () => {
+    if (isDeleting) {
+      return;
+    }
+    setOpenDeleteModal(false);
+  };
+
+  const handleDeleteUser = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteUser({ params: { path: { id: userId } } });
+      messageApi.success('ユーザーを削除しました');
+      setOpenDeleteModal(false);
+      window.location.href = '/manage-users/';
+    } catch {
+      messageApi.error('ユーザーの削除に失敗しました');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleCopyActivationUrl = async () => {
     try {
       setIsCopying(true);
@@ -551,9 +576,9 @@ function UserInfo({ userId }: { userId: string }) {
       messageApi.success('有効化URLをコピーしました');
     } catch (error) {
       setIsCopying(false);
-      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`)
+      messageApi.error(`有効化URLのコピーに失敗しました: ${String(error)}`);
     }
-  }
+  };
 
   const editableValue = (
     field: 'name' | 'email',
@@ -656,11 +681,31 @@ function UserInfo({ userId }: { userId: string }) {
         bordered
         items={userInfoData}
       />
-      <Flex gap={8} wrap>
+      <Flex gap={8} wrap justify="space-between">
         <Button type="default" href="/manage-users/" style={{ width: '5rem' }}>
           戻る
         </Button>
+        <Button danger type="primary" onClick={() => setOpenDeleteModal(true)}>
+          削除
+        </Button>
       </Flex>
+      <Modal
+        title="ユーザーを削除"
+        open={openDeleteModal}
+        onOk={() => {
+          void handleDeleteUser();
+        }}
+        onCancel={handleCloseDeleteModal}
+        centered
+        closable={false}
+        mask={{ closable: false }}
+        okText="削除する"
+        cancelText="キャンセル"
+        okButtonProps={{ danger: true, loading: isDeleting }}
+        cancelButtonProps={{ disabled: isDeleting }}
+      >
+        <p>本当にこのユーザーを削除しますか？この操作は取り消せません。</p>
+      </Modal>
       <Modal
         title={stateOfModalOnSendUserName()?.modalTitle}
         open={openNameModal}

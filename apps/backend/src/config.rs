@@ -25,6 +25,9 @@ pub struct Config {
     #[serde(default)]
     pub ses: Ses,
     pub discord: Discord,
+    /// 企画情報API(events26)。既存 config を壊さないため `serde(default)`。
+    #[serde(default)]
+    pub events26: Events26,
     pub secrets: Secrets,
 }
 
@@ -241,6 +244,32 @@ impl Default for Ses {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Discord {
     pub approval_request_url: String,
+}
+
+/// 企画情報API(events26)の接続先。
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Events26 {
+    /// ベース URL(スキーム込み、末尾スラッシュ無し)。
+    /// staging を向ける場合は `https://events26-staging.koudaisai.jp` を指定する。
+    pub base_url: String,
+}
+
+impl Events26 {
+    /// `base_url` のホスト部。プロキシの `Host` ヘッダ上書き等に用いる。
+    pub fn host(&self) -> Option<String> {
+        reqwest::Url::parse(&self.base_url)
+            .ok()?
+            .host_str()
+            .map(str::to_string)
+    }
+}
+
+impl Default for Events26 {
+    fn default() -> Self {
+        Self {
+            base_url: "https://events26.koudaisai.jp".to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

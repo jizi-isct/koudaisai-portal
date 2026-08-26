@@ -1,0 +1,110 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, issued_at, issued_by, group_id, type, status, description, icon_key, issue_reason,\n                      approved_by, approved_at, approval_reason, rejected_by, rejected_at, rejection_reason, closed_at\n               FROM approval_requests WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "issued_at",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "issued_by",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "group_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "type",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "status",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "description",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "icon_key",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "issue_reason",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "approved_by",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "approved_at",
+        "ordinal": 10,
+        "type_info": "Integer"
+      },
+      {
+        "name": "approval_reason",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "rejected_by",
+        "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "rejected_at",
+        "ordinal": 13,
+        "type_info": "Integer"
+      },
+      {
+        "name": "rejection_reason",
+        "ordinal": 14,
+        "type_info": "Text"
+      },
+      {
+        "name": "closed_at",
+        "ordinal": 15,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "95b253dbc059618c590a4911db0c23d445746a1f1eae076ef91ed04b17930263"
+}

@@ -3,7 +3,7 @@ import { LoadingScreen } from '@koudaisai/shared-ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Button, Card, Flex, Form, Input, message, Result, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import { $api, $plansInfoApiNoAuth } from '@/features/api/api';
+import { $api, $events26Api } from '@/features/api/api';
 import { ViewPendingEditExhibitionInfoRequest } from './ViewPendingEditExhibitionInfoRequest';
 
 type FormValues = {
@@ -71,13 +71,13 @@ function ApprovalRequestReviewForm({
       },
     },
   });
-  const { data: basePlan, isLoading } = $plansInfoApiNoAuth.useQuery(
+  const { data: baseProject, isLoading } = $events26Api.useQuery(
     'get',
-    '/plans/{planId}',
+    '/v1/projects/{projectId}',
     {
       params: {
         path: {
-          planId: issuer?.group_id ?? '',
+          projectId: issuer?.group_id ?? '',
         },
       },
       enabled: !!issuer?.group_id,
@@ -109,7 +109,7 @@ function ApprovalRequestReviewForm({
     return <LoadingScreen />;
   }
 
-  if (!approvalRequest || !issuer || !basePlan) {
+  if (!approvalRequest || !issuer || !baseProject) {
     return (
       <Result
         status="error"
@@ -210,7 +210,7 @@ function ApprovalRequestReviewForm({
           <Card title="申請内容" style={{ margin: '16px 0' }}>
             <ViewPendingEditExhibitionInfoRequest
               approvalRequest={approvalRequest}
-              plan={basePlan}
+              project={baseProject}
             />
           </Card>
         )}

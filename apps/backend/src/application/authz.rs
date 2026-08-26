@@ -466,6 +466,37 @@ pub fn can_fetch_meta(actor_ctx: &ActorContext) -> bool {
     matches!(actor_ctx, ActorContext::Admin { .. })
 }
 
+/// 企画情報API(events26)に企画を新規登録できるか。
+/// 参加団体が自分で外部公開情報を書き換えられてはならないため、管理者のみ。
+pub fn can_create_events26_project(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:events26-project:create".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// 企画情報API(events26)の企画を更新できるか。
+pub fn can_update_events26_project(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:events26-project:update".to_string())
+        }
+        _ => false,
+    }
+}
+
+/// 企画情報API(events26)の企画を削除できるか。
+pub fn can_delete_events26_project(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::Admin { claims, .. } => {
+            claims.contains(&"koudaisai-portal:admin:events26-project:delete".to_string())
+        }
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -503,6 +534,7 @@ mod tests {
         ApprovalRequest::create(
             ApprovalRequestId::generate(),
             issued_by,
+            create_group_id(),
             ApprovalRequestType::EditExhibitionInfo {
                 description: None,
                 icon_key: None,
@@ -892,5 +924,53 @@ mod tests {
             &ActorContext::NoLogin,
             &request
         ));
+    }
+
+    #[test]
+    fn test_can_manage_events26_project() {
+        let admin_with = |claim: &str| ActorContext::Admin {
+            name: "テストユーザー".to_string(),
+            user_id: create_user_id(),
+            claims: vec![claim.to_string()],
+        };
+
+        assert!(can_create_events26_project(&admin_with(
+            "koudaisai-portal:admin:events26-project:create"
+        )));
+        assert!(can_update_events26_project(&admin_with(
+            "koudaisai-portal:admin:events26-project:update"
+        )));
+        assert!(can_delete_events26_project(&admin_with(
+            "koudaisai-portal:admin:events26-project:delete"
+        )));
+
+        // claim は操作ごとに独立している。
+        let creator = admin_with("koudaisai-portal:admin:events26-project:create");
+        assert!(!can_update_events26_project(&creator));
+        assert!(!can_delete_events26_project(&creator));
+
+        let no_claim = ActorContext::Admin {
+            name: "テストユーザー".to_string(),
+            user_id: create_user_id(),
+            claims: vec![],
+        };
+        assert!(!can_create_events26_project(&no_claim));
+        assert!(!can_update_events26_project(&no_claim));
+        assert!(!can_delete_events26_project(&no_claim));
+
+        // 参加団体・未ログインは種別を問わず不可。
+        let user_ctx = ActorContext::User {
+            name: "テストユーザー".to_string(),
+            user_id: create_user_id(),
+            memberships: vec![],
+            group_type: GroupType::Press,
+        };
+        assert!(!can_create_events26_project(&user_ctx));
+        assert!(!can_update_events26_project(&user_ctx));
+        assert!(!can_delete_events26_project(&user_ctx));
+
+        assert!(!can_create_events26_project(&ActorContext::NoLogin));
+        assert!(!can_update_events26_project(&ActorContext::NoLogin));
+        assert!(!can_delete_events26_project(&ActorContext::NoLogin));
     }
 }

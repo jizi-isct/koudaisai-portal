@@ -135,9 +135,9 @@ function AdminLayoutContent({ children, currentPath }: Props) {
                 key: 'others',
                 children: [
                   {
-                    key: '/plans_info/',
+                    key: '/events26/',
                     icon: <InfoOutlined />,
-                    label: <a href="/plans_info/">参加団体情報</a>,
+                    label: <a href="/events26/">企画情報</a>,
                   },
                 ],
               },
