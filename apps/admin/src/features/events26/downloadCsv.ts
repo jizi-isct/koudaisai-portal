@@ -59,7 +59,11 @@ function toRow(project: Project, placeInfos: readonly PlaceInfo[]): ProjectRow {
   const places = [
     ...project.occasions.reduce((acc, x) => {
       if (x.place) {
-        const place = formatPlace(x.place, placeInfos);
+        const place = formatPlace(
+          x.place,
+          placeInfos,
+          project.type === 'food-stall',
+        );
         if (place) return acc.add(place);
       }
       return acc;
