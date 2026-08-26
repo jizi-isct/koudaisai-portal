@@ -326,27 +326,44 @@ impl<
         )
         .map_err(|e| ApplicationOperationError::InvalidInput(e.to_string()))?;
 
+        // 申請に添付されたアイコンは、保存前に本体を取得して正方形であることを
+        // 検証する。クライアント側の検証だけに頼らず、API の制約として保証する。
+        let icon_attachment = if let ApprovalRequestType::EditExhibitionInfo {
+            icon_key: Some(key),
+            ..
+        } = request.request_type()
+        {
+            let bytes = self
+                .object_storage
+                .get_object(key)
+                .await
+                .map_err(|e| ApplicationOperationError::InternalError(e.into()))?;
+            let dimensions = imagesize::blob_size(&bytes).map_err(|e| {
+                ApplicationOperationError::InvalidInput(format!(
+                    "アイコン画像のサイズを取得できませんでした: {e}"
+                ))
+            })?;
+            if dimensions.width != dimensions.height {
+                return Err(ApplicationOperationError::InvalidInput(
+                    "アイコン画像は正方形にしてください。".to_string(),
+                ));
+            }
+            Some((key.clone(), bytes))
+        } else {
+            None
+        };
+
         self.approval_request_repo.insert(&request).await?;
 
         // 作成では操作者＝申請者なので ActorContext から氏名・グループを得る。
         let issuer_label = issuer_label_from_actor(actor_ctx);
         let mut message = build_issue_message(self.base_url, &request, &issuer_label);
 
-        // アイコンが指定されていれば本体を取得して添付する(best-effort)。
-        if let ApprovalRequestType::EditExhibitionInfo {
-            icon_key: Some(key),
-            ..
-        } = request.request_type()
-        {
-            match self.object_storage.get_object(key).await {
-                Ok(bytes) => message.attachments.push(DiscordAttachment {
-                    file_name: key.clone(),
-                    bytes,
-                }),
-                Err(error) => {
-                    tracing::error!(%error, "承認申請アイコンの取得に失敗しました(添付をスキップ)")
-                }
-            }
+        if let Some((key, bytes)) = icon_attachment {
+            message.attachments.push(DiscordAttachment {
+                file_name: key,
+                bytes,
+            });
         }
 
         // 通知は best-effort: 送信失敗で作成自体は失敗させず、ログに残すのみ。
@@ -730,6 +747,14 @@ mod tests {
         }
     }
 
+    /// 寸法検証に必要な PNG ヘッダーを持つテスト画像を作る。
+    fn png_header(width: u32, height: u32) -> Vec<u8> {
+        let mut bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR".to_vec();
+        bytes.extend_from_slice(&width.to_be_bytes());
+        bytes.extend_from_slice(&height.to_be_bytes());
+        bytes
+    }
+
     #[tokio::test]
     async fn create_sends_issue_notification() {
         let now = Utc.timestamp_opt(0, 0).unwrap();
@@ -891,7 +916,8 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         // アイコン本体をオブジェクトストレージに用意しておく。
-        os.put("icon-key.png", vec![1, 2, 3, 4]);
+        let icon = png_header(128, 128);
+        os.put("icon-key.png", icon.clone());
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
         let settings = MemorySettingsRepo::new();
@@ -916,7 +942,44 @@ mod tests {
         // 取得したアイコン本体が添付されている。
         assert_eq!(messages[0].attachments.len(), 1);
         assert_eq!(messages[0].attachments[0].file_name, "icon-key.png");
-        assert_eq!(messages[0].attachments[0].bytes, vec![1, 2, 3, 4]);
+        assert_eq!(messages[0].attachments[0].bytes, icon);
+    }
+
+    #[tokio::test]
+    async fn create_with_non_square_icon_fails() {
+        let now = Utc.timestamp_opt(0, 0).unwrap();
+        let ar = MemoryApprovalRequestRepo::new();
+        let mr = MemoryMembershipRepo::new();
+        let ur = MemoryUserRepo::new();
+        let clock = MemoryClock::new(now);
+        let discord = MemoryDiscord::new();
+        let os = MemoryObjectStorage::new();
+        os.put("icon-key.png", png_header(128, 64));
+        let e26 = MemoryEvents26Api::new();
+        let nr = MemoryNotificationRepo::new();
+        let settings = MemorySettingsRepo::new();
+        let app = ApprovalRequestApp::new(
+            &ar, &mr, &ur, &clock, &discord, &os, &e26, &nr, &settings, BASE_URL,
+        );
+
+        let result = app
+            .create(
+                &user_ctx(),
+                group_id(),
+                ApprovalRequestType::EditExhibitionInfo {
+                    description: None,
+                    icon_key: Some("icon-key.png".to_string()),
+                },
+                "理由".to_string(),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::InvalidInput(message))
+                if message == "アイコン画像は正方形にしてください。"
+        ));
+        assert!(discord.sent_messages().is_empty());
     }
 
     #[tokio::test]
@@ -1000,10 +1063,7 @@ mod tests {
         let discord = MemoryDiscord::new();
         let os = MemoryObjectStorage::new();
         // 拡張子の無いキーでも中身(PNG のマジックバイト)から形式を決められること。
-        os.put(
-            "icon-key",
-            vec![0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, 1, 2],
-        );
+        os.put("icon-key", png_header(128, 128));
         let e26 = MemoryEvents26Api::new();
         let nr = MemoryNotificationRepo::new();
         let settings = MemorySettingsRepo::new();
@@ -1032,7 +1092,7 @@ mod tests {
         assert_eq!(e26.description("I-123").as_deref(), Some("新しい紹介文"));
         let (content_type, image) = e26.icon("I-123").expect("icon should be applied");
         assert_eq!(content_type, "image/png");
-        assert_eq!(image.len(), 10);
+        assert_eq!(image, png_header(128, 128));
     }
 
     #[tokio::test]
