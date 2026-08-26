@@ -18,6 +18,7 @@ export function EditableMemberField({
   role,
   displayNode,
   currentUserId,
+  extraAllowedUserId,
   messageApi,
   onSaved,
   isEditing,
@@ -29,6 +30,7 @@ export function EditableMemberField({
   role: Role;
   displayNode: ReactNode;
   currentUserId: string;
+  extraAllowedUserId?: string;
   messageApi: MessageInstance;
   onSaved: () => Promise<unknown>;
   isEditing: boolean;
@@ -135,7 +137,10 @@ export function EditableMemberField({
     isLoadingAllUsers || isLoadingAllGroups || isLoadingAssignedUserIds;
   const options = (allUsers ?? [])
     .filter(
-      (user) => !assignedUserIds?.has(user.id) || user.id === currentUserId,
+      (user) =>
+        !assignedUserIds?.has(user.id) ||
+        user.id === currentUserId ||
+        user.id === extraAllowedUserId,
     )
     .map((user) => ({
       value: user.id,

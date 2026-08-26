@@ -312,6 +312,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
             role="representative"
             displayNode={filteredMemberNameByRole.representative}
             currentUserId={filteredMemberByRole.representative}
+            extraAllowedUserId={filteredMemberByRole.operator}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
             isEditing={editingRole === 'representative'}
@@ -330,6 +331,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
             role="operator"
             displayNode={filteredMemberNameByRole.operator}
             currentUserId={filteredMemberByRole.operator}
+            extraAllowedUserId={filteredMemberByRole.representative}
             messageApi={messageApi}
             onSaved={refetchMemberInfo}
             isEditing={editingRole === 'operator'}
