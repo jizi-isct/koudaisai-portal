@@ -42,17 +42,20 @@ export async function enrichPlaceFloors(
 }
 
 /**
- * 階層 ID に対応する表示名を 2 階層目から半角スペースで結合する。
+ * 階層 ID に対応する表示名を半角スペースで結合する。
+ * 通常は 2 階層目から、`includeFirstLevel` が true なら 1 階層目から結合する。
  * 末端の場所に `floor` があれば、その表示名の直前へ挿入する。
  */
 export function formatPlace(
   placeId: string,
   places: readonly PlaceInfo[],
+  includeFirstLevel = false,
 ): string {
   const placesById = new Map(places.map((place) => [place.id, place]));
   const parts = placeId.split('.');
-  const labels = parts.slice(1).flatMap((_, index) => {
-    const id = parts.slice(0, index + 2).join('.');
+  const firstIndex = includeFirstLevel ? 0 : 1;
+  const labels = parts.slice(firstIndex).flatMap((_, index) => {
+    const id = parts.slice(0, index + firstIndex + 1).join('.');
     const displayName = placesById.get(id)?.displayName;
     return displayName ? [displayName] : [];
   });

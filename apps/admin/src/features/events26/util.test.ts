@@ -51,6 +51,12 @@ describe('formatPlace', () => {
     expect(formatPlace('main.m.m-101', places)).toBe('本館 1階 M-101');
   });
 
+  it('指定された場合は1階層目から表示名を結合する', () => {
+    expect(formatPlace('main.m.m-101', places, true)).toBe(
+      '大岡山キャンパス 本館 1階 M-101',
+    );
+  });
+
   it('floorがなければ表示名だけを結合する', () => {
     expect(
       formatPlace('east.taki-plaza.tp-b1-event', [
