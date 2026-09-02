@@ -18,6 +18,7 @@ import {
   Tag,
   Tooltip,
   Upload,
+  Input
 } from 'antd';
 import type { TableProps } from 'antd';
 import objectHash from 'object-hash';
@@ -37,6 +38,7 @@ import {
 } from './project';
 import type { Occasion, Project } from './project';
 import { enrichPlaceFloors, formatTime } from './util';
+import { type ChangeEvent } from 'react';
 
 /** `M-001.png` のようなファイル名から企画 ID(`M-001`)を取り出す。 */
 function projectIdFromFileName(fileName: string): string {
@@ -66,6 +68,7 @@ function Events26Table() {
     '/v1/places',
   );
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
+  const [keyWords, setKeyWords] = useState<string>("")
   const [iconVersion, setIconVersion] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const iconInputRef = useRef<HTMLInputElement>(null);
@@ -280,6 +283,14 @@ function Events26Table() {
       setIsDownloading(false);
     }
   };
+
+  const handleFilterProjectsByName = (event: ChangeEvent<HTMLInputElement>) => {
+    setKeyWords(event.target.value)
+  };
+
+  const targetedProjects: Project[] = !data ? [] : data.filter((item)=>
+    item.groupName.includes(keyWords),
+  );
 
   const columns: TableProps<Project>['columns'] = [
     {
@@ -515,10 +526,16 @@ function Events26Table() {
         ダウンロードCSVは一覧確認用の別スキーマです。
       </p>
 
+      <Input 
+        placeholder='団体名を検索'
+        onChange={handleFilterProjectsByName}
+        style={{width: 200}}
+      />
+
       <Flex gap={8} vertical>
         <Table<Project>
           size="small"
-          dataSource={data.map((item) => ({ ...item, key: item.id }))}
+          dataSource={targetedProjects.map((item) => ({ ...item, key: item.id }))}
           columns={columns}
           bordered
           scroll={{ x: 'max-content' }}
