@@ -67,7 +67,7 @@ function Events26Table() {
     '/v1/places',
   );
 
-  const [keyWords, setKeyWords] = useState<string>('');
+  const [filterKey, setFilterKey] = useState<string>('');
 
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
@@ -286,12 +286,12 @@ function Events26Table() {
   };
 
   const handleFilterProjectsByName = (event: ChangeEvent<HTMLInputElement>) => {
-    setKeyWords(event.target.value);
+    setFilterKey(event.target.value);
   };
 
   const targetedProjects: Project[] = useMemo<Project[]>(
-    () => data?.filter((item) => item.groupName.includes(keyWords)) ?? [],
-    [data, keyWords],
+    () => data?.filter((item) => item.groupName.includes(filterKey)) ?? [],
+    [data, filterKey],
   );
 
   const columns: TableProps<Project>['columns'] = [
