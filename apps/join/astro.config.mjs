@@ -1,9 +1,10 @@
 import { defineConfig, envField } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 
 export default defineConfig({
   integrations: [react()],
-  output: 'static',
+  output: 'server',
   site: 'https://join.koudaisai.jp',
   env: {
     schema: {
@@ -15,4 +16,7 @@ export default defineConfig({
       }),
     },
   },
+  adapter: cloudflare({
+    prerenderEnvironment: 'workerd',
+  }),
 });
