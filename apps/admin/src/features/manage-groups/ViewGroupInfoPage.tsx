@@ -1,5 +1,5 @@
 import { $api } from '@/features/api/api';
-import { type GroupRead } from '@koudaisai/shared-types';
+import { type GroupRead, type Role } from '@koudaisai/shared-types';
 import { LoadingScreen } from '@koudaisai/shared-ui';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import {
   message,
   type DescriptionsProps,
 } from 'antd';
+import { EditableMemberField } from './EditableMemberField';
 
 export function ViewGroupInfoPage() {
   const [queryClient] = useState(() => new QueryClient());
@@ -51,6 +52,7 @@ export function ViewGroupInfoPage() {
 
 function GroupInfo({ groupId }: { groupId: string }) {
   const [messageApi, contextHolder] = message.useMessage();
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -70,17 +72,17 @@ function GroupInfo({ groupId }: { groupId: string }) {
       },
     },
   );
-  const { data: memberInfo, isLoading: isLoadingMember } = $api.useQuery(
-    'get',
-    '/groups/{id}/members',
-    {
-      params: {
-        path: {
-          id: groupId,
-        },
+  const {
+    data: memberInfo,
+    isLoading: isLoadingMember,
+    refetch: refetchMemberInfo,
+  } = $api.useQuery('get', '/groups/{id}/members', {
+    params: {
+      path: {
+        id: groupId,
       },
     },
-  );
+  });
 
   const filteredMemberByRole = {
     representative:
@@ -312,12 +314,40 @@ function GroupInfo({ groupId }: { groupId: string }) {
       {
         key: 'representative',
         label: '企画責任者',
-        children: filteredMemberNameByRole.representative,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="representative"
+            displayNode={filteredMemberNameByRole.representative}
+            currentUserId={filteredMemberByRole.representative}
+            extraAllowedUserId={filteredMemberByRole.operator}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'representative'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('representative')}
+            onStopEditing={() => setEditingRole(null)}
+          />
+        ),
       },
       {
         key: 'operator',
         label: '企画実施担当者',
-        children: filteredMemberNameByRole.operator,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="operator"
+            displayNode={filteredMemberNameByRole.operator}
+            currentUserId={filteredMemberByRole.operator}
+            extraAllowedUserId={filteredMemberByRole.representative}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'operator'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('operator')}
+            onStopEditing={() => setEditingRole(null)}
+          />
+        ),
       },
       {
         key: 'created_at',
@@ -345,17 +375,56 @@ function GroupInfo({ groupId }: { groupId: string }) {
       {
         key: 'first_responsible',
         label: '第1責任者',
-        children: filteredMemberNameByRole.first_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="first_responsible"
+            displayNode={filteredMemberNameByRole.first_responsible}
+            currentUserId={filteredMemberByRole.first_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'first_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('first_responsible')}
+            onStopEditing={() => setEditingRole(null)}
+          />
+        ),
       },
       {
         key: 'second_responsible',
         label: '第2責任者',
-        children: filteredMemberNameByRole.second_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="second_responsible"
+            displayNode={filteredMemberNameByRole.second_responsible}
+            currentUserId={filteredMemberByRole.second_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'second_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('second_responsible')}
+            onStopEditing={() => setEditingRole(null)}
+          />
+        ),
       },
       {
         key: 'third_responsible',
         label: '第3責任者',
-        children: filteredMemberNameByRole.third_responsible,
+        children: (
+          <EditableMemberField
+            groupId={groupId}
+            role="third_responsible"
+            displayNode={filteredMemberNameByRole.third_responsible}
+            currentUserId={filteredMemberByRole.third_responsible}
+            messageApi={messageApi}
+            onSaved={refetchMemberInfo}
+            isEditing={editingRole === 'third_responsible'}
+            disabled={editingRole !== null}
+            onStartEditing={() => setEditingRole('third_responsible')}
+            onStopEditing={() => setEditingRole(null)}
+          />
+        ),
       },
       {
         key: 'created_at',
@@ -400,6 +469,7 @@ function GroupInfo({ groupId }: { groupId: string }) {
         bordered
         items={groupInfoData}
       />
+      {contextHolder}
       <Flex gap={8} wrap justify="space-between">
         <Button type="default" href="/manage-groups/" style={{ width: '5rem' }}>
           戻る
