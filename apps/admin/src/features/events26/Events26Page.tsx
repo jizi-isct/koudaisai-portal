@@ -18,10 +18,11 @@ import {
   Tag,
   Tooltip,
   Upload,
+  Input,
 } from 'antd';
 import type { TableProps } from 'antd';
 import objectHash from 'object-hash';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo, type ChangeEvent } from 'react';
 import { api, events26Api, $events26Api } from '@/features/api/api';
 import { parseCreateCsv } from './createCsv';
 import { createDownloadCsv } from './downloadCsv';
@@ -65,6 +66,9 @@ function Events26Table() {
     'get',
     '/v1/places',
   );
+
+  const [filterKey, setFilterKey] = useState<string>('');
+
   // アイコンは URL が同じまま中身だけ変わるので、更新後はこの値を進めて再取得させる。
   const [iconVersion, setIconVersion] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -280,6 +284,15 @@ function Events26Table() {
       setIsDownloading(false);
     }
   };
+
+  const handleFilterProjectsByName = (event: ChangeEvent<HTMLInputElement>) => {
+    setFilterKey(event.target.value);
+  };
+
+  const targetedProjects: Project[] = useMemo<Project[]>(
+    () => data?.filter((item) => item.groupName.includes(filterKey)) ?? [],
+    [data, filterKey],
+  );
 
   const columns: TableProps<Project>['columns'] = [
     {
@@ -515,10 +528,19 @@ function Events26Table() {
         ダウンロードCSVは一覧確認用の別スキーマです。
       </p>
 
+      <Input
+        placeholder="団体名を検索"
+        onChange={handleFilterProjectsByName}
+        style={{ width: 200 }}
+      />
+
       <Flex gap={8} vertical>
         <Table<Project>
           size="small"
-          dataSource={data.map((item) => ({ ...item, key: item.id }))}
+          dataSource={targetedProjects.map((item) => ({
+            ...item,
+            key: item.id,
+          }))}
           columns={columns}
           bordered
           scroll={{ x: 'max-content' }}
