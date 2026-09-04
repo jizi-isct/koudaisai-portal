@@ -764,6 +764,80 @@
         }
       }
     },
+    "/events26/projects/us/menu": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Store the menu of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+        "operationId": "put_own_project_menu",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetProjectDetails200ResponseMenu"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Menu stored"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "422": {
+            "description": "Invalid menu. The body carries the upstream reason.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete the menu of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+        "operationId": "delete_own_project_menu",
+        "responses": {
+          "204": {
+            "description": "Menu deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/events26/projects/{project_id}": {
       "put": {
         "tags": ["events26"],
@@ -3008,6 +3082,53 @@
         "type": "string",
         "description": "",
         "enum": ["experience", "display", "performance", "food", "lecture"]
+      },
+      "GetProjectDetails200ResponseMenu": {
+        "type": "object",
+        "required": ["items", "description"],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetProjectDetails200ResponseMenuItemsInner"
+            }
+          }
+        }
+      },
+      "GetProjectDetails200ResponseMenuItemsInner": {
+        "type": "object",
+        "required": ["name", "options"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetProjectDetails200ResponseMenuItemsInnerOptionsInner"
+            }
+          },
+          "price": {
+            "type": ["number", "null"],
+            "format": "double"
+          }
+        }
+      },
+      "GetProjectDetails200ResponseMenuItemsInnerOptionsInner": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": ["number", "null"],
+            "format": "double"
+          }
+        }
       },
       "GroupCreate": {
         "type": "object",

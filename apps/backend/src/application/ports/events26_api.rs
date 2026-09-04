@@ -1,5 +1,5 @@
 use crate::application::error::{DeleteError, InsertError, OperationError, UpdateError};
-use events26_api::models::Project;
+use events26_api::models::{GetProjectDetails200ResponseMenu, Project};
 use thiserror::Error;
 
 /// 企画アイコンの更新に失敗した理由。
@@ -18,6 +18,19 @@ pub enum UpdateIconError {
 }
 
 impl OperationError for UpdateIconError {}
+
+/// 企画メニューの更新に失敗した理由。
+#[derive(Debug, Error)]
+pub enum UpdateMenuError {
+    #[error("Not found")]
+    NotFound,
+    #[error("Invalid menu: {0}")]
+    InvalidMenu(String),
+    #[error("Internal error: {0}")]
+    InternalError(#[from] anyhow::Error),
+}
+
+impl OperationError for UpdateMenuError {}
 
 /// 企画情報API(events26)の `/admin/v1` 配下への操作を表すポート。
 ///
@@ -67,6 +80,16 @@ pub trait Events26Api {
 
     /// 企画アイコンの原本を削除する。未登録でも成功する。
     async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError>;
+
+    /// 企画メニューを保存する。追加情報は変更しない。
+    async fn update_project_menu(
+        &self,
+        project_id: &str,
+        menu: &GetProjectDetails200ResponseMenu,
+    ) -> Result<(), UpdateMenuError>;
+
+    /// 企画メニューを削除する。追加情報は変更しない。
+    async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError>;
 }
 
 /// `Arc` 越しでもポートとして扱えるようにする。
@@ -115,5 +138,17 @@ impl<T: Events26Api + Send + Sync + ?Sized> Events26Api for std::sync::Arc<T> {
 
     async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError> {
         (**self).delete_project_icon(project_id).await
+    }
+
+    async fn update_project_menu(
+        &self,
+        project_id: &str,
+        menu: &GetProjectDetails200ResponseMenu,
+    ) -> Result<(), UpdateMenuError> {
+        (**self).update_project_menu(project_id, menu).await
+    }
+
+    async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError> {
+        (**self).delete_project_menu(project_id).await
     }
 }
