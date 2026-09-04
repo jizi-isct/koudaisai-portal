@@ -539,6 +539,30 @@ pub fn can_delete_events26_project(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+/// 参加団体が自団体の企画メニューを編集できるか。
+///
+/// 対象企画 ID は呼び出し側から受け取らず、`ActorContext` の先頭の所属団体から
+/// 決定する。企画を持たない学内取材団体と管理者は参加団体向け経路を利用できない。
+pub fn can_update_own_events26_menu(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::User {
+            memberships,
+            group_type,
+            ..
+        } => {
+            !memberships.is_empty()
+                && matches!(
+                    group_type,
+                    crate::domain::group::GroupType::GeneralProject
+                        | crate::domain::group::GroupType::BoothProject
+                        | crate::domain::group::GroupType::LabProject
+                        | crate::domain::group::GroupType::StageProject
+                )
+        }
+        ActorContext::Admin { .. } | ActorContext::NoLogin => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

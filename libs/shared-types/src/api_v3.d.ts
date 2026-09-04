@@ -199,6 +199,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/events26/projects/us/menu': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Store the menu of the project belonging to the signed-in group. The project id is derived from the user's membership. */
+    put: operations['put_own_project_menu'];
+    post?: never;
+    /** @description Delete the menu of the project belonging to the signed-in group. The project id is derived from the user's membership. */
+    delete: operations['delete_own_project_menu'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/events26/projects/{project_id}': {
     parameters: {
       query?: never;
@@ -825,6 +843,21 @@ export interface components {
     GeneralProjectType: 'general';
     /** @enum {string} */
     GeneralTag: 'experience' | 'display' | 'performance' | 'food' | 'lecture';
+    GetProjectDetails200ResponseMenu: {
+      description: string;
+      items: components['schemas']['GetProjectDetails200ResponseMenuItemsInner'][];
+    };
+    GetProjectDetails200ResponseMenuItemsInner: {
+      name: string;
+      options: components['schemas']['GetProjectDetails200ResponseMenuItemsInnerOptionsInner'][];
+      /** Format: double */
+      price?: number | null;
+    };
+    GetProjectDetails200ResponseMenuItemsInnerOptionsInner: {
+      name: string;
+      /** Format: double */
+      price?: number | null;
+    };
     GroupCreate: {
       name: string;
       type: components['schemas']['GroupType'];
@@ -2164,6 +2197,101 @@ export interface operations {
         content: {
           'text/plain': string;
         };
+      };
+      /** @description Internal server error. The body carries the upstream status and message. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  put_own_project_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetProjectDetails200ResponseMenu'];
+      };
+    };
+    responses: {
+      /** @description Menu stored */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid menu. The body carries the upstream reason. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Internal server error. The body carries the upstream status and message. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  delete_own_project_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Menu deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Internal server error. The body carries the upstream status and message. */
       500: {

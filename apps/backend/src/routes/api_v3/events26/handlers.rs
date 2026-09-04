@@ -7,14 +7,14 @@
 
 use super::super::V3State;
 use crate::application::error::{ApplicationOperationError, DeleteError, InsertError, UpdateError};
-use crate::application::ports::events26_api::UpdateIconError;
+use crate::application::ports::events26_api::{UpdateIconError, UpdateMenuError};
 use crate::domain::actor_ctx::ActorContext;
 use axum::Json;
 use axum::body::Bytes;
 use axum::extract::{Path, State};
 use axum::http::HeaderMap;
 use axum::http::header::CONTENT_TYPE;
-use events26_api::models::Project;
+use events26_api::models::{GetProjectDetails200ResponseMenu, Project};
 use serde::Deserialize;
 use tracing::warn;
 use utoipa::IntoParams;
@@ -25,7 +25,7 @@ use utoipa_axum_auto_into_response::http_response;
 /// events26 が返したステータスと本文は [`internal_error`] が anyhow のメッセージへ
 /// 載せているので、それをそのまま渡す。中継先の検証(400 = リクエストボディが不正 など)は
 /// 本文にしか理由が出ず、握り潰すと管理画面から原因が分からなくなるため。
-/// この API は JIZI 管理者専用で、載るのは events26 の応答のみ(資格情報は含まない)。
+/// 載るのは events26 の応答のみで、資格情報は含まない。
 ///
 /// [`internal_error`]: crate::infra::events26_api_client
 fn detail<E: std::fmt::Display>(operation: &str, error: E) -> String {
@@ -317,6 +317,97 @@ pub async fn delete_project_icon(
         Err(ApplicationOperationError::Unauthorized) => DeleteProjectIconResponse::Forbidden,
         Err(error) => {
             DeleteProjectIconResponse::InternalServerError(detail("delete_project_icon", error))
+        }
+    }
+}
+
+#[http_response]
+pub enum PutOwnProjectMenuResponse {
+    #[response(status = NO_CONTENT, description = "Menu stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(
+        status = UNPROCESSABLE_ENTITY,
+        description = "Invalid menu. The body carries the upstream reason."
+    )]
+    UnprocessableEntity(String),
+    #[response(
+        status = INTERNAL_SERVER_ERROR,
+        description = "Internal server error. The body carries the upstream status and message."
+    )]
+    InternalServerError(String),
+}
+
+#[utoipa::path(
+    put,
+    description = "Store the menu of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+    path = "/projects/us/menu",
+    responses(PutOwnProjectMenuResponse),
+    request_body = GetProjectDetails200ResponseMenu,
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn put_own_project_menu(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Json(body): Json<GetProjectDetails200ResponseMenu>,
+) -> PutOwnProjectMenuResponse {
+    match st
+        .app
+        .events26()
+        .update_own_project_menu(&actor, &body)
+        .await
+    {
+        Ok(()) => PutOwnProjectMenuResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => PutOwnProjectMenuResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(UpdateMenuError::NotFound)) => {
+            PutOwnProjectMenuResponse::NotFound
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateMenuError::InvalidMenu(reason))) => {
+            PutOwnProjectMenuResponse::UnprocessableEntity(detail("update_project_menu", reason))
+        }
+        Err(error) => {
+            PutOwnProjectMenuResponse::InternalServerError(detail("update_project_menu", error))
+        }
+    }
+}
+
+#[http_response]
+pub enum DeleteOwnProjectMenuResponse {
+    #[response(status = NO_CONTENT, description = "Menu deleted")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(
+        status = INTERNAL_SERVER_ERROR,
+        description = "Internal server error. The body carries the upstream status and message."
+    )]
+    InternalServerError(String),
+}
+
+#[utoipa::path(
+    delete,
+    description = "Delete the menu of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+    path = "/projects/us/menu",
+    responses(DeleteOwnProjectMenuResponse),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn delete_own_project_menu(
+    State(st): State<V3State>,
+    actor: ActorContext,
+) -> DeleteOwnProjectMenuResponse {
+    match st.app.events26().delete_own_project_menu(&actor).await {
+        Ok(()) => DeleteOwnProjectMenuResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => DeleteOwnProjectMenuResponse::Forbidden,
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteOwnProjectMenuResponse::NotFound
+        }
+        Err(error) => {
+            DeleteOwnProjectMenuResponse::InternalServerError(detail("delete_project_menu", error))
         }
     }
 }

@@ -1,15 +1,16 @@
 use crate::application::error::{DeleteError, InsertError, UpdateError};
-use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
+use crate::application::ports::events26_api::{Events26Api, UpdateIconError, UpdateMenuError};
 use anyhow::{Context, anyhow};
 use async_trait::async_trait;
 use events26_api::apis::admin_api::{
-    CreateProjectParams, DeleteProjectIconParams, DeleteProjectParams,
-    UpdateProjectDescriptionParams, UpdateProjectParams, create_project, delete_project,
-    delete_project_icon, update_project, update_project_description,
+    CreateProjectParams, DeleteProjectIconParams, DeleteProjectMenuParams, DeleteProjectParams,
+    UpdateProjectDescriptionParams, UpdateProjectMenuParams, UpdateProjectParams, create_project,
+    delete_project, delete_project_icon, delete_project_menu, update_project,
+    update_project_description, update_project_menu,
 };
 use events26_api::apis::configuration::Configuration;
 use events26_api::apis::{Error, ResponseContent, urlencode};
-use events26_api::models::{Project, ProjectDescription};
+use events26_api::models::{GetProjectDetails200ResponseMenu, Project, ProjectDescription};
 use reqwest::header::{HeaderMap, HeaderValue};
 use tracing::warn;
 
@@ -85,6 +86,14 @@ impl Events26ApiClient {
 fn status_code<T>(error: &Error<T>) -> Option<u16> {
     match error {
         Error::ResponseError(ResponseContent { status, .. }) => Some(status.as_u16()),
+        _ => None,
+    }
+}
+
+/// 生成クライアントのエラーからレスポンス本文を取り出す。
+fn response_body<T>(error: &Error<T>) -> Option<&str> {
+    match error {
+        Error::ResponseError(ResponseContent { content, .. }) => Some(content),
         _ => None,
     }
 }
@@ -225,6 +234,42 @@ impl Events26Api for Events26ApiClient {
         .map_err(|e| match status_code(&e) {
             Some(404) => DeleteError::NotFound,
             _ => DeleteError::InternalError(internal_error("delete_project_icon", e)),
+        })
+    }
+
+    async fn update_project_menu(
+        &self,
+        project_id: &str,
+        menu: &GetProjectDetails200ResponseMenu,
+    ) -> Result<(), UpdateMenuError> {
+        update_project_menu(
+            &self.configuration,
+            UpdateProjectMenuParams {
+                project_id: project_id.to_string(),
+                get_project_details200_response_menu: menu.clone(),
+            },
+        )
+        .await
+        .map_err(|e| match status_code(&e) {
+            Some(400) => {
+                UpdateMenuError::InvalidMenu(response_body(&e).unwrap_or_default().to_string())
+            }
+            Some(404) => UpdateMenuError::NotFound,
+            _ => UpdateMenuError::InternalError(internal_error("update_project_menu", e)),
+        })
+    }
+
+    async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError> {
+        delete_project_menu(
+            &self.configuration,
+            DeleteProjectMenuParams {
+                project_id: project_id.to_string(),
+            },
+        )
+        .await
+        .map_err(|e| match status_code(&e) {
+            Some(404) => DeleteError::NotFound,
+            _ => DeleteError::InternalError(internal_error("delete_project_menu", e)),
         })
     }
 }
