@@ -18,6 +18,7 @@ pub struct MemoryEvents26Api {
     descriptions: Arc<RwLock<HashMap<String, String>>>,
     icons: Icons,
     menus: Arc<RwLock<HashMap<String, GetProjectDetails200ResponseMenu>>>,
+    additional_info: Arc<RwLock<HashMap<String, String>>>,
     /// 真にすると、以降の書き込みがすべて `InternalError` になる。
     fails: Arc<RwLock<bool>>,
 }
@@ -35,6 +36,7 @@ impl MemoryEvents26Api {
             descriptions: Arc::new(RwLock::new(HashMap::new())),
             icons: Arc::new(RwLock::new(HashMap::new())),
             menus: Arc::new(RwLock::new(HashMap::new())),
+            additional_info: Arc::new(RwLock::new(HashMap::new())),
             fails: Arc::new(RwLock::new(false)),
         }
     }
@@ -57,6 +59,14 @@ impl MemoryEvents26Api {
     /// 反映されたメニューを取り出す。
     pub fn menu(&self, project_id: &str) -> Option<GetProjectDetails200ResponseMenu> {
         self.menus.read().unwrap().get(project_id).cloned()
+    }
+
+    pub fn additional_info(&self, project_id: &str) -> Option<String> {
+        self.additional_info
+            .read()
+            .unwrap()
+            .get(project_id)
+            .cloned()
     }
 
     fn guard(&self, operation: &str) -> Result<(), anyhow::Error> {
@@ -148,6 +158,25 @@ impl Events26Api for MemoryEvents26Api {
     async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError> {
         self.guard("delete_project_menu")?;
         self.menus.write().unwrap().remove(project_id);
+        Ok(())
+    }
+
+    async fn update_project_additional_info(
+        &self,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), UpdateError> {
+        self.guard("update_project_additional_info")?;
+        self.additional_info
+            .write()
+            .unwrap()
+            .insert(project_id.to_string(), additional_info.to_string());
+        Ok(())
+    }
+
+    async fn delete_project_additional_info(&self, project_id: &str) -> Result<(), DeleteError> {
+        self.guard("delete_project_additional_info")?;
+        self.additional_info.write().unwrap().remove(project_id);
         Ok(())
     }
 }

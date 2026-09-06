@@ -764,6 +764,70 @@
         }
       }
     },
+    "/events26/projects/us/details/additional_info": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Store the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+        "operationId": "put_own_project_additional_info",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Additional info stored"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+        "operationId": "delete_own_project_additional_info",
+        "responses": {
+          "204": {
+            "description": "Additional info deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "500": {
+            "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/events26/projects/us/menu": {
       "put": {
         "tags": ["events26"],

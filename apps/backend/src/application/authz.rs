@@ -563,6 +563,26 @@ pub fn can_update_own_events26_menu(actor_ctx: &ActorContext) -> bool {
     }
 }
 
+pub fn can_update_own_events26_additional_info(actor_ctx: &ActorContext) -> bool {
+    match actor_ctx {
+        ActorContext::User {
+            memberships,
+            group_type,
+            ..
+        } => {
+            !memberships.is_empty()
+                && matches!(
+                    group_type,
+                    crate::domain::group::GroupType::GeneralProject
+                        | crate::domain::group::GroupType::BoothProject
+                        | crate::domain::group::GroupType::LabProject
+                        | crate::domain::group::GroupType::StageProject
+                )
+        }
+        ActorContext::Admin { .. } | ActorContext::NoLogin => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
