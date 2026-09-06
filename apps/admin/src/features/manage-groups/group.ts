@@ -53,7 +53,6 @@ const responsibleRoles: Role[] = [
   'third_responsible',
 ];
 
-
 export const rolesByGroupType: Record<GroupRead['type'], Role[]> = {
   booth_project: responsibleRoles,
   stage_project: responsibleRoles,

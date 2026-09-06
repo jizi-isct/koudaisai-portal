@@ -261,9 +261,7 @@ function AddGroupForm() {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error(
-                    `団体IDと団体種別が一致していません`,
-                  ),
+                  new Error(`団体IDと団体種別が一致していません`),
                 );
               },
             }),
