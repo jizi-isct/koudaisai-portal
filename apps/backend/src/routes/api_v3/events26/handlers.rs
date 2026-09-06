@@ -412,6 +412,100 @@ pub async fn delete_own_project_menu(
     }
 }
 
+#[http_response]
+pub enum PutOwnProjectAdditionalInfoResponse {
+    #[response(status = NO_CONTENT, description = "Additional info stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(
+        status = INTERNAL_SERVER_ERROR,
+        description = "Internal server error. The body carries the upstream status and message."
+    )]
+    InternalServerError(String),
+}
+
+#[utoipa::path(
+    put,
+    description = "Store the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+    path = "/projects/us/details/additional_info",
+    responses(PutOwnProjectAdditionalInfoResponse),
+    request_body(content = String, content_type = "application/json"),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn put_own_project_additional_info(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Json(body): Json<String>,
+) -> PutOwnProjectAdditionalInfoResponse {
+    match st
+        .app
+        .events26()
+        .update_own_project_additional_info(&actor, &body)
+        .await
+    {
+        Ok(()) => PutOwnProjectAdditionalInfoResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PutOwnProjectAdditionalInfoResponse::Forbidden
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PutOwnProjectAdditionalInfoResponse::NotFound
+        }
+        Err(error) => PutOwnProjectAdditionalInfoResponse::InternalServerError(detail(
+            "update_project_additional_info",
+            error,
+        )),
+    }
+}
+
+#[http_response]
+pub enum DeleteOwnProjectAdditionalInfoResponse {
+    #[response(status = NO_CONTENT, description = "Additional info deleted")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound,
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden,
+    #[response(
+        status = INTERNAL_SERVER_ERROR,
+        description = "Internal server error. The body carries the upstream status and message."
+    )]
+    InternalServerError(String),
+}
+
+#[utoipa::path(
+    delete,
+    description = "Delete the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership.",
+    path = "/projects/us/details/additional_info",
+    responses(DeleteOwnProjectAdditionalInfoResponse),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn delete_own_project_additional_info(
+    State(st): State<V3State>,
+    actor: ActorContext,
+) -> DeleteOwnProjectAdditionalInfoResponse {
+    match st
+        .app
+        .events26()
+        .delete_own_project_additional_info(&actor)
+        .await
+    {
+        Ok(()) => DeleteOwnProjectAdditionalInfoResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteOwnProjectAdditionalInfoResponse::Forbidden
+        }
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteOwnProjectAdditionalInfoResponse::NotFound
+        }
+        Err(error) => DeleteOwnProjectAdditionalInfoResponse::InternalServerError(detail(
+            "delete_project_additional_info",
+            error,
+        )),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
