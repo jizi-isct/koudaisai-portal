@@ -90,6 +90,14 @@ pub trait Events26Api {
 
     /// 企画メニューを削除する。追加情報は変更しない。
     async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError>;
+
+    async fn update_project_additional_info(
+        &self,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), UpdateError>;
+
+    async fn delete_project_additional_info(&self, project_id: &str) -> Result<(), DeleteError>;
 }
 
 /// `Arc` 越しでもポートとして扱えるようにする。
@@ -150,5 +158,19 @@ impl<T: Events26Api + Send + Sync + ?Sized> Events26Api for std::sync::Arc<T> {
 
     async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError> {
         (**self).delete_project_menu(project_id).await
+    }
+
+    async fn update_project_additional_info(
+        &self,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), UpdateError> {
+        (**self)
+            .update_project_additional_info(project_id, additional_info)
+            .await
+    }
+
+    async fn delete_project_additional_info(&self, project_id: &str) -> Result<(), DeleteError> {
+        (**self).delete_project_additional_info(project_id).await
     }
 }

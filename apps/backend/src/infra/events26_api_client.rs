@@ -3,10 +3,12 @@ use crate::application::ports::events26_api::{Events26Api, UpdateIconError, Upda
 use anyhow::{Context, anyhow};
 use async_trait::async_trait;
 use events26_api::apis::admin_api::{
-    CreateProjectParams, DeleteProjectIconParams, DeleteProjectMenuParams, DeleteProjectParams,
+    CreateProjectParams, DeleteProjectAdditionalInfoParams, DeleteProjectIconParams,
+    DeleteProjectMenuParams, DeleteProjectParams, UpdateProjectAdditionalInfoParams,
     UpdateProjectDescriptionParams, UpdateProjectMenuParams, UpdateProjectParams, create_project,
-    delete_project, delete_project_icon, delete_project_menu, update_project,
-    update_project_description, update_project_menu,
+    delete_project, delete_project_additional_info, delete_project_icon, delete_project_menu,
+    update_project, update_project_additional_info, update_project_description,
+    update_project_menu,
 };
 use events26_api::apis::configuration::Configuration;
 use events26_api::apis::{Error, ResponseContent, urlencode};
@@ -270,6 +272,39 @@ impl Events26Api for Events26ApiClient {
         .map_err(|e| match status_code(&e) {
             Some(404) => DeleteError::NotFound,
             _ => DeleteError::InternalError(internal_error("delete_project_menu", e)),
+        })
+    }
+
+    async fn update_project_additional_info(
+        &self,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), UpdateError> {
+        update_project_additional_info(
+            &self.configuration,
+            UpdateProjectAdditionalInfoParams {
+                project_id: project_id.to_string(),
+                body: additional_info.to_string(),
+            },
+        )
+        .await
+        .map_err(|e| match status_code(&e) {
+            Some(404) => UpdateError::NotFound,
+            _ => UpdateError::InternalError(internal_error("update_project_additional_info", e)),
+        })
+    }
+
+    async fn delete_project_additional_info(&self, project_id: &str) -> Result<(), DeleteError> {
+        delete_project_additional_info(
+            &self.configuration,
+            DeleteProjectAdditionalInfoParams {
+                project_id: project_id.to_string(),
+            },
+        )
+        .await
+        .map_err(|e| match status_code(&e) {
+            Some(404) => DeleteError::NotFound,
+            _ => DeleteError::InternalError(internal_error("delete_project_additional_info", e)),
         })
     }
 }

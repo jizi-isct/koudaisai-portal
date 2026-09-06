@@ -133,6 +133,39 @@ impl<'a, EA: Events26Api> Events26App<'a, EA> {
             .delete_project_menu(&project_id.to_string())
             .await?)
     }
+
+    pub async fn update_own_project_additional_info(
+        &self,
+        actor_ctx: &ActorContext,
+        additional_info: &str,
+    ) -> Result<(), ApplicationOperationError<UpdateError>> {
+        if !authz::can_update_own_events26_additional_info(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        let Some(project_id) = actor_ctx.primary_group_id() else {
+            return Err(ApplicationOperationError::Unauthorized);
+        };
+        Ok(self
+            .events26_api
+            .update_project_additional_info(&project_id.to_string(), additional_info)
+            .await?)
+    }
+
+    pub async fn delete_own_project_additional_info(
+        &self,
+        actor_ctx: &ActorContext,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        if !authz::can_update_own_events26_additional_info(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        let Some(project_id) = actor_ctx.primary_group_id() else {
+            return Err(ApplicationOperationError::Unauthorized);
+        };
+        Ok(self
+            .events26_api
+            .delete_project_additional_info(&project_id.to_string())
+            .await?)
+    }
 }
 
 #[cfg(test)]
@@ -211,5 +244,57 @@ mod tests {
             Err(ApplicationOperationError::Unauthorized)
         ));
         assert_eq!(api.menu("I-100"), None);
+    }
+
+    #[tokio::test]
+    async fn participant_updates_and_deletes_own_additional_info() {
+        let api = MemoryEvents26Api::new();
+        let app = Events26App::new(&api);
+        let actor = user_ctx(GroupType::GeneralProject);
+
+        app.update_own_project_additional_info(&actor, "持ち込み電源の利用はできません")
+            .await
+            .unwrap();
+        assert_eq!(
+            api.additional_info("I-100"),
+            Some("持ち込み電源の利用はできません".to_string())
+        );
+
+        app.delete_own_project_additional_info(&actor)
+            .await
+            .unwrap();
+        assert_eq!(api.additional_info("I-100"), None);
+    }
+
+    #[tokio::test]
+    async fn unauthenticated_user_cannot_update_additional_info() {
+        let api = MemoryEvents26Api::new();
+        let app = Events26App::new(&api);
+
+        let result = app
+            .update_own_project_additional_info(&ActorContext::NoLogin, "追加情報")
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+        assert_eq!(api.additional_info("I-100"), None);
+    }
+
+    #[tokio::test]
+    async fn press_group_cannot_update_additional_info() {
+        let api = MemoryEvents26Api::new();
+        let app = Events26App::new(&api);
+
+        let result = app
+            .update_own_project_additional_info(&user_ctx(GroupType::Press), "追加情報")
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ApplicationOperationError::Unauthorized)
+        ));
+        assert_eq!(api.additional_info("I-100"), None);
     }
 }
