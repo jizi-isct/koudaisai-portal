@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "format:check": "npx prettier . --check"
+    "format:check": "prettier . --check"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.0",
