@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "format:check": "npx prettier . --check"
+    "format:check": "prettier . --check"
   },
   "devDependencies": {
     "@types/object-hash": "^3.0.6",
