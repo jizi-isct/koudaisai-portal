@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "format:check": "prettier . --check"
   },
   "devDependencies": {
     "@types/object-hash": "^3.0.6",
