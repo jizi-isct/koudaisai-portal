@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { formatDate } from '@koudaisai/shared-utils';
 import { $api } from '@/features/api/api';
@@ -20,8 +20,12 @@ export default function ManageUserPage() {
 
 function UserTable() {
   const { data, isLoading } = $api.useQuery('get', '/users');
-  const userDataSet = data ?? [];
-  const [keyWords, setKeyWords] = useState('');
+  const userDataSet: UserRead[] = data ?? [];
+  const [filterKey, setFilterKey] = useState<string>('');
+  const targetedUsers: UserRead[] = useMemo<UserRead[]>(
+    () => userDataSet.filter((item) => item.name.includes(filterKey)),
+    [userDataSet, filterKey],
+  );
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -31,12 +35,8 @@ function UserTable() {
   }
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setKeyWords(e.target.value);
+    setFilterKey(e.target.value);
   };
-
-  const targetedUsers = userDataSet.filter((item) =>
-    item.name.includes(keyWords),
-  );
 
   const columns: TableProps<UserRead>['columns'] = [
     {
@@ -102,7 +102,7 @@ function UserTable() {
         placeholder="名前を検索"
         onChange={handleOnChange}
         style={{ width: 200 }}
-        value={keyWords}
+        value={filterKey}
       />
       <Table<UserRead>
         dataSource={targetedUsers.map((item) => ({ ...item, key: item.id }))}
