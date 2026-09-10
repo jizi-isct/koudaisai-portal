@@ -17,6 +17,7 @@ const typeLabels: Record<ProjectType, string> = {
   general: '一般企画',
   laboratory: '研究室企画',
   stage: 'ステージ',
+  official: '公式企画',
 };
 
 const foodStallTagLabels: Record<string, string> = {
