@@ -46,6 +46,7 @@ const CSV_COLUMNS: (keyof ProjectRow)[] = [
 ];
 
 function toRow(project: Project, placeInfos: readonly PlaceInfo[]): ProjectRow {
+  const hasOccasions = project.occasions.length > 0;
   const day1 = compactTimeRanges(
     project.occasions
       .filter((occasion) => occasion.timeRange.start.date === 1)
@@ -78,10 +79,10 @@ function toRow(project: Project, placeInfos: readonly PlaceInfo[]): ProjectRow {
     description: project.description,
     is_child_friendly: project.isChildFriendly ? 'true' : 'false',
     is_recommended: project.isRecommended ? 'true' : 'false',
-    day1_start_time: formatTime(day1.start),
-    day1_end_time: formatTime(day1.end),
-    day2_start_time: formatTime(day2.start),
-    day2_end_time: formatTime(day2.end),
+    day1_start_time: hasOccasions ? formatTime(day1.start) : '',
+    day1_end_time: hasOccasions ? formatTime(day1.end) : '',
+    day2_start_time: hasOccasions ? formatTime(day2.start) : '',
+    day2_end_time: hasOccasions ? formatTime(day2.end) : '',
     places: places,
     is_lab_tour: project.type === 'laboratory' ? project.isTour : '',
     offering: project.type === 'food-stall' ? project.offering : '',
