@@ -67,6 +67,7 @@ Class | Method | HTTP request | Description
  - [ListPlaces200ResponseInner](docs/ListPlaces200ResponseInner.md)
  - [MainFoodStallTag](docs/MainFoodStallTag.md)
  - [Occasion](docs/Occasion.md)
+ - [OfficialProject](docs/OfficialProject.md)
  - [Outdoor](docs/Outdoor.md)
  - [Place](docs/Place.md)
  - [Project](docs/Project.md)

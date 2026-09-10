@@ -36,6 +36,8 @@ pub mod main_food_stall_tag;
 pub use self::main_food_stall_tag::MainFoodStallTag;
 pub mod occasion;
 pub use self::occasion::Occasion;
+pub mod official_project;
+pub use self::official_project::OfficialProject;
 pub mod outdoor;
 pub use self::outdoor::Outdoor;
 pub mod place;

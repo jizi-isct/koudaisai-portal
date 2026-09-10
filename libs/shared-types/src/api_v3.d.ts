@@ -1220,11 +1220,25 @@ export interface components {
       | 'ishikawadai.fs-ishikawadai.5'
       | 'ishikawadai.fs-ishikawadai.6'
       | 'ishikawadai.fs-ishikawadai.7';
+    OfficialProject: {
+      category?: null | components['schemas']['Category'];
+      description: string;
+      groupName: string;
+      id: string;
+      isChildFriendly: boolean;
+      isRecommended: boolean;
+      occasions: components['schemas']['Occasion'][];
+      projectName: string;
+      type: components['schemas']['OfficialProjectType'];
+    };
+    /** @enum {string} */
+    OfficialProjectType: 'official';
     Project:
       | components['schemas']['FoodStallProject']
       | components['schemas']['GeneralProject']
       | components['schemas']['LaboratoryProject']
-      | components['schemas']['StageProject'];
+      | components['schemas']['StageProject']
+      | components['schemas']['OfficialProject'];
     /** @enum {string} */
     Role:
       | 'representative'
