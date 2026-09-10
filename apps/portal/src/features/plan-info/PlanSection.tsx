@@ -1,12 +1,15 @@
 import type { GroupRead } from '@koudaisai/shared-types';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
-import { useEffect, useState } from 'react';
-import { api } from '@/features/api/api';
-import { getPlaceLabel, getProject } from '@/features/api/events26Api';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueries,
+} from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
 import { PlanCard } from './PlanCard';
 import styles from './PlanSection.module.css';
-import type { Project } from './types';
 
 /** 企画を持つ団体種別。press は企画情報を持たない。 */
 const PLAN_GROUP_TYPES: GroupRead['type'][] = [
@@ -22,89 +25,124 @@ const PLAN_GROUP_TYPES: GroupRead['type'][] = [
  * 結果を projectId として使う。
  */
 export function PlanSection() {
-  const [group, setGroup] = useState<GroupRead | null>(null);
-  const [project, setProject] = useState<Project | null>(null);
-  const [placeLabels, setPlaceLabels] = useState<Record<string, string>>({});
-  const [showOccasionsOnPortal, setShowOccasionsOnPortal] = useState(false);
-  const [acceptCorrectionRequests, setAcceptCorrectionRequests] =
-    useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <PlanSectionContent />
+    </QueryClientProvider>
+  );
+}
+
+function PlanSectionContent() {
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const { data: group, error: groupError } = await api.GET('/groups/us');
+  const { data: group, isLoading: isGroupLoading } = $api.useQuery(
+    'get',
+    '/groups/us',
+  );
+  const hasPlan = Boolean(group && PLAN_GROUP_TYPES.includes(group.type));
 
-      if (groupError || !group) {
-        setError(
-          groupError ? `${groupError}` : '団体情報を取得できませんでした。',
-        );
-        setIsLoading(false);
-        return;
-      }
+  const {
+    data: occasionsSetting,
+    error: occasionsSettingError,
+    isLoading: isOccasionsSettingLoading,
+  } = $api.useQuery(
+    'get',
+    '/settings/show-occasions-on-portal',
+    {},
+    { enabled: hasPlan },
+  );
+  const {
+    data: correctionsSetting,
+    error: correctionsSettingError,
+    isLoading: isCorrectionsSettingLoading,
+  } = $api.useQuery(
+    'get',
+    '/settings/accept-correction-requests',
+    {},
+    { enabled: hasPlan },
+  );
+  const {
+    data: project,
+    error: projectError,
+    isLoading: isProjectLoading,
+  } = $events26Api.useQuery(
+    'get',
+    '/v1/projects/{projectId}',
+    {
+      params: { path: { projectId: group?.id ?? '' } },
+    },
+    { enabled: hasPlan, retry: false },
+  );
 
-      setGroup(group);
+  const showOccasionsOnPortal =
+    occasionsSetting?.show_occasions_on_portal ?? false;
+  const acceptCorrectionRequests =
+    correctionsSetting?.accept_correction_requests ?? true;
 
-      if (!PLAN_GROUP_TYPES.includes(group.type)) {
-        setIsLoading(false);
-        return;
-      }
+  // 場所は階層 ID でしか入っていないので、表示名に引き直す。
+  const placeIds = useMemo(
+    () => [
+      ...new Set(
+        project?.occasions
+          .map((occasion) => occasion.place)
+          .filter((place) => place !== null && place !== undefined) ?? [],
+      ),
+    ],
+    [project],
+  );
+  const placeQueries = useQueries({
+    queries: placeIds.map((placeId) =>
+      $events26Api.queryOptions(
+        'get',
+        '/v1/places/{placeId}',
+        { params: { path: { placeId } } },
+        { enabled: showOccasionsOnPortal },
+      ),
+    ),
+  });
+  const placeLabels = Object.fromEntries(
+    placeIds.map((placeId, index) => [
+      placeId,
+      placeQueries[index]?.data?.displayName ?? placeId,
+    ]),
+  );
 
-      const [occasionsResult, correctionsResult] = await Promise.all([
-        api.GET('/settings/show-occasions-on-portal'),
-        api.GET('/settings/accept-correction-requests'),
-      ]);
+  const arePlacesLoading =
+    showOccasionsOnPortal && placeQueries.some((query) => query.isLoading);
+  const isLoading =
+    isGroupLoading ||
+    (hasPlan &&
+      (isOccasionsSettingLoading ||
+        isCorrectionsSettingLoading ||
+        isProjectLoading ||
+        arePlacesLoading));
 
-      if (
-        occasionsResult.error ||
-        !occasionsResult.data ||
-        correctionsResult.error ||
-        !correctionsResult.data
-      ) {
-        setError('企画情報の設定を取得できませんでした。');
-        setIsLoading(false);
-        return;
-      }
-
-      const settings = occasionsResult.data;
-      setShowOccasionsOnPortal(settings.show_occasions_on_portal);
-      setAcceptCorrectionRequests(
-        correctionsResult.data.accept_correction_requests,
-      );
-
-      const project = await getProject(group.id);
-      setProject(project);
-      setIsLoading(false);
-
-      if (!settings.show_occasions_on_portal) {
-        return;
-      }
-
-      // 場所は階層 ID でしか入っていないので、表示名に引き直す。
-      const placeIds = [
-        ...new Set(
-          project?.occasions
-            .map((occasion) => occasion.place)
-            .filter((place) => place !== null && place !== undefined) ?? [],
-        ),
-      ];
-      const labels = await Promise.all(placeIds.map(getPlaceLabel));
-      setPlaceLabels(
-        Object.fromEntries(placeIds.map((id, i) => [id, labels[i]])),
-      );
-    })().catch((caughtError) => {
-      setError(`${caughtError}`);
-      setIsLoading(false);
-    });
-  }, []);
+  const settingsUnavailable =
+    hasPlan &&
+    !isOccasionsSettingLoading &&
+    !isCorrectionsSettingLoading &&
+    (occasionsSettingError ||
+      correctionsSettingError ||
+      !occasionsSetting ||
+      !correctionsSetting);
+  const unexpectedEvents26Error = [
+    projectError,
+    ...placeQueries.map((query) => query.error),
+  ].find((queryError) => queryError instanceof Error);
+  const error = settingsUnavailable
+    ? '企画情報の設定を取得できませんでした。'
+    : unexpectedEvents26Error
+      ? `${unexpectedEvents26Error}`
+      : null;
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   // 企画を持たない団体(取材団体など)には企画セクション自体を出さない。
-  if (!group || !PLAN_GROUP_TYPES.includes(group.type)) {
+  if (!group || !hasPlan) {
     return null;
   }
 
