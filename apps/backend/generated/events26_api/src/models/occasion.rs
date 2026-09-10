@@ -286,6 +286,8 @@ pub enum OccasionPlace {
     SouthS4S4203,
     #[serde(rename = "south.s7")]
     SouthS7,
+    #[serde(rename = "south.s7.s7-2f")]
+    SouthS7S72f,
     #[serde(rename = "south.s7.s7-201")]
     SouthS7S7201,
     #[serde(rename = "south.s7.s7-202")]

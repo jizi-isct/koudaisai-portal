@@ -1060,6 +1060,7 @@ export interface components {
       | 'south.s4.s4-202'
       | 'south.s4.s4-203'
       | 'south.s7'
+      | 'south.s7.s7-2f'
       | 'south.s7.s7-201'
       | 'south.s7.s7-202'
       | 'south.s7.s7-207'
