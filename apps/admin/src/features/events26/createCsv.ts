@@ -19,14 +19,17 @@ type CreateProjectRow = {
   category: string;
 };
 
-const PROJECT_TYPE_BY_ID_PREFIX: Record<string, Project['type']> = {
+// 新規作成 CSV は参加団体の企画番号（M / S / I / L）を扱う。
+type CsvProjectType = Exclude<Project['type'], 'official'>;
+
+const PROJECT_TYPE_BY_ID_PREFIX: Record<string, CsvProjectType> = {
   M: 'food-stall',
   S: 'stage',
   I: 'general',
   L: 'laboratory',
 };
 
-function projectTypeFromId(id: string): Project['type'] {
+function projectTypeFromId(id: string): CsvProjectType {
   const type = PROJECT_TYPE_BY_ID_PREFIX[id.charAt(0).toUpperCase()];
   if (!type) {
     throw new Error(

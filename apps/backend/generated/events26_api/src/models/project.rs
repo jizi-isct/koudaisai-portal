@@ -18,6 +18,7 @@ pub enum Project {
     GeneralProject(models::GeneralProject),
     LaboratoryProject(models::LaboratoryProject),
     StageProject(models::StageProject),
+    OfficialProject(models::OfficialProject),
 }
 
 impl Default for Project {
@@ -48,6 +49,8 @@ pub enum ProjectType {
     Laboratory,
     #[serde(rename = "stage")]
     Stage,
+    #[serde(rename = "official")]
+    Official,
 }
 
 impl Default for ProjectType {

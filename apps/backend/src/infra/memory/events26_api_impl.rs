@@ -132,5 +132,6 @@ fn project_id(project: &Project) -> String {
         Project::GeneralProject(p) => p.id.clone(),
         Project::LaboratoryProject(p) => p.id.clone(),
         Project::StageProject(p) => p.id.clone(),
+        Project::OfficialProject(p) => p.id.clone(),
     }
 }

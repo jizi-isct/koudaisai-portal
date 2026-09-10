@@ -728,11 +728,24 @@ export interface components {
       /** @enum {string} */
       type: 'stage';
     };
+    OfficialProject: {
+      id: string;
+      groupName: string;
+      projectName: string;
+      description: string;
+      isChildFriendly: boolean;
+      isRecommended: boolean;
+      category?: components['schemas']['Category'];
+      occasions: components['schemas']['Occasion'][];
+      /** @enum {string} */
+      type: 'official';
+    };
     Project:
       | components['schemas']['FoodStallProject']
       | components['schemas']['GeneralProject']
       | components['schemas']['LaboratoryProject']
-      | components['schemas']['StageProject'];
+      | components['schemas']['StageProject']
+      | components['schemas']['OfficialProject'];
     ProjectList: components['schemas']['Project'][];
     ProjectDescription: {
       description: string;

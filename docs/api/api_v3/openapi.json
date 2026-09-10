@@ -3623,6 +3623,63 @@
           "ishikawadai.fs-ishikawadai.7"
         ]
       },
+      "OfficialProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupName",
+          "projectName",
+          "description",
+          "isChildFriendly",
+          "isRecommended",
+          "occasions",
+          "type"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isChildFriendly": {
+            "type": "boolean"
+          },
+          "isRecommended": {
+            "type": "boolean"
+          },
+          "occasions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occasion"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OfficialProjectType"
+          }
+        }
+      },
+      "OfficialProjectType": {
+        "type": "string",
+        "description": "",
+        "enum": ["official"]
+      },
       "Project": {
         "oneOf": [
           {
@@ -3636,6 +3693,9 @@
           },
           {
             "$ref": "#/components/schemas/StageProject"
+          },
+          {
+            "$ref": "#/components/schemas/OfficialProject"
           }
         ]
       },

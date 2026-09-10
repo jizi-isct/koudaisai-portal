@@ -176,6 +176,8 @@ function buildProject(id: string, values: FormValues): Project {
       return { ...base, type: 'general', tag: values.generalTags ?? [] };
     case 'stage':
       return { ...base, type: 'stage' };
+    case 'official':
+      return { ...base, type: 'official' };
     case 'laboratory':
       return { ...base, type: 'laboratory', isTour: values.isTour ?? false };
   }

@@ -25,6 +25,7 @@ export const PROJECT_TYPE_LABEL: Record<
   general: { text: '一般企画', color: 'blue' },
   stage: { text: 'ステージ企画', color: 'green' },
   laboratory: { text: '研究室公開企画', color: 'orange' },
+  official: { text: '公式企画', color: 'purple' },
 };
 
 export const GENERAL_TAGS: GeneralTag[] = [

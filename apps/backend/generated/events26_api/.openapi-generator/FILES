@@ -23,6 +23,7 @@ docs/LaboratoryProject.md
 docs/ListPlaces200ResponseInner.md
 docs/MainFoodStallTag.md
 docs/Occasion.md
+docs/OfficialProject.md
 docs/Outdoor.md
 docs/Place.md
 docs/PlacesApi.md
@@ -63,6 +64,7 @@ src/models/list_places_200_response_inner.rs
 src/models/main_food_stall_tag.rs
 src/models/mod.rs
 src/models/occasion.rs
+src/models/official_project.rs
 src/models/outdoor.rs
 src/models/place.rs
 src/models/project.rs
