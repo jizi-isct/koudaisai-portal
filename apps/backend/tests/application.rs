@@ -2,6 +2,7 @@ pub mod authz;
 pub mod common;
 pub mod document;
 pub mod document_category;
+pub mod events26;
 pub mod form;
 pub mod group;
 pub mod settings;
