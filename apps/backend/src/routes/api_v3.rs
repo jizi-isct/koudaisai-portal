@@ -49,6 +49,7 @@ pub(crate) type V3State = crate::routes::auth_v2::AuthV2State;
     files::FileDownloadResponse,
     util::MetaInfo,
     events26_api::models::Project,
+    events26_api::models::GetProjectDetails200ResponseMenu,
     settings::SettingsRead,
     settings::ShowOccasionsOnPortalRead,
     settings::ShowOccasionsOnPortalUpdate,

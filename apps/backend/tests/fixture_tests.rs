@@ -73,6 +73,7 @@ datatest_stable::harness! {
     { test = application::authz::test_can_create_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_create_document_category/[^/]+\.json" },
     { test = application::authz::test_can_update_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_update_document_category/[^/]+\.json" },
     { test = application::authz::test_can_delete_document_category,           root = "tests/fixtures/application", pattern = r"authz/can_delete_document_category/[^/]+\.json" },
+    { test = application::authz::test_can_update_own_events26_additional_info, root = "tests/fixtures/application", pattern = r"authz/can_update_own_events26_additional_info/[^/]+\.json" },
     // application::user
     { test = application::user::test_get_all,           root = "tests/fixtures/application", pattern = r"user/get_all/[^/]+\.json" },
     { test = application::user::test_get_by_id,         root = "tests/fixtures/application", pattern = r"user/get_by_id/[^/]+\.json" },
@@ -88,6 +89,9 @@ datatest_stable::harness! {
     { test = application::group::test_get_all,      root = "tests/fixtures/application", pattern = r"group/get_all/[^/]+\.json" },
     { test = application::group::test_get_by_id,    root = "tests/fixtures/application", pattern = r"group/get_by_id/[^/]+\.json" },
     { test = application::group::test_create_group, root = "tests/fixtures/application", pattern = r"group/create_group/[^/]+\.json" },
+    // application::events26
+    { test = application::events26::test_update_own_project_additional_info, root = "tests/fixtures/application", pattern = r"events26/update_own_project_additional_info/[^/]+\.json" },
+    { test = application::events26::test_delete_own_project_additional_info, root = "tests/fixtures/application", pattern = r"events26/delete_own_project_additional_info/[^/]+\.json" },
     // application::document
     { test = application::document::test_create,          root = "tests/fixtures/application", pattern = r"document/create/[^/]+\.json" },
     { test = application::document::test_get_all,         root = "tests/fixtures/application", pattern = r"document/get_all/[^/]+\.json" },
