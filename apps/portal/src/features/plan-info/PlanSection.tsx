@@ -4,11 +4,18 @@ import {
   QueryClient,
   QueryClientProvider,
   useQueries,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
+import { EditAdditionalInfoModal } from './EditAdditionalInfoModal';
 import { PlanCard } from './PlanCard';
+import {
+  getProjectAdditionalInfo,
+  updateProjectAdditionalInfo,
+} from './additionalInfoApi';
 import styles from './PlanSection.module.css';
 
 /** 企画を持つ団体種別。press は企画情報を持たない。 */
@@ -35,13 +42,32 @@ export function PlanSection() {
 }
 
 function PlanSectionContent() {
+  const queryClient = useQueryClient();
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
+  const [isEditAdditionalInfoOpen, setIsEditAdditionalInfoOpen] =
+    useState(false);
 
   const { data: group, isLoading: isGroupLoading } = $api.useQuery(
     'get',
     '/groups/us',
   );
   const hasPlan = Boolean(group && PLAN_GROUP_TYPES.includes(group.type));
+  const projectId = group?.id ?? '';
+  const additionalInfoQueryKey = [
+    'events26-project-additional-info',
+    projectId,
+  ] as const;
+
+  const {
+    data: additionalInfo = '',
+    error: additionalInfoError,
+    isLoading: isAdditionalInfoLoading,
+  } = useQuery({
+    queryKey: additionalInfoQueryKey,
+    queryFn: () => getProjectAdditionalInfo(projectId),
+    enabled: hasPlan,
+    retry: false,
+  });
 
   const {
     data: occasionsSetting,
@@ -172,6 +198,31 @@ function PlanSectionContent() {
           企画情報はまだ公開されていません。公開までしばらくお待ちください。
         </p>
       )}
+      <Heading1 emoji="">企画詳細情報</Heading1>
+      {additionalInfoError && (
+        <p className={styles.message}>企画追加情報を取得できませんでした。</p>
+      )}
+      <div className={styles.buttonLayout}>
+        <button
+          type="button"
+          className={styles.editButton}
+          onClick={() => setIsEditAdditionalInfoOpen(true)}
+          disabled={isAdditionalInfoLoading || !!additionalInfoError}
+        >
+          {isAdditionalInfoLoading
+            ? '企画追加情報を読み込み中…'
+            : '企画追加情報を編集する'}
+        </button>
+      </div>
+      <EditAdditionalInfoModal
+        isOpen={isEditAdditionalInfoOpen}
+        setOpen={setIsEditAdditionalInfoOpen}
+        additionalInfo={additionalInfo}
+        updateAdditionalInfo={async (newAdditionalInfo) => {
+          await updateProjectAdditionalInfo(group.id, newAdditionalInfo);
+          queryClient.setQueryData(additionalInfoQueryKey, newAdditionalInfo);
+        }}
+      />
     </>
   );
 }

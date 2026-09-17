@@ -3,3 +3,24 @@
   margin: 0;
   text-align: center;
 }
+
+.editButton {
+  background-color: var(--darkblue);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px 14px;
+  width: min(20rem, 100%);
+}
+
+.editButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.buttonLayout {
+  margin: 0 auto;
+  max-width: 100%;
+}
