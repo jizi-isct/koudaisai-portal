@@ -1,0 +1,73 @@
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 60vh;
+  text-align: left;
+}
+
+.title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.editor {
+  border: 1px solid var(--gray);
+  border-radius: 6px;
+  flex: 1;
+  max-height: 65vh;
+  min-height: 360px;
+  overflow: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.updateButton {
+  border: 1px solid var(--gray);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 18px;
+}
+
+.cancelButton {
+  background-color: white;
+  color: var(--foreground);
+}
+
+.updateButton {
+  background-color: var(--darkblue);
+  border-color: var(--darkblue);
+  color: white;
+}
+
+.cancelButton:disabled,
+.updateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.error,
+.success {
+  font-size: 13px;
+  margin: 0;
+}
+
+.error {
+  color: #d4380d;
+}
+
+.success {
+  color: #237804;
+}
+
+@media (max-width: 600px) {
+  .editor {
+    min-height: 280px;
+  }
+}
