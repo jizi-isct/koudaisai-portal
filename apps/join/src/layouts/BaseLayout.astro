@@ -1,5 +1,6 @@
 ---
 import { GA_MEASUREMENT_ID } from "astro:env/client";
+import { env } from "cloudflare:workers";
 
 type Props = {
   title?: string;
@@ -12,10 +13,13 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, "https://join.koudaisai.jp").toString();
-const gaInlineScript = GA_MEASUREMENT_ID
+const gaMeasurementId = import.meta.env.DEV
+  ? GA_MEASUREMENT_ID
+  : env.GA_MEASUREMENT_ID ?? GA_MEASUREMENT_ID;
+const gaInlineScript = gaMeasurementId
   ? `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});`
+gtag('config', ${JSON.stringify(gaMeasurementId)});`
   : "";
 
 const isProduction = import.meta.env.PROD;
@@ -28,11 +32,11 @@ const isProduction = import.meta.env.PROD;
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
-    {isProduction && GA_MEASUREMENT_ID && (
+    {isProduction && gaMeasurementId && (
       <>
         <script
           async
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
         />
         <script is:inline set:html={gaInlineScript} />
       </>
