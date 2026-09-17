@@ -17,6 +17,6 @@ export default defineConfig({
     },
   },
   adapter: cloudflare({
-    prerenderEnvironment: 'node',
+    prerenderEnvironment: 'workerd',
   }),
 });
