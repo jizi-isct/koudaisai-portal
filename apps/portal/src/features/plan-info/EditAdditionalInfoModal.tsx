@@ -94,7 +94,7 @@ export function EditAdditionalInfoModal({
         <div ref={setOverlayContainer} className={styles.editorTheme}>
           <MDXEditor
             ref={editorRef}
-            className={styles.editor}
+            className={`${styles.editor} mdxeditor-full-height`}
             contentEditableClassName={styles.typography}
             markdown={additionalInfo}
             onChange={(markdown) => {
