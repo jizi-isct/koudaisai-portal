@@ -95,7 +95,7 @@
   --font-body: 'fot-tsukuardgothic-std', sans-serif;
 }
 
-.editor {
+.editor:global(.mdxeditor) {
   border-radius: 5px;
   height: 100%;
   min-height: 0;
