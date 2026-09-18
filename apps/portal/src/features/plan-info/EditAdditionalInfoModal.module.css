@@ -109,14 +109,23 @@
 }
 
 .typography {
-  background-color: var(--official-background);
   caret-color: var(--official-foreground);
   color: var(--official-foreground);
   cursor: text;
   font-family: 'fot-tsukuardgothic-std', sans-serif;
   font-size: 16px;
-  min-height: 100%;
   padding: 24px;
+}
+
+.typography[contenteditable='true'] {
+  background-color: var(--official-background);
+  min-height: 100%;
+}
+
+.editor
+  :global(.mdxeditor-root-contenteditable:focus-within)
+  .typography:not([contenteditable='true']) {
+  opacity: 0;
 }
 
 .typography h1,
