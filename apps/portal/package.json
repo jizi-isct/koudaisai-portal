@@ -19,6 +19,7 @@
     "@koudaisai/shared-types": "0.0.1",
     "@koudaisai/shared-ui": "0.0.1",
     "@koudaisai/shared-utils": "0.0.1",
+    "@mdxeditor/editor": "^4.2.4",
     "@tanstack/react-query": "^5.102.8",
     "astro": "^7.2.8",
     "react-markdown": "^10.1.0"
