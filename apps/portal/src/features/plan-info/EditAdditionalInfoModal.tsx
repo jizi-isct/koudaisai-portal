@@ -47,6 +47,8 @@ export function EditAdditionalInfoModal({
   updateAdditionalInfo,
 }: Props) {
   const editorRef = useRef<MDXEditorMethods>(null);
+  const [overlayContainer, setOverlayContainer] =
+    useState<HTMLDivElement | null>(null);
   const [currentMarkdown, setCurrentMarkdown] = useState(additionalInfo);
   const [isSaving, setIsSaving] = useState(false);
   const [editorError, setEditorError] = useState<string | null>(null);
@@ -89,59 +91,63 @@ export function EditAdditionalInfoModal({
     <Modal isOpen={isOpen} setOpen={setOpen}>
       <div className={styles.modalContent}>
         <h2 className={styles.title}>企画追加情報を編集</h2>
-        <MDXEditor
-          ref={editorRef}
-          className={styles.editor}
-          markdown={additionalInfo}
-          onChange={(markdown) => {
-            setCurrentMarkdown(markdown);
-            setEditorError(null);
-            setSaveError(null);
-            setIsSaved(false);
-          }}
-          onError={({ error: editorError }) => {
-            setEditorError(`Markdownを解析できませんでした: ${editorError}`);
-          }}
-          placeholder="企画の追加情報を入力してください"
-          readOnly={isSaving}
-          plugins={[
-            toolbarPlugin({
-              toolbarContents: () => (
-                <DiffSourceToggleWrapper>
-                  <UndoRedo />
-                  <BlockTypeSelect />
-                  <Separator />
-                  <BoldItalicUnderlineToggles />
-                  <StrikeThroughSupSubToggles />
-                  <Separator />
-                  <ListsToggle />
-                  <Separator />
-                  <CreateLink />
-                  <CodeToggle />
-                  <Separator />
-                  <InsertTable />
-                  <InsertThematicBreak />
-                </DiffSourceToggleWrapper>
-              ),
-            }),
-            imagePlugin(),
-            diffSourcePlugin({
-              diffMarkdown: additionalInfo,
-              viewMode: 'rich-text',
-            }),
-            headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5, 6] }),
-            listsPlugin(),
-            tablePlugin(),
-            quotePlugin(),
-            thematicBreakPlugin(),
-            linkPlugin(),
-            linkDialogPlugin(),
-            directivesPlugin({
-              directiveDescriptors: [AdmonitionDirectiveDescriptor],
-            }),
-            markdownShortcutPlugin(),
-          ]}
-        />
+        <div ref={setOverlayContainer} className={styles.editorTheme}>
+          <MDXEditor
+            ref={editorRef}
+            className={styles.editor}
+            contentEditableClassName={styles.typography}
+            markdown={additionalInfo}
+            onChange={(markdown) => {
+              setCurrentMarkdown(markdown);
+              setEditorError(null);
+              setSaveError(null);
+              setIsSaved(false);
+            }}
+            onError={({ error: editorError }) => {
+              setEditorError(`Markdownを解析できませんでした: ${editorError}`);
+            }}
+            overlayContainer={overlayContainer}
+            placeholder="企画の追加情報を入力してください"
+            readOnly={isSaving}
+            plugins={[
+              toolbarPlugin({
+                toolbarContents: () => (
+                  <DiffSourceToggleWrapper>
+                    <UndoRedo />
+                    <BlockTypeSelect />
+                    <Separator />
+                    <BoldItalicUnderlineToggles />
+                    <StrikeThroughSupSubToggles />
+                    <Separator />
+                    <ListsToggle />
+                    <Separator />
+                    <CreateLink />
+                    <CodeToggle />
+                    <Separator />
+                    <InsertTable />
+                    <InsertThematicBreak />
+                  </DiffSourceToggleWrapper>
+                ),
+              }),
+              imagePlugin(),
+              diffSourcePlugin({
+                diffMarkdown: additionalInfo,
+                viewMode: 'rich-text',
+              }),
+              headingsPlugin({ allowedHeadingLevels: [2, 3, 4] }),
+              listsPlugin(),
+              tablePlugin(),
+              quotePlugin(),
+              thematicBreakPlugin(),
+              linkPlugin(),
+              linkDialogPlugin(),
+              directivesPlugin({
+                directiveDescriptors: [AdmonitionDirectiveDescriptor],
+              }),
+              markdownShortcutPlugin(),
+            ]}
+          />
+        </div>
 
         {(editorError || saveError) && (
           <p className={styles.error} role="alert">
