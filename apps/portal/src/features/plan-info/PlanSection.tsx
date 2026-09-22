@@ -4,19 +4,33 @@ import {
   QueryClient,
   QueryClientProvider,
   useQueries,
-  useQuery,
-  useQueryClient,
 } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
 import { EditAdditionalInfoModal } from './EditAdditionalInfoModal';
 import { PlanCard } from './PlanCard';
-import {
-  getProjectAdditionalInfo,
-  updateProjectAdditionalInfo,
-} from './additionalInfoApi';
 import styles from './PlanSection.module.css';
+
+const ADDITIONAL_INFO_PATH =
+  '/events26/projects/us/details/additional_info' as const;
+
+function getApiErrorMessage(error: unknown): string {
+  if (typeof error === 'string' && error.length > 0) {
+    return error;
+  }
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return error.message;
+  }
+
+  return 'APIリクエストに失敗しました。';
+}
 
 /** 企画を持つ団体種別。press は企画情報を持たない。 */
 const PLAN_GROUP_TYPES: GroupRead['type'][] = [
@@ -42,7 +56,6 @@ export function PlanSection() {
 }
 
 function PlanSectionContent() {
-  const queryClient = useQueryClient();
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
   const [isEditAdditionalInfoOpen, setIsEditAdditionalInfoOpen] =
     useState(false);
@@ -53,21 +66,38 @@ function PlanSectionContent() {
   );
   const hasPlan = Boolean(group && PLAN_GROUP_TYPES.includes(group.type));
   const projectId = group?.id ?? '';
-  const additionalInfoQueryKey = [
-    'events26-project-additional-info',
-    projectId,
-  ] as const;
 
   const {
-    data: additionalInfo = '',
-    error: additionalInfoError,
+    data: projectDetails,
+    error: additionalInfoQueryError,
     isLoading: isAdditionalInfoLoading,
-  } = useQuery({
-    queryKey: additionalInfoQueryKey,
-    queryFn: () => getProjectAdditionalInfo(projectId),
-    enabled: hasPlan,
-    retry: false,
-  });
+    refetch: refetchAdditionalInfo,
+  } = $events26Api.useQuery(
+    'get',
+    '/v1/projects/{projectId}/details',
+    {
+      params: { path: { projectId } },
+    },
+    { enabled: hasPlan, retry: false },
+  );
+  // 追加情報とメニューがどちらも未登録の場合、企画詳細APIは404を返す。
+  const isAdditionalInfoNotFound =
+    additionalInfoQueryError != null &&
+    !(additionalInfoQueryError instanceof Error) &&
+    typeof additionalInfoQueryError === 'object' &&
+    'message' in additionalInfoQueryError;
+  const additionalInfoError = isAdditionalInfoNotFound
+    ? null
+    : additionalInfoQueryError;
+  const additionalInfo = projectDetails?.additionalInfo ?? '';
+  const { mutateAsync: putAdditionalInfo } = $api.useMutation(
+    'put',
+    ADDITIONAL_INFO_PATH,
+  );
+  const { mutateAsync: deleteAdditionalInfo } = $api.useMutation(
+    'delete',
+    ADDITIONAL_INFO_PATH,
+  );
 
   const {
     data: occasionsSetting,
@@ -219,8 +249,20 @@ function PlanSectionContent() {
         setOpen={setIsEditAdditionalInfoOpen}
         additionalInfo={additionalInfo}
         updateAdditionalInfo={async (newAdditionalInfo) => {
-          await updateProjectAdditionalInfo(group.id, newAdditionalInfo);
-          queryClient.setQueryData(additionalInfoQueryKey, newAdditionalInfo);
+          const shouldDelete = newAdditionalInfo.trim().length === 0;
+          try {
+            if (shouldDelete) {
+              await deleteAdditionalInfo({});
+            } else {
+              await putAdditionalInfo({ body: newAdditionalInfo });
+            }
+          } catch (updateError) {
+            throw updateError instanceof Error
+              ? updateError
+              : new Error(getApiErrorMessage(updateError));
+          }
+
+          await refetchAdditionalInfo();
         }}
       />
     </>
