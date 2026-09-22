@@ -199,6 +199,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/events26/projects/us/details/additional_info': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Store the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership. */
+    put: operations['put_own_project_additional_info'];
+    post?: never;
+    /** @description Delete the additional info of the project belonging to the signed-in group. The project id is derived from the user's membership. */
+    delete: operations['delete_own_project_additional_info'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/events26/projects/us/menu': {
     parameters: {
       query?: never;
@@ -2212,6 +2230,92 @@ export interface operations {
         content: {
           'text/plain': string;
         };
+      };
+      /** @description Internal server error. The body carries the upstream status and message. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  put_own_project_additional_info: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': string;
+      };
+    };
+    responses: {
+      /** @description Additional info stored */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error. The body carries the upstream status and message. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  delete_own_project_additional_info: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Additional info deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Internal server error. The body carries the upstream status and message. */
       500: {
