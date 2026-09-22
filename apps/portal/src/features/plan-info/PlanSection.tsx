@@ -8,8 +8,29 @@ import {
 import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
+import { EditAdditionalInfoModal } from './EditAdditionalInfoModal';
 import { PlanCard } from './PlanCard';
 import styles from './PlanSection.module.css';
+
+const ADDITIONAL_INFO_PATH =
+  '/events26/projects/us/details/additional_info' as const;
+
+function getApiErrorMessage(error: unknown): string {
+  if (typeof error === 'string' && error.length > 0) {
+    return error;
+  }
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return error.message;
+  }
+
+  return 'APIリクエストに失敗しました。';
+}
 
 /** 企画を持つ団体種別。press は企画情報を持たない。 */
 const PLAN_GROUP_TYPES: GroupRead['type'][] = [
@@ -36,12 +57,47 @@ export function PlanSection() {
 
 function PlanSectionContent() {
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
+  const [isEditAdditionalInfoOpen, setIsEditAdditionalInfoOpen] =
+    useState(false);
 
   const { data: group, isLoading: isGroupLoading } = $api.useQuery(
     'get',
     '/groups/us',
   );
   const hasPlan = Boolean(group && PLAN_GROUP_TYPES.includes(group.type));
+  const projectId = group?.id ?? '';
+
+  const {
+    data: projectDetails,
+    error: additionalInfoQueryError,
+    isLoading: isAdditionalInfoLoading,
+    refetch: refetchAdditionalInfo,
+  } = $events26Api.useQuery(
+    'get',
+    '/v1/projects/{projectId}/details',
+    {
+      params: { path: { projectId } },
+    },
+    { enabled: hasPlan, retry: false },
+  );
+  // 追加情報とメニューがどちらも未登録の場合、企画詳細APIは404を返す。
+  const isAdditionalInfoNotFound =
+    additionalInfoQueryError != null &&
+    !(additionalInfoQueryError instanceof Error) &&
+    typeof additionalInfoQueryError === 'object' &&
+    'message' in additionalInfoQueryError;
+  const additionalInfoError = isAdditionalInfoNotFound
+    ? null
+    : additionalInfoQueryError;
+  const additionalInfo = projectDetails?.additionalInfo ?? '';
+  const { mutateAsync: putAdditionalInfo } = $api.useMutation(
+    'put',
+    ADDITIONAL_INFO_PATH,
+  );
+  const { mutateAsync: deleteAdditionalInfo } = $api.useMutation(
+    'delete',
+    ADDITIONAL_INFO_PATH,
+  );
 
   const {
     data: occasionsSetting,
@@ -172,6 +228,43 @@ function PlanSectionContent() {
           企画情報はまだ公開されていません。公開までしばらくお待ちください。
         </p>
       )}
+      <Heading1 emoji="">企画詳細情報</Heading1>
+      {additionalInfoError && (
+        <p className={styles.message}>企画追加情報を取得できませんでした。</p>
+      )}
+      <div className={styles.buttonLayout}>
+        <button
+          type="button"
+          className={styles.editButton}
+          onClick={() => setIsEditAdditionalInfoOpen(true)}
+          disabled={isAdditionalInfoLoading || !!additionalInfoError}
+        >
+          {isAdditionalInfoLoading
+            ? '企画追加情報を読み込み中…'
+            : '企画追加情報を編集する'}
+        </button>
+      </div>
+      <EditAdditionalInfoModal
+        isOpen={isEditAdditionalInfoOpen}
+        setOpen={setIsEditAdditionalInfoOpen}
+        additionalInfo={additionalInfo}
+        updateAdditionalInfo={async (newAdditionalInfo) => {
+          const shouldDelete = newAdditionalInfo.trim().length === 0;
+          try {
+            if (shouldDelete) {
+              await deleteAdditionalInfo({});
+            } else {
+              await putAdditionalInfo({ body: newAdditionalInfo });
+            }
+          } catch (updateError) {
+            throw updateError instanceof Error
+              ? updateError
+              : new Error(getApiErrorMessage(updateError));
+          }
+
+          await refetchAdditionalInfo();
+        }}
+      />
     </>
   );
 }
