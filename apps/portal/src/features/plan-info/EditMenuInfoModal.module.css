@@ -1,0 +1,106 @@
+.modalContent {
+  text-align: left;
+}
+
+.title {
+  font-size: 20px;
+  margin: 0 0 16px;
+}
+
+.list,
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.itemCard,
+.optionCard {
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+}
+
+.itemCard {
+  padding: 16px;
+}
+
+.optionCard {
+  background-color: rgb(127 127 127 / 0.04);
+  padding: 12px;
+}
+
+.itemTitle,
+.optionTitle {
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.itemTitle {
+  font-size: 17px;
+}
+
+.optionTitle {
+  font-size: 14px;
+}
+
+.priceInput {
+  width: 100%;
+}
+
+.removeButtonLayout {
+  text-align: right;
+}
+
+.error {
+  color: #d4380d;
+  font-size: 13px;
+  margin: 16px 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.cancelButton,
+.updateButton {
+  border: 1px solid var(--gray);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 18px;
+}
+
+.cancelButton {
+  background-color: white;
+  color: var(--foreground);
+}
+
+.updateButton {
+  background-color: var(--darkblue);
+  border-color: var(--darkblue);
+  color: white;
+}
+
+.cancelButton:disabled,
+.updateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 600px) {
+  .itemCard {
+    padding: 12px;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .updateButton {
+    width: 100%;
+  }
+}

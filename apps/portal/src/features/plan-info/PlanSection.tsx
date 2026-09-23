@@ -9,11 +9,13 @@ import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
 import { EditAdditionalInfoModal } from './EditAdditionalInfoModal';
+import { EditMenuInfoModal, type MenuInfo } from './EditMenuInfoModal';
 import { PlanCard } from './PlanCard';
 import styles from './PlanSection.module.css';
 
 const ADDITIONAL_INFO_PATH =
   '/events26/projects/us/details/additional_info' as const;
+const MENU_PATH = '/events26/projects/us/menu' as const;
 
 function getApiErrorMessage(error: unknown): string {
   if (typeof error === 'string' && error.length > 0) {
@@ -59,6 +61,7 @@ function PlanSectionContent() {
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
   const [isEditAdditionalInfoOpen, setIsEditAdditionalInfoOpen] =
     useState(false);
+  const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
 
   const { data: group, isLoading: isGroupLoading } = $api.useQuery(
     'get',
@@ -69,9 +72,9 @@ function PlanSectionContent() {
 
   const {
     data: projectDetails,
-    error: additionalInfoQueryError,
-    isLoading: isAdditionalInfoLoading,
-    refetch: refetchAdditionalInfo,
+    error: projectDetailsQueryError,
+    isLoading: isProjectDetailsLoading,
+    refetch: refetchProjectDetails,
   } = $events26Api.useQuery(
     'get',
     '/v1/projects/{projectId}/details',
@@ -81,15 +84,15 @@ function PlanSectionContent() {
     { enabled: hasPlan, retry: false },
   );
   // 追加情報とメニューがどちらも未登録の場合、企画詳細APIは404を返す。
-  const isAdditionalInfoNotFound =
-    additionalInfoQueryError != null &&
-    !(additionalInfoQueryError instanceof Error) &&
-    typeof additionalInfoQueryError === 'object' &&
-    'message' in additionalInfoQueryError;
-  const additionalInfoError = isAdditionalInfoNotFound
+  const isProjectDetailsNotFound =
+    projectDetailsQueryError != null &&
+    !(projectDetailsQueryError instanceof Error) &&
+    typeof projectDetailsQueryError === 'object' &&
+    'message' in projectDetailsQueryError;
+  const projectDetailsError = isProjectDetailsNotFound
     ? null
-    : additionalInfoQueryError;
-  const additionalInfo = isAdditionalInfoNotFound
+    : projectDetailsQueryError;
+  const additionalInfo = isProjectDetailsNotFound
     ? ''
     : (projectDetails?.additionalInfo ?? '');
   const { mutateAsync: putAdditionalInfo } = $api.useMutation(
@@ -100,6 +103,8 @@ function PlanSectionContent() {
     'delete',
     ADDITIONAL_INFO_PATH,
   );
+  const menu = projectDetails?.menu;
+  const { mutateAsync: putMenu } = $api.useMutation('put', MENU_PATH);
 
   const {
     data: occasionsSetting,
@@ -231,17 +236,17 @@ function PlanSectionContent() {
         </p>
       )}
       <Heading1 emoji="">企画詳細情報</Heading1>
-      {additionalInfoError && (
-        <p className={styles.message}>企画追加情報を取得できませんでした。</p>
+      {projectDetailsError && (
+        <p className={styles.message}>企画詳細情報を取得できませんでした。</p>
       )}
       <div className={styles.buttonLayout}>
         <button
           type="button"
           className={styles.editButton}
           onClick={() => setIsEditAdditionalInfoOpen(true)}
-          disabled={isAdditionalInfoLoading || !!additionalInfoError}
+          disabled={isProjectDetailsLoading || !!projectDetailsError}
         >
-          {isAdditionalInfoLoading
+          {isProjectDetailsLoading
             ? '企画追加情報を読み込み中…'
             : '企画追加情報を編集する'}
         </button>
@@ -264,7 +269,35 @@ function PlanSectionContent() {
               : new Error(getApiErrorMessage(updateError));
           }
 
-          await refetchAdditionalInfo();
+          await refetchProjectDetails();
+        }}
+      />
+      <div className={styles.buttonLayout}>
+        <button
+          type="button"
+          className={styles.editButton}
+          onClick={() => setIsEditMenuOpen(true)}
+          disabled={isProjectDetailsLoading || !!projectDetailsError}
+        >
+          {isProjectDetailsLoading
+            ? 'メニュー情報を読み込み中…'
+            : 'メニューを編集する'}
+        </button>
+      </div>
+      <EditMenuInfoModal
+        isOpen={isEditMenuOpen}
+        setOpen={setIsEditMenuOpen}
+        menu={menu}
+        updateMenu={async (newMenu: MenuInfo) => {
+          try {
+            await putMenu({ body: newMenu });
+          } catch (updateError) {
+            throw updateError instanceof Error
+              ? updateError
+              : new Error(getApiErrorMessage(updateError));
+          }
+
+          await refetchProjectDetails();
         }}
       />
     </>
