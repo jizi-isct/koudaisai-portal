@@ -458,3 +458,13 @@ pub fn test_can_delete_document_category(
     assert_eq!(can_delete_document_category(&ctx), c.expected);
     Ok(())
 }
+
+pub fn test_can_update_own_events26_additional_info(
+    _path: &Path,
+    contents: String,
+) -> datatest_stable::Result<()> {
+    let c: BoolCase = serde_json::from_str(&contents)?;
+    let (_, ctx) = build_actor(c.actor);
+    assert_eq!(can_update_own_events26_additional_info(&ctx), c.expected);
+    Ok(())
+}

@@ -1,0 +1,5 @@
+{
+  "actor": { "User": { "group_type": "general", "group_ids": ["I-100"] } },
+  "additional_info_exists": true,
+  "expected": "ok"
+}

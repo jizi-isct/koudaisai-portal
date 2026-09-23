@@ -1,0 +1,4 @@
+{
+  "actor": { "User": { "group_type": "stage", "group_ids": ["S-100"] } },
+  "expected": true
+}
