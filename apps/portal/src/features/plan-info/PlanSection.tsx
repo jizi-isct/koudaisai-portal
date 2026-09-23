@@ -7,9 +7,29 @@ import {
 } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
+import { EditMenuInfoModal, type MenuInfo } from './EditMenuInfoModal';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
 import { PlanCard } from './PlanCard';
 import styles from './PlanSection.module.css';
+
+const MENU_PATH = '/events26/projects/us/menu' as const;
+
+function getApiErrorMessage(error: unknown): string {
+  if (typeof error === 'string' && error.length > 0) {
+    return error;
+  }
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return error.message;
+  }
+
+  return 'APIリクエストに失敗しました。';
+}
 
 /** 企画を持つ団体種別。press は企画情報を持たない。 */
 const PLAN_GROUP_TYPES: GroupRead['type'][] = [
@@ -36,12 +56,37 @@ export function PlanSection() {
 
 function PlanSectionContent() {
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
+  const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
 
   const { data: group, isLoading: isGroupLoading } = $api.useQuery(
     'get',
     '/groups/us',
   );
   const hasPlan = Boolean(group && PLAN_GROUP_TYPES.includes(group.type));
+  const projectId = group?.id ?? '';
+
+  const {
+    data: projectDetails,
+    error: menuQueryError,
+    isLoading: isMenuLoading,
+    refetch: refetchMenu,
+  } = $events26Api.useQuery(
+    'get',
+    '/v1/projects/{projectId}/details',
+    {
+      params: { path: { projectId } },
+    },
+    { enabled: hasPlan, retry: false },
+  );
+  // 追加情報とメニューがどちらも未登録の場合、企画詳細APIは404を返す。
+  const isMenuNotFound =
+    menuQueryError != null &&
+    !(menuQueryError instanceof Error) &&
+    typeof menuQueryError === 'object' &&
+    'message' in menuQueryError;
+  const menuError = isMenuNotFound ? null : menuQueryError;
+  const menu = projectDetails?.menu;
+  const { mutateAsync: putMenu } = $api.useMutation('put', MENU_PATH);
 
   const {
     data: occasionsSetting,
@@ -172,6 +217,36 @@ function PlanSectionContent() {
           企画情報はまだ公開されていません。公開までしばらくお待ちください。
         </p>
       )}
+      <Heading1 emoji="">企画詳細情報</Heading1>
+      {menuError && (
+        <p className={styles.message}>メニュー情報を取得できませんでした。</p>
+      )}
+      <div className={styles.buttonLayout}>
+        <button
+          type="button"
+          className={styles.editButton}
+          onClick={() => setIsEditMenuOpen(true)}
+          disabled={isMenuLoading || !!menuError}
+        >
+          {isMenuLoading ? 'メニュー情報を読み込み中…' : 'メニューを編集する'}
+        </button>
+      </div>
+      <EditMenuInfoModal
+        isOpen={isEditMenuOpen}
+        setOpen={setIsEditMenuOpen}
+        menu={menu}
+        updateMenu={async (newMenu: MenuInfo) => {
+          try {
+            await putMenu({ body: newMenu });
+          } catch (updateError) {
+            throw updateError instanceof Error
+              ? updateError
+              : new Error(getApiErrorMessage(updateError));
+          }
+
+          await refetchMenu();
+        }}
+      />
     </>
   );
 }
