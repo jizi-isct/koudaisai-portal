@@ -56,6 +56,8 @@ pub enum OccasionPlace {
     EastCentennialHall,
     #[serde(rename = "east.centennial-hall.centennial-hall-1f")]
     EastCentennialHallCentennialHall1f,
+    #[serde(rename = "east.mosimo")]
+    EastMosimo,
     #[serde(rename = "east.taki-plaza-stage")]
     EastTakiPlazaStage,
     #[serde(rename = "east.wood-deck-stage")]
