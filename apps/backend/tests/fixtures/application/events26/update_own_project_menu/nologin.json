@@ -1,0 +1,5 @@
+{
+  "actor": "Nologin",
+  "menu": {"items":[{"name":"豚汁","price":100.0,"options":[{"name":"大盛り","price":50.0}]}],"description":"販売メニュー"},
+  "expected": "unauthorized"
+}

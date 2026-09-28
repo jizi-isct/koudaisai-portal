@@ -1,8 +1,8 @@
 use crate::application::error::{DeleteError, InsertError, UpdateError};
-use crate::application::ports::events26_api::{Events26Api, UpdateIconError};
+use crate::application::ports::events26_api::{Events26Api, UpdateIconError, UpdateMenuError};
 use anyhow::anyhow;
 use async_trait::async_trait;
-use events26_api::models::Project;
+use events26_api::models::{GetProjectDetails200ResponseMenu, Project};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
@@ -17,6 +17,8 @@ pub struct MemoryEvents26Api {
     projects: Arc<RwLock<HashMap<String, Project>>>,
     descriptions: Arc<RwLock<HashMap<String, String>>>,
     icons: Icons,
+    menus: Arc<RwLock<HashMap<String, GetProjectDetails200ResponseMenu>>>,
+    additional_info: Arc<RwLock<HashMap<String, String>>>,
     /// 真にすると、以降の書き込みがすべて `InternalError` になる。
     fails: Arc<RwLock<bool>>,
 }
@@ -33,6 +35,8 @@ impl MemoryEvents26Api {
             projects: Arc::new(RwLock::new(HashMap::new())),
             descriptions: Arc::new(RwLock::new(HashMap::new())),
             icons: Arc::new(RwLock::new(HashMap::new())),
+            menus: Arc::new(RwLock::new(HashMap::new())),
+            additional_info: Arc::new(RwLock::new(HashMap::new())),
             fails: Arc::new(RwLock::new(false)),
         }
     }
@@ -50,6 +54,19 @@ impl MemoryEvents26Api {
     /// 反映されたアイコンを (content_type, バイト列) で取り出す。
     pub fn icon(&self, project_id: &str) -> Option<(String, Vec<u8>)> {
         self.icons.read().unwrap().get(project_id).cloned()
+    }
+
+    /// 反映されたメニューを取り出す。
+    pub fn menu(&self, project_id: &str) -> Option<GetProjectDetails200ResponseMenu> {
+        self.menus.read().unwrap().get(project_id).cloned()
+    }
+
+    pub fn additional_info(&self, project_id: &str) -> Option<String> {
+        self.additional_info
+            .read()
+            .unwrap()
+            .get(project_id)
+            .cloned()
     }
 
     fn guard(&self, operation: &str) -> Result<(), anyhow::Error> {
@@ -122,6 +139,44 @@ impl Events26Api for MemoryEvents26Api {
     async fn delete_project_icon(&self, project_id: &str) -> Result<(), DeleteError> {
         self.guard("delete_project_icon")?;
         self.icons.write().unwrap().remove(project_id);
+        Ok(())
+    }
+
+    async fn update_project_menu(
+        &self,
+        project_id: &str,
+        menu: &GetProjectDetails200ResponseMenu,
+    ) -> Result<(), UpdateMenuError> {
+        self.guard("update_project_menu")?;
+        self.menus
+            .write()
+            .unwrap()
+            .insert(project_id.to_string(), menu.clone());
+        Ok(())
+    }
+
+    async fn delete_project_menu(&self, project_id: &str) -> Result<(), DeleteError> {
+        self.guard("delete_project_menu")?;
+        self.menus.write().unwrap().remove(project_id);
+        Ok(())
+    }
+
+    async fn update_project_additional_info(
+        &self,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), UpdateError> {
+        self.guard("update_project_additional_info")?;
+        self.additional_info
+            .write()
+            .unwrap()
+            .insert(project_id.to_string(), additional_info.to_string());
+        Ok(())
+    }
+
+    async fn delete_project_additional_info(&self, project_id: &str) -> Result<(), DeleteError> {
+        self.guard("delete_project_additional_info")?;
+        self.additional_info.write().unwrap().remove(project_id);
         Ok(())
     }
 }

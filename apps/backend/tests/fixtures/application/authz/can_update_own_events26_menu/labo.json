@@ -1,0 +1,4 @@
+{
+  "actor": { "User": { "group_type": "labo", "group_ids": ["L-100"] } },
+  "expected": true
+}

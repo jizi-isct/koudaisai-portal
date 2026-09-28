@@ -1,0 +1,5 @@
+{
+  "actor": { "User": { "group_type": "general", "group_ids": ["I-100"] } },
+  "additional_info": "持ち込み電源の利用はできません",
+  "expected": "ok"
+}

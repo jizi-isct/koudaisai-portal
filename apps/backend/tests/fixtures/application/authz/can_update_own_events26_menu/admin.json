@@ -1,0 +1,4 @@
+{
+  "actor": { "Admin": { "claims": [] } },
+  "expected": false
+}

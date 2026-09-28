@@ -1,0 +1,4 @@
+{
+  "actor": { "User": { "group_type": "booth", "group_ids": ["M-100"] } },
+  "expected": true
+}
