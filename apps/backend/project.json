@@ -20,7 +20,7 @@
     "format:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fmt --all -- --check",
+        "command": "cargo fmt --all -- --check && npx prettier . --check --ignore-path ../../.prettierignore",
         "cwd": "apps/backend"
       }
     },
