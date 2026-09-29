@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import { formatDate } from '@koudaisai/shared-utils';
@@ -20,8 +20,12 @@ export default function ManageGroupPage() {
 
 function GroupTable() {
   const { data, isLoading } = $api.useQuery('get', '/groups');
-  const groupDataSet = data ?? [];
-  const [keyWords, setKeyWords] = useState('');
+  const groupDataSet: GroupRead[] = data ?? [];
+  const [filterKey, setFilterKey] = useState<string>('');
+  const targetedGroups: GroupRead[] = useMemo<GroupRead[]>(
+    () => groupDataSet.filter((item) => item.id.includes(filterKey)),
+    [groupDataSet, filterKey],
+  );
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -31,12 +35,8 @@ function GroupTable() {
   }
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setKeyWords(e.target.value);
+    setFilterKey(e.target.value);
   };
-
-  const targetedGroups = groupDataSet.filter((item) =>
-    item.id.includes(keyWords),
-  );
 
   const typeOfGroups = (groupType: GroupRead['type']) => {
     switch (groupType) {
@@ -103,7 +103,7 @@ function GroupTable() {
         placeholder="団体IDを検索"
         onChange={handleOnChange}
         style={{ width: 200 }}
-        value={keyWords}
+        value={filterKey}
       />
       <Table<GroupRead>
         dataSource={targetedGroups.map((item) => ({ ...item, key: item.id }))}
