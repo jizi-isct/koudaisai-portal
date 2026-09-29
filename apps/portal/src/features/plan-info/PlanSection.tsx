@@ -89,7 +89,7 @@ function PlanSectionContent() {
   const additionalInfoError = isAdditionalInfoNotFound
     ? null
     : additionalInfoQueryError;
-  const additionalInfo = projectDetails?.additionalInfo ?? '';
+const additionalInfo = isAdditionalInfoNotFound ? '' : (projectDetails?.additionalInfo ?? '');
   const { mutateAsync: putAdditionalInfo } = $api.useMutation(
     'put',
     ADDITIONAL_INFO_PATH,
