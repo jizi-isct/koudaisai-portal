@@ -494,6 +494,8 @@ pub enum OccasionPlace {
     WestW9W9201,
     #[serde(rename = "west.w9.w9-202")]
     WestW9W9202,
+    #[serde(rename = "west.w9.w9e-mediahall")]
+    WestW9W9eMediahall,
     #[serde(rename = "west.w9.w9-321")]
     WestW9W9321,
     #[serde(rename = "west.w9.w9-322")]
@@ -522,6 +524,8 @@ pub enum OccasionPlace {
     WestWl1,
     #[serde(rename = "west.wl1.wl1-201")]
     WestWl1Wl1201,
+    #[serde(rename = "west.wl1.wl1-301")]
+    WestWl1Wl1301,
     #[serde(rename = "west.wl1.wl1-401")]
     WestWl1Wl1401,
     #[serde(rename = "west.wl2")]
