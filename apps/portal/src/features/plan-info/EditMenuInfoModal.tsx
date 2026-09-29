@@ -1,11 +1,20 @@
 import type { apiComponents } from '@koudaisai/shared-types';
 import { Modal } from '@koudaisai/shared-ui';
-import { Button, Divider, Form, Input, InputNumber } from 'antd';
+import { Button, Divider, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import styles from './EditMenuInfoModal.module.css';
 
 export type MenuInfo =
   apiComponents['schemas']['GetProjectDetails200ResponseMenu'];
+
+type MenuFormValues = {
+  description: string;
+  items: {
+    name: string;
+    price?: string;
+    options: { name: string; price?: string }[];
+  }[];
+};
 
 type Props = {
   isOpen: boolean;
@@ -14,20 +23,40 @@ type Props = {
   updateMenu: (menu: MenuInfo) => Promise<void>;
 };
 
-const EMPTY_MENU: MenuInfo = {
+const EMPTY_MENU: MenuFormValues = {
   description: '',
   items: [],
 };
 
-function cloneMenu(menu: MenuInfo | undefined): MenuInfo {
+function cloneMenu(menu: MenuInfo | undefined): MenuFormValues {
   return {
     description: menu?.description ?? '',
     items:
       menu?.items.map((item) => ({
-        ...item,
-        options: item.options.map((option) => ({ ...option })),
+        name: item.name,
+        price: item.price == null ? undefined : String(item.price),
+        options: item.options.map((option) => ({
+          name: option.name,
+          price: option.price == null ? undefined : String(option.price),
+        })),
       })) ?? [],
   };
+}
+
+function validatePrice(_: unknown, value: string | undefined) {
+  if (
+    value === undefined ||
+    value === '' ||
+    (/^\d+(?:\.\d+)?$/.test(value) && Number.isFinite(Number(value)))
+  ) {
+    return Promise.resolve();
+  }
+
+  return Promise.reject(new Error('値段は0以上の半角数字で入力してください'));
+}
+
+function parsePrice(value: string | undefined): number | undefined {
+  return value === undefined || value === '' ? undefined : Number(value);
 }
 
 /** 商品、価格、オプションを含む企画メニューを編集するモーダル。 */
@@ -37,7 +66,7 @@ export function EditMenuInfoModal({
   menu,
   updateMenu,
 }: Props) {
-  const [form] = Form.useForm<MenuInfo>();
+  const [form] = Form.useForm<MenuFormValues>();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -52,7 +81,7 @@ export function EditMenuInfoModal({
     setSaveError(null);
   }, [form, isOpen, menu]);
 
-  const handleUpdate = async (values: MenuInfo) => {
+  const handleUpdate = async (values: MenuFormValues) => {
     setIsSaving(true);
     setSaveError(null);
 
@@ -60,8 +89,11 @@ export function EditMenuInfoModal({
       description: values.description,
       items: values.items.map((item) => ({
         name: item.name,
-        price: item.price,
-        options: item.options ?? [],
+        price: parsePrice(item.price),
+        options: (item.options ?? []).map((option) => ({
+          name: option.name,
+          price: parsePrice(option.price),
+        })),
       })),
     };
 
@@ -83,7 +115,7 @@ export function EditMenuInfoModal({
     <Modal isOpen={isOpen} setOpen={setOpen}>
       <div className={styles.modalContent}>
         <h2 className={styles.title}>メニュー情報を編集</h2>
-        <Form<MenuInfo>
+        <Form<MenuFormValues>
           form={form}
           initialValues={EMPTY_MENU}
           layout="vertical"
@@ -133,11 +165,13 @@ export function EditMenuInfoModal({
                       label="値段"
                       name={[itemField.name, 'price']}
                       tooltip="未入力（または0）でも構いません。価格が変動する場合は未入力にできます。"
+                      rules={[{ validator: validatePrice }]}
                     >
-                      <InputNumber
+                      <Input
                         className={styles.priceInput}
                         placeholder="例: 500"
-                        addonAfter="円"
+                        inputMode="decimal"
+                        suffix="円"
                       />
                     </Form.Item>
 
@@ -177,11 +211,13 @@ export function EditMenuInfoModal({
                                 label="値段"
                                 name={[optionField.name, 'price']}
                                 tooltip="未入力（または0）でも構いません。必要に応じて追加料金を入力してください。"
+                                rules={[{ validator: validatePrice }]}
                               >
-                                <InputNumber
+                                <Input
                                   className={styles.priceInput}
                                   placeholder="例: 100"
-                                  addonAfter="円"
+                                  inputMode="decimal"
+                                  suffix="円"
                                 />
                               </Form.Item>
 
