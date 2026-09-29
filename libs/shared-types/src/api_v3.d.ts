@@ -996,6 +996,7 @@ export interface components {
       | 'east.taki-plaza.tp-1'
       | 'east.centennial-hall'
       | 'east.centennial-hall.centennial-hall-1f'
+      | 'east.mosimo'
       | 'east.taki-plaza-stage'
       | 'east.wood-deck-stage'
       | 'east.wood-deck'
