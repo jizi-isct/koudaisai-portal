@@ -1,0 +1,368 @@
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.editorTheme {
+  --official-background: #ffffff;
+  --official-background-raised: #f0f4f8;
+  --official-background-12: rgb(15 41 67 / 0.12);
+  --official-foreground: #0f2943;
+  --official-foreground-60: rgb(15 41 67 / 0.6);
+  --official-border-12: rgb(15 41 67 / 0.12);
+  --official-border-40: rgb(15 41 67 / 0.4);
+  --official-orange: #f29134;
+  --official-orange-deep: #dd5519;
+
+  /* MDXEditor のテーマを工大祭公式サイトのカラートークンに合わせる。 */
+  --accentBase: var(--official-background);
+  --accentBgSubtle: rgb(242 145 52 / 0.08);
+  --accentBg: rgb(242 145 52 / 0.12);
+  --accentBgHover: rgb(242 145 52 / 0.2);
+  --accentBgActive: rgb(242 145 52 / 0.28);
+  --accentLine: rgb(242 145 52 / 0.4);
+  --accentBorder: rgb(242 145 52 / 0.6);
+  --accentBorderHover: var(--official-orange);
+  --accentSolid: var(--official-orange);
+  --accentSolidHover: var(--official-orange-deep);
+  --accentText: var(--official-orange-deep);
+  --accentTextContrast: var(--official-foreground);
+  --basePageBg: var(--official-background);
+  --baseBase: var(--official-background);
+  --baseBgSubtle: var(--official-background-raised);
+  --baseBg: var(--official-background-raised);
+  --baseBgHover: var(--official-background-12);
+  --baseBgActive: rgb(15 41 67 / 0.18);
+  --baseLine: var(--official-border-12);
+  --baseBorder: var(--official-border-40);
+  --baseBorderHover: var(--official-foreground-60);
+  --baseSolid: var(--official-foreground-60);
+  --baseSolidHover: var(--official-foreground);
+  --baseText: var(--official-foreground-60);
+  --baseTextContrast: var(--official-foreground);
+  --font-body: 'fot-tsukuardgothic-std', sans-serif;
+
+  border: 1px solid var(--gray);
+  border-radius: 6px;
+  height: 360px;
+  position: relative;
+  width: 100%;
+}
+
+:global(.dark) .editorTheme {
+  --official-background: #0f2943;
+  --official-background-raised: #223a52;
+  --official-background-12: rgb(255 255 255 / 0.12);
+  --official-foreground: #ffffff;
+  --official-foreground-60: rgb(255 255 255 / 0.6);
+  --official-border-12: rgb(255 255 255 / 0.12);
+  --official-border-40: rgb(255 255 255 / 0.4);
+}
+
+.editorTheme .editor {
+  --accentBase: var(--official-background);
+  --accentBgSubtle: rgb(242 145 52 / 0.08);
+  --accentBg: rgb(242 145 52 / 0.12);
+  --accentBgHover: rgb(242 145 52 / 0.2);
+  --accentBgActive: rgb(242 145 52 / 0.28);
+  --accentLine: rgb(242 145 52 / 0.4);
+  --accentBorder: rgb(242 145 52 / 0.6);
+  --accentBorderHover: var(--official-orange);
+  --accentSolid: var(--official-orange);
+  --accentSolidHover: var(--official-orange-deep);
+  --accentText: var(--official-orange-deep);
+  --accentTextContrast: var(--official-foreground);
+  --basePageBg: var(--official-background);
+  --baseBase: var(--official-background);
+  --baseBgSubtle: var(--official-background-raised);
+  --baseBg: var(--official-background-raised);
+  --baseBgHover: var(--official-background-12);
+  --baseBgActive: rgb(15 41 67 / 0.18);
+  --baseLine: var(--official-border-12);
+  --baseBorder: var(--official-border-40);
+  --baseBorderHover: var(--official-foreground-60);
+  --baseSolid: var(--official-foreground-60);
+  --baseSolidHover: var(--official-foreground);
+  --baseText: var(--official-foreground-60);
+  --baseTextContrast: var(--official-foreground);
+  --font-body: 'fot-tsukuardgothic-std', sans-serif;
+}
+
+.editor:global(.mdxeditor) {
+  border-radius: 5px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor :global(.mdxeditor-toolbar) {
+  background-color: var(--official-background-raised);
+  border-bottom: 1px solid var(--official-border-12);
+  border-radius: 5px 5px 0 0;
+}
+
+.typography {
+  caret-color: var(--official-foreground);
+  color: var(--official-foreground);
+  cursor: text;
+  font-family: 'fot-tsukuardgothic-std', sans-serif;
+  font-size: 16px;
+  padding: 24px;
+}
+
+.typography[contenteditable='true'] {
+  background-color: var(--official-background);
+  min-height: 100%;
+}
+
+.editor
+  :global(.mdxeditor-root-contenteditable:focus-within)
+  .typography:not([contenteditable='true']) {
+  opacity: 0;
+}
+
+.typography h1,
+.typography h2,
+.typography h3,
+.typography h4,
+.typography h5,
+.typography h6 {
+  color: var(--official-foreground);
+  font-family: inherit;
+}
+
+/* Heading2.astro */
+.typography h2 {
+  align-items: center;
+  display: flex;
+  font-size: 30px;
+  font-weight: 700;
+  gap: 12px;
+  line-height: 1.2;
+  margin: 32px 0 16px;
+}
+
+.typography h2::before {
+  background-image: url('./official-star.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: '';
+  flex-shrink: 0;
+  height: 32px;
+  width: 32px;
+}
+
+/* Heading3.astro */
+.typography h3 {
+  align-items: center;
+  display: flex;
+  font-size: 24px;
+  font-weight: 700;
+  gap: 10px;
+  line-height: 32px;
+  margin: 32px 0 16px;
+}
+
+.typography h3::before {
+  align-self: stretch;
+  background-color: var(--official-orange);
+  border-radius: 1px;
+  content: '';
+  flex-shrink: 0;
+  width: 2px;
+}
+
+/* Heading4.astro */
+.typography h4 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 32px 0 16px;
+}
+
+.typography p {
+  color: var(--official-foreground);
+  line-height: 28px;
+  margin: 0 0 16px;
+  text-align: left;
+}
+
+.typography a {
+  color: var(--official-orange);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 150ms;
+}
+
+.typography a:hover {
+  opacity: 0.7;
+}
+
+.typography ul,
+.typography ol {
+  margin: 4px 0;
+  padding-left: 24px;
+}
+
+.typography ul {
+  list-style: disc;
+}
+
+.typography ol {
+  list-style: decimal;
+}
+
+.typography li {
+  line-height: 28px;
+}
+
+.typography li + li {
+  margin-top: 4px;
+}
+
+.typography li::marker {
+  color: var(--official-orange);
+}
+
+.typography blockquote {
+  background-color: var(--official-background-raised);
+  border-left: 3px solid var(--official-orange);
+  color: var(--official-foreground);
+  margin: 16px 0;
+  padding: 0 16px;
+  white-space: pre-line;
+}
+
+.typography blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.typography hr {
+  border: 0;
+  border-top: 1px solid var(--official-border-12);
+  margin: 32px 0;
+}
+
+.typography img {
+  border-radius: 4px;
+  display: block;
+  margin: 16px 0;
+  max-height: 480px;
+  object-fit: contain;
+  width: 100%;
+}
+
+.typography table {
+  border: 1px solid var(--official-background-raised);
+  border-collapse: separate;
+  border-radius: 4px;
+  border-spacing: 0;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.typography th,
+.typography td {
+  border-bottom: 1px solid var(--official-background-raised);
+  color: var(--official-foreground);
+  padding: 16px;
+}
+
+.typography th {
+  background-color: var(--official-background-raised);
+  font-weight: 700;
+  text-align: center;
+}
+
+.typography td {
+  background-color: var(--official-background);
+  text-align: left;
+}
+
+.typography tr:last-child th,
+.typography tr:last-child td {
+  border-bottom: 0;
+}
+
+.typography code {
+  background-color: var(--official-background-raised);
+  border-radius: 4px;
+  color: var(--official-foreground);
+  padding: 2px 4px;
+}
+
+.typography pre {
+  background-color: var(--official-background-raised);
+  border-radius: 4px;
+  color: var(--official-foreground);
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding: 16px;
+}
+
+.typography pre code {
+  padding: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.updateButton {
+  border: 1px solid var(--gray);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 18px;
+}
+
+.cancelButton {
+  background-color: white;
+  color: var(--foreground);
+}
+
+.updateButton {
+  background-color: var(--darkblue);
+  border-color: var(--darkblue);
+  color: white;
+}
+
+.cancelButton:disabled,
+.updateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.error,
+.success {
+  font-size: 13px;
+  margin: 0;
+}
+
+.error {
+  color: #d4380d;
+}
+
+.success {
+  color: #237804;
+}
+
+@media (max-width: 600px) {
+  .editorTheme {
+    height: 280px;
+  }
+
+  .typography {
+    padding: 16px;
+  }
+}
