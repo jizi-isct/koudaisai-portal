@@ -1033,7 +1033,7 @@
         },
         "responses": {
           "204": {
-            "description": "Project details stored"
+            "description": "Project additional info stored"
           },
           "403": {
             "description": "Forbidden",
@@ -1047,16 +1047,6 @@
           },
           "404": {
             "description": "Project not found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid menu",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1261,7 +1251,7 @@
         },
         "responses": {
           "204": {
-            "description": "Project details stored"
+            "description": "Project menu stored"
           },
           "403": {
             "description": "Forbidden",

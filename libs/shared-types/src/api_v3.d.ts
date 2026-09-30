@@ -2581,7 +2581,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Project details stored */
+      /** @description Project additional info stored */
       204: {
         headers: {
           [name: string]: unknown;
@@ -2599,15 +2599,6 @@ export interface operations {
       };
       /** @description Project not found */
       404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'text/plain': string;
-        };
-      };
-      /** @description Invalid menu */
-      422: {
         headers: {
           [name: string]: unknown;
         };
@@ -2794,7 +2785,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Project details stored */
+      /** @description Project menu stored */
       204: {
         headers: {
           [name: string]: unknown;

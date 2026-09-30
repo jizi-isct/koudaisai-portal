@@ -508,8 +508,8 @@ pub async fn delete_own_project_additional_info(
 
 /// openapi-react-query が失敗を検出できるよう、管理者用のエラーには本文を付ける。
 #[http_response]
-pub enum PutProjectDetailsResponse {
-    #[response(status = NO_CONTENT, description = "Project details stored")]
+pub enum PutProjectMenuResponse {
+    #[response(status = NO_CONTENT, description = "Project menu stored")]
     NoContent,
     #[response(status = NOT_FOUND, description = "Project not found")]
     NotFound(String),
@@ -517,6 +517,18 @@ pub enum PutProjectDetailsResponse {
     Forbidden(String),
     #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid menu")]
     UnprocessableEntity(String),
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Upstream error")]
+    InternalServerError(String),
+}
+
+#[http_response]
+pub enum PutProjectAdditionalInfoResponse {
+    #[response(status = NO_CONTENT, description = "Project additional info stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound(String),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden(String),
     #[response(status = INTERNAL_SERVER_ERROR, description = "Upstream error")]
     InternalServerError(String),
 }
@@ -538,7 +550,7 @@ pub enum DeleteProjectDetailsResponse {
     description = "Store the menu of the project specified by an administrator.",
     params(ProjectPath),
     path = "/projects/{project_id}/menu",
-    responses(PutProjectDetailsResponse),
+    responses(PutProjectMenuResponse),
     request_body = GetProjectDetails200ResponseMenu,
     tag = super::super::EVENTS26_TAG
 )]
@@ -547,25 +559,25 @@ pub async fn put_project_menu(
     actor: ActorContext,
     Path(path): Path<ProjectPath>,
     Json(body): Json<GetProjectDetails200ResponseMenu>,
-) -> PutProjectDetailsResponse {
+) -> PutProjectMenuResponse {
     match st
         .app
         .events26()
         .update_project_menu(&actor, &path.project_id, &body)
         .await
     {
-        Ok(()) => PutProjectDetailsResponse::NoContent,
+        Ok(()) => PutProjectMenuResponse::NoContent,
         Err(ApplicationOperationError::Unauthorized) => {
-            PutProjectDetailsResponse::Forbidden("Forbidden".to_string())
+            PutProjectMenuResponse::Forbidden("Forbidden".to_string())
         }
         Err(ApplicationOperationError::OperationFailed(UpdateMenuError::NotFound)) => {
-            PutProjectDetailsResponse::NotFound("Project not found".to_string())
+            PutProjectMenuResponse::NotFound("Project not found".to_string())
         }
         Err(ApplicationOperationError::OperationFailed(UpdateMenuError::InvalidMenu(reason))) => {
-            PutProjectDetailsResponse::UnprocessableEntity(detail("update_project_menu", reason))
+            PutProjectMenuResponse::UnprocessableEntity(detail("update_project_menu", reason))
         }
         Err(error) => {
-            PutProjectDetailsResponse::InternalServerError(detail("update_project_menu", error))
+            PutProjectMenuResponse::InternalServerError(detail("update_project_menu", error))
         }
     }
 }
@@ -607,7 +619,7 @@ pub async fn delete_project_menu(
     description = "Store the additional info of the project specified by an administrator.",
     params(ProjectPath),
     path = "/projects/{project_id}/details/additional_info",
-    responses(PutProjectDetailsResponse),
+    responses(PutProjectAdditionalInfoResponse),
     request_body(content = String, content_type = "application/json"),
     tag = super::super::EVENTS26_TAG
 )]
@@ -616,21 +628,21 @@ pub async fn put_project_additional_info(
     actor: ActorContext,
     Path(path): Path<ProjectPath>,
     Json(body): Json<String>,
-) -> PutProjectDetailsResponse {
+) -> PutProjectAdditionalInfoResponse {
     match st
         .app
         .events26()
         .update_project_additional_info(&actor, &path.project_id, &body)
         .await
     {
-        Ok(()) => PutProjectDetailsResponse::NoContent,
+        Ok(()) => PutProjectAdditionalInfoResponse::NoContent,
         Err(ApplicationOperationError::Unauthorized) => {
-            PutProjectDetailsResponse::Forbidden("Forbidden".to_string())
+            PutProjectAdditionalInfoResponse::Forbidden("Forbidden".to_string())
         }
         Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
-            PutProjectDetailsResponse::NotFound("Project not found".to_string())
+            PutProjectAdditionalInfoResponse::NotFound("Project not found".to_string())
         }
-        Err(error) => PutProjectDetailsResponse::InternalServerError(detail(
+        Err(error) => PutProjectAdditionalInfoResponse::InternalServerError(detail(
             "update_project_additional_info",
             error,
         )),
@@ -679,7 +691,8 @@ mod tests {
         use axum::{body::to_bytes, http::StatusCode, response::IntoResponse};
 
         let responses = [
-            PutProjectDetailsResponse::Forbidden("Forbidden".to_string()).into_response(),
+            PutProjectMenuResponse::Forbidden("Forbidden".to_string()).into_response(),
+            PutProjectAdditionalInfoResponse::Forbidden("Forbidden".to_string()).into_response(),
             DeleteProjectDetailsResponse::NotFound("Project not found".to_string()).into_response(),
         ];
         for response in responses {
