@@ -1005,6 +1005,130 @@
         }
       }
     },
+    "/events26/projects/{project_id}/details/additional_info": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Store the additional info of the project specified by an administrator.",
+        "operationId": "put_project_additional_info",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Project details stored"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid menu",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upstream error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete the additional info of the project specified by an administrator.",
+        "operationId": "delete_project_additional_info",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Project details deleted"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upstream error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/events26/projects/{project_id}/icon": {
       "put": {
         "tags": ["events26"],
@@ -1098,6 +1222,130 @@
           },
           "500": {
             "description": "Internal server error. The body carries the upstream status and message.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events26/projects/{project_id}/menu": {
+      "put": {
+        "tags": ["events26"],
+        "description": "Store the menu of the project specified by an administrator.",
+        "operationId": "put_project_menu",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetProjectDetails200ResponseMenu"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Project details stored"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid menu",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upstream error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["events26"],
+        "description": "Delete the menu of the project specified by an administrator.",
+        "operationId": "delete_project_menu",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "企画情報API 側の企画 ID。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Project details deleted"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upstream error",
             "content": {
               "text/plain": {
                 "schema": {
