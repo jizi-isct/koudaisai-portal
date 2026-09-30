@@ -325,7 +325,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                               <Button
                                 danger
                                 onClick={() => removeOption(optionField.name)}
-                                size='small'
+                                size="small"
                               >
                                 オプションを削除
                               </Button>
@@ -341,7 +341,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                       danger
                       onClick={() => remove(field.name)}
                       style={{ marginTop: 12 }}
-                      size='small'
+                      size="small"
                     >
                       商品を削除
                     </Button>
