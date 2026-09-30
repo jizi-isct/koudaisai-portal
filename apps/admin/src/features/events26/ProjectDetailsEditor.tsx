@@ -39,6 +39,7 @@ import {
   Popconfirm,
   Result,
   Spin,
+  theme,
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
@@ -87,6 +88,9 @@ function price(value?: string): number | undefined {
 
 /** 企画本体とは別 API で管理するメニューと追加情報。 */
 export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
+  const {
+    token: { colorBgContainer, colorBgLayout, colorTextTertiary },
+  } = theme.useToken();
   const [form] = Form.useForm<MenuFormValues>();
   const [messageApi, contextHolder] = message.useMessage();
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -269,6 +273,10 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                     key={field.key}
                     title={'商品 ' + (index + 1)}
                     size="small"
+                    style={{
+                      backgroundColor: colorBgLayout,
+                      borderColor: colorTextTertiary,
+                    }}
                   >
                     <Form.Item
                       label="商品名"
@@ -301,6 +309,10 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                               key={optionField.key}
                               title={'オプション ' + (optionIndex + 1)}
                               size="small"
+                              style={{
+                                backgroundColor: colorBgContainer,
+                                borderColor: colorTextTertiary,
+                              }}
                             >
                               <Form.Item
                                 label="オプション名"
