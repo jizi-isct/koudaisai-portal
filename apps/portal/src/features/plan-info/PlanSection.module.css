@@ -12,7 +12,12 @@
   cursor: pointer;
   font-size: 14px;
   padding: 6px 14px;
-  width: min(20rem, 100%);
+  width: min(25rem, 60vw);
+}
+
+.editButton:hover {
+  background-color: #3e61fc;
+  transition: background-color 0.3s ease;
 }
 
 .editButton:disabled {
