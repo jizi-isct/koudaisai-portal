@@ -29,6 +29,7 @@ import {
 } from '@mdxeditor/editor';
 import type { apiComponents } from '@koudaisai/shared-types';
 import {
+  Alert,
   Button,
   Card,
   Divider,
@@ -94,6 +95,8 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
   const [form] = Form.useForm<MenuFormValues>();
   const [messageApi, contextHolder] = message.useMessage();
   const editorRef = useRef<MDXEditorMethods>(null);
+  const menuDirty = useRef(false);
+  const additionalInfoDirty = useRef(false);
   const [overlayContainer, setOverlayContainer] =
     useState<HTMLDivElement | null>(null);
   const [markdown, setMarkdown] = useState('');
@@ -138,17 +141,21 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
     '/events26/projects/{project_id}/details/additional_info',
   );
 
-  useEffect(() => {
-    if (details === undefined && !isNotFound) return;
-    form.setFieldsValue(toFormValues(details?.menu));
-    const nextMarkdown = details?.additionalInfo ?? '';
-    setMarkdown(nextMarkdown);
-    editorRef.current?.setMarkdown(nextMarkdown);
-    setEditorError(null);
-  }, [details, form, isNotFound]);
+  const hasDetails = details !== undefined && !isNotFound;
+  const menu = isNotFound ? undefined : details?.menu;
+  const additionalInfo = isNotFound ? '' : (details?.additionalInfo ?? '');
 
-  const menu = details?.menu;
-  const additionalInfo = details?.additionalInfo ?? '';
+  useEffect(() => {
+    if ((!hasDetails && !isNotFound) || menuDirty.current) return;
+    form.setFieldsValue(toFormValues(menu));
+  }, [form, hasDetails, isNotFound, menu]);
+
+  useEffect(() => {
+    if ((!hasDetails && !isNotFound) || additionalInfoDirty.current) return;
+    setMarkdown(additionalInfo);
+    editorRef.current?.setMarkdown(additionalInfo);
+    setEditorError(null);
+  }, [additionalInfo, hasDetails, isNotFound]);
   const busy =
     menuSaving || additionalSaving || menuDeleting || additionalDeleting;
 
@@ -170,6 +177,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
         params: { path: { project_id: projectId } },
         body,
       });
+      menuDirty.current = false;
       await refetch();
       messageApi.success('メニューを保存しました');
     } catch (cause) {
@@ -185,6 +193,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
       await deleteMenuMutation({
         params: { path: { project_id: projectId } },
       });
+      menuDirty.current = false;
       await refetch();
       messageApi.success('メニューを削除しました');
     } catch (cause) {
@@ -202,6 +211,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
         params: { path: { project_id: projectId } },
         body: markdown,
       });
+      additionalInfoDirty.current = false;
       await refetch();
       messageApi.success('企画追加情報を保存しました');
     } catch (cause) {
@@ -217,6 +227,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
       await deleteAdditionalInfoMutation({
         params: { path: { project_id: projectId } },
       });
+      additionalInfoDirty.current = false;
       await refetch();
       messageApi.success('企画追加情報を削除しました');
     } catch (cause) {
@@ -227,7 +238,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
   };
 
   if (isLoading) return <Spin aria-label="企画詳細情報を読み込み中" />;
-  if (error && !isNotFound) {
+  if (error && !isNotFound && !hasDetails) {
     return (
       <Result
         status="error"
@@ -242,6 +253,15 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
     <>
       <Divider />
       <h2>メニュー・企画追加情報</h2>
+      {error && !isNotFound && (
+        <Alert
+          type="error"
+          showIcon
+          message="企画詳細情報を再取得できませんでした"
+          action={<Button onClick={() => refetch()}>再読み込み</Button>}
+          style={{ marginBottom: 16 }}
+        />
+      )}
       <Card title="メニュー" size="small" style={{ marginBottom: 16 }}>
         {!menu && <p>未設定</p>}
         <Form<MenuFormValues>
@@ -249,6 +269,9 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
           layout="vertical"
           initialValues={emptyMenu}
           onFinish={saveMenu}
+          onValuesChange={() => {
+            menuDirty.current = true;
+          }}
           disabled={busy}
         >
           <Form.Item
@@ -387,7 +410,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
         </Form>
       </Card>
       <Card title="企画追加情報" size="small">
-        {!details?.additionalInfo && <p>未設定</p>}
+        {!additionalInfo && <p>未設定</p>}
         <div
           ref={setOverlayContainer}
           style={{
@@ -401,6 +424,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
             markdown={additionalInfo}
             onChange={(value) => {
               setMarkdown(value);
+              additionalInfoDirty.current = value !== additionalInfo;
               setEditorError(null);
             }}
             onError={({ error: cause }) =>
@@ -463,7 +487,7 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
           >
             企画追加情報を保存
           </Button>
-          {details?.additionalInfo && (
+          {additionalInfo && (
             <Popconfirm
               title="企画追加情報を削除しますか？"
               onConfirm={deleteAdditionalInfo}

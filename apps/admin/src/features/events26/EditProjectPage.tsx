@@ -614,7 +614,7 @@ function EditProjectForm({ projectId }: { projectId: string }) {
           対応形式は png / jpeg / gif / webp / heic、正方形で 20MB 以下です。
         </p>
       </Card>
-      <ProjectDetailsEditor projectId={projectId} />
+      <ProjectDetailsEditor key={projectId} projectId={projectId} />
       {contextHolder}
     </>
   );
