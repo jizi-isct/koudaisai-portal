@@ -38,7 +38,6 @@ import {
   message,
   Popconfirm,
   Result,
-  Space,
   Spin,
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
@@ -298,9 +297,13 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                       ) => (
                         <Flex vertical gap={8}>
                           {optionFields.map((optionField, optionIndex) => (
-                            <Space key={optionField.key} align="baseline" wrap>
+                            <Card
+                              key={optionField.key}
+                              title={'オプション ' + (optionIndex + 1)}
+                              size="small"
+                            >
                               <Form.Item
-                                label={'オプション ' + (optionIndex + 1)}
+                                label="オプション名"
                                 name={[optionField.name, 'name']}
                                 rules={[
                                   {
@@ -323,9 +326,9 @@ export function ProjectDetailsEditor({ projectId }: { projectId: string }) {
                                 danger
                                 onClick={() => removeOption(optionField.name)}
                               >
-                                削除
+                                オプションを削除
                               </Button>
-                            </Space>
+                            </Card>
                           ))}
                           <Button type="dashed" onClick={() => addOption()}>
                             オプションを追加
