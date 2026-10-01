@@ -24,7 +24,7 @@ vi.mock('@/features/api/api', async () => {
           isLoading: false,
           refetch: async () => {
             state.refetchCount += 1;
-            setData({ ...state.details });
+            setData(structuredClone(state.details));
             return { data: state.details };
           },
         };
@@ -84,6 +84,7 @@ vi.mock('@mdxeditor/editor', async () => {
     ListsToggle: Empty,
     MDXEditor,
     Separator: Empty,
+    StrikeThroughSupSubToggles: Empty,
     UndoRedo: Empty,
     diffSourcePlugin: plugin,
     directivesPlugin: plugin,
@@ -157,13 +158,13 @@ it('片方を保存して再取得しても、もう片方の未保存入力を�
   const editor = document.querySelector<HTMLTextAreaElement>(
     'textarea[aria-label="企画追加情報エディタ"]',
   );
-  const description =
-    document.querySelector<HTMLTextAreaElement>('#description');
+  let description = document.querySelector<HTMLTextAreaElement>('#description');
   expect(editor?.value).toBe('保存済み追加情報');
   expect(description?.value).toBe('保存済みメニュー');
   if (!editor || !description) throw new Error('Editors not found');
 
   await act(async () => input(editor, '未保存の追加情報'));
+  state.details.additionalInfo = '別の管理者が更新した追加情報';
   await act(async () => {
     button('メニューを保存').click();
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -171,12 +172,21 @@ it('片方を保存して再取得しても、もう片方の未保存入力を�
   expect(state.refetchCount).toBe(1);
   expect(editor.value).toBe('未保存の追加情報');
 
-  await act(async () => input(description, '未保存のメニュー'));
+  description = document.querySelector<HTMLTextAreaElement>('#description');
+  if (!description) throw new Error('Menu editor not found');
+  const menuEditor = description;
+  await act(async () => input(menuEditor, '未保存のメニュー'));
+  state.details.menu = {
+    description: '別の管理者が更新したメニュー',
+    items: [],
+  };
   await act(async () => {
     button('企画追加情報を保存').click();
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
   expect(state.refetchCount).toBe(2);
   expect(state.details.additionalInfo).toBe('未保存の追加情報');
-  expect(description.value).toBe('未保存のメニュー');
+  expect(
+    document.querySelector<HTMLTextAreaElement>('#description')?.value,
+  ).toBe('未保存のメニュー');
 });
