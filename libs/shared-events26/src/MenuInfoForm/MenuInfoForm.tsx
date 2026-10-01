@@ -1,5 +1,5 @@
 import { Button, Divider, Form, Input } from 'antd';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, type CSSProperties, type ReactNode } from 'react';
 import styles from './MenuInfoForm.module.css';
 
 export type MenuInfo = {
@@ -24,6 +24,8 @@ export type MenuInfoFormProps = {
   menu?: MenuInfo;
   onSubmit: (menu: MenuInfo) => void | Promise<void>;
   disabled?: boolean;
+  onValuesChange?: () => void;
+  style?: CSSProperties;
   children?: ReactNode;
 };
 
@@ -77,6 +79,8 @@ export function MenuInfoForm({
   menu,
   onSubmit,
   disabled = false,
+  onValuesChange,
+  style,
   children,
 }: MenuInfoFormProps) {
   const [form] = Form.useForm<MenuFormValues>();
@@ -93,6 +97,8 @@ export function MenuInfoForm({
       layout="vertical"
       onFinish={(values) => onSubmit(normalizeMenu(values))}
       disabled={disabled}
+      onValuesChange={onValuesChange}
+      style={style}
     >
       <Form.Item
         label="メニュー全体の説明"

@@ -7,16 +7,17 @@
 
 .itemCard,
 .optionCard {
-  border: 1px solid var(--gray, #d9d9d9);
+  border: 1px solid var(--menu-card-border-color, var(--gray, #d9d9d9));
   border-radius: 8px;
 }
 
 .itemCard {
+  background-color: var(--menu-item-background, transparent);
   padding: 16px;
 }
 
 .optionCard {
-  background-color: rgb(127 127 127 / 0.04);
+  background-color: var(--menu-option-background, rgb(127 127 127 / 0.04));
   padding: 12px;
 }
 
@@ -39,7 +40,7 @@
 }
 
 .removeButtonLayout {
-  text-align: right;
+  text-align: var(--menu-remove-button-align, right);
   margin-top: 0.5rem;
 }
 
