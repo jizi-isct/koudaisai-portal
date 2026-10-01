@@ -1,20 +1,7 @@
-import type { apiComponents } from '@koudaisai/shared-types';
+import { MenuInfoForm, type MenuInfo } from '@koudaisai-portal/shared-events26';
 import { Modal } from '@koudaisai/shared-ui';
-import { Button, Divider, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import styles from './EditMenuInfoModal.module.css';
-
-export type MenuInfo =
-  apiComponents['schemas']['GetProjectDetails200ResponseMenu'];
-
-type MenuFormValues = {
-  description: string;
-  items: {
-    name: string;
-    price?: string;
-    options: { name: string; price?: string }[];
-  }[];
-};
 
 type Props = {
   isOpen: boolean;
@@ -23,42 +10,6 @@ type Props = {
   updateMenu: (menu: MenuInfo) => Promise<void>;
 };
 
-const EMPTY_MENU: MenuFormValues = {
-  description: '',
-  items: [],
-};
-
-function cloneMenu(menu: MenuInfo | undefined): MenuFormValues {
-  return {
-    description: menu?.description ?? '',
-    items:
-      menu?.items.map((item) => ({
-        name: item.name,
-        price: item.price == null ? undefined : String(item.price),
-        options: item.options.map((option) => ({
-          name: option.name,
-          price: option.price == null ? undefined : String(option.price),
-        })),
-      })) ?? [],
-  };
-}
-
-function validatePrice(_: unknown, value: string | undefined) {
-  if (
-    value === undefined ||
-    value === '' ||
-    (/^\d+(?:\.\d+)?$/.test(value) && Number.isFinite(Number(value)))
-  ) {
-    return Promise.resolve();
-  }
-
-  return Promise.reject(new Error('値段は0以上の半角数字で入力してください'));
-}
-
-function parsePrice(value: string | undefined): number | undefined {
-  return value === undefined || value === '' ? undefined : Number(value);
-}
-
 /** 商品、価格、オプションを含む企画メニューを編集するモーダル。 */
 export function EditMenuInfoModal({
   isOpen,
@@ -66,39 +17,18 @@ export function EditMenuInfoModal({
   menu,
   updateMenu,
 }: Props) {
-  const [form] = Form.useForm<MenuFormValues>();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // 閉じて破棄した内容を残さず、再取得した最新のメニューを表示する。
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (isOpen) setSaveError(null);
+  }, [isOpen, menu]);
 
-    form.resetFields();
-    form.setFieldsValue(cloneMenu(menu));
-    setSaveError(null);
-  }, [form, isOpen, menu]);
-
-  const handleUpdate = async (values: MenuFormValues) => {
+  const handleUpdate = async (newMenu: MenuInfo) => {
     setIsSaving(true);
     setSaveError(null);
-
-    const normalizedMenu: MenuInfo = {
-      description: values.description,
-      items: values.items.map((item) => ({
-        name: item.name,
-        price: parsePrice(item.price),
-        options: (item.options ?? []).map((option) => ({
-          name: option.name,
-          price: parsePrice(option.price),
-        })),
-      })),
-    };
-
     try {
-      await updateMenu(normalizedMenu);
+      await updateMenu(newMenu);
       setOpen(false);
     } catch (updateError) {
       setSaveError(
@@ -115,184 +45,32 @@ export function EditMenuInfoModal({
     <Modal isOpen={isOpen} setOpen={setOpen}>
       <div className={styles.modalContent}>
         <h2 className={styles.title}>メニュー情報を編集</h2>
-        <Form<MenuFormValues>
-          form={form}
-          initialValues={EMPTY_MENU}
-          layout="vertical"
-          onFinish={handleUpdate}
-          disabled={isSaving}
-        >
-          <Form.Item
-            label="メニュー全体の説明"
-            name="description"
-            rules={[
-              {
-                required: true,
-                whitespace: true,
-                message: 'メニュー全体の説明を入力してください',
-              },
-            ]}
-          >
-            <Input.TextArea
-              placeholder="例: 当日の販売方針や注意点など"
-              rows={3}
-            />
-          </Form.Item>
-
-          <Divider titlePlacement="start">商品一覧</Divider>
-
-          <Form.List name="items">
-            {(itemFields, { add: addItem, remove: removeItem }) => (
-              <div className={styles.list}>
-                {itemFields.map((itemField, itemIndex) => (
-                  <section className={styles.itemCard} key={itemField.key}>
-                    <h3 className={styles.itemTitle}>商品 {itemIndex + 1}</h3>
-                    <Form.Item
-                      label="商品名"
-                      name={[itemField.name, 'name']}
-                      rules={[
-                        {
-                          required: true,
-                          whitespace: true,
-                          message: '商品名を入力してください',
-                        },
-                      ]}
-                    >
-                      <Input placeholder="例: かき氷 / フランクフルト など" />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="値段"
-                      name={[itemField.name, 'price']}
-                      tooltip="未入力（または0）でも構いません。価格が変動する場合は未入力にできます。"
-                      rules={[{ validator: validatePrice }]}
-                    >
-                      <Input
-                        className={styles.priceInput}
-                        placeholder="例: 500"
-                        inputMode="decimal"
-                        suffix="円"
-                      />
-                    </Form.Item>
-
-                    <Divider titlePlacement="start" plain>
-                      トッピングやフレーバーなどのオプション
-                    </Divider>
-
-                    <Form.List name={[itemField.name, 'options']}>
-                      {(
-                        optionFields,
-                        { add: addOption, remove: removeOption },
-                      ) => (
-                        <div className={styles.optionList}>
-                          {optionFields.map((optionField, optionIndex) => (
-                            <section
-                              className={styles.optionCard}
-                              key={optionField.key}
-                            >
-                              <h4 className={styles.optionTitle}>
-                                オプション {optionIndex + 1}
-                              </h4>
-                              <Form.Item
-                                label="オプション名"
-                                name={[optionField.name, 'name']}
-                                rules={[
-                                  {
-                                    required: true,
-                                    whitespace: true,
-                                    message: 'オプション名を入力してください',
-                                  },
-                                ]}
-                              >
-                                <Input placeholder="例: 大盛り / いちごフレーバー など" />
-                              </Form.Item>
-
-                              <Form.Item
-                                label="値段"
-                                name={[optionField.name, 'price']}
-                                tooltip="未入力（または0）でも構いません。必要に応じて追加料金を入力してください。"
-                                rules={[{ validator: validatePrice }]}
-                              >
-                                <Input
-                                  className={styles.priceInput}
-                                  placeholder="例: 100"
-                                  inputMode="decimal"
-                                  suffix="円"
-                                />
-                              </Form.Item>
-
-                              <div className={styles.removeButtonLayout}>
-                                <Button
-                                  danger
-                                  size="small"
-                                  type="default"
-                                  onClick={() => removeOption(optionField.name)}
-                                >
-                                  このオプションを削除
-                                </Button>
-                              </div>
-                            </section>
-                          ))}
-
-                          <Button
-                            block
-                            type="dashed"
-                            onClick={() => addOption()}
-                          >
-                            オプションを追加
-                          </Button>
-                        </div>
-                      )}
-                    </Form.List>
-
-                    <div className={styles.removeButtonLayout}>
-                      <Button
-                        danger
-                        size="small"
-                        type="default"
-                        onClick={() => removeItem(itemField.name)}
-                      >
-                        この商品を削除
-                      </Button>
-                    </div>
-                  </section>
-                ))}
-
-                <Button
-                  block
-                  type="dashed"
-                  onClick={() => addItem({ options: [] })}
-                >
-                  商品を追加
-                </Button>
-              </div>
+        {isOpen && (
+          <MenuInfoForm menu={menu} onSubmit={handleUpdate} disabled={isSaving}>
+            {saveError && (
+              <p className={styles.error} role="alert">
+                {saveError}
+              </p>
             )}
-          </Form.List>
-
-          {saveError && (
-            <p className={styles.error} role="alert">
-              {saveError}
-            </p>
-          )}
-
-          <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={() => setOpen(false)}
-              disabled={isSaving}
-            >
-              閉じる
-            </button>
-            <button
-              type="submit"
-              className={styles.updateButton}
-              disabled={isSaving}
-            >
-              {isSaving ? '更新中…' : '更新する'}
-            </button>
-          </div>
-        </Form>
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={() => setOpen(false)}
+                disabled={isSaving}
+              >
+                閉じる
+              </button>
+              <button
+                type="submit"
+                className={styles.updateButton}
+                disabled={isSaving}
+              >
+                {isSaving ? '更新中…' : '更新する'}
+              </button>
+            </div>
+          </MenuInfoForm>
+        )}
       </div>
     </Modal>
   );
