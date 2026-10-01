@@ -1,2 +1,2 @@
-export * from './lib/MenuInfoForm';
-export * from './lib/AdditionalInfoEditor';
+export * from './MenuInfoForm/MenuInfoForm';
+export * from './AdditionalInfoEditor/AdditionalInfoEditor';
