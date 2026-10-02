@@ -1,4 +1,7 @@
-import { MenuInfoForm, type MenuInfo } from '@koudaisai-portal/shared-events26';
+import {
+  MenuInfoForm,
+  type MenuInfo,
+} from '@koudaisai-portal/shared-ui-events26';
 import { Modal } from '@koudaisai/shared-ui';
 import { useEffect, useState } from 'react';
 import styles from './EditMenuInfoModal.module.css';

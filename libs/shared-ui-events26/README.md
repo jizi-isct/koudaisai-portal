@@ -1,4 +1,4 @@
-# @koudaisai-portal/shared-events26
+# @koudaisai-portal/shared-ui-events26
 
 2026 年の企画詳細情報に使う UI コンポーネントです。
 

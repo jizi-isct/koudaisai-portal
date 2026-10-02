@@ -98,7 +98,7 @@ function normalizeMenu(values: MenuFormValues): MenuInfo {
  *
  * @example
  * ```tsx
- * import { MenuInfoForm } from '@koudaisai-portal/shared-events26';
+ * import { MenuInfoForm } from '@koudaisai-portal/shared-ui-events26';
  *
  * <MenuInfoForm menu={menu} onSubmit={saveMenu} disabled={isSaving}>
  *   <button type="submit" disabled={isSaving}>保存する</button>

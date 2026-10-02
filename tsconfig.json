@@ -42,7 +42,7 @@
       "path": "./apps/join"
     },
     {
-      "path": "./libs/shared-events26"
+      "path": "./libs/shared-ui-events26"
     }
   ]
 }

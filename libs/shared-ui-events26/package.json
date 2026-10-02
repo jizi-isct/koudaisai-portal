@@ -1,5 +1,5 @@
 {
-  "name": "@koudaisai-portal/shared-events26",
+  "name": "@koudaisai-portal/shared-ui-events26",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",

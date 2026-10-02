@@ -54,7 +54,7 @@ export type AdditionalInfoEditorProps = {
  *
  * @example
  * ```tsx
- * import { AdditionalInfoEditor } from '@koudaisai-portal/shared-events26';
+ * import { AdditionalInfoEditor } from '@koudaisai-portal/shared-ui-events26';
  *
  * <AdditionalInfoEditor
  *   initialMarkdown={additionalInfo}

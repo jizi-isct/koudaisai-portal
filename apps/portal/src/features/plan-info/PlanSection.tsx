@@ -1,4 +1,4 @@
-import type { MenuInfo } from '@koudaisai-portal/shared-events26';
+import type { MenuInfo } from '@koudaisai-portal/shared-ui-events26';
 import type { GroupRead } from '@koudaisai/shared-types';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import {

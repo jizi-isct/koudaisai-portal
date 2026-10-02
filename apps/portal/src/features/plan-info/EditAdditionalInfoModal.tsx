@@ -1,5 +1,5 @@
 import { Modal } from '@koudaisai/shared-ui';
-import { AdditionalInfoEditor } from '@koudaisai-portal/shared-events26';
+import { AdditionalInfoEditor } from '@koudaisai-portal/shared-ui-events26';
 import { useEffect, useState } from 'react';
 import styles from './EditAdditionalInfoModal.module.css';
 

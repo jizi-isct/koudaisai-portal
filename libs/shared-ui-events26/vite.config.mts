@@ -6,7 +6,7 @@ import * as path from 'path';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/libs/shared-events26',
+  cacheDir: '../../node_modules/.vite/libs/shared-ui-events26',
   plugins: [
     react(),
     dts({
@@ -30,7 +30,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: '@koudaisai-portal/shared-events26',
+      name: '@koudaisai-portal/shared-ui-events26',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
