@@ -7,51 +7,6 @@
   margin: 0 0 16px;
 }
 
-.list,
-.optionList {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.itemCard,
-.optionCard {
-  border: 1px solid var(--gray);
-  border-radius: 8px;
-}
-
-.itemCard {
-  padding: 16px;
-}
-
-.optionCard {
-  background-color: rgb(127 127 127 / 0.04);
-  padding: 12px;
-}
-
-.itemTitle,
-.optionTitle {
-  font-weight: 700;
-  margin: 0 0 12px;
-}
-
-.itemTitle {
-  font-size: 17px;
-}
-
-.optionTitle {
-  font-size: 14px;
-}
-
-.priceInput {
-  width: 100%;
-}
-
-.removeButtonLayout {
-  text-align: right;
-  margin-top: 0.5rem;
-}
-
 .error {
   color: #d4380d;
   font-size: 13px;
@@ -92,10 +47,6 @@
 }
 
 @media (max-width: 600px) {
-  .itemCard {
-    padding: 12px;
-  }
-
   .actions {
     flex-direction: column-reverse;
   }

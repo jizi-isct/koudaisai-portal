@@ -40,6 +40,9 @@
     },
     {
       "path": "./apps/join"
+    },
+    {
+      "path": "./libs/shared-ui-events26"
     }
   ]
 }

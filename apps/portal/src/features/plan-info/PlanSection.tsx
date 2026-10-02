@@ -1,3 +1,4 @@
+import type { MenuInfo } from '@koudaisai-portal/shared-ui-events26';
 import type { GroupRead } from '@koudaisai/shared-types';
 import { Heading1, LoadingScreen } from '@koudaisai/shared-ui';
 import {
@@ -9,7 +10,7 @@ import { useMemo, useState } from 'react';
 import { $api, $events26Api } from '@/features/api/api';
 import { EditPlanInfoModal } from './EditPlanInfoModal';
 import { EditAdditionalInfoModal } from './EditAdditionalInfoModal';
-import { EditMenuInfoModal, type MenuInfo } from './EditMenuInfoModal';
+import { EditMenuInfoModal } from './EditMenuInfoModal';
 import { PlanCard } from './PlanCard';
 import styles from './PlanSection.module.css';
 

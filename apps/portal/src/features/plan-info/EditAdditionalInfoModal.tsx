@@ -1,35 +1,6 @@
-import '@mdxeditor/editor/style.css';
-
-import {
-  AdmonitionDirectiveDescriptor,
-  BlockTypeSelect,
-  BoldItalicUnderlineToggles,
-  CodeToggle,
-  CreateLink,
-  DiffSourceToggleWrapper,
-  InsertTable,
-  InsertThematicBreak,
-  ListsToggle,
-  MDXEditor,
-  type MDXEditorMethods,
-  Separator,
-  StrikeThroughSupSubToggles,
-  UndoRedo,
-  diffSourcePlugin,
-  directivesPlugin,
-  headingsPlugin,
-  imagePlugin,
-  linkDialogPlugin,
-  linkPlugin,
-  listsPlugin,
-  markdownShortcutPlugin,
-  quotePlugin,
-  tablePlugin,
-  thematicBreakPlugin,
-  toolbarPlugin,
-} from '@mdxeditor/editor';
 import { Modal } from '@koudaisai/shared-ui';
-import { useEffect, useRef, useState } from 'react';
+import { AdditionalInfoEditor } from '@koudaisai-portal/shared-ui-events26';
+import { useEffect, useState } from 'react';
 import styles from './EditAdditionalInfoModal.module.css';
 
 type Props = {
@@ -46,9 +17,6 @@ export function EditAdditionalInfoModal({
   additionalInfo,
   updateAdditionalInfo,
 }: Props) {
-  const editorRef = useRef<MDXEditorMethods>(null);
-  const [overlayContainer, setOverlayContainer] =
-    useState<HTMLDivElement | null>(null);
   const [currentMarkdown, setCurrentMarkdown] = useState(additionalInfo);
   const [isSaving, setIsSaving] = useState(false);
   const [editorError, setEditorError] = useState<string | null>(null);
@@ -62,7 +30,6 @@ export function EditAdditionalInfoModal({
     }
 
     setCurrentMarkdown(additionalInfo);
-    editorRef.current?.setMarkdown(additionalInfo);
     setEditorError(null);
     setSaveError(null);
     setIsSaved(false);
@@ -91,63 +58,19 @@ export function EditAdditionalInfoModal({
     <Modal isOpen={isOpen} setOpen={setOpen}>
       <div className={styles.modalContent}>
         <h2 className={styles.title}>企画追加情報を編集</h2>
-        <div ref={setOverlayContainer} className={styles.editorTheme}>
-          <MDXEditor
-            ref={editorRef}
-            className={`${styles.editor} mdxeditor-full-height`}
-            contentEditableClassName={styles.typography}
-            markdown={additionalInfo}
+        {isOpen && (
+          <AdditionalInfoEditor
+            initialMarkdown={additionalInfo}
             onChange={(markdown) => {
               setCurrentMarkdown(markdown);
               setEditorError(null);
               setSaveError(null);
               setIsSaved(false);
             }}
-            onError={({ error: editorError }) => {
-              setEditorError(`Markdownを解析できませんでした: ${editorError}`);
-            }}
-            overlayContainer={overlayContainer}
-            placeholder="企画の追加情報を入力してください"
+            onError={setEditorError}
             readOnly={isSaving}
-            plugins={[
-              toolbarPlugin({
-                toolbarContents: () => (
-                  <DiffSourceToggleWrapper>
-                    <UndoRedo />
-                    <BlockTypeSelect />
-                    <Separator />
-                    <BoldItalicUnderlineToggles />
-                    <StrikeThroughSupSubToggles />
-                    <Separator />
-                    <ListsToggle />
-                    <Separator />
-                    <CreateLink />
-                    <CodeToggle />
-                    <Separator />
-                    <InsertTable />
-                    <InsertThematicBreak />
-                  </DiffSourceToggleWrapper>
-                ),
-              }),
-              imagePlugin(),
-              diffSourcePlugin({
-                diffMarkdown: additionalInfo,
-                viewMode: 'rich-text',
-              }),
-              headingsPlugin({ allowedHeadingLevels: [2, 3, 4] }),
-              listsPlugin(),
-              tablePlugin(),
-              quotePlugin(),
-              thematicBreakPlugin(),
-              linkPlugin(),
-              linkDialogPlugin(),
-              directivesPlugin({
-                directiveDescriptors: [AdmonitionDirectiveDescriptor],
-              }),
-              markdownShortcutPlugin(),
-            ]}
           />
-        </div>
+        )}
 
         {(editorError || saveError) && (
           <p className={styles.error} role="alert">
