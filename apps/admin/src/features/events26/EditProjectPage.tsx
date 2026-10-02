@@ -35,6 +35,7 @@ import {
   PROJECT_TYPE_LABEL,
   putIcon,
 } from './project';
+import { ProjectDetailsEditor } from './ProjectDetailsEditor';
 import { formatTime } from './util';
 import type {
   Category,
@@ -613,6 +614,7 @@ function EditProjectForm({ projectId }: { projectId: string }) {
           対応形式は png / jpeg / gif / webp / heic、正方形で 20MB 以下です。
         </p>
       </Card>
+      <ProjectDetailsEditor key={projectId} projectId={projectId} />
       {contextHolder}
     </>
   );

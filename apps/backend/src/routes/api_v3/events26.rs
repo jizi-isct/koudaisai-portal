@@ -9,6 +9,14 @@ pub fn router() -> OpenApiRouter<super::V3State> {
         .routes(routes!(handlers::post_project))
         .routes(routes!(handlers::put_project, handlers::delete_project))
         .routes(routes!(
+            handlers::put_project_menu,
+            handlers::delete_project_menu
+        ))
+        .routes(routes!(
+            handlers::put_project_additional_info,
+            handlers::delete_project_additional_info
+        ))
+        .routes(routes!(
             handlers::put_own_project_menu,
             handlers::delete_own_project_menu
         ))

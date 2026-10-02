@@ -8,7 +8,8 @@
     "@koudaisai/shared-auth-admin",
     "@koudaisai/shared-types",
     "@koudaisai/shared-ui",
-    "@koudaisai/shared-utils"
+    "@koudaisai/shared-utils",
+    "@koudaisai-portal/shared-events26"
   ],
   "targets": {
     "build": {

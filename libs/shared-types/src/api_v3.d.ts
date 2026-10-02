@@ -253,6 +253,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/events26/projects/{project_id}/details/additional_info': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Store the additional info of the project specified by an administrator. */
+    put: operations['put_project_additional_info'];
+    post?: never;
+    /** @description Delete the additional info of the project specified by an administrator. */
+    delete: operations['delete_project_additional_info'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/events26/projects/{project_id}/icon': {
     parameters: {
       query?: never;
@@ -266,6 +284,24 @@ export interface paths {
     post?: never;
     /** @description Delete a project icon on the events26 API. Succeeds even if no icon is set. */
     delete: operations['delete_project_icon'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/events26/projects/{project_id}/menu': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Store the menu of the project specified by an administrator. */
+    put: operations['put_project_menu'];
+    post?: never;
+    /** @description Delete the menu of the project specified by an administrator. */
+    delete: operations['delete_project_menu'];
     options?: never;
     head?: never;
     patch?: never;
@@ -2529,6 +2565,106 @@ export interface operations {
       };
     };
   };
+  put_project_additional_info: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': string;
+      };
+    };
+    responses: {
+      /** @description Project additional info stored */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Upstream error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  delete_project_additional_info: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Project details deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Upstream error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
   put_project_icon: {
     parameters: {
       query?: never;
@@ -2623,6 +2759,115 @@ export interface operations {
         content?: never;
       };
       /** @description Internal server error. The body carries the upstream status and message. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  put_project_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetProjectDetails200ResponseMenu'];
+      };
+    };
+    responses: {
+      /** @description Project menu stored */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Invalid menu */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Upstream error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+    };
+  };
+  delete_project_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description 企画情報API 側の企画 ID。 */
+        project_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Project details deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+        };
+      };
+      /** @description Upstream error */
       500: {
         headers: {
           [name: string]: unknown;

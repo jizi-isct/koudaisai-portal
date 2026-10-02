@@ -506,9 +506,208 @@ pub async fn delete_own_project_additional_info(
     }
 }
 
+/// openapi-react-query が失敗を検出できるよう、管理者用のエラーには本文を付ける。
+#[http_response]
+pub enum PutProjectMenuResponse {
+    #[response(status = NO_CONTENT, description = "Project menu stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound(String),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden(String),
+    #[response(status = UNPROCESSABLE_ENTITY, description = "Invalid menu")]
+    UnprocessableEntity(String),
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Upstream error")]
+    InternalServerError(String),
+}
+
+#[http_response]
+pub enum PutProjectAdditionalInfoResponse {
+    #[response(status = NO_CONTENT, description = "Project additional info stored")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound(String),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden(String),
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Upstream error")]
+    InternalServerError(String),
+}
+
+#[http_response]
+pub enum DeleteProjectDetailsResponse {
+    #[response(status = NO_CONTENT, description = "Project details deleted")]
+    NoContent,
+    #[response(status = NOT_FOUND, description = "Project not found")]
+    NotFound(String),
+    #[response(status = FORBIDDEN, description = "Forbidden")]
+    Forbidden(String),
+    #[response(status = INTERNAL_SERVER_ERROR, description = "Upstream error")]
+    InternalServerError(String),
+}
+
+#[utoipa::path(
+    put,
+    description = "Store the menu of the project specified by an administrator.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/menu",
+    responses(PutProjectMenuResponse),
+    request_body = GetProjectDetails200ResponseMenu,
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn put_project_menu(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+    Json(body): Json<GetProjectDetails200ResponseMenu>,
+) -> PutProjectMenuResponse {
+    match st
+        .app
+        .events26()
+        .update_project_menu(&actor, &path.project_id, &body)
+        .await
+    {
+        Ok(()) => PutProjectMenuResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PutProjectMenuResponse::Forbidden("Forbidden".to_string())
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateMenuError::NotFound)) => {
+            PutProjectMenuResponse::NotFound("Project not found".to_string())
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateMenuError::InvalidMenu(reason))) => {
+            PutProjectMenuResponse::UnprocessableEntity(detail("update_project_menu", reason))
+        }
+        Err(error) => {
+            PutProjectMenuResponse::InternalServerError(detail("update_project_menu", error))
+        }
+    }
+}
+
+#[utoipa::path(
+    delete,
+    description = "Delete the menu of the project specified by an administrator.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/menu",
+    responses(DeleteProjectDetailsResponse),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn delete_project_menu(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+) -> DeleteProjectDetailsResponse {
+    match st
+        .app
+        .events26()
+        .delete_project_menu(&actor, &path.project_id)
+        .await
+    {
+        Ok(()) => DeleteProjectDetailsResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteProjectDetailsResponse::Forbidden("Forbidden".to_string())
+        }
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteProjectDetailsResponse::NotFound("Project not found".to_string())
+        }
+        Err(error) => {
+            DeleteProjectDetailsResponse::InternalServerError(detail("delete_project_menu", error))
+        }
+    }
+}
+
+#[utoipa::path(
+    put,
+    description = "Store the additional info of the project specified by an administrator.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/details/additional_info",
+    responses(PutProjectAdditionalInfoResponse),
+    request_body(content = String, content_type = "application/json"),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn put_project_additional_info(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+    Json(body): Json<String>,
+) -> PutProjectAdditionalInfoResponse {
+    match st
+        .app
+        .events26()
+        .update_project_additional_info(&actor, &path.project_id, &body)
+        .await
+    {
+        Ok(()) => PutProjectAdditionalInfoResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            PutProjectAdditionalInfoResponse::Forbidden("Forbidden".to_string())
+        }
+        Err(ApplicationOperationError::OperationFailed(UpdateError::NotFound)) => {
+            PutProjectAdditionalInfoResponse::NotFound("Project not found".to_string())
+        }
+        Err(error) => PutProjectAdditionalInfoResponse::InternalServerError(detail(
+            "update_project_additional_info",
+            error,
+        )),
+    }
+}
+
+#[utoipa::path(
+    delete,
+    description = "Delete the additional info of the project specified by an administrator.",
+    params(ProjectPath),
+    path = "/projects/{project_id}/details/additional_info",
+    responses(DeleteProjectDetailsResponse),
+    tag = super::super::EVENTS26_TAG
+)]
+pub async fn delete_project_additional_info(
+    State(st): State<V3State>,
+    actor: ActorContext,
+    Path(path): Path<ProjectPath>,
+) -> DeleteProjectDetailsResponse {
+    match st
+        .app
+        .events26()
+        .delete_project_additional_info(&actor, &path.project_id)
+        .await
+    {
+        Ok(()) => DeleteProjectDetailsResponse::NoContent,
+        Err(ApplicationOperationError::Unauthorized) => {
+            DeleteProjectDetailsResponse::Forbidden("Forbidden".to_string())
+        }
+        Err(ApplicationOperationError::OperationFailed(DeleteError::NotFound)) => {
+            DeleteProjectDetailsResponse::NotFound("Project not found".to_string())
+        }
+        Err(error) => DeleteProjectDetailsResponse::InternalServerError(detail(
+            "delete_project_additional_info",
+            error,
+        )),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn admin_detail_errors_have_response_bodies() {
+        use axum::{body::to_bytes, http::StatusCode, response::IntoResponse};
+
+        let responses = [
+            PutProjectMenuResponse::Forbidden("Forbidden".to_string()).into_response(),
+            PutProjectAdditionalInfoResponse::Forbidden("Forbidden".to_string()).into_response(),
+            DeleteProjectDetailsResponse::NotFound("Project not found".to_string()).into_response(),
+        ];
+        for response in responses {
+            assert!(matches!(
+                response.status(),
+                StatusCode::FORBIDDEN | StatusCode::NOT_FOUND
+            ));
+            assert!(
+                !to_bytes(response.into_body(), usize::MAX)
+                    .await
+                    .unwrap()
+                    .is_empty()
+            );
+        }
+    }
 
     /// 開催場所が空欄の企画は、`place` を持たない JSON として中継されること。
     ///

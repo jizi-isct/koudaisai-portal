@@ -98,6 +98,65 @@ impl<'a, EA: Events26Api> Events26App<'a, EA> {
         Ok(self.events26_api.delete_project_icon(project_id).await?)
     }
 
+    /// 管理者が指定した企画のメニューを保存する。
+    pub async fn update_project_menu(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+        menu: &GetProjectDetails200ResponseMenu,
+    ) -> Result<(), ApplicationOperationError<UpdateMenuError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self
+            .events26_api
+            .update_project_menu(project_id, menu)
+            .await?)
+    }
+
+    /// 管理者が指定した企画のメニューを削除する。
+    pub async fn delete_project_menu(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self.events26_api.delete_project_menu(project_id).await?)
+    }
+
+    /// 管理者が指定した企画の追加情報を保存する。
+    pub async fn update_project_additional_info(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+        additional_info: &str,
+    ) -> Result<(), ApplicationOperationError<UpdateError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self
+            .events26_api
+            .update_project_additional_info(project_id, additional_info)
+            .await?)
+    }
+
+    /// 管理者が指定した企画の追加情報を削除する。
+    pub async fn delete_project_additional_info(
+        &self,
+        actor_ctx: &ActorContext,
+        project_id: &str,
+    ) -> Result<(), ApplicationOperationError<DeleteError>> {
+        if !authz::can_update_events26_project(actor_ctx) {
+            return Err(ApplicationOperationError::Unauthorized);
+        }
+        Ok(self
+            .events26_api
+            .delete_project_additional_info(project_id)
+            .await?)
+    }
+
     /// ログイン中の参加団体自身の企画メニューを保存する。
     /// 企画 ID は所属団体 ID から決定し、呼び出し側には指定させない。
     pub async fn update_own_project_menu(
@@ -196,8 +255,94 @@ mod tests {
         }
     }
 
+    fn admin_ctx(claims: &[&str]) -> ActorContext {
+        ActorContext::Admin {
+            user_id: UserId::new(Uuid::new_v4()),
+            name: "管理者".to_string(),
+            claims: claims.iter().map(|claim| claim.to_string()).collect(),
+        }
+    }
+
     fn menu() -> GetProjectDetails200ResponseMenu {
         GetProjectDetails200ResponseMenu::new(vec![], "販売メニュー".to_string())
+    }
+
+    #[tokio::test]
+    async fn admin_updates_and_deletes_specified_project_details() {
+        let api = MemoryEvents26Api::new();
+        let app = Events26App::new(&api);
+        let actor = admin_ctx(&["koudaisai-portal:admin:events26-project:update"]);
+
+        app.update_project_menu(&actor, "M-200", &menu())
+            .await
+            .unwrap();
+        app.update_project_additional_info(&actor, "M-200", "案内")
+            .await
+            .unwrap();
+        assert_eq!(api.menu("M-200"), Some(menu()));
+        assert_eq!(api.additional_info("M-200").as_deref(), Some("案内"));
+        assert_eq!(api.menu("I-100"), None);
+
+        app.delete_project_menu(&actor, "M-200").await.unwrap();
+        app.delete_project_additional_info(&actor, "M-200")
+            .await
+            .unwrap();
+        assert_eq!(api.menu("M-200"), None);
+        assert_eq!(api.additional_info("M-200"), None);
+    }
+
+    #[tokio::test]
+    async fn specified_project_details_require_admin_update_permission() {
+        let api = MemoryEvents26Api::new();
+        let app = Events26App::new(&api);
+        let actors = [
+            ActorContext::NoLogin,
+            user_ctx(GroupType::GeneralProject),
+            admin_ctx(&["koudaisai-portal:admin:events26-project:create"]),
+        ];
+
+        for actor in actors {
+            assert!(matches!(
+                app.update_project_menu(&actor, "I-100", &menu()).await,
+                Err(ApplicationOperationError::Unauthorized)
+            ));
+            assert!(matches!(
+                app.delete_project_menu(&actor, "I-100").await,
+                Err(ApplicationOperationError::Unauthorized)
+            ));
+            assert!(matches!(
+                app.update_project_additional_info(&actor, "I-100", "案内")
+                    .await,
+                Err(ApplicationOperationError::Unauthorized)
+            ));
+            assert!(matches!(
+                app.delete_project_additional_info(&actor, "I-100").await,
+                Err(ApplicationOperationError::Unauthorized)
+            ));
+        }
+        assert_eq!(api.menu("I-100"), None);
+        assert_eq!(api.additional_info("I-100"), None);
+    }
+
+    #[tokio::test]
+    async fn admin_detail_write_failure_is_returned() {
+        let api = MemoryEvents26Api::new();
+        api.fail_writes();
+        let app = Events26App::new(&api);
+        let actor = admin_ctx(&["koudaisai-portal:admin:events26-project:update"]);
+        assert!(matches!(
+            app.update_project_menu(&actor, "I-100", &menu()).await,
+            Err(ApplicationOperationError::OperationFailed(
+                UpdateMenuError::InternalError(_)
+            ))
+        ));
+        assert!(matches!(
+            app.update_project_additional_info(&actor, "I-100", "案内")
+                .await,
+            Err(ApplicationOperationError::OperationFailed(
+                UpdateError::InternalError(_)
+            ))
+        ));
     }
 
     #[tokio::test]
