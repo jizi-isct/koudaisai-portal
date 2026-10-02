@@ -21,11 +21,26 @@ type MenuFormValues = {
 };
 
 export type MenuInfoFormProps = {
+  /** フォームの初期値。値が変わると入力内容をリセットして反映します。 */
   menu?: MenuInfo;
+  /** 入力検証後のメニューを受け取ります。API による保存は呼び出し元で行います。 */
   onSubmit: (menu: MenuInfo) => void | Promise<void>;
+  /** 保存中などにフォームの入力を無効にします。 */
   disabled?: boolean;
+  /** 利用者の入力変更を通知します。未保存入力の管理に使用できます。 */
   onValuesChange?: () => void;
+  /**
+   * フォームに適用するスタイル。
+   *
+   * @remarks
+   * 次の CSS カスタムプロパティで配色と削除ボタンの位置を調整できます。
+   * - `--menu-card-border-color`: 商品・オプションの枠線の色
+   * - `--menu-item-background`: 商品の背景色
+   * - `--menu-option-background`: オプションの背景色
+   * - `--menu-remove-button-align`: 削除ボタンの配置（`left`、`center`、`right` など）
+   */
   style?: CSSProperties;
+  /** フォーム末尾に表示する内容。保存ボタンなどを配置できます。 */
   children?: ReactNode;
 };
 
@@ -74,7 +89,22 @@ function normalizeMenu(values: MenuFormValues): MenuInfo {
   };
 }
 
-/** 商品、価格、オプションを編集する API 非依存のフォーム。 */
+/**
+ * 商品、価格、オプションを編集するフォーム。
+ *
+ * @remarks
+ * 初期値を `menu` に渡し、検証済みのメニューを `onSubmit` で受け取ります。
+ * モーダルの開閉、API による取得・保存、保存結果の表示は呼び出し元で実装します。
+ *
+ * @example
+ * ```tsx
+ * import { MenuInfoForm } from '@koudaisai-portal/shared-events26';
+ *
+ * <MenuInfoForm menu={menu} onSubmit={saveMenu} disabled={isSaving}>
+ *   <button type="submit" disabled={isSaving}>保存する</button>
+ * </MenuInfoForm>
+ * ```
+ */
 export function MenuInfoForm({
   menu,
   onSubmit,
