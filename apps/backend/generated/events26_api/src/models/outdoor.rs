@@ -19,6 +19,8 @@ pub struct Outdoor {
     pub display_name: String,
     #[serde(rename = "type")]
     pub r#type: OutdoorType,
+    #[serde(rename = "alias", skip_serializing_if = "Option::is_none")]
+    pub alias: Option<String>,
 }
 
 impl Outdoor {
@@ -27,6 +29,7 @@ impl Outdoor {
             name,
             display_name,
             r#type,
+            alias: None,
         }
     }
 }

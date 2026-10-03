@@ -310,6 +310,7 @@ export interface components {
       displayName: string;
       /** @enum {string} */
       type: 'outdoor';
+      alias?: string;
     };
     FoodStallSlot: {
       name: string;
@@ -438,6 +439,7 @@ export interface components {
         | 'main.mb.m-b101'
         | 'main.mb.m-b104'
         | 'main.mb.m-b107'
+        | 'main.art-street'
         | 'main.fs-honkan-main'
         | 'main.fs-honkan-main.1'
         | 'main.fs-honkan-main.2'
@@ -866,6 +868,7 @@ export interface operations {
               | 'main.mb.m-b101'
               | 'main.mb.m-b104'
               | 'main.mb.m-b107'
+              | 'main.art-street'
               | 'main.fs-honkan-main'
               | 'main.fs-honkan-main.1'
               | 'main.fs-honkan-main.2'
@@ -1181,6 +1184,7 @@ export interface operations {
           | 'main.mb.m-b101'
           | 'main.mb.m-b104'
           | 'main.mb.m-b107'
+          | 'main.art-street'
           | 'main.fs-honkan-main'
           | 'main.fs-honkan-main.1'
           | 'main.fs-honkan-main.2'

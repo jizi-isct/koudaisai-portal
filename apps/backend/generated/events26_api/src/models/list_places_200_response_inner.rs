@@ -201,6 +201,8 @@ pub enum ListPlaces200ResponseInnerId {
     MainMbMB104,
     #[serde(rename = "main.mb.m-b107")]
     MainMbMB107,
+    #[serde(rename = "main.art-street")]
+    MainArtStreet,
     #[serde(rename = "main.fs-honkan-main")]
     MainFsHonkanMain,
     #[serde(rename = "main.fs-honkan-main.1")]
